@@ -58,18 +58,17 @@ export default function HowItWorks() {
             <span className="font-bold">têxteis desviados de aterro e CO₂</span>{" "}
             evitado, facilitando decisões sustentáveis e baseadas em dados.
           </p>
-          <Button
-            className="mt-4 text-primary text-md border-2 border-primary hover:bg-gradient-to-r hover:from-secondary hover:to-primary hover:text-white hover:border-transparent"
-            variant="outline"
-          >
-            Explora as soluções
-          </Button>
-          <Button
-            className="mt-4 text-primary text-md border-2 border-primary hover:bg-gradient-to-r hover:from-secondary hover:to-primary hover:text-white hover:border-transparent"
-            variant="outline"
-          >
-            Descarregar pdf*
-          </Button>
+          <div className="flex flex-col md:flex-row gap-4">
+            <Button
+              className="mt-4 text-primary text-md border-2 border-primary hover:bg-gradient-to-r hover:from-secondary hover:to-primary hover:text-white hover:border-transparent"
+              variant="outline"
+            >
+              Explora as soluções
+            </Button>
+            <a className="mt-5 text-primary text-md underline bold" href="">
+              Descarregar pdf*
+            </a>
+          </div>
         </div>
       </div>
     </section>

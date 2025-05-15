@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { Button } from "../ui/button";
 
 export const Header = () => {
   return (
@@ -17,8 +18,10 @@ export const Header = () => {
         <nav className="flex justify-between items-center  pr-14 gap-14">
           <div className="flex items-center">Como Funciona</div>
           <div className="flex items-center">Sobre nós</div>
-          <div className="flex items-center bg-gradient-horizontal text-white">
-            Descobre Mais
+          <div className="flex items-center">
+            <Button className="text-md bg-gradient-horizontal p-4 pt-5 pb-5  text-white">
+              Descobre mais
+            </Button>
           </div>
         </nav>
       </div>
