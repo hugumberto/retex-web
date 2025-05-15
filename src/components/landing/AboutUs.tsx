@@ -1,8 +1,8 @@
 export default function AboutUs() {
   return (
-    <section className="bg-gray-100 py-16 px-4">
+    <section className="bg-gray-100 py-16 px-4 font-family-poppins">
       <div className="max-w-5xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-6">Sobre nós</h2>
+        <h1 className="text-3xl font-bold mb-6 text-primary">Sobre nós</h1>
         <p className="text-sm max-w-3xl mx-auto">
           Sabias que todos os anos, mais de 92 milhões de toneladas de têxteis
           vão parar ao lixo? Em{" "}
