@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "projects": {
+    "landing-page": {
+      "root": "apps/landing-page",
+      "sourceRoot": "apps/landing-page/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/next:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/landing-page"
+          },
+          "configurations": {
+            "production": {
+              "dev": false
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/next:server",
+          "options": {
+            "buildTarget": "landing-page:build",
+            "dev": true
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "landing-page:build:production"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/landing-page/**/*.{ts,tsx,js,jsx}"]
+          }
+        }
+      }
+    }
+  }
+}
