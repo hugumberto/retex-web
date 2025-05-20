@@ -28,6 +28,8 @@
     "@nx/js": "21.0.3",
     "@nx/next": "21.0.3",
     "@nx/playwright": "21.0.3",
+    "@typescript-eslint/eslint-plugin": "8.32.1",
+    "@typescript-eslint/parser": "8.32.1",
     "tw-animate-css": "1.3.0"
   }
 }
