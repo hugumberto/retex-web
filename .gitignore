@@ -1,10 +1,9 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # compiled output
 dist
-target
 tmp
-/out-tsc
+out-tsc
 
 # dependencies
 node_modules
@@ -19,7 +18,7 @@ node_modules
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -33,7 +32,7 @@ node_modules
 npm-debug.log
 yarn-error.log
 testem.log
-
+/typings
 
 # System Files
 .DS_Store
@@ -45,3 +44,8 @@ Thumbs.db
 # Next.js
 .next
 out
+
+test-output
+
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md

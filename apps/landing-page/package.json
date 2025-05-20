@@ -1,0 +1,26 @@
+{
+  "name": "@retex-web/landing-page",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "landing-page"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "1.2.2",
+    "@tailwindcss/postcss": "4.1.7",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "0.511.0",
+    "next": "~15.2.4",
+    "postcss": "8.5.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-hook-form": "7.56.4",
+    "tailwind-merge": "3.3.0",
+    "tailwindcss": "4.1.7"
+  },
+  "devDependencies": {
+    "@nrwl/next": "19.8.4",
+    "tw-animate-css": "1.3.0"
+  }
+}
