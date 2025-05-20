@@ -6,13 +6,13 @@
       "projectType": "application",
       "targets": {
         "build": {
-          "executor": "@nrwl/next:build",
+          "executor": "@nx/next:build",
           "options": {
             "outputPath": "dist/apps/landing-page"
           }
         },
         "serve": {
-          "executor": "@nrwl/next:server",
+          "executor": "@nx/next:server",
           "options": {
             "buildTarget": "landing-page:build",
             "dev": true
