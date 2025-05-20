@@ -1,0 +1,95 @@
+{
+  "extends": ["./.eslintrc.base.json"],
+  "rules": {
+    "no-param-reassign": "off",
+    "promise/prefer-await-to-then": "off",
+    "no-void": "off"
+  },
+  "ignorePatterns": [
+    "**/*.config.ts",
+    "**/*.config.js",
+    "**/jest.preset.js",
+    "dist/**/*",
+    "**/*.d.ts",
+    "bin/**/*"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "@nx/enforce-module-boundaries": [
+          "error",
+          {
+            "enforceBuildableLibDependency": true,
+            "allow": [],
+            "depConstraints": [
+              {
+                "sourceTag": "*",
+                "onlyDependOnLibsWithTags": ["*"]
+              }
+            ]
+          }
+        ],
+        "functional/prefer-immutable-types": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-argument": "warn",
+        "max-params": ["error", 3]
+      }
+    },
+    {
+      "files": ["typings/**/*.d.ts"],
+      "rules": {
+        "import/no-default-export": "off",
+        "no-restricted-syntax": "off"
+      }
+    },
+    {
+      "files": ["**/*.{ts,tsx}"],
+      "rules": {
+        "functional/prefer-immutable-types": "off",
+        "max-params": ["error", 3]
+      }
+    },
+    {
+      "files": ["**/*.js"],
+      "rules": {
+        "functional/prefer-immutable-types": "off",
+        "max-params": ["error", 3]
+      }
+    },
+    {
+      "files": ["*.test.ts", "*.spec.jsx"],
+      "env": {
+        "jest": true
+      },
+      "rules": {},
+      "parserOptions": {
+        "project": ["./tsconfig.spec.json"]
+      }
+    },
+    {
+      "files": ["**/*.tsx"],
+      "rules": {
+        "import/no-unassigned-import": [
+          "error",
+          {
+            "allow": ["**/*.css"]
+          }
+        ]
+      }
+    }
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": ["tsconfig.json"]
+      },
+      "node": {
+        "project": ["tsconfig.json"]
+      }
+    }
+  }
+}

@@ -1,9 +1,9 @@
-import Hero from '@/components/landing/Hero';
-import HowItWorks from '@/components/landing/HowItWorks';
-import AboutUs from '@/components/landing/AboutUs';
-import ContactForm from '@/components/landing/ContactForm';
-import FAQ from '@/components/landing/FAQ';
-import { Header } from '@/components/landing/Header';
+import Hero from '../components/landing/Hero';
+import HowItWorks from '../components/landing/HowItWorks';
+import AboutUs from '../components/landing/AboutUs';
+import ContactForm from '../components/landing/ContactForm';
+import FAQ from '../components/landing/FAQ';
+import { Header } from '../components/landing/Header';
 
 export default function Home() {
   return (

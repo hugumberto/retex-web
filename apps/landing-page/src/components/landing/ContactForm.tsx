@@ -1,13 +1,13 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
+'use client';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { useForm } from 'react-hook-form';
 
 export default function ContactForm() {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = (data: unknown) => {
-    console.log("Form data:", data);
+    console.log('Form data:', data);
   };
 
   return (
@@ -17,20 +17,20 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             placeholder="Nome*"
-            {...register("nome", { required: "Nome é obrigatório" })}
+            {...register('nome', { required: 'Nome é obrigatório' })}
           />
           <Input
             placeholder="Email*"
             type="email"
-            {...register("email", { required: "Email é obrigatório" })}
+            {...register('email', { required: 'Email é obrigatório' })}
           />
           <Input
             placeholder="Telemóvel*"
-            {...register("telefone", { required: "Telemóvel é obrigatório" })}
+            {...register('telefone', { required: 'Telemóvel é obrigatório' })}
           />
           <Input
             placeholder="Assunto*"
-            {...register("assunto", { required: "Assunto é obrigatório" })}
+            {...register('assunto', { required: 'Assunto é obrigatório' })}
           />
           <Button type="submit">Submeter</Button>
         </form>

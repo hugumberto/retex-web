@@ -1,7 +1,38 @@
 {
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
-  "files": [],
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "target": "ES2017",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["ESNext", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types"],
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "strictNullChecks": true,
+    "paths": {
+      "*": ["typings/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "./**/*.config.ts",
+    "**/*.d.ts",
+    "target",
+    "**/*.test.ts"
+  ],
+  "include": ["**/*.ts", "**/*.tsx"],
   "references": [
     {
       "path": "./apps/landing-page"

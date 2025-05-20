@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '../../components/ui/card';
 
 export default function FAQ() {
   return (
@@ -8,11 +8,11 @@ export default function FAQ() {
       </h2>
       <div className="max-w-md mx-auto space-y-2">
         {[
-          "O que é a RETEX?",
-          "Como posso contribuir para a RETEX?",
-          "O que acontece às roupas recolhidas?",
-          "A RETEX só trabalha com roupa usada?",
-          "Como posso trabalhar convosco?"
+          'O que é a RETEX?',
+          'Como posso contribuir para a RETEX?',
+          'O que acontece às roupas recolhidas?',
+          'A RETEX só trabalha com roupa usada?',
+          'Como posso trabalhar convosco?',
         ].map((q, i) => (
           <Card key={i} className="cursor-pointer hover:shadow-md">
             <CardContent className="p-4 flex justify-between items-center">
