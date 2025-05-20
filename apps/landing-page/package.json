@@ -20,7 +20,9 @@
     "tailwindcss": "4.1.7"
   },
   "devDependencies": {
+    "@nrwl/js": "19.8.4",
     "@nrwl/next": "19.8.4",
+    "@nx/js": "21.0.3",
     "tw-animate-css": "1.3.0"
   }
 }
