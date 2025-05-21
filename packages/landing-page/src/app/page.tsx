@@ -1,17 +1,19 @@
+import styles from './page.module.css';
+
 export default function Index() {
   /*
    * Replace the elements below with your own.
    *
-   * Note: The corresponding styles are in the ./index.tailwind file.
+   * Note: The corresponding styles are in the ./index.css file.
    */
   return (
-    <div>
+    <div className={styles.page}>
       <div className="wrapper">
         <div className="container">
           <div id="welcome">
             <h1>
               <span> Hello there, </span>
-              Welcome @retex-web/landing-page 👋
+              Welcome @retex-web/apps 👋
             </h1>
           </div>
 
@@ -48,7 +50,7 @@ export default function Index() {
           </div>
 
           <div id="middle-content">
-            <div id="learning-materials" className="rounded shadow-sm">
+            <div id="learning-materials" className="rounded shadow">
               <h2>Learning materials</h2>
               <a
                 href="https://nx.dev/getting-started/intro?utm_source=nx-project"
@@ -237,7 +239,7 @@ export default function Index() {
             <div id="other-links">
               <a
                 id="nx-console"
-                className="button-pill rounded-sm shadow-sm"
+                className="button-pill rounded shadow"
                 href="https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console&utm_source=nx-project"
                 target="_blank"
                 rel="noreferrer"
@@ -258,7 +260,7 @@ export default function Index() {
               </a>
               <a
                 id="nx-console-jetbrains"
-                className="button-pill rounded-sm shadow-sm"
+                className="button-pill rounded shadow"
                 href="https://plugins.jetbrains.com/plugin/21060-nx-console"
                 target="_blank"
                 rel="noreferrer"
@@ -290,7 +292,7 @@ export default function Index() {
                   </span>
                 </span>
               </a>
-              <div id="nx-cloud" className="rounded shadow-sm">
+              <div id="nx-cloud" className="rounded shadow">
                 <div>
                   <svg
                     id="nx-cloud-logo"
@@ -330,7 +332,7 @@ export default function Index() {
               </div>
               <a
                 id="nx-repo"
-                className="button-pill rounded-sm shadow-sm"
+                className="button-pill rounded shadow"
                 href="https://github.com/nrwl/nx?utm_source=nx-project"
                 target="_blank"
                 rel="noreferrer"
@@ -351,7 +353,7 @@ export default function Index() {
             </div>
           </div>
 
-          <div id="commands" className="rounded shadow-sm">
+          <div id="commands" className="rounded shadow">
             <h2>Next steps</h2>
             <p>Here are some things you can do with Nx:</p>
             <details>
@@ -395,7 +397,7 @@ export default function Index() {
                 </svg>
                 View project details
               </summary>
-              <pre>nx show project @retex-web/landing-page --web</pre>
+              <pre>nx show project @retex-web/apps --web</pre>
             </details>
             <details>
               <summary>
