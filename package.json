@@ -2,7 +2,9 @@
   "name": "@retex-web/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start:web": "nx dev landing-page"
+  },
   "private": true,
   "devDependencies": {
     "@eslint/compat": "^1.1.1",
