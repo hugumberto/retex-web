@@ -11,7 +11,7 @@ export default function Index() {
           <div id="welcome">
             <h1>
               <span> Hello there, </span>
-              Welcome @retex-web/retex-portal 👋
+              Welcome @retex-web/landing-page 👋
             </h1>
           </div>
 
@@ -395,7 +395,7 @@ export default function Index() {
                 </svg>
                 View project details
               </summary>
-              <pre>nx show project @retex-web/retex-portal --web</pre>
+              <pre>nx show project @retex-web/landing-page --web</pre>
             </details>
             <details>
               <summary>
