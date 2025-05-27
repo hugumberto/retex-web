@@ -16,7 +16,7 @@ export default function Home() {
         <ContactForm />
         <FAQ />
       </div>
-      <footer className="text-xs text-center text-gray-400 py-6">
+      <footer className="text-xs text-center text-white  bg-gradient-horizontal py-6">
         <p>
           Política de Privacidade | Política de Cookies | Livro de Reclamações
           Online

@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
@@ -66,6 +67,11 @@ export default function HowItWorks() {
             <Button
               className="mt-4 text-primary text-md border-2 border-primary hover:bg-gradient-to-r hover:from-secondary hover:to-primary hover:text-white hover:border-transparent"
               variant="outline"
+              onClick={() =>
+                document
+                  .getElementById('contact-form')
+                  ?.scrollIntoView({ behavior: 'smooth' })
+              }
             >
               Explora as soluções
             </Button>

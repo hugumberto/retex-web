@@ -1,3 +1,4 @@
+'use client';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 export default function Hero() {
@@ -5,8 +6,10 @@ export default function Hero() {
     <section className="font-family-poppins ">
       <div className="relative min-w-full bg-cover bg-center text-white  bg-gradient-horizontal ">
         <div
-          className="flex h-[450px]  items-center"
-          style={{ backgroundImage: 'url(/assets/hero.png)' }}
+          className="flex flex-row w-full h-[450px] items-center gap-[44px] px-4
+    bg-[url('/assets/hero-mobile.png')] 
+    md:bg-[url('/assets/hero.png')]
+    bg-cover bg-center"
         >
           <div className="max-w-6xl md:ml-20  m-4">
             <h1 className="text-2xl md:text-5xl font-bold">
@@ -68,7 +71,14 @@ export default function Hero() {
           </p>
         </div>
         <div className="flex flex-col max-w-64">
-          <Button className="w-52 text-md bg-gradient-horizontal p-4 pt-6 pb-6  text-white">
+          <Button
+            className="w-52 text-md bg-gradient-horizontal p-4 pt-6 pb-6  text-white"
+            onClick={() =>
+              document
+                .getElementById('contact-form')
+                ?.scrollIntoView({ behavior: 'smooth' })
+            }
+          >
             Agendar Recolha
           </Button>
         </div>
