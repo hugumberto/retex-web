@@ -5,12 +5,16 @@ export default function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="py-16 px-4 font-family-poppins gap-24 flex flex-col text-primary "
+      className="py-16 px-8 font-family-poppins md:gap-24 flex flex-col text-primary gap-12"
     >
-      <h1 className="text-5xl font-bold text-center mb-12 ">Como funciona</h1>
+      <h1 className="text-4xl md:text-5xl font-bold text-center  ">
+        Como funciona
+      </h1>
       <div className="max-w-5xl mx-auto flex flex-col-reverse md:flex-row gap-12 justify-center items-center">
         <div>
-          <h2 className="text-3xl font-bold text-primary">Particulares</h2>
+          <h2 className="text-3xl font-bold text-primary text-center md:text-justify">
+            Particulares
+          </h2>
           <p className="mt-4 text-md">
             Tens roupa que já não usas?{' '}
             <strong>Dá-lhe um novo propósito!</strong>
@@ -18,12 +22,6 @@ export default function HowItWorks() {
             Se tens roupas em bom estado que já não usas, a RETEX ajuda-te a
             encaminhá-las para reutilização.
           </p>
-          <Button
-            className="mt-4 text-primary text-md  border-2 border-primary hover:bg-gradient-to-r hover:from-secondary hover:to-primary hover:text-white hover:border-transparent"
-            variant="outline"
-          >
-            Sabe como doar
-          </Button>
         </div>
 
         <Image
@@ -31,7 +29,7 @@ export default function HowItWorks() {
           alt="Logo"
           width={600}
           height={510}
-          className="object-cover a"
+          className="object-cover w-2xl/2 h-auto"
         />
       </div>
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-12">
@@ -40,10 +38,12 @@ export default function HowItWorks() {
           alt="Logo"
           width={600}
           height={510}
-          className="object-cover a"
+          className="object-cover w-2xl/2 h-auto"
         />
         <div>
-          <h3 className="text-3xl font-bold text-primary">Empresas</h3>
+          <h3 className="text-3xl font-bold text-primary text-center md:text-justify">
+            Empresas
+          </h3>
           <p className="mt-4 text-md">
             A nossa solução{' '}
             <span className="font-bold">
@@ -52,7 +52,10 @@ export default function HowItWorks() {
               ativos digitais{' '}
             </span>{' '}
             que refletem o impacto positivo de doações têxteis e podem ser
-            usados para compensar emissões. Além disso, disponibilizamos{' '}
+            usados para compensar emissões.{' '}
+          </p>{' '}
+          <p className="mt-4 text-md">
+            Além disso, disponibilizamos{' '}
             <span className="font-bold"> dashboards ESG</span> e{' '}
             <span className="font-bold">analíticos</span> que monitorizam
             indicadores como{' '}
@@ -66,9 +69,6 @@ export default function HowItWorks() {
             >
               Explora as soluções
             </Button>
-            <a className="mt-5 text-primary text-md underline bold" href="">
-              Descarregar pdf*
-            </a>
           </div>
         </div>
       </div>

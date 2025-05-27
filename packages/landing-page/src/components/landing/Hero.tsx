@@ -2,13 +2,13 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 export default function Hero() {
   return (
-    <section className="font-family-poppins">
+    <section className="font-family-poppins ">
       <div className="relative min-w-full bg-cover bg-center text-white  bg-gradient-horizontal ">
         <div
           className="flex h-[450px]  items-center"
           style={{ backgroundImage: 'url(/assets/hero.png)' }}
         >
-          <div className="max-w-6xl md:ml-32  ml-8">
+          <div className="max-w-6xl md:ml-20  m-4">
             <h1 className="text-2xl md:text-5xl font-bold">
               wear.care.share.repeat
             </h1>
@@ -22,44 +22,48 @@ export default function Hero() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row ml-[10%] w-[80%] mt-12  items-center text-primary gap-12 md:gap-28 ">
-        <div className="flex flex-col max-w-64">
+      <div className="w-full flex flex-col md:flex-row justify-center items-center  mt-12  items-center text-primary gap-12 md:gap-28  ">
+        <div className="flex flex-col max-w-64 relative">
           <Image
             src="/assets/formulario.png"
             alt="Logo"
             width={51}
             height={55}
-            className="mx-auto mb-4"
+            className="mx-auto absolute top-0 left-0 right-0"
           />
-          <h4 className="font-bold mx-auto mb-4">Preenche o formulário</h4>
-          <p className="text-md ms-8 max-w-xs">
+          <h4 className="font-bold mx-auto  mt-16 min-h-8">
+            Preenche o formulário
+          </h4>
+          <p className="text-md ms-8 max-w-xs md:min-h-36">
             Preenche o formulário que se encontra no{' '}
             <strong>fundo da página</strong>.
           </p>
         </div>
-        <div className="flex flex-col max-w-64">
+        <div className="flex flex-col max-w-64 relative">
           <Image
             src="/assets/recolha.png"
             alt="Logo"
             width={51}
             height={55}
-            className="mx-auto mb-4"
+            className="mx-auto absolute top-0 left-0 right-0"
           />
-          <h4 className="font-bold mx-auto mb-4">Agenda a tua recolha</h4>
-          <p className="text-md ms-8 max-w-xs">
+          <h4 className="font-bold mx-auto  mt-16 min-h-8">
+            Agenda a tua recolha
+          </h4>
+          <p className="text-md ms-8 max-w-xs md:min-h-36">
             Menciona o local e a hora mais indicado para ti.
           </p>
         </div>
-        <div className="flex flex-col max-w-64">
+        <div className="flex flex-col max-w-64 relative">
           <Image
             src="/assets/agora_connosco.png"
             alt="Logo"
             width={51}
             height={55}
-            className="mx-auto mb-4"
+            className="mx-auto absolute top-0 left-0 right-0"
           />
-          <h4 className="font-bold mx-auto mb-4">Agora é connosco</h4>
-          <p className="text-md ms-8 max-w-xs">
+          <h4 className="font-bold mx-auto  mt-16 min-h-8">Agora é connosco</h4>
+          <p className="text-md ms-8 max-w-xs md:min-h-36">
             Espera que um dos nossos transportadores entre em contancto contigo.
           </p>
         </div>
