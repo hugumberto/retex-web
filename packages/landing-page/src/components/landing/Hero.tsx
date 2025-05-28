@@ -67,10 +67,10 @@ export default function Hero() {
           />
           <h4 className="font-bold mx-auto  mt-16 min-h-8">Agora é connosco</h4>
           <p className="text-md ms-8 max-w-xs md:min-h-36">
-            Espera que um dos nossos transportadores entre em contancto contigo.
+            Espera que um dos nossos transportadores entre em contacto contigo.
           </p>
         </div>
-        <div className="flex flex-col max-w-64">
+        <div className="flex flex-col max-w-64 md:min-h-44">
           <Button
             className="w-52 text-md bg-gradient-horizontal p-4 pt-6 pb-6  text-white"
             onClick={() =>
