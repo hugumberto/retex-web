@@ -51,7 +51,6 @@ export default function Formulario() {
     handleSubmit,
     control,
     setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm<FormUserData>();
