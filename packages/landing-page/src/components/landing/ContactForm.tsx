@@ -59,7 +59,7 @@ export default function Formulario() {
 
   const onSubmit = async (data: FormUserData) => {
     try {
-      const res = await fetch('https://retex-api.onrender.com/user', {
+      const res = await fetch(`${process.env.API_URL}user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -88,7 +88,7 @@ export default function Formulario() {
     const postalCode = e.target.value;
     try {
       const res = await fetch(
-        `https://api.tomtom.com/search/2/search/${postalCode}.json?typeahead=false&limit=1&countrySet=pt&extendedPostalCodesFor=addr&minFuzzyLevel=1&maxFuzzyLevel=2&view=Unified&relatedPois=off&key=ktakzXgOEbsE0vJS1WO3wm8bPlHRcDn9`
+        `${process.env.TOMTOM_API_URL}${postalCode}.json?typeahead=false&limit=1&countrySet=pt&extendedPostalCodesFor=addr&minFuzzyLevel=1&maxFuzzyLevel=2&view=Unified&relatedPois=off&key=${process.env.TOMTOM_API_KEY}`
       );
       if (!res.ok) throw new Error('Erro ao buscar endereço');
       const { results } = await res.json();
