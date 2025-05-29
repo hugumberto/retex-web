@@ -56,10 +56,12 @@ export default function Formulario() {
   } = useForm<FormUserData>();
   const [formData, setFormData] = useState<FormUserData>();
   const [mensagem, setMensagem] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: FormUserData) => {
+    setIsSubmitting(true);
     try {
-      const res = await fetch('https://retex-api.onrender.com/user', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -79,6 +81,8 @@ export default function Formulario() {
     } catch (e) {
       setMensagem('Erro ao enviar o formulário.');
       console.error(e);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -88,7 +92,7 @@ export default function Formulario() {
     const postalCode = e.target.value;
     try {
       const res = await fetch(
-        `https://api.tomtom.com/search/2/search/${postalCode}.json?typeahead=false&limit=1&countrySet=pt&extendedPostalCodesFor=addr&minFuzzyLevel=1&maxFuzzyLevel=2&view=Unified&relatedPois=off&key=ktakzXgOEbsE0vJS1WO3wm8bPlHRcDn9`
+        `${process.env.NEXT_PUBLIC_TOMTOM_API_URL}${postalCode}.json?typeahead=false&limit=1&countrySet=pt&extendedPostalCodesFor=addr&minFuzzyLevel=1&maxFuzzyLevel=2&view=Unified&relatedPois=off&key=${process.env.NEXT_PUBLIC_TOMTOM_API_KEY}`
       );
       if (!res.ok) throw new Error('Erro ao buscar endereço');
       const { results } = await res.json();
@@ -345,8 +349,13 @@ export default function Formulario() {
           <Button
             type="submit"
             className="w-64 text-md bg-gradient-horizontal mt-8 p-4 pt-6 pb-6 text-white"
+            disabled={isSubmitting}
           >
-            Submeter
+            {isSubmitting ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              'Submeter'
+            )}
           </Button>
         </form>
       </div>
