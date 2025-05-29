@@ -56,8 +56,10 @@ export default function Formulario() {
   } = useForm<FormUserData>();
   const [formData, setFormData] = useState<FormUserData>();
   const [mensagem, setMensagem] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: FormUserData) => {
+    setIsSubmitting(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}user`, {
         method: 'POST',
@@ -79,6 +81,8 @@ export default function Formulario() {
     } catch (e) {
       setMensagem('Erro ao enviar o formulário.');
       console.error(e);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -345,8 +349,13 @@ export default function Formulario() {
           <Button
             type="submit"
             className="w-64 text-md bg-gradient-horizontal mt-8 p-4 pt-6 pb-6 text-white"
+            disabled={isSubmitting}
           >
-            Submeter
+            {isSubmitting ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              'Submeter'
+            )}
           </Button>
         </form>
       </div>
