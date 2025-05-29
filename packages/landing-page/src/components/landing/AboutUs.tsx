@@ -17,7 +17,7 @@ export default function AboutUs() {
               Portugal, são mais de 200 mil toneladas descartadas como resíduos
               urbanos
             </strong>
-            . O problema não pára de crescer, mas nós temos uma solução.
+            . O problema não para de crescer, mas nós temos uma solução.
           </p>
           <p className="text-sm max-w-3xl mx-auto">
             Apresentamos a RETEX, uma{' '}
@@ -36,7 +36,7 @@ export default function AboutUs() {
           </p>
         </div>
       </div>
-      <div className="w-full flex flex-col md:flex-row justify-center items-center  mt-12  items-center text-primary gap-12 md:gap-28  ">
+      <div className="w-full flex flex-col md:flex-row justify-center items-center  mt-12   text-primary gap-12 md:gap-28  ">
         <div className="flex flex-col max-w-64 relative">
           <Image
             src="/assets/sustentavel.png"

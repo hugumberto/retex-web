@@ -1,0 +1,19 @@
+{
+  "cSpell.language": "en,pt", // or any languages you want
+  "cSpell.enabled": true,
+  "cSpell.words": [
+    "epg",
+    "localhost",
+    "Modara",
+    "Nextjs",
+    "Retex",
+    "tailwindcss"
+  ],
+  "cSpell.ignorePaths": [
+    "node_modules",
+    "dist",
+    "build",
+    "**/*.json",
+    "**/*.lock"
+  ]
+}

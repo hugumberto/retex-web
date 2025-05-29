@@ -76,8 +76,9 @@ export default function Formulario() {
       reset();
       setValue('dayOfWeek', '');
       setValue('timeOfDay', '');
-    } catch (error) {
+    } catch (e) {
       setMensagem('Erro ao enviar o formulário.');
+      console.error(e);
     }
   };
 
@@ -314,7 +315,7 @@ export default function Formulario() {
                 {...register('address.cityDivision')}
               />
               <Input
-                placeholder="Conselho"
+                placeholder="Concelho"
                 disabled
                 {...register('address.city')}
               />
@@ -327,13 +328,16 @@ export default function Formulario() {
 
             <div className="flex flex-col md:flex-row gap-4">
               <div className="w-full">
-                <Input placeholder="Número" {...register('address.number')} />
+                <Input
+                  placeholder="Nº edifício/porta"
+                  {...register('address.number')}
+                />
                 {errors.address?.number && (
                   <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
                 )}
               </div>
               <Input
-                placeholder="Complemento"
+                placeholder="Complemento Modara (opcional)"
                 {...register('address.complement')}
               />
             </div>

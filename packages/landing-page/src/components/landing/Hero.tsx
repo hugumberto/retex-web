@@ -25,7 +25,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
-      <div className="w-full flex flex-col md:flex-row justify-center items-center  mt-12  items-center text-primary gap-12 md:gap-28  ">
+      <div className="w-full flex flex-col md:flex-row justify-center items-center  mt-12  text-primary gap-12 md:gap-28  ">
         <div className="flex flex-col max-w-64 relative">
           <Image
             src="/assets/formulario.png"
