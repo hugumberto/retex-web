@@ -35,11 +35,11 @@ interface FormUserData {
 }
 
 const diasDaSemana = [
-  'Segunda',
-  'Terça',
-  'Quarta',
-  'Quinta',
-  'Sexta',
+  'Segunda-Feira',
+  'Terça-Feira',
+  'Quarta-Feira',
+  'Quinta-Feira',
+  'Sexta-Feira',
   'Sábado',
   'Domingo',
 ];
@@ -170,7 +170,7 @@ export default function Formulario() {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="w-full">
                 <Input
-                  placeholder="Nome"
+                  placeholder="Nome*"
                   className={errors.firstName ? 'border-red-500' : ''}
                   {...register('firstName', { required: 'Campo obrigatório' })}
                 />
@@ -180,7 +180,7 @@ export default function Formulario() {
               </div>
               <div className="w-full">
                 <Input
-                  placeholder="Apelido"
+                  placeholder="Apelido*"
                   className={errors.lastName ? 'border-red-500' : ''}
                   {...register('lastName', { required: 'Campo obrigatório' })}
                 />
@@ -193,7 +193,7 @@ export default function Formulario() {
             {/* Email */}
             <div>
               <Input
-                placeholder="Email"
+                placeholder="Email*"
                 type="email"
                 className={errors.email ? 'border-red-500' : ''}
                 {...register('email', { required: 'Campo obrigatório' })}
@@ -207,7 +207,7 @@ export default function Formulario() {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="w-full">
                 <Input
-                  placeholder="Contacto"
+                  placeholder="Contacto*"
                   className={errors.contactPhone ? 'border-red-500' : ''}
                   {...register('contactPhone', {
                     required: 'Campo obrigatório',
@@ -219,7 +219,7 @@ export default function Formulario() {
               </div>
               <div className="w-full">
                 <Input
-                  placeholder="NIF"
+                  placeholder="NIF*"
                   className={errors.nif ? 'border-red-500' : ''}
                   {...register('nif', { required: 'Campo obrigatório' })}
                 />
@@ -244,7 +244,7 @@ export default function Formulario() {
                         <SelectTrigger
                           className={errors.dayOfWeek ? 'border-red-500' : ''}
                         >
-                          <SelectValue placeholder="Dia da Semana" />
+                          <SelectValue placeholder="Dia da Semana*" />
                         </SelectTrigger>
                         <SelectContent>
                           {diasDaSemana.map((dia) => (
@@ -333,7 +333,7 @@ export default function Formulario() {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="w-full">
                 <Input
-                  placeholder="Nº edifício/porta"
+                  placeholder="Nº edifício/porta*"
                   {...register('address.number')}
                 />
                 {errors.address?.number && (
@@ -341,7 +341,7 @@ export default function Formulario() {
                 )}
               </div>
               <Input
-                placeholder="Complemento Modara (opcional)"
+                placeholder="Complemento Morada (opcional)"
                 {...register('address.complement')}
               />
             </div>
