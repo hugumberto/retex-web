@@ -23,6 +23,19 @@ export default function HowItWorks() {
             Se tens roupas em bom estado que já não usas, a RETEX ajuda-te a
             encaminhá-las para reutilização.
           </p>
+          <div className="flex flex-col md:flex-row gap-4">
+            <Button
+              className="mt-4 text-primary text-md border-2 border-primary hover:bg-gradient-to-r hover:from-secondary hover:to-primary hover:text-white hover:border-transparent"
+              variant="outline"
+              onClick={() =>
+                document
+                  .getElementById('contact-form')
+                  ?.scrollIntoView({ behavior: 'smooth' })
+              }
+            >
+              Agendar recolha
+            </Button>
+          </div>
         </div>
 
         <Image
@@ -43,7 +56,7 @@ export default function HowItWorks() {
         />
         <div>
           <h3 className="text-3xl font-bold text-primary text-center md:text-justify">
-            Empresas
+            Empresas e Municípios
           </h3>
           <p className="mt-4 text-md">
             A nossa solução{' '}
@@ -63,19 +76,6 @@ export default function HowItWorks() {
             <span className="font-bold">têxteis desviados de aterro e CO₂</span>{' '}
             evitado, facilitando decisões sustentáveis e baseadas em dados.
           </p>
-          <div className="flex flex-col md:flex-row gap-4">
-            <Button
-              className="mt-4 text-primary text-md border-2 border-primary hover:bg-gradient-to-r hover:from-secondary hover:to-primary hover:text-white hover:border-transparent"
-              variant="outline"
-              onClick={() =>
-                document
-                  .getElementById('contact-form')
-                  ?.scrollIntoView({ behavior: 'smooth' })
-              }
-            >
-              Explora as soluções
-            </Button>
-          </div>
         </div>
       </div>
     </section>

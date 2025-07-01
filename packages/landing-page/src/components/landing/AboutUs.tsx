@@ -49,9 +49,8 @@ export default function AboutUs() {
             Recolha Sustentável
           </h4>
           <p className="text-md ms-8 max-w-xs md:min-h-36">
-            Sabias que mais de 92 milhões de toneladas de têxteis vão parar ao
-            lixo todos os anos? Em Portugal, são mais de 200 mil. O problema
-            cresce, mas temos solução.
+            Em Portugal, são mais de 200 mil. O problema cresce, mas temos
+            solução.
           </p>
         </div>
         <div className="flex flex-col max-w-64 relative">
