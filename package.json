@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start:web": "nx dev landing-page",
+    "start:portal": "nx dev portal",
     "prepare": "husky install"
   },
   "private": true,
