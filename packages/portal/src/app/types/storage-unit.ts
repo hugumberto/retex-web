@@ -1,19 +1,22 @@
-import { Brand } from './brand';
-import { Entity } from './helper';
+export enum Quality {
+  GOOD = 'BOM',
+  MEDIUM = 'REGULAR',
+  BAD = 'RUIM',
+}
 
-export interface StorageUnitData {
-  id?: string;
+export type StorageUnitDTO = {
+  id: string;
+  brand: {
+    id: string;
+    name: string;
+  };
+  quality: Quality;
+  status: 'ATIVO' | 'INATIVO';
+};
+
+export type StorageUnitFormData = {
   brandId: string;
   quality: Quality;
-  weight: number;
-}
-export enum Quality {
-  GOOD = 'GOOD',
-  MEDIUM = 'MEDIUM',
-  BAD = 'BAD',
-}
-export interface StorageUnitDTO extends Entity {  
-  quality: Quality;
-  weight: number;
-  brand: Brand;
-}
+  state: 'ATIVO' | 'INATIVO';
+  weight: 'LEVE' | 'MEDIO' | 'PESADO';
+};
