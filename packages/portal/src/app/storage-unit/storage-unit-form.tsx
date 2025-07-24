@@ -1,11 +1,15 @@
 'use client'; 
 
 import React, { useState, useEffect } from 'react';
-
+interface StorageUnitData {
+  id?: string;
+  mark: string;
+  quality: string;
+}
 interface StorageUnitFormProps {
   onFormClose: () => void; 
-  initialData?: { id: string; mark: string; quality: string };
-  onSave: (data: { id?: string; mark: string; quality: string }) => void; 
+  initialData?: StorageUnitData;
+  onSave: (data: StorageUnitData) => void; 
 }
 
 export default function StorageUnitForm({ onFormClose, initialData, onSave }: StorageUnitFormProps) {
