@@ -13,8 +13,8 @@ interface StorageUnitFormProps {
 }
 
 export default function StorageUnitForm({ onFormClose, initialData, onSave }: StorageUnitFormProps) {
-  const [mark, setMarca] = useState('');
-  const [quality, setQualidade] = useState('');
+  const [mark, setMark] = useState('');
+  const [quality, setQuality] = useState('');
 
   // Define the options for the dropdowns
   const brandOptions = [
@@ -41,11 +41,11 @@ export default function StorageUnitForm({ onFormClose, initialData, onSave }: St
 
   useEffect(() => {
     if (initialData) {
-      setMarca(initialData.mark);
-      setQualidade(initialData.quality);
+      setMark(initialData.mark);
+      setQuality(initialData.quality);
     } else {
-      setMarca(brandOptions[0]);
-      setQualidade(qualityOptions[0]);
+      setMark(brandOptions[0]);
+      setQuality(qualityOptions[0]);
     }
   }, [initialData]); 
   const handleSubmit = (e: React.FormEvent) => {
@@ -77,7 +77,7 @@ export default function StorageUnitForm({ onFormClose, initialData, onSave }: St
             id="marca"
             name="marca"
             value={mark} 
-            onChange={(e) => setMarca(e.target.value)} 
+            onChange={(e) => setMark(e.target.value)} 
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
             required 
           >
@@ -98,7 +98,7 @@ export default function StorageUnitForm({ onFormClose, initialData, onSave }: St
             id="qualidade"
             name="qualidade"
             value={quality} 
-            onChange={(e) => setQualidade(e.target.value)} 
+            onChange={(e) => setQuality(e.target.value)} 
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
             required 
           >
