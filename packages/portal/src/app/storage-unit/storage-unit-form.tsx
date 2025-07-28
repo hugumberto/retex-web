@@ -1,16 +1,20 @@
 'use client'; 
 
 import React, { useState, useEffect } from 'react';
-
+interface StorageUnitData {
+  id?: string;
+  mark: string;
+  quality: string;
+}
 interface StorageUnitFormProps {
   onFormClose: () => void; 
-  initialData?: { id: string; marca: string; qualidade: string };
-  onSave: (data: { id?: string; marca: string; qualidade: string }) => void; 
+  initialData?: StorageUnitData;
+  onSave: (data: StorageUnitData) => void; 
 }
 
 export default function StorageUnitForm({ onFormClose, initialData, onSave }: StorageUnitFormProps) {
-  const [marca, setMarca] = useState('');
-  const [qualidade, setQualidade] = useState('');
+  const [mark, setMark] = useState('');
+  const [quality, setQuality] = useState('');
 
   // Define the options for the dropdowns
   const brandOptions = [
@@ -37,23 +41,23 @@ export default function StorageUnitForm({ onFormClose, initialData, onSave }: St
 
   useEffect(() => {
     if (initialData) {
-      setMarca(initialData.marca);
-      setQualidade(initialData.qualidade);
+      setMark(initialData.mark);
+      setQuality(initialData.quality);
     } else {
-      setMarca(brandOptions[0]);
-      setQualidade(qualityOptions[0]);
+      setMark(brandOptions[0]);
+      setQuality(qualityOptions[0]);
     }
   }, [initialData]); 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); 
 
     // Basic validation: ensure options other than the placeholder are selected
-    if (marca === brandOptions[0] || qualidade === qualityOptions[0]) {
+    if (mark === brandOptions[0] || quality === qualityOptions[0]) {
         alert('Por favor, selecione uma Marca e uma Qualidade válidas.');
         return;
     }
 
-    const formData = { marca, qualidade };
+    const formData = { mark, quality };
 
     // Call the `onSave` prop function.
     // If `initialData` exists, include its `id` to signify an update operation.
@@ -72,8 +76,8 @@ export default function StorageUnitForm({ onFormClose, initialData, onSave }: St
           <select
             id="marca"
             name="marca"
-            value={marca} 
-            onChange={(e) => setMarca(e.target.value)} 
+            value={mark} 
+            onChange={(e) => setMark(e.target.value)} 
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
             required 
           >
@@ -93,8 +97,8 @@ export default function StorageUnitForm({ onFormClose, initialData, onSave }: St
           <select
             id="qualidade"
             name="qualidade"
-            value={qualidade} 
-            onChange={(e) => setQualidade(e.target.value)} 
+            value={quality} 
+            onChange={(e) => setQuality(e.target.value)} 
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
             required 
           >

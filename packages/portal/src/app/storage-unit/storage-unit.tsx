@@ -6,8 +6,8 @@ import StorageUnitForm from './storage-unit-form';
 
 interface StorageUnitItem {
   id: string;
-  marca: string;
-  qualidade: string;
+  mark: string;
+  quality: string;
   status: string;
 }
 
@@ -17,11 +17,11 @@ export default function StorageUnit() {
   const [editingUnit, setEditingUnit] = useState<StorageUnitItem | null>(null);
 
   const [storageUnits, setStorageUnits] = useState<StorageUnitItem[]>([
-    { id: '1', marca: 'Zara', qualidade: 'Excelente', status: 'Disponível' },
-    { id: '2', marca: 'Bershka', qualidade: 'Boa', status: 'Em Armazém' },
-    { id: '3', marca: 'Pull & Bear', qualidade: 'Média', status: 'Disponível' },
-    { id: '4', marca: 'Stradivarius', qualidade: 'Boa', status: 'Em Trânsito' },
-    { id: '5', 'marca': 'H&M', qualidade: 'Média', status: 'Em Manutenção' },
+    { id: '1', mark: 'Zara', quality: 'Excelente', status: 'Disponível' },
+    { id: '2', mark: 'Bershka', quality: 'Boa', status: 'Em Armazém' },
+    { id: '3', mark: 'Pull & Bear', quality: 'Média', status: 'Disponível' },
+    { id: '4', mark: 'Stradivarius', quality: 'Boa', status: 'Em Trânsito' },
+    { id: '5', 'mark': 'H&M', quality: 'Média', status: 'Em Manutenção' },
   ]);
 
   const handleToggleForm = () => {
@@ -48,12 +48,12 @@ export default function StorageUnit() {
     });
   };
 
-  const handleSaveUnit = (formData: { id?: string; marca: string; qualidade: string }) => {
+  const handleSaveUnit = (formData: { id?: string; mark: string; quality: string }) => {
     if (formData.id) {
       setStorageUnits((prevUnits) =>
         prevUnits.map((unit) =>
           unit.id === formData.id
-            ? { ...unit, marca: formData.marca, qualidade: formData.qualidade }
+            ? { ...unit, mark: formData.mark, quality: formData.quality }
             : unit
         )
       );
@@ -61,8 +61,8 @@ export default function StorageUnit() {
       const newId = String(Date.now());
       const newUnit: StorageUnitItem = {
         id: newId,
-        marca: formData.marca,
-        qualidade: formData.qualidade,
+        mark: formData.mark,
+        quality: formData.quality,
         status: 'Disponível',
       };
       setStorageUnits((prevUnits) => [...prevUnits, newUnit]);
@@ -133,8 +133,8 @@ export default function StorageUnit() {
                       onChange={() => handleCheckboxChange(unit.id)}
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.marca}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{unit.qualidade}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.mark}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{unit.quality}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       unit.status === 'Disponível' ? 'bg-green-100 text-green-800' :
