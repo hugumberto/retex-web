@@ -1,4 +1,3 @@
-// app/storage-unit/storage-unit.tsx
 'use client';
 
 import { useState } from 'react';
@@ -21,7 +20,7 @@ export default function StorageUnit() {
     { id: '2', mark: 'Bershka', quality: 'Boa', status: 'Em Armazém' },
     { id: '3', mark: 'Pull & Bear', quality: 'Média', status: 'Disponível' },
     { id: '4', mark: 'Stradivarius', quality: 'Boa', status: 'Em Trânsito' },
-    { id: '5', 'mark': 'H&M', quality: 'Média', status: 'Em Manutenção' },
+    { id: '5', mark: 'H&M', quality: 'Média', status: 'Em Manutenção' },
   ]);
 
   const handleToggleForm = () => {
@@ -167,7 +166,7 @@ export default function StorageUnit() {
                   {/* colSpan is now 5 because the data rows have 5 cells (Checkbox + 4 data columns),
                       while the header has 4. This is to match data row count */}
                   <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Nenhuma unidade de armazenamento encontrada. Clique em "Criar Nova Unidade" para adicionar uma.
+                    {'Nenhuma unidade de armazenamento encontrada. Clique em "Criar Nova Unidade" para adicionar uma.'}
                   </td>
                 </tr>
               )}
