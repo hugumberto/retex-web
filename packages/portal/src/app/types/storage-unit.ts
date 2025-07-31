@@ -1,7 +1,10 @@
+import { BrandResponse } from './brand';
+
 export interface StorageUnitData {
   id?: string;
   brandId: string;
   quality: Quality;
+  weight: number;
 }
 export enum Quality {
   GOOD = 'GOOD',
@@ -15,13 +18,5 @@ export interface StorageUnitResponse {
   createdAt: string;
   updatedAt: string;
   deletedAt: null | string;
-  brand: Brand;
-}
-interface Brand {
-  id: string;
-  name: string;
-  manual: boolean;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: null | string;
+  brand: BrandResponse;
 }

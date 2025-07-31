@@ -7,16 +7,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { BrandResponse } from '../types/brand';
 import { Quality, StorageUnitData } from '../types/storage-unit';
 
 interface StorageUnitFormProps {
   onFormClose: () => void;
   initialData?: StorageUnitData;
-  onSave?: (data: StorageUnitData) => void;
+  onSave?: () => void;
 }
-
+const qualityOptions = [
+  { id: Quality.GOOD, name: 'Boa' },
+  { id: Quality.MEDIUM, name: 'Regular' },
+  { id: Quality.BAD, name: 'Ruim' },
+];
 export default function StorageUnitForm({
   onFormClose,
   initialData,
@@ -30,31 +35,42 @@ export default function StorageUnitForm({
     reset,
     formState: { errors },
   } = useForm<StorageUnitData>();
-  const [formData, setFormData] = useState<StorageUnitData>();
   const [mensagem, setMensagem] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // TODO: Replace with actual API call to fetch brands
-  const brandOptions = [
-    { id: '0228c478-4073-4b6b-a9a2-58e158ea40d0', name: 'The Kooples' },
-    { id: '03658f63-5a37-4db4-ab24-37345f335fb6', name: 'Weekday' },
-    { id: '08420ce3-7edc-407d-ae9c-49c161714324', name: 'Decenio' },
-    { id: '0e4bf3c9-2027-4c5b-a4a9-62d8ec11e485', name: 'Stradivarius' },
-    { id: '13190a59-b71c-4d65-a505-db39c7d53dfa', name: 'Tiger of Sweden' },
-  ];
-  const qualityOptions = [
-    { id: Quality.GOOD, name: 'Boa' },
-    { id: Quality.MEDIUM, name: 'Regular' },
-    { id: Quality.BAD, name: 'Ruim' },
-  ];
+  const [brandOptions, setBrandOptions] = useState<BrandResponse[]>([]);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}brand`);
+        if (!res.ok) throw new Error('Erro ao buscar marcas');
+        const data: BrandResponse[] = await res.json();
+        setBrandOptions(data);
+      } catch (error) {
+        console.error('Erro ao buscar marcas:', error);
+      }
+    };
+    fetchBrands();
+    return;
+  }, []);
+
+  useEffect(() => {
+    console.log('[xxx] ~ StorageUnitForm ~ initialData:', initialData);
+    if (brandOptions.length > 0 && initialData) {
+      setValue('brandId', initialData.brandId);
+      setValue('quality', initialData.quality);
+    }
+  }, [initialData, brandOptions, setValue]);
 
   const onSubmit = async (data: StorageUnitData) => {
-    console.log('[xxx] ~ onSubmit ~ data:', data);
     setIsSubmitting(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}storage-unit`,
+        `${process.env.NEXT_PUBLIC_API_URL}storage-unit${
+          initialData?.id ? `/${initialData.id}` : ''
+        }`,
         {
-          method: 'POST',
+          method: initialData?.id ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...data,
@@ -69,6 +85,7 @@ export default function StorageUnitForm({
       console.error(e);
     } finally {
       setIsSubmitting(false);
+      onSave?.();
     }
   };
   return (
@@ -157,13 +174,14 @@ export default function StorageUnitForm({
         <div className="flex justify-end space-x-3 mt-6">
           <Button
             type="button"
-            onClick={onFormClose} // Calls the parent-provided handler to close the form
+            onClick={onFormClose}
             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
           >
             Cancelar
           </Button>
           <Button
             type="submit"
+            disabled={isSubmitting}
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
           >
             {initialData ? 'Guardar Alterações' : 'Criar'}

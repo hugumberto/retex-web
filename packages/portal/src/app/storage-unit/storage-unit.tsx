@@ -1,114 +1,71 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
-import StorageUnitForm from './storage-unit-form';
-import { StorageUnitResponse } from '../types/storage-unit';
+import { Button } from '@/components/ui/button';
 import {
-  TableCaption,
-  TableHeader,
-  TableRow,
-  TableHead,
+  Table,
   TableBody,
   TableCell,
-  TableFooter,
-  Table,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
-interface StorageUnitItem {
-  id: string;
-  mark: string;
-  quality: string;
-  status: string;
-}
+import { PencilIcon, TrashIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { StorageUnitData, StorageUnitResponse } from '../types/storage-unit';
+import StorageUnitForm from './storage-unit-form';
 
 export default function StorageUnit() {
   const [showForm, setShowForm] = useState(false);
   const [storageUnits, setStorageUnits] = useState<StorageUnitResponse[]>();
+  const [editingUnit, setEditingUnit] = useState<StorageUnitData | undefined>();
+  const fetchData = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}storage-unit`, {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) {
+      console.error('Failed to fetch storage units');
+      return;
+    }
+    const data: StorageUnitResponse[] = await res.json();
+    console.log('[xxx] ~ fetchData ~ data:', data);
+    setStorageUnits(data);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}storage-unit`,
-        {
-          method: 'get',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-      if (!res.ok) {
-        console.error('Failed to fetch storage units');
-        return;
-      }
-      const data: StorageUnitResponse[] = await res.json();
-      console.log('[xxx] ~ fetchData ~ data:', data);
-      setStorageUnits(data);
-    };
     fetchData();
   }, []);
 
-  const handleToggleForm = () => {
+  const handleToggleForm = (item?: StorageUnitResponse | undefined) => {
+    if (item) {
+      setEditingUnit({
+        id: item.id,
+        brandId: item.brand.id,
+        quality: item.quality,
+        weight: item.weight,
+      });
+    } else {
+      setEditingUnit(undefined);
+    }
     setShowForm((prev) => !prev);
   };
 
   const handleFormClose = () => {
     setShowForm(false);
   };
-
-  // const handleCheckboxChange = (id: string) => {
-  //   setSelectedItems((prevSelected) => {
-  //     const newSelected = new Set(prevSelected);
-  //     if (newSelected.has(id)) {
-  //       newSelected.delete(id);
-  //     } else {
-  //       newSelected.add(id);
-  //     }
-  //     return newSelected;
-  //   });
-  // };
-
-  // const handleSaveUnit = (formData: {
-  //   id?: string;
-  //   mark: string;
-  //   quality: string;
-  // }) => {
-  //   if (formData.id) {
-  //     setStorageUnits((prevUnits) =>
-  //       prevUnits.map((unit) =>
-  //         unit.id === formData.id
-  //           ? { ...unit, mark: formData.mark, quality: formData.quality }
-  //           : unit
-  //       )
-  //     );
-  //   } else {
-  //     const newId = String(Date.now());
-  //     const newUnit: StorageUnitItem = {
-  //       id: newId,
-  //       mark: formData.mark,
-  //       quality: formData.quality,
-  //       status: 'Disponível',
-  //     };
-  //     setStorageUnits((prevUnits) => [...prevUnits, newUnit]);
-  //   }
-  //   handleFormClose();
-  // };
-
-  // const handleEdit = (unitId: string) => {
-  //   const unitToEdit = storageUnits.find((unit) => unit.id === unitId);
-  //   if (unitToEdit) {
-  //     setEditingUnit(unitToEdit);
-  //     setShowForm(true);
-  //   }
-  // };
-
-  // const handleDelete = (unitId: string) => {
-  //   if (window.confirm('Tem certeza que deseja eliminar esta unidade?')) {
-  //     setStorageUnits((prevUnits) =>
-  //       prevUnits.filter((unit) => unit.id !== unitId)
-  //     );
-  //     setSelectedItems((prevSelected) => {
-  //       const newSelected = new Set(prevSelected);
-  //       newSelected.delete(unitId);
-  //       return newSelected;
-  //     });
-  //   }
-  // };
+  const handleDeleteUnit = async (id: string) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}storage-unit/${id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+      if (!res.ok) throw new Error('Erro ao eliminar unidade');
+      await fetchData();
+    } catch (error) {
+      console.error('Erro ao eliminar unidade:', error);
+    }
+  };
 
   return (
     <section
@@ -121,7 +78,7 @@ export default function StorageUnit() {
 
       <button
         className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-        onClick={handleToggleForm}
+        onClick={() => handleToggleForm()}
       >
         {showForm ? 'Fechar Formulário' : 'Criar Nova Unidade'}
       </button>
@@ -129,8 +86,12 @@ export default function StorageUnit() {
       {showForm ? (
         <StorageUnitForm
           onFormClose={handleFormClose}
-          // initialData={editingUnit || undefined}
-          // onSave={handleSaveUnit}
+          initialData={editingUnit}
+          onSave={() => {
+            setShowForm(false);
+            setEditingUnit(undefined);
+            fetchData();
+          }}
         />
       ) : (
         <div className="mt-8 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
@@ -140,6 +101,7 @@ export default function StorageUnit() {
                 <TableHead className="w-[100px]">id</TableHead>
                 <TableHead>Marca</TableHead>
                 <TableHead>Qualidade</TableHead>
+                <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -148,6 +110,24 @@ export default function StorageUnit() {
                   <TableCell>{storageUnit.id}</TableCell>
                   <TableCell>{storageUnit.brand.name}</TableCell>
                   <TableCell>{storageUnit.quality}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="default"
+                      size="icon"
+                      className="size-8"
+                      onClick={() => handleToggleForm(storageUnit)}
+                    >
+                      <PencilIcon />
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="icon"
+                      className="size-8"
+                      onClick={() => handleDeleteUnit(storageUnit.id)}
+                    >
+                      <TrashIcon />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
