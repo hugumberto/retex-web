@@ -5,10 +5,11 @@ import UserForm from './user-form';
 
 interface UserItem {
   id: string;
-  primeiroNome: string;
-  ultimoNome: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  perfil: string;
+  phone: string;
+  profile: string;
   status: string;
 }
 
@@ -20,18 +21,20 @@ export default function User() {
   const [users, setUsers] = useState<UserItem[]>([
     {
       id: 'usr1',
-      primeiroNome: 'Hugo',
-      ultimoNome: 'Gonçalves',
+      firstName: 'Hugo',
+      lastName: 'Gonçalves',
       email: 'hugo@retex.pt',
-      perfil: 'Admin', 
+      phone: '987654321',
+      profile: 'Admin', 
       status: 'Ativo',
     },
     {
       id: 'usr2',
-      primeiroNome: 'Tamara',
-      ultimoNome: 'Fedorenko',
+      firstName: 'Tamara',
+      lastName: 'Fedorenko',
       email: 'tamara@retex.pt',
-      perfil: 'Motorista',
+      phone: '987654321',
+      profile: 'Motorista',
       status: 'Ativo',
     },
   ]);
@@ -62,11 +65,11 @@ export default function User() {
 
   const handleSaveUser = (formData: {
     id?: string;
-    primeiroNome: string;
-    ultimoNome: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    telefone: string;
-    perfil: string;
+    phone: string;
+    profile: string;
   }) => {
     if (formData.id) {
       setUsers((prevUsers) =>
@@ -74,10 +77,11 @@ export default function User() {
           user.id === formData.id
             ? {
                 ...user,
-                primeiroNome: formData.primeiroNome,
-                ultimoNome: formData.ultimoNome,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
                 email: formData.email,
-                perfil: formData.perfil,
+                phone: formData.phone,
+                profile: formData.profile,
               }
             : user
         )
@@ -86,10 +90,11 @@ export default function User() {
       const newId = String(Date.now());
       const newUser: UserItem = {
         id: newId,
-        primeiroNome: formData.primeiroNome,
-        ultimoNome: formData.ultimoNome,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
-        perfil: formData.perfil,
+        phone: formData.phone,
+        profile: formData.profile,
         status: 'Ativo', 
       };
       setUsers((prevUsers) => [...prevUsers, newUser]);
@@ -162,9 +167,9 @@ export default function User() {
                       onChange={() => handleCheckboxChange(user.id)}
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.primeiroNome} {user.ultimoNome}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.perfil}</td> 
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.profile}</td> 
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       user.status === 'Ativo' ? 'bg-green-100 text-green-800' :

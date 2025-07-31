@@ -6,54 +6,56 @@ interface UserFormProps {
   onFormClose: () => void;
   initialData?: {
     id: string;
-    primeiroNome: string;
-    ultimoNome: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    perfil: string; 
+    phone: string;
+    profile: string; 
   };
   onSave: (data: {
     id?: string;
-    primeiroNome: string;
-    ultimoNome: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    telefone: string;
-    perfil: string;
+    phone: string;
+    profile: string;
   }) => void;
 }
 
 export default function UserForm({ onFormClose, initialData, onSave }: UserFormProps) {
-  const [primeiroNome, setPrimeiroNome] = useState('');
-  const [ultimoNome, setUltimoNome] = useState('');
+  const [firstName, setfirstName] = useState('');
+  const [lastName, setlastName] = useState('');
   const [email, setEmail] = useState('');
-  const [telefone, setTelefone] = useState(''); 
-  const [selectedPerfil, setSelectedPerfil] = useState(''); 
+  const [phone, setPhone] = useState(''); 
+  const [selectedProfile, setSelectedProfile] = useState(''); 
 
   const profileOptions = ['Operacao', 'Admin', 'Motorista']; 
 
   useEffect(() => {
     if (initialData) {
-      setPrimeiroNome(initialData.primeiroNome);
-      setUltimoNome(initialData.ultimoNome);
+      setfirstName(initialData.firstName);
+      setlastName(initialData.lastName);
       setEmail(initialData.email);
-      setSelectedPerfil(initialData.perfil || '');
+      setPhone(initialData.phone || '');
+      setSelectedProfile(initialData.profile || '');
     } else {
-      setPrimeiroNome('');
-      setUltimoNome('');
+      setfirstName('');
+      setlastName('');
       setEmail('');
-      setTelefone('');
-      setSelectedPerfil('');
+      setPhone('');
+      setSelectedProfile('');
     }
   }, [initialData]);
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!primeiroNome || !ultimoNome || !email || !selectedPerfil) {
+    if (!firstName || !lastName || !email || !selectedProfile) {
       alert('Por favor, preencha todos os campos obrigatórios e selecione pelo menos um perfil.');
       return;
     }
 
-    const formData = { primeiroNome, ultimoNome, email, telefone, perfil: selectedPerfil };
+    const formData = { firstName, lastName, email, phone, profile: selectedProfile };
     onSave(initialData ? { ...formData, id: initialData.id } : formData);
   };
 
@@ -63,29 +65,29 @@ export default function UserForm({ onFormClose, initialData, onSave }: UserFormP
         {initialData ? 'Editar Usuário' : 'Cadastro de Usuário'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Primeiro Nome */}
+        {/* First Name */}
         <div>
-          <label htmlFor="primeiroNome" className="block text-sm font-medium text-gray-700">Primeiro Nome</label>
+          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Primeiro Nome</label>
           <input
             type="text"
-            id="primeiroNome"
-            name="primeiroNome"
-            value={primeiroNome}
-            onChange={(e) => setPrimeiroNome(e.target.value)}
+            id="firstName"
+            name="firstName"
+            value={firstName}
+            onChange={(e) => setfirstName(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
             required
           />
         </div>
 
-        {/* Ultimo Nome */}
+        {/* Last Name */}
         <div>
-          <label htmlFor="ultimoNome" className="block text-sm font-medium text-gray-700">Ultimo Nome</label>
+          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Ultimo Nome</label>
           <input
             type="text"
-            id="ultimoNome"
-            name="ultimoNome"
-            value={ultimoNome}
-            onChange={(e) => setUltimoNome(e.target.value)}
+            id="lastName"
+            name="lastName"
+            value={lastName}
+            onChange={(e) => setlastName(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
             required
           />
@@ -105,27 +107,27 @@ export default function UserForm({ onFormClose, initialData, onSave }: UserFormP
           />
         </div>
 
-        {/* Telefone */}
+        {/* Phone */}
         <div>
-          <label htmlFor="telefone" className="block text-sm font-medium text-gray-700">Telefone</label>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefone</label>
           <input
             type="text"
-            id="telefone"
-            name="telefone"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
+            id="phone"
+            name="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
           />
         </div>
 
-         {/* Perfil Dropdown */}
+         {/* Profile Dropdown */}
          <div>
-          <label htmlFor="perfil" className="block text-sm font-medium text-gray-700">Perfil</label>
+          <label htmlFor="profile" className="block text-sm font-medium text-gray-700">Perfil</label>
           <select
-            id="perfil"
-            name="perfil"
-            value={selectedPerfil}
-            onChange={(e) => setSelectedPerfil(e.target.value)}
+            id="profile"
+            name="profile"
+            value={selectedProfile}
+            onChange={(e) => setSelectedProfile(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900"
             required
           >
