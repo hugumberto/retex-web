@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import UserForm from './user-form';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,50 +12,28 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PencilIcon, TrashIcon } from 'lucide-react';
-
-interface UserResponse {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  profile: string;
-  status: string;
-}
-
-interface UserFormData {
-  id?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  profile: string;
-}
+import { UserFormData, UserResponse } from '../types/user';
+import { fetchWithAuth } from '@/lib/fetcher';
 
 export default function User() {
   const [showForm, setShowForm] = useState(false);
-  const [users, setUsers] = useState<UserResponse[]>([
-    {
-      id: 'usr1',
-      firstName: 'Hugo',
-      lastName: 'Gonçalves',
-      email: 'hugo@retex.pt',
-      phone: '987654321',
-      profile: 'Admin',
-      status: 'Ativo',
-    },
-    {
-      id: 'usr2',
-      firstName: 'Tamara',
-      lastName: 'Fedorenko',
-      email: 'tamara@retex.pt',
-      phone: '987654321',
-      profile: 'Motorista',
-      status: 'Ativo',
-    },
-  ]);
+  const [users, setUsers] = useState<UserResponse[]>([]);
   const [editingUser, setEditingUser] = useState<UserFormData | undefined>();
-
+  const fetchData = async () => {
+    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}user`, {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) {
+      console.error('Failed to fetch users');
+      return;
+    }
+    const data: UserResponse[] = await res.json();
+    setUsers(data);
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   const handleToggleForm = (userToEdit?: UserResponse) => {
     if (userToEdit) {
       setEditingUser({
@@ -63,8 +41,8 @@ export default function User() {
         firstName: userToEdit.firstName,
         lastName: userToEdit.lastName,
         email: userToEdit.email,
-        phone: userToEdit.phone,
-        profile: userToEdit.profile,
+        contactPhone: userToEdit.contactPhone,
+        documentNumber: userToEdit.documentNumber,
       });
     } else {
       setEditingUser(undefined);
@@ -77,28 +55,6 @@ export default function User() {
     setEditingUser(undefined);
   };
 
-  const handleSaveUser = async (formData: UserFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    if (formData.id) {
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id === formData.id ? { ...user, ...formData } : user
-        )
-      );
-    } else {
-      const newId = `usr${Date.now()}`;
-      const newUser: UserResponse = {
-        ...formData,
-        id: newId,
-        status: 'Ativo',
-      };
-      setUsers((prevUsers) => [...prevUsers, newUser]);
-    }
-
-    handleFormClose();
-  };
-
   const handleDeleteUser = async (id: string) => {
     if (window.confirm('Tem certeza que deseja eliminar este usuário?')) {
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -107,7 +63,10 @@ export default function User() {
   };
 
   return (
-    <section id="user-page" className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]">
+    <section
+      id="user-page"
+      className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]"
+    >
       <h1 className="text-4xl md:text-5xl font-bold text-center text-neutral-950 mb-8">
         Usuário
       </h1>
@@ -120,22 +79,18 @@ export default function User() {
       </Button>
 
       {showForm ? (
-        <UserForm
-          onFormClose={handleFormClose}
-          initialData={editingUser}
-          onSave={handleSaveUser}
-        />
+        <UserForm onFormClose={handleFormClose} initialData={editingUser} />
       ) : (
         <div className="mt-8 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
           <Table>
-            <caption className="p-4 text-left text-sm text-gray-500">Detalhes dos Usuários.</caption>
+            <caption className="p-4 text-left text-sm text-gray-500">
+              Detalhes dos Usuários.
+            </caption>
             <TableHeader>
               <TableRow>
                 <TableHead>id</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Perfil</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -143,20 +98,11 @@ export default function User() {
               {users?.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.id}</TableCell>
-                  <TableCell>{user.firstName} {user.lastName}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.profile}</TableCell>
                   <TableCell>
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.status === 'Ativo' ? 'bg-green-100 text-green-800' :
-                        user.status === 'Inativo' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {user.status}
-                    </span>
+                    {user.firstName} {user.lastName}
                   </TableCell>
+                  <TableCell>{user.email}</TableCell>
+
                   <TableCell className="space-x-2">
                     <Button
                       variant="ghost"
@@ -179,8 +125,13 @@ export default function User() {
               ))}
               {users.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-sm text-gray-500">
-                    Nenhum usuário encontrado. Clique em "Criar Novo Usuário" para adicionar um.
+                  <TableCell
+                    colSpan={6}
+                    className="text-center text-sm text-gray-500"
+                  >
+                    {
+                      'Nenhum usuário encontrado. Clique em "Criar Novo Usuário" para adicionar um.'
+                    }
                   </TableCell>
                 </TableRow>
               )}

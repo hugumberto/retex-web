@@ -1,33 +1,26 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-interface UserFormData {
-  id?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  profile: string;
-}
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Role, UserFormData } from '../types/user';
+import { Label } from '@/components/ui/label';
+import { fetchWithAuth } from '@/lib/fetcher';
 
 interface UserFormProps {
   onFormClose: () => void;
   initialData?: UserFormData;
-  onSave: (data: UserFormData) => void;
+  onSave?: (data: UserFormData) => void;
 }
 
-export default function UserForm({ onFormClose, initialData, onSave }: UserFormProps) {
+export default function UserForm({
+  onFormClose,
+  initialData,
+  onSave,
+}: UserFormProps) {
   const {
     control,
     handleSubmit,
@@ -35,36 +28,64 @@ export default function UserForm({ onFormClose, initialData, onSave }: UserFormP
     reset,
     formState: { errors, isSubmitting },
     setValue,
-  } = useForm<UserFormData>({
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      profile: '',
-    },
-  });
+  } = useForm<UserFormData>();
 
   const [mensagem, setMensagem] = useState<string | null>(null);
-  const profileOptions = ['Operacao', 'Admin', 'Motorista'];
+
+  const roleOptions = [
+    { id: Role.ADMIN, label: 'Admin' },
+    { id: Role.OPS, label: 'Operação' },
+    { id: Role.DRIVER, label: 'Motorista' },
+  ];
 
   useEffect(() => {
     if (initialData) {
       setValue('firstName', initialData.firstName);
       setValue('lastName', initialData.lastName);
       setValue('email', initialData.email);
-      setValue('phone', initialData.phone || '');
-      setValue('profile', initialData.profile || '');
+      setValue('contactPhone', initialData.contactPhone);
+      setValue('documentNumber', initialData.documentNumber);
     } else {
       reset();
     }
   }, [initialData, setValue, reset]);
 
   const onSubmit: SubmitHandler<UserFormData> = async (data) => {
-    setMensagem(null);
     try {
-      await onSave(data);
+      // Primeiro, cria o usuário
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          contactPhone: data.contactPhone,
+          documentNumber: data.documentNumber,
+          password: data.documentNumber, // senha fixa conforme solicitado
+        }),
+      });
+
+      if (!res.ok) throw new Error('Erro ao criar usuário');
+      const user = await res.json();
+
+      // Depois, atribui as roles selecionadas
+      if (Array.isArray(data.role) && data.role.length > 0) {
+        for (const role of data.role) {
+          await fetchWithAuth(
+            `${process.env.NEXT_PUBLIC_API_URL}user/${user.id}/roles`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ role }),
+            }
+          );
+        }
+      }
+
       setMensagem('Usuário salvo com sucesso!');
+      onSave?.(data);
+      reset();
     } catch (e) {
       setMensagem('Erro ao salvar o usuário.');
       console.error(e);
@@ -83,93 +104,146 @@ export default function UserForm({ onFormClose, initialData, onSave }: UserFormP
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Primeiro Nome</label>
-          <input
-            type="text"
-            id="firstName"
-            {...register('firstName', { required: 'Primeiro Nome é obrigatório' })}
-            className={`mt-1 block w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900`}
-          />
-          {errors.firstName && (
-            <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
-          )}
+          <label
+            htmlFor="firstName"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Primeiro Nome
+          </label>
+          <div className="w-full">
+            <Input
+              placeholder="Primeiro Nome*"
+              className={errors.firstName ? 'border-red-500' : ''}
+              {...register('firstName', { required: 'Campo obrigatório' })}
+            />
+            {errors.firstName && (
+              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+            )}
+          </div>
         </div>
 
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Ultimo Nome</label>
-          <input
-            type="text"
-            id="lastName"
-            {...register('lastName', { required: 'Ultimo Nome é obrigatório' })}
-            className={`mt-1 block w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900`}
-          />
-          {errors.lastName && (
-            <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
-          )}
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Último Nome
+          </label>
+          <div className="w-full">
+            <Input
+              placeholder="Último Nome*"
+              className={errors.lastName ? 'border-red-500' : ''}
+              {...register('lastName', { required: 'Campo obrigatório' })}
+            />
+            {errors.lastName && (
+              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+            )}
+          </div>
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            id="email"
-            {...register('email', {
-              required: 'Email é obrigatório',
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                message: 'Formato de email inválido'
-              }
-            })}
-            className={`mt-1 block w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900`}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-          )}
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Email
+          </label>
+          <div className="w-full">
+            <Input
+              placeholder="Email*"
+              className={errors.email ? 'border-red-500' : ''}
+              {...register('email', {
+                required: 'Campo obrigatório',
+                pattern: {
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                  message: 'Formato de email inválido',
+                },
+              })}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefone</label>
-          <input
-            type="text"
-            id="phone"
-            {...register('phone')}
-            className={`mt-1 block w-full px-3 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900`}
-          />
-          {errors.phone && (
-            <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
-          )}
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Telefone
+          </label>
+          <div className="w-full">
+            <Input
+              placeholder="Telefone*"
+              className={errors.contactPhone ? 'border-red-500' : ''}
+              {...register('contactPhone', { required: 'Campo obrigatório' })}
+            />
+            {errors.contactPhone && (
+              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+            )}
+          </div>
+        </div>
+        <div>
+          <label
+            htmlFor="documentNumber"
+            className="block text-sm font-medium text-gray-700"
+          >
+            NIF
+          </label>
+          <div className="w-full">
+            <Input
+              placeholder="NIF*"
+              className={errors.documentNumber ? 'border-red-500' : ''}
+              {...register('documentNumber', { required: 'Campo obrigatório' })}
+            />
+            {errors.documentNumber && (
+              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+            )}
+          </div>
         </div>
 
         <div>
-          <label htmlFor="profile" className="block text-sm font-medium text-gray-700">Perfil</label>
+          <label
+            htmlFor="profile"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Perfil
+          </label>
           <Controller
-            name="profile"
+            name="role"
             control={control}
             rules={{ required: 'Perfil é obrigatório' }}
+            defaultValue={[]}
             render={({ field }) => (
-              <>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <SelectTrigger
-                    id="profile"
-                    className={`mt-1 block w-full px-3 py-2 border ${errors.profile ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900`}
-                  >
-                    <SelectValue placeholder="Selecione um perfil*" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {profileOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.profile && (
-                  <p className="text-red-500 text-sm mt-1">{errors.profile.message}</p>
+              <div className="flex flex-col gap-2">
+                {roleOptions.map((option) => (
+                  <label key={option.id} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={field.value?.includes(option.id) ?? false}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          field.onChange([...(field.value ?? []), option.id]);
+                        } else {
+                          field.onChange(
+                            (field.value ?? []).filter((id) => id !== option.id)
+                          );
+                        }
+                      }}
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      {option.label}
+                    </span>
+                  </label>
+                ))}
+                {errors.role && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.role.message}
+                  </p>
                 )}
-              </>
+              </div>
             )}
           />
         </div>
@@ -187,7 +261,11 @@ export default function UserForm({ onFormClose, initialData, onSave }: UserFormP
             disabled={isSubmitting}
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
           >
-            {isSubmitting ? 'Salvando...' : (initialData ? 'Guardar Alterações' : 'Criar')}
+            {isSubmitting
+              ? 'Salvando...'
+              : initialData
+              ? 'Guardar Alterações'
+              : 'Criar'}
           </Button>
         </div>
       </form>
