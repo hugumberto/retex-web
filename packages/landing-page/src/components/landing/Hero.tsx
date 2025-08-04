@@ -1,14 +1,27 @@
 'use client';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { JSX, ReactElement } from 'react';
+import { JSX, ReactElement, useEffect } from 'react';
 export default function Hero() {
   type ItemContainerProps = {
     path: string;
     title: string;
     children: JSX.Element;
   };
-
+ const fetchData = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) {
+      console.error('Failed to fetch health status');
+      return;
+    }
+   
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   const ItemContainer: React.FC<ItemContainerProps> = ({
     path,
     title,
