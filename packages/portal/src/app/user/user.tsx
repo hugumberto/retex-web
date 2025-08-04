@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import UserForm from './user-form';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,9 +32,9 @@ interface UserFormData {
   profile: string;
 }
 
-const fetchUsersFromApi = async (): Promise<UserResponse[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return [
+export default function User() {
+  const [showForm, setShowForm] = useState(false);
+  const [users, setUsers] = useState<UserResponse[]>([
     {
       id: 'usr1',
       firstName: 'Hugo',
@@ -53,29 +53,9 @@ const fetchUsersFromApi = async (): Promise<UserResponse[]> => {
       profile: 'Motorista',
       status: 'Ativo',
     },
-  ];
-};
-
-export default function User() {
-  const [showForm, setShowForm] = useState(false);
-  const [users, setUsers] = useState<UserResponse[]>([]);
+  ]);
   const [editingUser, setEditingUser] = useState<UserFormData | undefined>();
 
-  const fetchData = async () => {
-    try {
-      const data = await fetchUsersFromApi();
-      setUsers(data);
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-    }
-  };
-
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Toggle the form visibility and set the user to be edited
   const handleToggleForm = (userToEdit?: UserResponse) => {
     if (userToEdit) {
       setEditingUser({
@@ -98,20 +78,31 @@ export default function User() {
   };
 
   const handleSaveUser = async (formData: UserFormData) => {
-    console.log('Simulating saving user:', formData);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    setShowForm(false);
-    setEditingUser(undefined);
-    await fetchData(); 
+    if (formData.id) {
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === formData.id ? { ...user, ...formData } : user
+        )
+      );
+    } else {
+      const newId = `usr${Date.now()}`;
+      const newUser: UserResponse = {
+        ...formData,
+        id: newId,
+        status: 'Ativo',
+      };
+      setUsers((prevUsers) => [...prevUsers, newUser]);
+    }
+
+    handleFormClose();
   };
 
-  
   const handleDeleteUser = async (id: string) => {
     if (window.confirm('Tem certeza que deseja eliminar este usuário?')) {
-      console.log('Simulating deleting user with ID:', id);
-
-     
-      await fetchData();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     }
   };
 
@@ -121,7 +112,6 @@ export default function User() {
         Usuário
       </h1>
 
-      {/* Button to toggle the form */}
       <Button
         className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
         onClick={() => handleToggleForm()}
