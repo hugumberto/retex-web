@@ -7,13 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Role, UserFormData } from '../types/user';
-import { Label } from '@/components/ui/label';
 import { fetchWithAuth } from '@/lib/fetcher';
 
 interface UserFormProps {
   onFormClose: () => void;
   initialData?: UserFormData;
-  onSave?: (data: UserFormData) => void;
+  onSave?: () => void;
 }
 
 export default function UserForm({
@@ -45,16 +44,20 @@ export default function UserForm({
       setValue('email', initialData.email);
       setValue('contactPhone', initialData.contactPhone);
       setValue('documentNumber', initialData.documentNumber);
+      setValue('role', initialData.role || []);
     } else {
       reset();
     }
   }, [initialData, setValue, reset]);
 
   const onSubmit: SubmitHandler<UserFormData> = async (data) => {
+    
     try {
       // Primeiro, cria o usuário
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}user`, {
-        method: 'POST',
+      const res = await fetchWithAuth( `${process.env.NEXT_PUBLIC_API_URL}user${
+          initialData?.id ? `/${initialData.id}` : ''
+        }`, {
+        method: initialData?.id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firstName: data.firstName,
@@ -71,20 +74,17 @@ export default function UserForm({
 
       // Depois, atribui as roles selecionadas
       if (Array.isArray(data.role) && data.role.length > 0) {
-        for (const role of data.role) {
-          await fetchWithAuth(
-            `${process.env.NEXT_PUBLIC_API_URL}user/${user.id}/roles`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ role }),
-            }
-          );
-        }
+        await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}user/${user.id}/roles`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ roles: data.role }),
+          });
       }
 
       setMensagem('Usuário salvo com sucesso!');
-      onSave?.(data);
+      onSave?.();
       reset();
     } catch (e) {
       setMensagem('Erro ao salvar o usuário.');

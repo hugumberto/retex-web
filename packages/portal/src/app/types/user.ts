@@ -9,6 +9,15 @@ export interface UserResponse {
   createdAt: string;
   updatedAt: string;
   deletedAt: string;
+  roles: RoleResponse[];
+}
+
+export interface RoleResponse {
+  id: string;
+  role: Role;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 export interface UserFormData {

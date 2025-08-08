@@ -3,7 +3,11 @@
 import { login } from '@/service/auth';
 import { useAuthStore } from '@/store/auth';
 
-export async function fetchWithAuth(url: string, options: RequestInit = {}) {
+export async function fetchWithAuth(
+  url: string,
+  options: RequestInit = {},
+  retry = true
+) {
   let token = useAuthStore.getState().token;
   if (!token) {
     await login();
@@ -16,6 +20,13 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
       Authorization: token ? `Bearer ${token}` : '',
     },
   });
-
+  if (!res.ok) {
+    if (res.status === 401 && retry) {
+      await login();
+      token = useAuthStore.getState().token;
+      return fetchWithAuth(url, options, false);
+    }
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
   return res;
 }

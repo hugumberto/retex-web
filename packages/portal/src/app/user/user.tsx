@@ -43,6 +43,7 @@ export default function User() {
         email: userToEdit.email,
         contactPhone: userToEdit.contactPhone,
         documentNumber: userToEdit.documentNumber,
+        role: userToEdit.roles.map((role) => role.role),
       });
     } else {
       setEditingUser(undefined);
@@ -55,10 +56,30 @@ export default function User() {
     setEditingUser(undefined);
   };
 
-  const handleDeleteUser = async (id: string) => {
+  const handleDeleteUser = async (user: UserResponse) => {
     if (window.confirm('Tem certeza que deseja eliminar este usuário?')) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+      try {
+        const res = await fetchWithAuth(
+          `${process.env.NEXT_PUBLIC_API_URL}user/${user.id}`,
+          {
+            method: 'PUT',
+            body: JSON.stringify({
+              id: user.id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              contactPhone: user.contactPhone,
+              documentNumber: user.documentNumber,
+              password: '',
+              status: 'INACTIVE',
+            }),
+          }
+        );
+        if (!res.ok) throw new Error('Erro ao eliminar usuário');
+        await fetchData();
+      } catch (error) {
+        console.error('Erro ao eliminar usuário:', error);
+      }
     }
   };
 
@@ -79,7 +100,15 @@ export default function User() {
       </Button>
 
       {showForm ? (
-        <UserForm onFormClose={handleFormClose} initialData={editingUser} />
+        <UserForm
+          onFormClose={handleFormClose}
+          initialData={editingUser}
+          onSave={() => {
+            setShowForm(false);
+            setEditingUser(undefined);
+            fetchData();
+          }}
+        />
       ) : (
         <div className="mt-8 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
           <Table>
@@ -91,6 +120,7 @@ export default function User() {
                 <TableHead>id</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Perfil</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -102,6 +132,9 @@ export default function User() {
                     {user.firstName} {user.lastName}
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    {user.roles.map((role) => role.role).join(', ')}
+                  </TableCell>
 
                   <TableCell className="space-x-2">
                     <Button
@@ -116,7 +149,7 @@ export default function User() {
                       variant="ghost"
                       size="icon"
                       className="size-8"
-                      onClick={() => handleDeleteUser(user.id)}
+                      onClick={() => handleDeleteUser(user)}
                     >
                       <TrashIcon className="size-4" />
                     </Button>
