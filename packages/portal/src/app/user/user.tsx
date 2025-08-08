@@ -70,7 +70,7 @@ export default function User() {
               email: user.email,
               contactPhone: user.contactPhone,
               documentNumber: user.documentNumber,
-              password: '',
+              password: user.documentNumber,
               status: 'INACTIVE',
             }),
           }
@@ -121,6 +121,7 @@ export default function User() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Perfil</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -135,6 +136,7 @@ export default function User() {
                   <TableCell>
                     {user.roles.map((role) => role.role).join(', ')}
                   </TableCell>
+                  <TableCell>{user.status}</TableCell>
 
                   <TableCell className="space-x-2">
                     <Button

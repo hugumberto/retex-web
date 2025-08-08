@@ -17,6 +17,7 @@ export async function fetchWithAuth(
     ...options,
     headers: {
       ...options.headers,
+      'Content-Type': 'application/json',
       Authorization: token ? `Bearer ${token}` : '',
     },
   });
