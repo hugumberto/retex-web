@@ -21,7 +21,9 @@ import {
 
 export default function PackageCollection() {
   const [showForm, setShowForm] = useState(false);
-  const [packageCollections, setPackageCollections] = useState<PackageCollectionResponse[]>([
+  const [packageCollections, setPackageCollections] = useState<
+    PackageCollectionResponse[]
+  >([
     {
       id: 'rec1',
       driver: 'Hugo Gonçalves',
@@ -29,7 +31,7 @@ export default function PackageCollection() {
       status: CollectionStatus.AWAITING_COLLECTION,
       collectionDate: '2025-08-08',
       shift: Shift.NIGHT,
-      selectedCollectionItems: ['addr1', 'addr2'], 
+      selectedCollectionItems: ['addr1', 'addr2'],
       createdAt: '2025-08-08T10:00:00Z',
       updatedAt: '2025-08-08T10:00:00Z',
       deletedAt: null,
@@ -41,22 +43,27 @@ export default function PackageCollection() {
       status: CollectionStatus.IN_TRANSIT,
       collectionDate: '2025-08-08',
       shift: Shift.AFTERNOON,
-      selectedCollectionItems: ['addr1', 'addr3'], 
+      selectedCollectionItems: ['addr1', 'addr3'],
       createdAt: '2025-08-08T11:00:00Z',
       updatedAt: '2025-08-08T11:00:00Z',
       deletedAt: null,
     },
   ]);
-  const [editingPackageCollection, setEditingPackageCollection] = useState<PackageCollectionFormData | undefined>();
+  const [editingPackageCollection, setEditingPackageCollection] = useState<
+    PackageCollectionFormData | undefined
+  >();
 
-  const handleToggleForm = (packageCollectionToEdit?: PackageCollectionResponse) => {
+  const handleToggleForm = (
+    packageCollectionToEdit?: PackageCollectionResponse
+  ) => {
     if (packageCollectionToEdit) {
       setEditingPackageCollection({
         id: packageCollectionToEdit.id,
         driver: packageCollectionToEdit.driver,
         collectionDate: packageCollectionToEdit.collectionDate,
         shift: packageCollectionToEdit.shift,
-        selectedCollectionItems: packageCollectionToEdit.selectedCollectionItems, 
+        selectedCollectionItems:
+          packageCollectionToEdit.selectedCollectionItems,
       });
     } else {
       setEditingPackageCollection(undefined);
@@ -69,7 +76,9 @@ export default function PackageCollection() {
     setEditingPackageCollection(undefined);
   };
 
-  const handleSavePackageCollection = async (formData: PackageCollectionFormData) => {
+  const handleSavePackageCollection = async (
+    formData: PackageCollectionFormData
+  ) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (formData.id) {
@@ -102,7 +111,10 @@ export default function PackageCollection() {
         deletedAt: null,
       };
 
-      setPackageCollections((prevCollections) => [...prevCollections, newPackageCollection]);
+      setPackageCollections((prevCollections) => [
+        ...prevCollections,
+        newPackageCollection,
+      ]);
     }
 
     console.log('Saving package collection:', formData);
@@ -110,26 +122,35 @@ export default function PackageCollection() {
   };
 
   const handleDeletePackageCollection = async (id: string) => {
-    if (window.confirm('Tem certeza de que deseja excluir esta recolha de encomendas?')) {
+    if (
+      window.confirm(
+        'Tem certeza de que deseja excluir esta recolha de encomendas?'
+      )
+    ) {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      setPackageCollections((prevCollections) => prevCollections.filter((collection) => collection.id !== id));
+      setPackageCollections((prevCollections) =>
+        prevCollections.filter((collection) => collection.id !== id)
+      );
     }
   };
 
   return (
-    <section id="package-collection-page" className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]">
+    <section
+      id="package-collection-page"
+      className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]"
+    >
       <h1 className="text-4xl md:text-5xl font-bold text-center text-neutral-950 mb-8">
         Recolha de Encomendas
       </h1>
-      
+
       {!showForm && (
-      <Button
-        className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-        onClick={() => handleToggleForm()}
-      >
-        Criar Nova Recolha de Encomendas
-      </Button>
-       )}
+        <Button
+          className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+          onClick={() => handleToggleForm()}
+        >
+          Criar Nova Recolha de Encomendas
+        </Button>
+      )}
 
       {showForm ? (
         <PackageCollectionForm
@@ -152,15 +173,21 @@ export default function PackageCollection() {
               {packageCollections?.map((packageCollection) => (
                 <TableRow key={packageCollection.id}>
                   <TableCell>
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
                   </TableCell>
-                  <TableCell className="font-medium">{packageCollection.driver}</TableCell>
+                  <TableCell className="font-medium">
+                    {packageCollection.driver}
+                  </TableCell>
                   <TableCell>{packageCollection.packageQty}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        packageCollection.status === CollectionStatus.IN_TRANSIT ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-green-100 text-green-800'
+                        packageCollection.status === CollectionStatus.IN_TRANSIT
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-green-100 text-green-800'
                       }`}
                     >
                       {packageCollection.status}
@@ -179,7 +206,9 @@ export default function PackageCollection() {
                       variant="ghost"
                       size="icon"
                       className="size-8"
-                      onClick={() => handleDeletePackageCollection(packageCollection.id)}
+                      onClick={() =>
+                        handleDeletePackageCollection(packageCollection.id)
+                      }
                     >
                       <TrashIcon className="size-4" />
                     </Button>
@@ -188,8 +217,13 @@ export default function PackageCollection() {
               ))}
               {packageCollections.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-sm text-gray-500">
-                    Nenhuma recolha de encomendas encontrada. Clique em "Criar Nova Recolha de Encomendas" para adicionar uma.
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-sm text-gray-500"
+                  >
+                    {
+                      ' Nenhuma recolha de encomendas encontrada. Clique em "Criar Nova Recolha de Encomendas" para adicionar uma.'
+                    }
                   </TableCell>
                 </TableRow>
               )}

@@ -5,13 +5,12 @@ export interface UserResponse {
   email: string;
   contactPhone: string;
   documentNumber: string;
-  status: string;
+  status: UserStatus;
   createdAt: string;
   updatedAt: string;
   deletedAt: string;
   roles: RoleResponse[];
 }
-
 export interface RoleResponse {
   id: string;
   role: Role;
@@ -30,9 +29,14 @@ export interface UserFormData {
   password?: string;
   role?: Role[];
 }
+
 export enum Role {
   USER = 'USER',
   DRIVER = 'DRIVER',
   OPS = 'OPS',
   ADMIN = 'ADMIN',
+}
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
 }
