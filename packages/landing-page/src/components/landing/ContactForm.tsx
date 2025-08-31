@@ -55,7 +55,7 @@ export default function Formulario() {
     formState: { errors },
   } = useForm<FormUserData>();
   const [formData, setFormData] = useState<FormUserData>();
-  const [mensagem, setMensagem] = useState('');
+  const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: FormUserData) => {
@@ -74,12 +74,12 @@ export default function Formulario() {
         }),
       });
       if (!res.ok) throw new Error('Erro na requisição');
-      setMensagem('Formulário enviado com sucesso!');
+      setMessage('Formulário enviado com sucesso!');
       reset();
       setValue('dayOfWeek', '');
       setValue('timeOfDay', '');
     } catch (e) {
-      setMensagem('Erro ao enviar o formulário.');
+      setMessage('Erro ao enviar o formulário.');
       console.error(e);
     } finally {
       setIsSubmitting(false);
@@ -97,7 +97,7 @@ export default function Formulario() {
       if (!res.ok) throw new Error('Erro ao buscar endereço');
       const { results } = await res.json();
       if (results.length === 0) {
-        setMensagem('Código postal não encontrado.');
+        setMessage('Código postal não encontrado.');
         return;
       }
       const { address, position } = results[0];
@@ -162,8 +162,8 @@ export default function Formulario() {
           className=" flex flex-col items-center mt-4 md:mt-0"
         >
           <div className="md:min-w-xl max-w-2xl mx-auto p-2 md:p-4 space-y-4">
-            {mensagem && (
-              <p className="text-center text-sm text-gray-700">{mensagem}</p>
+            {message && (
+              <p className="text-center text-sm text-gray-700">{message}</p>
             )}
 
             {/* Nome e Apelido */}

@@ -35,7 +35,7 @@ export default function StorageUnitForm({
     reset,
     formState: { errors },
   } = useForm<StorageUnitData>();
-  const [mensagem, setMensagem] = useState('');
+  const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [brandOptions, setBrandOptions] = useState<BrandResponse[]>([]);
 
@@ -78,10 +78,10 @@ export default function StorageUnitForm({
         }
       );
       if (!res.ok) throw new Error('Erro na requisição');
-      setMensagem('Formulário enviado com sucesso!');
+      setMessage('Formulário enviado com sucesso!');
       reset();
     } catch (e) {
-      setMensagem('Erro ao enviar o formulário.');
+      setMessage('Erro ao enviar o formulário.');
       console.error(e);
     } finally {
       setIsSubmitting(false);
@@ -95,8 +95,8 @@ export default function StorageUnitForm({
           ? 'Editar Unidade de Armazenamento'
           : 'Criar Nova Unidade de Armazenamento'}
       </h2>
-      {mensagem && (
-        <p className="text-center text-sm text-gray-700">{mensagem}</p>
+      {message && (
+        <p className="text-center text-sm text-gray-700">{message}</p>
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>

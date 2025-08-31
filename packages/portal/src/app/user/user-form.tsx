@@ -29,7 +29,7 @@ export default function UserForm({
     setValue,
   } = useForm<UserFormData>();
 
-  const [mensagem, setMensagem] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const roleOptions = [
     { id: Role.ADMIN, label: 'Admin' },
@@ -51,23 +51,25 @@ export default function UserForm({
   }, [initialData, setValue, reset]);
 
   const onSubmit: SubmitHandler<UserFormData> = async (data) => {
-    
     try {
       // Primeiro, cria o usuário
-      const res = await fetchWithAuth( `${process.env.NEXT_PUBLIC_API_URL}user${
+      const res = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}user${
           initialData?.id ? `/${initialData.id}` : ''
-        }`, {
-        method: initialData?.id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          contactPhone: data.contactPhone,
-          documentNumber: data.documentNumber,
-          password: data.documentNumber, // senha fixa conforme solicitado
-        }),
-      });
+        }`,
+        {
+          method: initialData?.id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            contactPhone: data.contactPhone,
+            documentNumber: data.documentNumber,
+            password: data.documentNumber, // senha fixa conforme solicitado
+          }),
+        }
+      );
 
       if (!res.ok) throw new Error('Erro ao criar usuário');
       const user = await res.json();
@@ -80,14 +82,15 @@ export default function UserForm({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ roles: data.role }),
-          });
+          }
+        );
       }
 
-      setMensagem('Usuário salvo com sucesso!');
+      setMessage('Usuário salvo com sucesso!');
       onSave?.();
       reset();
     } catch (e) {
-      setMensagem('Erro ao salvar o usuário.');
+      setMessage('Erro ao salvar o usuário.');
       console.error(e);
     }
   };
@@ -98,8 +101,8 @@ export default function UserForm({
         {initialData ? 'Editar Usuário' : 'Cadastro de Usuário'}
       </h2>
 
-      {mensagem && (
-        <p className="text-center text-sm text-gray-700">{mensagem}</p>
+      {message && (
+        <p className="text-center text-sm text-gray-700">{message}</p>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

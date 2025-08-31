@@ -5,14 +5,12 @@ import {
   PackageCollectionFormData,
   Shift,
 } from '@/app/types/package-collection';
+import { CheckboxForm } from '@/components/form/checkbox-form';
+import { DatePickerForm } from '@/components/form/date-picker-form';
+import { SelectForm } from '@/components/form/select-form';
+import { InputForm } from '@/components/form/input-form';
+import Title from '@/components/title';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -22,14 +20,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { fetchWithAuth } from '@/lib/fetcher';
-import { useEffect, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { use, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Role, UserResponse, UserStatus } from '../types/user';
 
 interface PackageCollectionFormProps {
   onFormClose: () => void;
   initialData?: PackageCollectionFormData;
-  onSave: (data: PackageCollectionFormData) => void;
+  onSave: () => void;
 }
 
 export default function PackageCollectionForm({
@@ -40,21 +38,27 @@ export default function PackageCollectionForm({
   const {
     control,
     handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
+    reset,
+    getValues,
+    setValue,
+    watch,
+    formState: { errors },
   } = useForm<PackageCollectionFormData>({
     defaultValues: initialData || {
       driver: '',
-      collectionDate: '',
+      collectionDate: new Date(),
       shift: Shift.MORNING,
-      selectedCollectionItems: [],
+      packageIds: [],
     },
   });
 
-  const [message, setMessage] = useState<string | null>(null);
-  const [driverOptions, setDriverOptions] = useState<UserResponse[]>([]);
+  const [, setDriverOptions] = useState<UserResponse[]>([]);
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const shiftOptions = [Shift.MORNING, Shift.AFTERNOON, Shift.NIGHT];
-  const [collectionItems] = useState<CollectionItemResponse[]>([
+  const [collectionItems, setCollectionItems] = useState<
+    CollectionItemResponse[]
+  >([
     {
       id: 'addr1',
       address: 'Rua da boavista 123',
@@ -74,6 +78,26 @@ export default function PackageCollectionForm({
       shift: Shift.NIGHT,
     },
   ]);
+
+  const packageIds = watch('packageIds');
+  const collectionDate = watch('collectionDate');
+  const dayOfWeek = [
+    'Domingo',
+    'Segunda-Feira',
+    'Terça-Feira',
+    'Quarta-Feira',
+    'Quinta-Feira',
+    'Sexta-Feira',
+    'Sábado',
+  ];
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  useEffect(() => {
+    fetchPackageCollectionItems();
+  }, [collectionDate]);
+
   const fetchData = async () => {
     const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}user`, {
       method: 'get',
@@ -92,149 +116,103 @@ export default function PackageCollectionForm({
       )
     );
   };
-  useEffect(() => {
-    fetchData();
-  }, []);
-  const onSubmit: SubmitHandler<PackageCollectionFormData> = async (data) => {
-    setMessage(null);
-    try {
-      await onSave(data);
-      setMessage('Recolha de encomendas guardada com sucesso!');
-    } catch (e) {
-      setMessage('Erro ao guardar a recolha de encomendas.');
-      console.error(e);
+
+  const fetchPackageCollectionItems = async () => {
+    const res = await fetchWithAuth(
+      `${process.env.NEXT_PUBLIC_API_URL}package/created?collectDay=${
+        dayOfWeek[collectionDate.getDay()]
+      }&collectTime=${watch('shift')}&page=1&limit=10`,
+      {
+        method: 'get',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+    if (!res.ok) {
+      console.error('Failed to fetch users');
+      return;
     }
+    const data: any[] = await res.json();
+    console.log('[xxx] ~ fetchPackageCollectionItems ~ data:', data);
+    setCollectionItems(data);
+  };
+
+  const onSubmit = async (data: PackageCollectionFormData) => {
+    console.log('[xxx] ~ onSubmit ~ data:', data);
+    // setIsSubmitting(true);
+    // try {
+    //   const res = await fetch(
+    //     `${process.env.NEXT_PUBLIC_API_URL}route${
+    //       initialData?.id ? `/${initialData.id}` : ''
+    //     }`,
+    //     {
+    //       method: initialData?.id ? 'PUT' : 'POST',
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify({
+    //         ...data,
+    //       }),
+    //     }
+    //   );
+    //   if (!res.ok) throw new Error('Erro na requisição');
+    //   setMessage('Formulário enviado com sucesso!');
+    //   reset();
+    // } catch (e) {
+    //   setMessage('Erro ao enviar o formulário.');
+    //   console.error(e);
+    // } finally {
+    //   setIsSubmitting(false);
+    //   onSave?.();
+    // }
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto my-8">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-        Registo de Recolha de Encomendas
-      </h2>
+      <Title as="h2">Registo de Recolha de Encomendas</Title>
 
-      {message && (
-        <p className="text-center text-sm text-gray-700">{message}</p>
-      )}
+      {message && <p className="text-center text-sm ">{message}</p>}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Driver Dropdown */}
           <div>
-            <label
-              htmlFor="driver"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Motorista
-            </label>
-            <Controller
+            <InputForm
               name="driver"
               control={control}
+              label="Motorista"
               rules={{ required: 'O motorista é obrigatório' }}
-              render={({ field }) => (
-                <>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger
-                      id="driver"
-                      className={`mt-1 block w-full px-3 py-2 border ${
-                        errors.driver ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm`}
-                    >
-                      <SelectValue placeholder="Selecionar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {driverOptions.map((option) => (
-                        <SelectItem key={option.id} value={option.id}>
-                          {option.firstName} {option.lastName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.driver && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.driver.message}
-                    </p>
-                  )}
-                </>
-              )}
+              errors={errors}
             />
           </div>
 
           {/* Collection Date Input */}
           <div>
-            <label
-              htmlFor="collectionDate"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Data da Recolha
-            </label>
-            <input
-              type="date"
-              id="collectionDate"
-              {...register('collectionDate', {
-                required: 'A data é obrigatória',
-              })}
-              className={`mt-1 block w-full px-3 py-2 border ${
-                errors.collectionDate ? 'border-red-500' : 'border-gray-300'
-              } rounded-md shadow-sm`}
+            <DatePickerForm
+              label="Data da Recolha"
+              name="collectionDate"
+              control={control}
+              rules={{ required: 'A data é obrigatória' }}
             />
-            {errors.collectionDate && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.collectionDate.message}
-              </p>
-            )}
           </div>
 
           {/* Shift Dropdown */}
           <div className="col-span-1 md:col-span-2">
-            <label
-              htmlFor="shift"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Turno
-            </label>
-            <Controller
+            <SelectForm
+              label="Turno"
               name="shift"
               control={control}
               rules={{ required: 'O turno é obrigatório' }}
-              render={({ field }) => (
-                <>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger
-                      id="shift"
-                      className={`mt-1 block w-full px-3 py-2 border ${
-                        errors.shift ? 'border-red-500' : 'border-gray-300'
-                      } rounded-md shadow-sm`}
-                    >
-                      <SelectValue placeholder="Selecionar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {shiftOptions.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.shift && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.shift.message}
-                    </p>
-                  )}
-                </>
-              )}
+              options={shiftOptions}
             />
           </div>
         </div>
 
         {/* Collection Selection Table */}
         <div className="pt-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800">
-            Seleção de Encomendas
-          </h3>
-          <div className="mt-4 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+          <Title as="h3">Seleção de Encomendas</Title>
+          <div className="mt-4 w-full ">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead></TableHead>
                   <TableHead>Morada</TableHead>
                   <TableHead>Dia da semana</TableHead>
                   <TableHead>Turno</TableHead>
@@ -244,11 +222,27 @@ export default function PackageCollectionForm({
                 {collectionItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
-                      <input
-                        type="checkbox"
-                        value={item.id}
-                        {...register('selectedCollectionItems')}
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      <CheckboxForm
+                        control={control}
+                        name="packageIds"
+                        checked={packageIds?.includes(item.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setValue('packageIds', [
+                              ...(packageIds || []),
+                              item.id,
+                            ]);
+                          } else {
+                            setValue(
+                              'packageIds',
+                              (packageIds || []).filter(
+                                (id: string) => id !== item.id
+                              )
+                            );
+                          }
+                        }}
+                        label=""
+                        id={item.id}
                       />
                     </TableCell>
                     <TableCell>{item.address}</TableCell>
@@ -262,18 +256,10 @@ export default function PackageCollectionForm({
         </div>
 
         <div className="flex justify-end space-x-3 mt-6">
-          <Button
-            type="button"
-            onClick={onFormClose}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-          >
+          <Button type="button" onClick={onFormClose} variant={'outline'}>
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-          >
+          <Button type="submit" disabled={isSubmitting} variant={'secondary'}>
             {isSubmitting ? 'A Submeter...' : 'Submeter'}
           </Button>
         </div>

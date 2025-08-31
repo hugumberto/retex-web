@@ -18,6 +18,7 @@ import {
   CollectionStatus,
   Shift,
 } from '@/app/types/package-collection';
+import Title from '@/components/title';
 
 export default function PackageCollection() {
   const [showForm, setShowForm] = useState(false);
@@ -139,15 +140,10 @@ export default function PackageCollection() {
       id="package-collection-page"
       className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]"
     >
-      <h1 className="text-4xl md:text-5xl font-bold text-center text-neutral-950 mb-8">
-        Recolha de Encomendas
-      </h1>
+      <Title color="secondary">Recolha de Encomendas</Title>
 
       {!showForm && (
-        <Button
-          className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-          onClick={() => handleToggleForm()}
-        >
+        <Button variant={'secondary'} onClick={() => handleToggleForm()}>
           Criar Nova Recolha de Encomendas
         </Button>
       )}
@@ -156,13 +152,17 @@ export default function PackageCollection() {
         <PackageCollectionForm
           onFormClose={handleFormClose}
           initialData={editingPackageCollection}
-          onSave={handleSavePackageCollection}
+          onSave={() => {
+            setEditingPackageCollection(undefined);
+            setShowForm(false);
+          }}
         />
       ) : (
-        <div className="mt-8 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+        <div className="mt-8 w-full">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead></TableHead>
                 <TableHead>Motorista</TableHead>
                 <TableHead>Qtd. Encomendas</TableHead>
                 <TableHead>Estado</TableHead>

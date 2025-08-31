@@ -15,9 +15,9 @@ export enum Shift {
   export interface PackageCollectionFormData {
     id?: string;
     driver: string; 
-    collectionDate: string;
+    collectionDate: Date;
     shift: Shift;
-    selectedCollectionItems: string[];
+    packageIds: string[];
   }
   
   export interface CollectionItemResponse {
