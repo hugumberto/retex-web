@@ -1,10 +1,7 @@
-export interface Brand {
-  id: string;
+import { Entity } from "./helper";
+
+
+export interface Brand extends Entity {
   name: string;
   manual: boolean;
-}
-export interface BrandResponse extends Brand {
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: null | string;
 }

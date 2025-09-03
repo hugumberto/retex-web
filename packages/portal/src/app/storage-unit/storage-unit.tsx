@@ -11,15 +11,16 @@ import {
 } from '@/components/ui/table';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { StorageUnitData, StorageUnitResponse } from '../types/storage-unit';
+import { StorageUnitData, StorageUnitDTO } from '../types/storage-unit';
 import StorageUnitForm from './storage-unit-form';
+import { fetchWithAuth } from '@/lib/fetcher';
 
 export default function StorageUnit() {
   const [showForm, setShowForm] = useState(false);
-  const [storageUnits, setStorageUnits] = useState<StorageUnitResponse[]>();
+  const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>();
   const [editingUnit, setEditingUnit] = useState<StorageUnitData | undefined>();
   const fetchData = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}storage-unit`, {
+    const res = await fetchWithAuth(`/storage-unit`, {
       method: 'get',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -27,7 +28,7 @@ export default function StorageUnit() {
       console.error('Failed to fetch storage units');
       return;
     }
-    const data: StorageUnitResponse[] = await res.json();
+    const data: StorageUnitDTO[] = await res.json();
     console.log('[xxx] ~ fetchData ~ data:', data);
     setStorageUnits(data);
   };
@@ -35,7 +36,7 @@ export default function StorageUnit() {
     fetchData();
   }, []);
 
-  const handleToggleForm = (item?: StorageUnitResponse | undefined) => {
+  const handleToggleForm = (item?: StorageUnitDTO | undefined) => {
     if (item) {
       setEditingUnit({
         id: item.id,
@@ -49,17 +50,15 @@ export default function StorageUnit() {
     setShowForm((prev) => !prev);
   };
 
-  const handleFormClose = () => {
+  const handleFormClose = async () => {
     setShowForm(false);
+    await fetchData();
   };
   const handleDeleteUnit = async (id: string) => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}storage-unit/${id}`,
-        {
-          method: 'DELETE',
-        }
-      );
+      const res = await fetch(`/storage-unit/${id}`, {
+        method: 'DELETE',
+      });
       if (!res.ok) throw new Error('Erro ao eliminar unidade');
       await fetchData();
     } catch (error) {
