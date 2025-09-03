@@ -24,6 +24,5 @@ export const routeToTitle = (path: string) => {
     '/user': 'Utilizador',
   };
   if (map[path]) return map[path];
-  const seg = path.split('/').filter(Boolean).at(0);
-  return seg ? seg[0].toUpperCase() + seg.slice(1) : null;
+  throw new Error(`Unmapped path: ${path}`);
 }
