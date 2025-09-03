@@ -4,10 +4,11 @@ import { login } from '@/service/auth';
 import { useAuthStore } from '@/store/auth';
 
 export async function fetchWithAuth(
-  url: string,
+  path: string,
   options: RequestInit = {},
   retry = true
 ) {
+  const url =`${process.env.NEXT_PUBLIC_API_URL}${path}`
   let token = useAuthStore.getState().token;
   if (!token) {
     await login();
@@ -25,7 +26,7 @@ export async function fetchWithAuth(
     if (res.status === 401 && retry) {
       await login();
       token = useAuthStore.getState().token;
-      return fetchWithAuth(url, options, false);
+      return fetchWithAuth(path, options, false);
     }
     throw new Error(`HTTP error! status: ${res.status}`);
   }

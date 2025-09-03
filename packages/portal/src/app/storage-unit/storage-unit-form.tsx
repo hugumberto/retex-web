@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { BrandResponse } from '../types/brand';
+import { Brand } from '../types/brand';
 import { Quality, StorageUnitData } from '../types/storage-unit';
 
 interface StorageUnitFormProps {
@@ -37,14 +37,14 @@ export default function StorageUnitForm({
   } = useForm<StorageUnitData>();
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [brandOptions, setBrandOptions] = useState<BrandResponse[]>([]);
+  const [brandOptions, setBrandOptions] = useState<Brand[]>([]);
 
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}brand`);
+        const res = await fetch(`/brand`);
         if (!res.ok) throw new Error('Erro ao buscar marcas');
-        const data: BrandResponse[] = await res.json();
+        const data: Brand[] = await res.json();
         setBrandOptions(data);
       } catch (error) {
         console.error('Erro ao buscar marcas:', error);
@@ -66,9 +66,7 @@ export default function StorageUnitForm({
     setIsSubmitting(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}storage-unit${
-          initialData?.id ? `/${initialData.id}` : ''
-        }`,
+        `/storage-unit${initialData?.id ? `/${initialData.id}` : ''}`,
         {
           method: initialData?.id ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -1,4 +1,5 @@
-import { BrandResponse } from './brand';
+import { Brand } from './brand';
+import { Entity } from './helper';
 
 export interface StorageUnitData {
   id?: string;
@@ -11,12 +12,8 @@ export enum Quality {
   MEDIUM = 'MEDIUM',
   BAD = 'BAD',
 }
-export interface StorageUnitResponse {
-  id: string;
+export interface StorageUnitDTO extends Entity {  
   quality: Quality;
   weight: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: null | string;
-  brand: BrandResponse;
+  brand: Brand;
 }

@@ -1,4 +1,4 @@
-import { DatePicker } from '@/components/date-picker';
+import { DatePicker } from '@/components/custom/date-picker';
 import { Label } from '@/components/ui/label';
 import {
   Control,

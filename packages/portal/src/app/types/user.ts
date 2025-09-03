@@ -1,22 +1,16 @@
-export interface UserResponse {
-  id: string;
+import { Entity } from "./helper";
+
+export interface User extends Entity {
   firstName: string;
   lastName: string;
   email: string;
   contactPhone: string;
   documentNumber: string;
   status: UserStatus;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string;
   roles: RoleResponse[];
 }
-export interface RoleResponse {
-  id: string;
+export interface RoleResponse extends Entity {
   role: Role;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
 }
 
 export interface UserFormData {

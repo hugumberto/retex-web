@@ -54,9 +54,7 @@ export default function UserForm({
     try {
       // Primeiro, cria o usuário
       const res = await fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL}user${
-          initialData?.id ? `/${initialData.id}` : ''
-        }`,
+        `/user${initialData?.id ? `/${initialData.id}` : ''}`,
         {
           method: initialData?.id ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -77,7 +75,7 @@ export default function UserForm({
       // Depois, atribui as roles selecionadas
       if (Array.isArray(data.role) && data.role.length > 0) {
         await fetchWithAuth(
-          `${process.env.NEXT_PUBLIC_API_URL}user/${user.id}/roles`,
+          `/user/${user.id}/roles`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

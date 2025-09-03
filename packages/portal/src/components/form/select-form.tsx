@@ -15,13 +15,17 @@ import {
 } from 'react-hook-form';
 
 import { RegisterOptions } from 'react-hook-form';
+export type SelectFieldOption = {
+  label: string;
+  value: string | number;
+};
 
 interface SelectFieldProps<T extends FieldValues> {
   name: Path<T>;
   control: Control<T>;
   label: string;
   id?: string;
-  options: { value: string; label: string }[] | string[];
+  options: SelectFieldOption[] | string[];
   placeholder?: string;
   rules?: Omit<
     RegisterOptions<T, Path<T>>,
@@ -68,7 +72,10 @@ export function SelectForm<T extends FieldValues>({
                       {option}
                     </SelectItem>
                   ) : (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem
+                      key={String(option.value)}
+                      value={String(option.value ?? '')}
+                    >
                       {option.label}
                     </SelectItem>
                   )

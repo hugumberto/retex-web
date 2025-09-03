@@ -26,10 +26,10 @@ export function DatePicker({
   className,
   placeholder,
 }: DatePickerProps) {
-  const [date, setDate] = React.useState<Date>(selected || new Date());
+  const [date, setDate] = React.useState<Date | undefined>(selected);
 
   React.useEffect(() => {
-    setDate(selected || new Date());
+    setDate(selected);
   }, [selected]);
 
   const handleSelect = (newDate: Date) => {
@@ -38,7 +38,7 @@ export function DatePicker({
   };
 
   return (
-    <Popover>
+    <Popover modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -56,7 +56,7 @@ export function DatePicker({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent forceMount className="w-auto p-0 z-[9999]">
         <Calendar
           mode="single"
           required={true}

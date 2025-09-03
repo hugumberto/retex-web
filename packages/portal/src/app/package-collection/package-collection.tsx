@@ -1,7 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import PackageCollectionForm from './package-collection-form';
+import {
+  CollectionStatus,
+  PackageCollectionDTO,
+  PackageCollectionTableDTO,
+} from '@/app/types/package-collection';
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import Title from '@/components/custom/title';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -11,127 +16,71 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PencilIcon, TrashIcon } from 'lucide-react';
-import {
-  PackageCollectionResponse,
-  PackageCollectionFormData,
-  CollectionStatus,
-  Shift,
-} from '@/app/types/package-collection';
-import Title from '@/components/title';
+import { fetchWithAuth } from '@/lib/fetcher';
+import { TrashIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { PaginatedResult } from '../types/helper';
+import PackageCollectionForm from './package-collection-form';
 
 export default function PackageCollection() {
-  const [showForm, setShowForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [packageCollections, setPackageCollections] = useState<
-    PackageCollectionResponse[]
-  >([
-    {
-      id: 'rec1',
-      driver: 'Hugo Gonçalves',
-      packageQty: 2,
-      status: CollectionStatus.AWAITING_COLLECTION,
-      collectionDate: '2025-08-08',
-      shift: Shift.NIGHT,
-      selectedCollectionItems: ['addr1', 'addr2'],
-      createdAt: '2025-08-08T10:00:00Z',
-      updatedAt: '2025-08-08T10:00:00Z',
-      deletedAt: null,
-    },
-    {
-      id: 'rec2',
-      driver: 'Tamara Fedorenko',
-      packageQty: 1,
-      status: CollectionStatus.IN_TRANSIT,
-      collectionDate: '2025-08-08',
-      shift: Shift.AFTERNOON,
-      selectedCollectionItems: ['addr1', 'addr3'],
-      createdAt: '2025-08-08T11:00:00Z',
-      updatedAt: '2025-08-08T11:00:00Z',
-      deletedAt: null,
-    },
-  ]);
-  const [editingPackageCollection, setEditingPackageCollection] = useState<
-    PackageCollectionFormData | undefined
-  >();
+    PackageCollectionTableDTO[]
+  >([]);
 
-  const handleToggleForm = (
-    packageCollectionToEdit?: PackageCollectionResponse
-  ) => {
-    if (packageCollectionToEdit) {
-      setEditingPackageCollection({
-        id: packageCollectionToEdit.id,
-        driver: packageCollectionToEdit.driver,
-        collectionDate: packageCollectionToEdit.collectionDate,
-        shift: packageCollectionToEdit.shift,
-        selectedCollectionItems:
-          packageCollectionToEdit.selectedCollectionItems,
+  const fetchData = async () => {
+    const res = await fetchWithAuth(`/route`, {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) {
+      console.error('Failed to fetch storage units');
+      return;
+    }
+    const data: PaginatedResult<PackageCollectionTableDTO> = await res.json();
+    setPackageCollections(data.data);
+  };
+  const fetchCollectionDataById = async (
+    id: string
+  ): Promise<PackageCollectionDTO | undefined> => {
+    const res = await fetchWithAuth(`/route/${id}`, {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) {
+      console.error('Failed to fetch storage units');
+      return;
+    }
+    return await res.json();
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const onSave = async () => {
+    await fetchData();
+  };
+
+  const handleDelete = async (id: string) => {
+    setIsSubmitting(true);
+    try {
+      const data = await fetchCollectionDataById(id);
+      const res = await fetchWithAuth(`/route/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          status: CollectionStatus.FINISHED,
+        }),
       });
-    } else {
-      setEditingPackageCollection(undefined);
-    }
-    setShowForm((prev) => !prev);
-  };
-
-  const handleFormClose = () => {
-    setShowForm(false);
-    setEditingPackageCollection(undefined);
-  };
-
-  const handleSavePackageCollection = async (
-    formData: PackageCollectionFormData
-  ) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    if (formData.id) {
-      setPackageCollections((prevCollections) =>
-        prevCollections.map((collection) =>
-          collection.id === formData.id
-            ? {
-                ...collection,
-                driver: formData.driver,
-                packageQty: formData.selectedCollectionItems.length,
-                collectionDate: formData.collectionDate,
-                shift: formData.shift,
-                selectedCollectionItems: formData.selectedCollectionItems,
-                updatedAt: new Date().toISOString(),
-              }
-            : collection
-        )
-      );
-    } else {
-      const newPackageCollection: PackageCollectionResponse = {
-        id: Date.now().toString(),
-        driver: formData.driver,
-        packageQty: formData.selectedCollectionItems.length,
-        status: CollectionStatus.AWAITING_COLLECTION,
-        collectionDate: formData.collectionDate,
-        shift: formData.shift,
-        selectedCollectionItems: formData.selectedCollectionItems,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        deletedAt: null,
-      };
-
-      setPackageCollections((prevCollections) => [
-        ...prevCollections,
-        newPackageCollection,
-      ]);
-    }
-
-    console.log('Saving package collection:', formData);
-    handleFormClose();
-  };
-
-  const handleDeletePackageCollection = async (id: string) => {
-    if (
-      window.confirm(
-        'Tem certeza de que deseja excluir esta recolha de encomendas?'
-      )
-    ) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setPackageCollections((prevCollections) =>
-        prevCollections.filter((collection) => collection.id !== id)
-      );
+      if (!res.ok) throw new Error('Erro na requisição');
+      await fetchData();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -142,95 +91,89 @@ export default function PackageCollection() {
     >
       <Title color="secondary">Recolha de Encomendas</Title>
 
-      {!showForm && (
-        <Button variant={'secondary'} onClick={() => handleToggleForm()}>
-          Criar Nova Recolha de Encomendas
-        </Button>
-      )}
+      <PackageCollectionForm onSave={() => onSave()} />
 
-      {showForm ? (
-        <PackageCollectionForm
-          onFormClose={handleFormClose}
-          initialData={editingPackageCollection}
-          onSave={() => {
-            setEditingPackageCollection(undefined);
-            setShowForm(false);
-          }}
-        />
-      ) : (
-        <div className="mt-8 w-full">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead></TableHead>
-                <TableHead>Motorista</TableHead>
-                <TableHead>Qtd. Encomendas</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Ação</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {packageCollections?.map((packageCollection) => (
-                <TableRow key={packageCollection.id}>
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {packageCollection.driver}
-                  </TableCell>
-                  <TableCell>{packageCollection.packageQty}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        packageCollection.status === CollectionStatus.IN_TRANSIT
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}
-                    >
-                      {packageCollection.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handleToggleForm(packageCollection)}
-                    >
-                      <PencilIcon className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() =>
-                        handleDeletePackageCollection(packageCollection.id)
-                      }
-                    >
-                      <TrashIcon className="size-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {packageCollections.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center text-sm text-gray-500"
+      <div className="mt-8 w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead></TableHead>
+              <TableHead>Motorista</TableHead>
+              <TableHead>Qtd. Encomendas</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Ação</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {packageCollections?.map((packageCollection) => (
+              <TableRow key={packageCollection.id}>
+                <TableCell>
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                </TableCell>
+                <TableCell className="font-medium">
+                  {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}
+                </TableCell>
+                <TableCell>{packageCollection.packagesCount}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      packageCollection.status === CollectionStatus.IN_TRANSIT
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-green-100 text-green-800'
+                    }`}
                   >
-                    {
-                      ' Nenhuma recolha de encomendas encontrada. Clique em "Criar Nova Recolha de Encomendas" para adicionar uma.'
+                    {packageCollection.status}
+                  </span>
+                </TableCell>
+                <TableCell className="space-x-2">
+                  <PackageCollectionForm
+                    packageCollectionId={packageCollection.id}
+                    onSave={() => onSave()}
+                  />
+                  <ConfirmDialog
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={isSubmitting}
+                        className="size-8"
+                      >
+                        <TrashIcon />
+                      </Button>
                     }
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+                    onConfirm={async () => {
+                      await toast.promise(handleDelete(packageCollection.id), {
+                        loading: 'Loading...',
+                        success: () => {
+                          return 'Recolha de Encomendas desativada com sucesso';
+                        },
+                        error: () => {
+                          return 'Erro ao desativar a recolha de encomendas';
+                        },
+                      });
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+            {packageCollections.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-sm text-gray-500"
+                >
+                  {
+                    ' Nenhuma recolha de encomendas encontrada. Clique em "Criar Nova Recolha de Encomendas" para adicionar uma.'
+                  }
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </section>
   );
 }
