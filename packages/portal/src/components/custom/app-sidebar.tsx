@@ -71,7 +71,7 @@ export function AppSidebar() {
                   >
                     <Link href={href}>
                       <Icon className={cn('size-5')} />
-                      <Label className={cn('size-5')}>{label}</Label>
+                      <Label className="text-[13px]">{label}</Label>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
