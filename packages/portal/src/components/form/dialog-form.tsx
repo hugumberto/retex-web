@@ -73,7 +73,7 @@ export function DialogForm<T extends FieldValues>({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="text-secondary">{title}</DialogTitle>
           {description && (
             <DialogDescription aria-describedby={undefined}>
               {description}
