@@ -1,6 +1,6 @@
 import { Entity } from "./helper";
 import { PackageDTO } from "./package";
-import { User } from "./user";
+import { UserDTO } from "./user";
 
 export enum Shift {
     MORNING = 'Manhã',
@@ -25,7 +25,7 @@ export enum Shift {
 
  export interface PackageCollectionDTO extends Entity {
   status: CollectionStatus
-  driver: User
+  driver: UserDTO
   packages: PackageDTO[]
   startDate: Date
   endDate?: Date

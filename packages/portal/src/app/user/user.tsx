@@ -12,12 +12,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PencilIcon, TrashIcon } from 'lucide-react';
-import { UserFormData, User } from '../types/user';
+import { UserFormData, UserDTO } from '../types/user';
 import { fetchWithAuth } from '@/lib/fetcher';
 
 export default function User() {
   const [showForm, setShowForm] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserDTO[]>([]);
   const [editingUser, setEditingUser] = useState<UserFormData | undefined>();
   const fetchData = async () => {
     const res = await fetchWithAuth(`/user`, {
@@ -28,13 +28,13 @@ export default function User() {
       console.error('Failed to fetch users');
       return;
     }
-    const data: User[] = await res.json();
+    const data: UserDTO[] = await res.json();
     setUsers(data);
   };
   useEffect(() => {
     fetchData();
   }, []);
-  const handleToggleForm = (userToEdit?: User) => {
+  const handleToggleForm = (userToEdit?: UserDTO) => {
     if (userToEdit) {
       setEditingUser({
         id: userToEdit.id,
@@ -56,7 +56,7 @@ export default function User() {
     setEditingUser(undefined);
   };
 
-  const handleDeleteUser = async (user: User) => {
+  const handleDeleteUser = async (user: UserDTO) => {
     if (window.confirm('Tem certeza que deseja eliminar este usuário?')) {
       try {
         const res = await fetchWithAuth(`/user/${user.id}`, {

@@ -28,7 +28,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../types/helper';
 import { PackageDTO } from '../types/package';
-import { Role, User, UserStatus } from '../types/user';
+import { Role, UserDTO, UserStatus } from '../types/user';
 
 interface PackageCollectionFormProps {
   packageCollectionId?: string;
@@ -123,7 +123,7 @@ export default function PackageCollectionForm({
       console.error('Failed to fetch users');
       return;
     }
-    const data: User[] = await res.json();
+    const data: UserDTO[] = await res.json();
     setDriverOptions(
       data
         .filter(

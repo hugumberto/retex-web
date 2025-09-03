@@ -2,7 +2,7 @@ import { Brand } from "./brand";
 import { Entity } from "./helper"
 import { PackageCollectionDTO } from "./package-collection"
 import { StorageUnitDTO } from "./storage-unit";
-import { User } from "./user"
+import { UserDTO } from "./user"
 
 export interface Address {
   street: string;
@@ -19,7 +19,7 @@ export interface Address {
 
 export interface PackageDTO extends Entity {
   status: PackageStatus
-  user: User
+  user: UserDTO
   route?: PackageCollectionDTO
   weight?: number
   collectDay: string

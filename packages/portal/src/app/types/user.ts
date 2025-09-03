@@ -1,6 +1,6 @@
 import { Entity } from "./helper";
 
-export interface User extends Entity {
+export interface UserDTO extends Entity {
   firstName: string;
   lastName: string;
   email: string;
