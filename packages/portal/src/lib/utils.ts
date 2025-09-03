@@ -25,5 +25,5 @@ export const routeToTitle = (path: string) => {
   };
   if (map[path]) return map[path];
   const seg = path.split('/').filter(Boolean).at(0);
-  return seg ? seg[0]?.toUpperCase() + seg.slice(1) : null;
+  return seg ? seg[0].toUpperCase() + seg.slice(1) : null;
 }

@@ -9,7 +9,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar, RetexTopbar } from '@/components/custom/app-sidebar';
 
 // shadcn/ui breadcrumbs
-import { Breadcrumbs } from '@/components/custom/breadcrums';
+import { Breadcrumbs } from '@/components/custom/breadcrumbs';
 import React from 'react';
 
 export const metadata = {
