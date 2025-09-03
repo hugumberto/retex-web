@@ -48,9 +48,13 @@ export function AppSidebar() {
           <SidebarGroupLabel className="sr-only">Navigation</SidebarGroupLabel>
           <SidebarMenu>
             {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-              const active =
-                pathname === href ||
-                (href !== '/' && pathname?.startsWith(href));
+                (href !== '/' &&
+                  pathname?.startsWith(href) &&
+                  (
+                    pathname.length === href.length ||
+                    pathname.charAt(href.length) === '/'
+                  )
+                );
               return (
                 <SidebarMenuItem key={href}>
                   <SidebarMenuButton
