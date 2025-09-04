@@ -1,6 +1,5 @@
 'use client';
 import { useAppStore } from '@/store';
-import { usePathname } from 'next/navigation';
 import React from 'react';
 import {
   Breadcrumb,
@@ -11,8 +10,6 @@ import {
 } from '../ui/breadcrumb';
 
 export const Breadcrumbs = () => {
-  const pathname = usePathname();
-  const segments = pathname.split('/').filter(Boolean);
   const { breadcrumbs } = useAppStore();
 
   return (

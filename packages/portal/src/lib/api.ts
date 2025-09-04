@@ -79,7 +79,9 @@ api.interceptors.response.use(
       }
 
       config.headers = config.headers ?? {};
-      (config.headers as any).Authorization = `Bearer ${newToken}`;
+      (
+        config.headers as Record<string, string>
+      ).Authorization = `Bearer ${newToken}`;
       return api(config);
     }
 

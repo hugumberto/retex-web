@@ -6,7 +6,7 @@ export default function Index() {
   const { setPageTitle } = useAppStore();
   useEffect(() => {
     setPageTitle('Home');
-  }, []);
+  }, [setPageTitle]);
 
   return (
     <div className="font-family-poppins">
