@@ -65,8 +65,7 @@ export default function StorageUnitForm({
   const onSubmit = async (data: StorageUnitData) => {
     setIsSubmitting(true);
     try {
-      if (initialData?.id) {
-        const { status } = await api.post(`/storage-unit${initialData?.id}`, {
+        const { status } = await api.put(`/storage-unit/${initialData?.id}`, {
           ...data,
         });
         if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
