@@ -6,8 +6,8 @@ import {
   PackageCollectionTableDTO,
 } from '@/app/types/package-collection';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
-import Title from '@/components/custom/title';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -87,13 +87,11 @@ export default function PackageCollection() {
   return (
     <section
       id="package-collection-page"
-      className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]"
+      className=" flex flex-col items-center"
     >
-      <Title color="secondary">Recolha de Encomendas</Title>
-
       <PackageCollectionForm onSave={() => onSave()} />
 
-      <div className="mt-8 w-full">
+      <div className="mt-4 w-full">
         <Table>
           <TableHeader>
             <TableRow>
@@ -108,10 +106,7 @@ export default function PackageCollection() {
             {packageCollections?.map((packageCollection) => (
               <TableRow key={packageCollection.id}>
                 <TableCell>
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
+                  <Checkbox className="h-4 w-4 " />
                 </TableCell>
                 <TableCell className="font-medium">
                   {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}

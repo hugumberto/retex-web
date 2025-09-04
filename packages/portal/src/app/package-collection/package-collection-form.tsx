@@ -234,7 +234,7 @@ export default function PackageCollectionForm({
             <PencilIcon className="size-4" />
           </Button>
         ) : (
-          <Button variant="secondary" className="w-full">
+          <Button variant="secondary" className="ml-auto block">
             Criar
           </Button>
         )
