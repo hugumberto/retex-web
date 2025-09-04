@@ -15,8 +15,6 @@ const createStateCreator: StateCreator<AppStore, [["zustand/devtools", never], [
 export const useAppStore = create<AppStore>()(
   devtools(
     persist(createStateCreator, {
-      name: 'AppStore', // key in localStorage
-     
     })
   )
 )
