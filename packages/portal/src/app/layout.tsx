@@ -11,6 +11,7 @@ import { AppSidebar, RetexTopbar } from '@/components/custom/app-sidebar';
 // shadcn/ui breadcrumbs
 import { Breadcrumbs } from '@/components/custom/breadcrumbs';
 import React from 'react';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 export const metadata = {
   title: 'Welcome to portal',
@@ -36,7 +37,7 @@ export default function RootLayout({
             <main className="relative min-h-[calc(100dvh-4rem)] flex flex-col">
               <div className="flex-1 p-4 sm:p-6 lg:p-8">
                 <Breadcrumbs />
-                {children}
+                <TooltipProvider>{children}</TooltipProvider>
               </div>
 
               {/* Footer fixed at the bottom */}

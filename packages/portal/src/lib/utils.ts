@@ -24,5 +24,5 @@ export const routeToTitle = (path: string) => {
     '/user': 'Utilizador',
   };
   if (map[path]) return map[path];
-  throw new Error(`Unmapped path: ${path}`);
+  return '';
 }
