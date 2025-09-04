@@ -23,7 +23,7 @@ export const Breadcrumbs = () => {
         </BreadcrumbItem>
         {breadcrumbs.map((seg, idx) => {
           const { label, href } = seg;
-          const isLast = idx === segments.length - 1;
+          const isLast = idx === breadcrumbs.length - 1;
           return (
             <React.Fragment key={href}>
               <BreadcrumbSeparator />
