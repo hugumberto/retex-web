@@ -104,11 +104,6 @@ export default function PackageCollectionForm({
   }, [fetchPackageCollectionItems, isEditing, isOpen]);
 
   useEffect(() => {
-    isOpen && fetchData();
-    if (isEditing) fetchPackageCollectionItems();
-  }, [fetchPackageCollectionItems, isEditing, isOpen]);
-
-  useEffect(() => {
     if (startDate && shift) fetchPackageCollectionItems();
   }, [startDate, shift, fetchPackageCollectionItems]);
 
