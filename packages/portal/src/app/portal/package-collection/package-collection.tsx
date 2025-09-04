@@ -2,7 +2,6 @@
 
 import {
   CollectionStatus,
-  PackageCollectionDTO,
   PackageCollectionTableDTO,
 } from '@/app/types/package-collection';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
@@ -16,13 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import api from '@/lib/api';
+import { useAppStore } from '@/store';
 import { TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
-import { useAppStore } from '@/store';
-import api from '@/lib/api';
 
 export default function PackageCollection() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
@@ -37,13 +36,6 @@ export default function PackageCollection() {
       `/route`
     );
     setPackageCollections(data.data);
-  };
-
-  const fetchCollectionDataById = async (
-    id: string
-  ): Promise<PackageCollectionDTO | undefined> => {
-    const { data } = await api.get<PackageCollectionDTO>(`/route/${id}`);
-    return data;
   };
 
   useEffect(() => {
