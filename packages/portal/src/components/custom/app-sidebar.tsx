@@ -50,8 +50,8 @@ export function AppSidebar() {
           <SidebarMenu>
             {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
               const active =
-                href === '/'
-                  ? pathname === '/'
+                href === '/portal'
+                  ? pathname === '/portal'
                   : pathname?.startsWith(href) &&
                     (pathname.length === href.length ||
                       pathname.charAt(href.length) === '/');

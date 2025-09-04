@@ -16,7 +16,7 @@ export default function NoAuthLayout({
       <body>
         {/* Breadcrumbs */}
 
-        <main className="relative min-h-[calc(100dvh-4rem)] flex flex-col bg-amber-600">
+        <main className="relative min-h-[calc(100dvh-4rem)] flex flex-col ">
           <div className="flex-1 p-4 sm:p-6 lg:p-8">{children}</div>
 
           {/* Footer fixed at the bottom */}

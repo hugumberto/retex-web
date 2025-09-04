@@ -19,7 +19,7 @@ import {
 import { TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { PaginatedResult } from '../types/helper';
+import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
 import { useAppStore } from '@/store';
 import api from '@/lib/api';

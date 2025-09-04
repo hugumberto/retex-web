@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
-import { Role, UserFormData } from '../types/user';
+import { Role, UserFormData } from '../../types/user';
 
 interface UserFormProps {
   onFormClose: () => void;

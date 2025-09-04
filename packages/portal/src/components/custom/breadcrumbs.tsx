@@ -19,7 +19,7 @@ export const Breadcrumbs = () => {
     <Breadcrumb className="px-4 sm:px-6 lg:px-8 ">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          <BreadcrumbLink href="/portal">Home</BreadcrumbLink>
         </BreadcrumbItem>
         {breadcrumbs.map((seg, idx) => {
           const { label, href } = seg;

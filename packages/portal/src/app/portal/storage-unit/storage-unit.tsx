@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { StorageUnitData, StorageUnitDTO } from '../types/storage-unit';
+import { StorageUnitData, StorageUnitDTO } from '../../types/storage-unit';
 import StorageUnitForm from './storage-unit-form';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';

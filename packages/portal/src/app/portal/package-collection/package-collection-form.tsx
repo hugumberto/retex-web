@@ -26,9 +26,9 @@ import { PencilIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { PaginatedResult } from '../types/helper';
-import { PackageDTO } from '../types/package';
-import { Role, UserDTO, UserStatus } from '../types/user';
+import { PaginatedResult } from '../../types/helper';
+import { PackageDTO } from '../../types/package';
+import { Role, UserDTO, UserStatus } from '../../types/user';
 import { isSuccessStatus } from '@/lib/utils';
 
 interface PackageCollectionFormProps {

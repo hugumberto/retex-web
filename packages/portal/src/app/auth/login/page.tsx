@@ -17,7 +17,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push('/home');
+      router.push('/portal');
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message ?? 'Erro ao fazer login');

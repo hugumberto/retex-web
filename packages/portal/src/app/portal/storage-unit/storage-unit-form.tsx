@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Brand } from '../types/brand';
-import { Quality, StorageUnitData } from '../types/storage-unit';
+import { Brand } from '../../types/brand';
+import { Quality, StorageUnitData } from '../../types/storage-unit';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 

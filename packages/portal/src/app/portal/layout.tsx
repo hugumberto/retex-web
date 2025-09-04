@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Toaster } from 'sonner';
-import './global.css';
+import '../global.css';
 
 // shadcn/ui sidebar v3.1
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
@@ -12,7 +12,8 @@ import { AppSidebar, RetexTopBar } from '@/components/custom/app-sidebar';
 import { Breadcrumbs } from '@/components/custom/breadcrumbs';
 import React from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import AuthBootstrapper from './auth-bootstrapper';
+import AuthBootstrapper from './guard/auth-bootstrapper';
+import Protected from './guard/guard';
 
 export const metadata = {
   title: 'Welcome to portal',
@@ -39,7 +40,9 @@ export default function RootLayout({
             <main className="relative min-h-[calc(100dvh-4rem)] flex flex-col">
               <div className="flex-1 p-4 sm:p-6 lg:p-8">
                 <Breadcrumbs />
-                <TooltipProvider>{children}</TooltipProvider>
+                <TooltipProvider>
+                  <Protected>{children}</Protected>
+                </TooltipProvider>
               </div>
 
               {/* Footer fixed at the bottom */}

@@ -13,7 +13,7 @@ import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { UserDTO, UserFormData } from '../types/user';
+import { UserDTO, UserFormData } from '../../types/user';
 import UserForm from './user-form';
 
 export default function User() {
