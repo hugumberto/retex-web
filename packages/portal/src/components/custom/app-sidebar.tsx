@@ -49,10 +49,11 @@ export function AppSidebar() {
           <SidebarMenu>
             {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
               const active =
-                href !== '/' &&
-                pathname?.startsWith(href) &&
-                (pathname.length === href.length ||
-                  pathname.charAt(href.length) === '/');
+                href === '/'
+                  ? pathname === '/'
+                  : pathname?.startsWith(href) &&
+                    (pathname.length === href.length ||
+                      pathname.charAt(href.length) === '/');
               return (
                 <SidebarMenuItem key={href}>
                   <SidebarMenuButton
