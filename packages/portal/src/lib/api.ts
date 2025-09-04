@@ -1,12 +1,13 @@
-import { useAppStore } from "@/store";
-import axios, { AxiosError } from "axios";
+import { useAppStore } from '@/store';
+import axios, { AxiosError } from 'axios';
+import { isSuccessStatus } from './utils';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true, // envia/recebe cookie de refresh da API externa
 });
 
-declare module "axios" {
+declare module 'axios' {
   // marca interna para evitar loop
   export interface AxiosRequestConfig {
     _retry?: boolean;
@@ -21,13 +22,13 @@ const flush = () => queue.splice(0).forEach((cb) => cb());
 
 async function refreshAccessToken(): Promise<string | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
+    const { data, status } = await api.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+      {
+        refresh_token: useAppStore.getState().refreshToken,
+      }
+    );
+    if (!isSuccessStatus(status)) return null;
     return data.access_token ?? data.accessToken ?? null;
   } catch {
     return null;
@@ -38,7 +39,9 @@ api.interceptors.request.use((config) => {
   const token = useAppStore.getState().accessToken;
   if (token) {
     config.headers = config.headers ?? {};
-    (config.headers as any).Authorization = `Bearer ${token}`;
+    (
+      config.headers as Record<string, string>
+    ).Authorization = `Bearer ${token}`;
   }
   return config;
 });
