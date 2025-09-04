@@ -9,8 +9,10 @@ import {
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Brand } from '../types/brand';
-import { Quality, StorageUnitData } from '../types/storage-unit';
+import { Brand } from '../../types/brand';
+import { Quality, StorageUnitData } from '../../types/storage-unit';
+import api from '@/lib/api';
+import { isSuccessStatus } from '@/lib/utils';
 
 interface StorageUnitFormProps {
   onFormClose: () => void;
@@ -42,9 +44,8 @@ export default function StorageUnitForm({
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const res = await fetch(`/brand`);
-        if (!res.ok) throw new Error('Erro ao buscar marcas');
-        const data: Brand[] = await res.json();
+        const { data, status } = await api.get<Brand[]>(`/brand`);
+        if (!isSuccessStatus(status)) throw new Error('Erro ao buscar marcas');
         setBrandOptions(data);
       } catch (error) {
         console.error('Erro ao buscar marcas:', error);
@@ -55,7 +56,6 @@ export default function StorageUnitForm({
   }, []);
 
   useEffect(() => {
-    console.log('[xxx] ~ StorageUnitForm ~ initialData:', initialData);
     if (brandOptions.length > 0 && initialData) {
       setValue('brandId', initialData.brandId);
       setValue('quality', initialData.quality);
@@ -65,17 +65,17 @@ export default function StorageUnitForm({
   const onSubmit = async (data: StorageUnitData) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch(
-        `/storage-unit${initialData?.id ? `/${initialData.id}` : ''}`,
-        {
-          method: initialData?.id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...data,
-          }),
-        }
-      );
-      if (!res.ok) throw new Error('Erro na requisição');
+      if (initialData?.id) {
+        const { status } = await api.put(`/storage-unit/${initialData.id}`, {
+          ...data,
+        });
+        if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
+      } else {
+        const { status } = await api.post(`/storage-unit`, {
+          ...data,
+        });
+        if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
+      }
       setMessage('Formulário enviado com sucesso!');
       reset();
     } catch (e) {

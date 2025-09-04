@@ -1,22 +1,18 @@
-// stores/auth.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+// app/store/auth.ts
+import { AuthSlice } from '@/app/types/state';
 
-interface AuthState {
-  token: string | null;
-  setToken: (token: string) => void;
-  clearToken: () => void;
-}
-
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      token: null,
-      setToken: (token) => set({ token }),
-      clearToken: () => set({ token: null }),
-    }),
-    {
-      name: 'auth-storage', // localStorage key
-    }
-  )
-);
+export const createAuthSlice = (
+  set: (state: Partial<AuthSlice>) => void
+): AuthSlice => ({
+  accessToken: null,
+  refreshToken: null,
+  user: null,
+  setAccessToken: (t) => set({ accessToken: t }),
+  setRefreshToken: (t) => set({ refreshToken: t }),
+  setUser: (u) => set({ user: u }),
+  logout: async () => {
+    set({ accessToken: null, user: null });
+    // limpa refresh cookie no servidor
+    await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+  },
+});

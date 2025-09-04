@@ -20,15 +20,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { fetchWithAuth } from '@/lib/fetcher';
+import api from '@/lib/api';
 import { format } from 'date-fns';
 import { PencilIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { PaginatedResult } from '../types/helper';
-import { PackageDTO } from '../types/package';
-import { Role, UserDTO, UserStatus } from '../types/user';
+import { PaginatedResult } from '../../types/helper';
+import { PackageDTO } from '../../types/package';
+import { Role, UserDTO, UserStatus } from '../../types/user';
+import { isSuccessStatus } from '@/lib/utils';
 
 interface PackageCollectionFormProps {
   packageCollectionId?: string;
@@ -59,6 +60,7 @@ export default function PackageCollectionForm({
   const [driverOptions, setDriverOptions] = useState<SelectFieldOption[]>([]);
   const [packages, setPackages] = useState<PackageDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isEditing] = useState(!!packageCollectionId);
   const shiftOptions = [Shift.MORNING, Shift.AFTERNOON, Shift.NIGHT];
   const statusOptions = [
@@ -87,43 +89,31 @@ export default function PackageCollectionForm({
 
   const fetchPackageCollectionItems = useCallback(async () => {
     if (!startDate || !shift) return;
-    const res = await fetchWithAuth(
+    const { data } = await api.get<PaginatedResult<PackageDTO>>(
       `/package/created?collectDay=${
         dayOfWeek[startDate.getDay()]
-      }&collectTime=${shift}&page=1&limit=10`,
-      {
-        method: 'get',
-        headers: { 'Content-Type': 'application/json' },
-      }
+      }&collectTime=${shift}&page=1&limit=10`
     );
-    if (!res.ok) {
-      console.error('Failed to fetch users');
-      return;
-    }
-    const data: PaginatedResult<PackageDTO> = await res.json();
+
     setPackages(data.data);
   }, [startDate, shift, dayOfWeek]);
 
   useEffect(() => {
-    fetchData();
+    isOpen && fetchData();
     if (isEditing) fetchPackageCollectionItems();
-  }, [fetchPackageCollectionItems, isEditing]);
+  }, [fetchPackageCollectionItems, isEditing, isOpen]);
 
   useEffect(() => {
-    console.log('[xxx] ~ PackageCollectionForm ~ startDate:', startDate);
     if (startDate && shift) fetchPackageCollectionItems();
   }, [startDate, shift, fetchPackageCollectionItems]);
 
   const fetchData = async () => {
-    const res = await fetchWithAuth(`/user`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) {
+    const { data, status } = await api.get<UserDTO[]>(`/user`);
+    if (!isSuccessStatus(status)) {
       console.error('Failed to fetch users');
       return;
     }
-    const data: UserDTO[] = await res.json();
+
     setDriverOptions(
       data
         .filter(
@@ -137,19 +127,20 @@ export default function PackageCollectionForm({
         }))
     );
   };
+
   const fetchCollectionDataById = async (
     id: string
   ): Promise<PackageCollectionDTO | undefined> => {
-    const res = await fetchWithAuth(`/route/${id}`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) {
+    const { data, status } = await api.get<PackageCollectionDTO>(
+      `/route/${id}`
+    );
+    if (!isSuccessStatus(status)) {
       console.error('Failed to fetch storage units');
       return;
     }
-    return await res.json();
+    return data;
   };
+
   const getEditingItem = async (): Promise<
     PackageCollectionFormData | undefined
   > => {
@@ -170,7 +161,9 @@ export default function PackageCollectionForm({
     }
     return undefined;
   };
+
   const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
     if (open && isEditing && packageCollectionId) {
       getEditingItem().then((data) => {
         reset(data);
@@ -185,21 +178,21 @@ export default function PackageCollectionForm({
         const formattedDate = data.startDate
           ? format(data.startDate, "yyyy-MM-dd HH:mm:ss'.000000+00'")
           : undefined;
-
-        const res = await fetchWithAuth(
-          `/route${
-            isEditing && packageCollectionId ? `/${packageCollectionId}` : ''
-          }`,
-          {
-            method: isEditing ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...data,
-              startDate: formattedDate,
-            }),
-          }
-        );
-        if (!res.ok) throw new Error('Erro na requisição');
+        if (isEditing) {
+          const res = await api.put(`/route/${packageCollectionId}`, {
+            ...data,
+            startDate: formattedDate,
+          });
+          if (!isSuccessStatus(res.status))
+            throw new Error('Erro na requisição');
+          reset();
+          return;
+        }
+        const res = await api.post(`/route`, {
+          ...data,
+          startDate: formattedDate,
+        });
+        if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
         reset();
       },
       {

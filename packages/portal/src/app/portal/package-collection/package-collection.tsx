@@ -2,7 +2,6 @@
 
 import {
   CollectionStatus,
-  PackageCollectionDTO,
   PackageCollectionTableDTO,
 } from '@/app/types/package-collection';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
@@ -16,48 +15,38 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { fetchWithAuth } from '@/lib/fetcher';
+import api from '@/lib/api';
+import { useAppStore } from '@/store';
 import { TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { PaginatedResult } from '../types/helper';
+import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
 
 export default function PackageCollection() {
+  const { setPageTitle, setBreadcrumbs } = useAppStore();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [packageCollections, setPackageCollections] = useState<
     PackageCollectionTableDTO[]
   >([]);
 
   const fetchData = async () => {
-    const res = await fetchWithAuth(`/route`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) {
-      console.error('Failed to fetch storage units');
-      return;
-    }
-    const data: PaginatedResult<PackageCollectionTableDTO> = await res.json();
+    const { data } = await api.get<PaginatedResult<PackageCollectionTableDTO>>(
+      `/route`
+    );
     setPackageCollections(data.data);
-  };
-  const fetchCollectionDataById = async (
-    id: string
-  ): Promise<PackageCollectionDTO | undefined> => {
-    const res = await fetchWithAuth(`/route/${id}`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) {
-      console.error('Failed to fetch storage units');
-      return;
-    }
-    return await res.json();
   };
 
   useEffect(() => {
+    setPageTitle('Recolha');
+    setBreadcrumbs([{ label: 'Recolha', href: '/portal/package-collection' }]);
     fetchData();
-  }, []);
+    return () => {
+      setPageTitle('');
+      setBreadcrumbs([]);
+    };
+  }, [setBreadcrumbs, setPageTitle]);
 
   const onSave = async () => {
     await fetchData();
@@ -66,16 +55,8 @@ export default function PackageCollection() {
   const handleDelete = async (id: string) => {
     setIsSubmitting(true);
     try {
-      const data = await fetchCollectionDataById(id);
-      const res = await fetchWithAuth(`/route/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          status: CollectionStatus.FINISHED,
-        }),
-      });
-      if (!res.ok) throw new Error('Erro na requisição');
+      const res = await api.delete(`/route/${id}`);
+      if (res.status !== 200) throw new Error('Erro na requisição');
       await fetchData();
     } catch (e) {
       console.error(e);
