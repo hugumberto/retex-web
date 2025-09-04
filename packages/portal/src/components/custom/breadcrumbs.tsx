@@ -32,7 +32,7 @@ export const Breadcrumbs = () => {
                   aria-current={isLast ? 'page' : undefined}
                   className={isLast ? 'font-semibold' : undefined}
                 >
-                  {routeToTitle(href)}
+                  {routeToTitle(href) || seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ')}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </React.Fragment>
