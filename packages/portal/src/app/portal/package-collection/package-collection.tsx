@@ -40,7 +40,7 @@ export default function PackageCollection() {
 
   useEffect(() => {
     setPageTitle('Recolha');
-    setBreadcrumbs([{ label: 'Recolha', href: '/package-collection' }]);
+    setBreadcrumbs([{ label: 'Recolha', href: '/portal/package-collection' }]);
     fetchData();
     return () => {
       setPageTitle('');
