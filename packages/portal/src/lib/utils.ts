@@ -16,13 +16,5 @@ export const NAV_ITEMS = [
   { href: '/user', label: 'UTILIZADOR', icon: UserIcon },
 ];
 
-export const routeToTitle = (path: string) => {
-  const map: Record<string, string> = {
-    '/': 'Home',
-    '/package-collection': 'Recolha',
-    '/storage-unit': 'Armazenamento',
-    '/user': 'Utilizador',
-  };
-  if (map[path]) return map[path];
-  return '';
+  return 'Page';
 }
