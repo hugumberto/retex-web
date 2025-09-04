@@ -13,25 +13,23 @@ import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { StorageUnitData, StorageUnitDTO } from '../types/storage-unit';
 import StorageUnitForm from './storage-unit-form';
-import { fetchWithAuth } from '@/lib/fetcher';
+import api from '@/lib/api';
+import { isSuccessStatus } from '@/lib/utils';
 
 export default function StorageUnit() {
   const [showForm, setShowForm] = useState(false);
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>();
   const [editingUnit, setEditingUnit] = useState<StorageUnitData | undefined>();
+
   const fetchData = async () => {
-    const res = await fetchWithAuth(`/storage-unit`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) {
+    const { data, status } = await api.get<StorageUnitDTO[]>(`/storage-unit`);
+    if (!isSuccessStatus(status)) {
       console.error('Failed to fetch storage units');
       return;
     }
-    const data: StorageUnitDTO[] = await res.json();
-    console.log('[xxx] ~ fetchData ~ data:', data);
     setStorageUnits(data);
   };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -54,12 +52,12 @@ export default function StorageUnit() {
     setShowForm(false);
     await fetchData();
   };
+
   const handleDeleteUnit = async (id: string) => {
     try {
-      const res = await fetch(`/storage-unit/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Erro ao eliminar unidade');
+      const res = await api.delete(`/storage-unit/${id}`);
+      if (!isSuccessStatus(res.status))
+        throw new Error('Erro ao eliminar unidade');
       await fetchData();
     } catch (error) {
       console.error('Erro ao eliminar unidade:', error);

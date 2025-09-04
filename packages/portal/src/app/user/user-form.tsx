@@ -6,8 +6,9 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import api from '@/lib/api';
+import { isSuccessStatus } from '@/lib/utils';
 import { Role, UserFormData } from '../types/user';
-import { fetchWithAuth } from '@/lib/fetcher';
 
 interface UserFormProps {
   onFormClose: () => void;
@@ -50,38 +51,38 @@ export default function UserForm({
     }
   }, [initialData, setValue, reset]);
 
-  const onSubmit: SubmitHandler<UserFormData> = async (data) => {
+  const onSubmit: SubmitHandler<UserFormData> = async (formData) => {
+    let userId = '';
     try {
       // Primeiro, cria o usuário
-      const res = await fetchWithAuth(
-        `/user${initialData?.id ? `/${initialData.id}` : ''}`,
-        {
-          method: initialData?.id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            contactPhone: data.contactPhone,
-            documentNumber: data.documentNumber,
-            password: data.documentNumber, // senha fixa conforme solicitado
-          }),
-        }
-      );
+      if (initialData?.id) {
+        const { data, status } = await api.post(`/user`, {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          contactPhone: formData.contactPhone,
+          documentNumber: formData.documentNumber,
+          password: formData.documentNumber, // senha fixa conforme solicitado
+        });
 
-      if (!res.ok) throw new Error('Erro ao criar usuário');
-      const user = await res.json();
+        if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
+        userId = data.id;
+      } else {
+        const { status } = await api.post(`/user${initialData?.id}`, {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          contactPhone: formData.contactPhone,
+          documentNumber: formData.documentNumber,
+          password: formData.documentNumber, // senha fixa conforme solicitado
+        });
+        if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
+        userId = initialData?.id ?? '';
+      }
 
       // Depois, atribui as roles selecionadas
-      if (Array.isArray(data.role) && data.role.length > 0) {
-        await fetchWithAuth(
-          `/user/${user.id}/roles`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ roles: data.role }),
-          }
-        );
+      if (Array.isArray(formData.role) && formData.role.length > 0) {
+        await api.post(`/user/${userId}/roles`, { roles: formData.role });
       }
 
       setMessage('Usuário salvo com sucesso!');

@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import UserForm from './user-form';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -11,24 +9,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import api from '@/lib/api';
+import { isSuccessStatus } from '@/lib/utils';
 import { PencilIcon, TrashIcon } from 'lucide-react';
-import { UserFormData, UserDTO } from '../types/user';
-import { fetchWithAuth } from '@/lib/fetcher';
+import { useEffect, useState } from 'react';
+import { UserDTO, UserFormData } from '../types/user';
+import UserForm from './user-form';
 
 export default function User() {
   const [showForm, setShowForm] = useState(false);
   const [users, setUsers] = useState<UserDTO[]>([]);
   const [editingUser, setEditingUser] = useState<UserFormData | undefined>();
   const fetchData = async () => {
-    const res = await fetchWithAuth(`/user`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) {
+    const { data, status } = await api.get<UserDTO[]>(`/user`);
+    if (!isSuccessStatus(status)) {
       console.error('Failed to fetch users');
       return;
     }
-    const data: UserDTO[] = await res.json();
     setUsers(data);
   };
   useEffect(() => {
@@ -59,20 +56,18 @@ export default function User() {
   const handleDeleteUser = async (user: UserDTO) => {
     if (window.confirm('Tem certeza que deseja eliminar este usuário?')) {
       try {
-        const res = await fetchWithAuth(`/user/${user.id}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            contactPhone: user.contactPhone,
-            documentNumber: user.documentNumber,
-            password: user.documentNumber,
-            status: 'INACTIVE',
-          }),
+        const res = await api.put(`/user/${user.id}`, {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          contactPhone: user.contactPhone,
+          documentNumber: user.documentNumber,
+          password: user.documentNumber,
+          status: 'INACTIVE',
         });
-        if (!res.ok) throw new Error('Erro ao eliminar usuário');
+        if (!isSuccessStatus(res.status))
+          throw new Error('Erro ao eliminar usuário');
         await fetchData();
       } catch (error) {
         console.error('Erro ao eliminar usuário:', error);

@@ -1,18 +1,19 @@
 'use client';
+import { useAppStore } from '@/store';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbSeparator,
 } from '../ui/breadcrumb';
-import { usePathname } from 'next/navigation';
-import { routeToTitle } from '@/lib/utils';
 
 export const Breadcrumbs = () => {
   const pathname = usePathname();
   const segments = pathname.split('/').filter(Boolean);
+  const { breadcrumbs } = useAppStore();
 
   return (
     <Breadcrumb className="px-4 sm:px-6 lg:px-8 ">
@@ -20,8 +21,8 @@ export const Breadcrumbs = () => {
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>
         </BreadcrumbItem>
-        {segments.map((seg, idx) => {
-          const href = '/' + segments.slice(0, idx + 1).join('/');
+        {breadcrumbs.map((seg, idx) => {
+          const { label, href } = seg;
           const isLast = idx === segments.length - 1;
           return (
             <React.Fragment key={href}>
@@ -32,9 +33,7 @@ export const Breadcrumbs = () => {
                   aria-current={isLast ? 'page' : undefined}
                   className={isLast ? 'font-semibold' : undefined}
                 >
-                  {routeToTitle(href) && routeToTitle(href) !== 'Page Title'
-                    ? routeToTitle(href)
-                    : seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ')}
+                  {label.toUpperCase()}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </React.Fragment>

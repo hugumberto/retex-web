@@ -6,12 +6,13 @@ import './global.css';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 // tua sidebar e topbar (client)
-import { AppSidebar, RetexTopbar } from '@/components/custom/app-sidebar';
+import { AppSidebar, RetexTopBar } from '@/components/custom/app-sidebar';
 
 // shadcn/ui breadcrumbs
 import { Breadcrumbs } from '@/components/custom/breadcrumbs';
 import React from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import AuthBootstrapper from './auth-bootstrapper';
 
 export const metadata = {
   title: 'Welcome to portal',
@@ -26,11 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <AuthBootstrapper />
         <Toaster richColors />
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset className="bg-white">
-            <RetexTopbar />
+            <RetexTopBar />
 
             {/* Breadcrumbs */}
 

@@ -57,7 +57,6 @@ export function DialogForm<T extends FieldValues>({
     if (onConfirm) {
       await onConfirm();
       if (!errors) {
-        console.log('[xxx] ~ handleConfirm ~ res:', errors);
         handleOpenChange(false);
       }
     }

@@ -1,9 +1,13 @@
+'use client';
+import { useAppStore } from '@/store';
+import { useEffect } from 'react';
+
 export default function Index() {
-  /*
-   * Replace the elements below with your own.
-   *
-   * Note: The corresponding styles are in the ./index.tailwind file.
-   */
+  const { setPageTitle } = useAppStore();
+  useEffect(() => {
+    setPageTitle('Home');
+  }, []);
+
   return (
     <div className="font-family-poppins">
       <div></div>

@@ -1,18 +1,34 @@
-import { useAuthStore } from '@/store/auth';
+// app/auth/actions.ts
+"use client";
+import api from "@/lib/api";
+import { useAppStore } from "@/store";
 
-export const login = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email: 'admin@retex.pt', password: '123456' }),
-  });
+export async function login(email: string, password: string) {
+  const {data} = await api.post(`/auth/login`, {   email, password }  );
+ 
+  const access = data.access_token;
+  if (!access) throw new Error("API não devolveu access_token");
+  useAppStore.getState().setAccessToken(access);
+  useAppStore.getState().setRefreshToken(data.refresh_token);
 
-  if (!response.ok) {
-    throw new Error('Login failed');
+  // Opcional: obter user já de seguida
+  try {
+    useAppStore.getState().setUser(data.user);
+  } catch { /* empty */ }
+}
+
+export async function bootstrapAuth() {
+  // chama refresh logo ao montar a app para obter um access a partir do refresh cookie
+  try {
+    const {data} = await api.post(`/auth/refresh`,{refresh_token: useAppStore.getState().refreshToken} );
+    if (data) {
+      const access = data.access_token ?? data.accessToken ?? null;
+      useAppStore.getState().setAccessToken(access);
+    }
+
+  } catch {
+    useAppStore.getState().setAccessToken(null);
+    useAppStore.getState().setUser(null);
   }
+}
 
-  const data = await response.json();
-  useAuthStore.getState().setToken(data.access_token);
-};

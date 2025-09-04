@@ -19,11 +19,11 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { cn, NAV_ITEMS, routeToTitle } from '@/lib/utils';
+import { cn, NAV_ITEMS } from '@/lib/utils';
+import { useAppStore } from '@/store';
 import { Label } from '../ui/label';
 import Title from './title';
 
-/** Sidebar fixa no estilo do mock, usando shadcn 3.1 */
 export function AppSidebar() {
   const pathname = usePathname();
 
@@ -39,6 +39,7 @@ export function AppSidebar() {
           height={28}
           width={207}
           className="h-12 opacity-90"
+          style={{ width: 'auto' }}
           priority
         />
       </SidebarHeader>
@@ -61,11 +62,8 @@ export function AppSidebar() {
                     isActive={active}
                     className={cn(
                       'px-3 py-3 rounded-lg text-[13px] tracking-wide',
-                      // aplica text-secondary para todos os filhos normalmente
                       '[&_*]:text-secondary',
-                      // aplica text-white para todos os filhos quando ativo
                       active && '[&_*]:text-white',
-                      // aplica text-white para todos os filhos no hover
                       'hover:[&_*]:text-white',
                       active
                         ? 'bg-secondary/60 font-semibold shadow-sm text-white'
@@ -108,16 +106,14 @@ export function AppSidebar() {
   );
 }
 
-/** Topbar no estilo do mock (título dinâmico, sino, avatar, sublinhado) */
-export function RetexTopbar() {
-  const pathname = usePathname();
-  const title = routeToTitle(pathname ?? '/') ?? 'Dashboard';
+export function RetexTopBar() {
+  const { pageTitle } = useAppStore();
 
   return (
     <header className="sticky top-0 z-40 bg-white">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <SidebarTrigger className="-ml-1 md:hidden" />
-        <Title>{title}</Title>
+        <Title>{pageTitle || 'Page Title'}</Title>
 
         <div className="ml-auto flex items-center gap-5">
           <Bell className="size-5" />
