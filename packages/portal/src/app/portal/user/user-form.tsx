@@ -56,7 +56,7 @@ export default function UserForm({
     try {
       // Primeiro, cria o usuário
       if (initialData?.id) {
-        const { data, status } = await api.post(`/user`, {
+        const { data, status } = await api.put(`/user${initialData?.id}`, {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
@@ -68,7 +68,7 @@ export default function UserForm({
         if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
         userId = data.id;
       } else {
-        const { status } = await api.post(`/user${initialData?.id}`, {
+        const { status } = await api.post(`/user`, {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
