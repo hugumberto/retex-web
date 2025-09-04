@@ -83,7 +83,12 @@ function SidebarProvider({
       }
 
       // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${encodeURIComponent(openState)}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Strict${window.location.protocol === "https:" ? "; Secure" : ""}`
+      if (typeof openState === "boolean") {
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${encodeURIComponent(openState)}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Strict${window.location.protocol === "https:" ? "; Secure" : ""}`
+      } else {
+        // Optionally, handle invalid value (e.g., log, throw, or default)
+        console.warn("Attempted to set sidebar state cookie with non-boolean value:", openState);
+      }
     },
     [setOpenProp, open]
   )
