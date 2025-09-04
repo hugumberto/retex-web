@@ -1,5 +1,4 @@
 // app/store/auth.ts
-import { create } from 'zustand';
 import { AuthSlice } from '@/app/types/state';
 
 export const createAuthSlice = (
