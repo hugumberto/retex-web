@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
+import Barcode from '@/components/custom/bar-code';
 
 export default function PackageCollection() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
@@ -78,6 +79,7 @@ export default function PackageCollection() {
             <TableRow>
               <TableHead></TableHead>
               <TableHead>Motorista</TableHead>
+              <TableHead>Recolha</TableHead>
               <TableHead>Qtd. Encomendas</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Ação</TableHead>
@@ -91,6 +93,11 @@ export default function PackageCollection() {
                 </TableCell>
                 <TableCell className="font-medium">
                   {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}
+                </TableCell>
+                <TableCell className="font-medium">
+                  <div className="flex justify-center">
+                    <Barcode value={packageCollection.id} />
+                  </div>
                 </TableCell>
                 <TableCell>{packageCollection.packagesCount}</TableCell>
                 <TableCell>

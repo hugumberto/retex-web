@@ -2,66 +2,86 @@
 
 import { login } from '@/service/auth';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Button } from '@/components/ui/button';
+import { InputForm } from '@/components/form/input-form';
+import Title from '@/components/custom/title';
+import Image from 'next/image';
+
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@retex.pt');
-  const [password, setPassword] = useState('123456');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      email: 'admin@retex.pt',
+      password: '123456',
+    },
+  });
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  async function onSubmit(data: LoginFormData) {
     try {
-      await login(email, password);
+      await login(data.email, data.password);
       router.push('/portal');
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message ?? 'Erro ao fazer login');
-      } else {
-        setError('Erro ao fazer login');
-      }
-    } finally {
-      setLoading(false);
+      // Optionally handle error (e.g., show toast)
     }
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-sm space-y-4 rounded-xl border bg-white p-6 shadow-md"
       >
-        <h1 className="text-xl font-bold text-center">Login</h1>
+        <div className="flex justify-center">
+          <Image
+            src="/assets/logo.png"
+            alt="retex"
+            height={28}
+            width={207}
+            className="h-12 opacity-90"
+            style={{ width: 'auto' }}
+            priority
+          />
+        </div>
+        <Title>Login</Title>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <input
+        <InputForm
+          name="email"
+          control={control}
+          label="Email"
           type="email"
           placeholder="Email"
-          className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          rules={{ required: 'Email é obrigatório' }}
+          errors={errors}
         />
 
-        <input
+        <InputForm
+          name="password"
+          control={control}
+          label="Password"
           type="password"
           placeholder="Password"
-          className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          rules={{ required: 'Senha é obrigatória' }}
+          errors={errors}
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          variant="secondary"
+          className="w-full"
+          disabled={isSubmitting}
         >
-          {loading ? 'Entrando...' : 'Entrar'}
-        </button>
+          {isSubmitting ? 'Entrando...' : 'Entrar'}
+        </Button>
       </form>
     </div>
   );
