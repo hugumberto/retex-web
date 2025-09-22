@@ -27,7 +27,7 @@ interface DialogFormProps<T extends FieldValues> {
   children: React.ReactNode;
   loading?: boolean;
   errors: FieldErrors<T>;
-  triggerText?: string; // Add this prop
+  triggerText?: string;
 }
 
 export function DialogForm<T extends FieldValues>({
