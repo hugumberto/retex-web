@@ -104,7 +104,7 @@ export default function StorageUnitForm({
         reset();
       },
       {
-        loading: 'Loading...',
+        loading: 'Carregando...',
         success: () => {
           onSave();
           setIsOpen(false);
