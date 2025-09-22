@@ -138,7 +138,7 @@ export default function StorageUnit() {
                         await toast.promise(
                           handleDeleteUnit(storageUnit.id),
                           {
-                            loading: 'Loading...',
+                            loading: 'Carregando...',
                             success: () => {
                               return 'Unidade de Armazenamento desativada com sucesso';
                             },
