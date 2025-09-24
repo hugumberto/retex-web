@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -8,20 +9,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import { TrashIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
 import { StorageUnitDTO, Quality } from '../../types/storage-unit';
 import StorageUnitForm from './storage-unit-form';
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import api from '@/lib/api';
 import { useAppStore } from '@/store';
-import { toast } from 'sonner';
-import ConfirmDialog from '@/components/custom/confirmation-dialog';
-import { Checkbox } from '@/components/ui/checkbox';
 
-const qualityMap: Record<Quality, string> = {
+// Constants
+const QUALITY_MAP: Record<Quality, string> = {
   [Quality.GOOD]: 'Bom',
   [Quality.MEDIUM]: 'Regular',
   [Quality.BAD]: 'Ruim',
+};
+
+const STATUS_MAP: Record<string, string> = {
+  'ATIVO': 'Ativo',
+  'INATIVO': 'Inativo',
 };
 
 export default function StorageUnit() {
@@ -30,55 +37,66 @@ export default function StorageUnit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
 
-  const fetchData = async () => {
+  const fetchStorageUnits = useCallback(async () => {
     try {
       const { data } = await api.get<StorageUnitDTO[]>('/storage-unit');
       setStorageUnits(data);
-    } catch (e) {
-      console.error('Failed to fetch storage units', e);
+    } catch (error) {
+      console.error('Failed to fetch storage units', error);
     }
-  };
+  }, []);
 
-  useEffect(() => {
-    setPageTitle('Armazenamento');
-    setBreadcrumbs([{ label: 'Armazenamento', href: '/portal/storage-unit' }]);
-    fetchData();
-
-    return () => {
-      setPageTitle('');
-      setBreadcrumbs([]);
-    };
-  }, [setBreadcrumbs, setPageTitle]);
-
-  const onSave = async () => {
-    await fetchData();
-  };
-
-  const handleDeleteUnit = async (id: string) => {
+  const handleDeleteUnit = useCallback(async (id: string) => {
     setIsSubmitting(true);
     try {
       const res = await api.delete(`/storage-unit/${id}`);
       if (res.status !== 200) throw new Error('Erro ao eliminar unidade');
-      await fetchData();
+      await fetchStorageUnits();
     } catch (error) {
       console.error('Erro ao eliminar unidade:', error);
       throw error;
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [fetchStorageUnits]);
 
-  const handleSelectUnit = (id: string, isChecked: boolean) => {
+  const handleSelectUnit = useCallback((id: string, isChecked: boolean) => {
     if (isChecked) {
       setSelectedUnits((prev) => [...prev, id]);
     } else {
       setSelectedUnits((prev) => prev.filter((unitId) => unitId !== id));
     }
-  };
+  }, []);
+
+  const handleDeleteWithToast = useCallback(async (id: string) => {
+    await toast.promise(
+      handleDeleteUnit(id),
+      {
+        loading: 'Carregando...',
+        success: () => 'Unidade de Armazenamento desativada com sucesso',
+        error: () => 'Erro ao desativar a Unidade de Armazenamento',
+      }
+    );
+  }, [handleDeleteUnit]);
+
+  useEffect(() => {
+    setPageTitle('Armazenamento');
+    setBreadcrumbs([{ label: 'Armazenamento', href: '/portal/storage-unit' }]);
+    fetchStorageUnits();
+
+    return () => {
+      setPageTitle('');
+      setBreadcrumbs([]);
+    };
+  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits]);
+
+  const handleSave = useCallback(async () => {
+    await fetchStorageUnits();
+  }, [fetchStorageUnits]);
 
   return (
     <section id="storage-unit-page" className="flex flex-col items-center">
-      <StorageUnitForm onSave={onSave} />
+      <StorageUnitForm onSave={handleSave} />
       <div className="mt-4 w-full">
         <Table>
           <TableHeader>
@@ -104,9 +122,7 @@ export default function StorageUnit() {
                     </div>
                   </TableCell>
                   <TableCell>{storageUnit.brand.name}</TableCell>
-                  <TableCell>
-                    {storageUnit.quality in qualityMap ? qualityMap[storageUnit.quality] : 'Desconhecido'}
-                  </TableCell>
+                  <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -115,13 +131,14 @@ export default function StorageUnit() {
                           : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {storageUnit.status}
+                      {STATUS_MAP[storageUnit.status]}
                     </span>
                   </TableCell>
                   <TableCell className="space-x-2">
                     <StorageUnitForm
                       storageUnitId={storageUnit.id}
-                      onSave={onSave}
+                      initialData={storageUnit}
+                      onSave={handleSave}
                     />
                     <ConfirmDialog
                       trigger={
@@ -134,20 +151,7 @@ export default function StorageUnit() {
                           <TrashIcon />
                         </Button>
                       }
-                      onConfirm={async () => {
-                        await toast.promise(
-                          handleDeleteUnit(storageUnit.id),
-                          {
-                            loading: 'Carregando...',
-                            success: () => {
-                              return 'Unidade de Armazenamento desativada com sucesso';
-                            },
-                            error: () => {
-                              return 'Erro ao desativar a Unidade de Armazenamento';
-                            },
-                          }
-                        );
-                      }}
+                      onConfirm={() => handleDeleteWithToast(storageUnit.id)}
                     />
                   </TableCell>
                 </TableRow>

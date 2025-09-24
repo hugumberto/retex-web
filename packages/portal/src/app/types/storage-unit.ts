@@ -1,7 +1,7 @@
 export enum Quality {
-  GOOD = 'BOM',
-  MEDIUM = 'REGULAR',
-  BAD = 'RUIM',
+  GOOD = 'GOOD',
+  MEDIUM = 'MEDIUM',
+  BAD = 'BAD',
 }
 
 export type StorageUnitDTO = {
@@ -12,11 +12,12 @@ export type StorageUnitDTO = {
   };
   quality: Quality;
   status: 'ATIVO' | 'INATIVO';
+  weight: number; 
 };
 
 export type StorageUnitFormData = {
   brandId: string;
   quality: Quality;
   state: 'ATIVO' | 'INATIVO';
-  weight: 'LEVE' | 'MEDIO' | 'PESADO';
+  weight: number; 
 };

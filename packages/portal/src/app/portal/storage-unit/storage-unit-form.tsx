@@ -1,43 +1,64 @@
 'use client';
-import { DialogForm } from '@/components/form/dialog-form';
-import { SelectForm } from '@/components/form/select-form';
-import { Button } from '@/components/ui/button';
-import api from '@/lib/api';
-import { isSuccessStatus } from '@/lib/utils';
-import { PencilIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { PencilIcon } from 'lucide-react';
+
+import { DialogForm } from '@/components/form/dialog-form';
+import { SelectForm } from '@/components/form/select-form';
+import { InputForm } from '@/components/form/input-form';
+import { Button } from '@/components/ui/button';
+
 import { Brand } from '../../types/brand';
-import { Quality, StorageUnitFormData } from '../../types/storage-unit';
+import { Quality, StorageUnitFormData, StorageUnitDTO } from '../../types/storage-unit';
+import api from '@/lib/api';
+import { isSuccessStatus } from '@/lib/utils';
+
+// Constants
+const QUALITY_OPTIONS = [
+  { value: 'GOOD', label: 'Bom' },
+  { value: 'MEDIUM', label: 'Regular' },
+  { value: 'BAD', label: 'Ruim' },
+];
+
+const STATUS_OPTIONS = [
+  { value: 'ATIVO', label: 'Ativo' },
+  { value: 'INATIVO', label: 'Inativo' },
+];
 
 interface StorageUnitFormProps {
   storageUnitId?: string;
+  initialData?: StorageUnitDTO;
   onSave: () => void;
 }
 
-const qualityOptions = [
-  { value: Quality.GOOD, label: 'Bom' },
-  { value: Quality.MEDIUM, label: 'Regular' },
-  { value: Quality.BAD, label: 'Ruim' },
-];
-
 export default function StorageUnitForm({
   storageUnitId,
+  initialData,
   onSave,
 }: StorageUnitFormProps) {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<StorageUnitFormData>();
-  const [isOpen, setIsOpen] = useState(false);
+  const isEditing = useMemo(() => !!storageUnitId, [storageUnitId]);
+  const [, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [brandOptions, setBrandOptions] = useState<
     { value: string; label: string }[]
   >([]);
-  const isEditing = useMemo(() => !!storageUnitId, [storageUnitId]);
+
+  const form = useForm<StorageUnitFormData>({
+    defaultValues: initialData ? {
+      brandId: initialData.brand.id,
+      quality: initialData.quality,
+      state: initialData.status,
+      weight: initialData.weight,
+    } : {
+      brandId: '',
+      quality: Quality.GOOD,
+      state: 'ATIVO' as 'ATIVO' | 'INATIVO',
+      weight: 0,
+    },
+  });
+
+  const { control, formState: { errors } } = form;
 
   const fetchBrands = useCallback(async () => {
     try {
@@ -51,36 +72,18 @@ export default function StorageUnitForm({
     }
   }, []);
 
-  const fetchStorageUnitData = useCallback(async () => {
-    if (!storageUnitId) return;
-    try {
-      const { data, status } = await api.get<StorageUnitFormData>(
-        `/storage-unit/${storageUnitId}`
-      );
-      if (!isSuccessStatus(status)) throw new Error('Erro ao buscar unidade');
-      reset(data);
-    } catch (error) {
-      console.error('Erro ao buscar unidade de armazenamento:', error);
-    }
-  }, [storageUnitId, reset]);
-
   useEffect(() => {
     fetchBrands();
-    if (isEditing && isOpen) {
-      fetchStorageUnitData();
-    }
-  }, [fetchBrands, fetchStorageUnitData, isEditing, isOpen]);
+  }, [fetchBrands]);
 
-  const handleOpenChange = (open: boolean) => {
+  const handleOpenChange = useCallback((open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      reset();
-    } else if (isEditing) {
-      fetchStorageUnitData();
+      form.reset();
     }
-  };
+  }, [form]);
 
-  const submit = async (data: StorageUnitFormData) => {
+  const handleSubmit = useCallback(async (data: StorageUnitFormData) => {
     setIsSubmitting(true);
     toast.promise(
       async () => {
@@ -101,7 +104,7 @@ export default function StorageUnitForm({
           });
           if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
         }
-        reset();
+        form.reset();
       },
       {
         loading: 'Carregando...',
@@ -116,13 +119,13 @@ export default function StorageUnitForm({
       }
     );
     setIsSubmitting(false);
-  };
+  }, [isEditing, storageUnitId, form, onSave]);
 
   return (
     <DialogForm
       triggerText={isEditing ? 'Editar' : 'Criar'}
       title={isEditing ? 'Atualizar Unidade de Armazenamento' : 'Cadastro de Unidade de Armazenamento'}
-      onConfirm={handleSubmit(submit)}
+      onConfirm={form.handleSubmit(handleSubmit)}
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
       errors={errors}
@@ -155,7 +158,7 @@ export default function StorageUnitForm({
             name="quality"
             control={control}
             rules={{ required: 'A qualidade é obrigatória' }}
-            options={qualityOptions}
+            options={QUALITY_OPTIONS}
             errors={errors}
           />
         </div>
@@ -167,17 +170,19 @@ export default function StorageUnitForm({
                 name="state"
                 control={control}
                 rules={{ required: 'O estado é obrigatório' }}
-                options={[{ value: 'ATIVO', label: 'ATIVO' }, { value: 'INATIVO', label: 'INATIVO' }]}
+                options={STATUS_OPTIONS}
                 errors={errors}
               />
             </div>
             <div>
-              <SelectForm
+              <InputForm
                 label="Peso"
                 name="weight"
                 control={control}
-                rules={{ required: 'O peso é obrigatório' }}
-                options={[{ value: 'LEVE', label: 'LEVE' }, { value: 'MEDIO', label: 'MÉDIO' }, { value: 'PESADO', label: 'PESADO' }]}
+                rules={{
+                  required: 'O peso é obrigatório',
+                  valueAsNumber: true,
+                }}
                 errors={errors}
               />
             </div>
