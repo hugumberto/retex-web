@@ -7,9 +7,9 @@
     "start:portal": "nx dev portal",
     "prepare": "if [ \"$VERCEL\" != \"1\" ]; then husky install; fi",
     "lint": "nx lint",
-    "lint:all": "nx run-many --target=lint --all",
-    "build:portal": "nx build portal",
-    "build:all": "nx run-many --target=build --all"
+    "lint:all": "nx run-many --target=lint --all --skip-nx-cache",
+    "build:portal": "nx build portal --skip-nx-cache",
+    "build:all": "nx run-many --target=build --all --skip-nx-cache"
   },
   "private": true,
   "devDependencies": {
