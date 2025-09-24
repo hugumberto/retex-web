@@ -19,14 +19,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '23'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Lint all projects
+        if: success()
         run: npm run lint:all
 
       - name: Build portal
+        if: success()
         run: npm run build:portal
