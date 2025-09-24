@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -9,15 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
 import { TrashIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { StorageUnitDTO, Quality } from '../../types/storage-unit';
-import StorageUnitForm from './storage-unit-form';
+import { Brand } from '@/app/types/brand';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import { SelectFieldOption } from '@/components/form/select-form';
 import api from '@/lib/api';
 import { useAppStore } from '@/store';
+import { Quality, StorageUnitDTO } from '../../types/storage-unit';
+import StorageUnitForm from './storage-unit-form';
 
 // Constants
 const QUALITY_MAP: Record<Quality, string> = {
@@ -27,8 +29,8 @@ const QUALITY_MAP: Record<Quality, string> = {
 };
 
 const STATUS_MAP: Record<string, string> = {
-  'ATIVO': 'Ativo',
-  'INATIVO': 'Inativo',
+  ATIVO: 'Ativo',
+  INATIVO: 'Inativo',
 };
 
 export default function StorageUnit() {
@@ -36,6 +38,7 @@ export default function StorageUnit() {
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
+  const [brandsOptions, setBrandOptions] = useState<SelectFieldOption[]>([]);
 
   const fetchStorageUnits = useCallback(async () => {
     try {
@@ -46,19 +49,34 @@ export default function StorageUnit() {
     }
   }, []);
 
-  const handleDeleteUnit = useCallback(async (id: string) => {
-    setIsSubmitting(true);
+  const fetchBrands = useCallback(async () => {
     try {
-      const res = await api.delete(`/storage-unit/${id}`);
-      if (res.status !== 200) throw new Error('Erro ao eliminar unidade');
-      await fetchStorageUnits();
+      const { data, status } = await api.get<Brand[]>('/brand');
+
+      setBrandOptions(
+        data.map((brand) => ({ value: brand.id, label: brand.name }))
+      );
     } catch (error) {
-      console.error('Erro ao eliminar unidade:', error);
-      throw error;
-    } finally {
-      setIsSubmitting(false);
+      console.error('Erro ao buscar marcas:', error);
     }
-  }, [fetchStorageUnits]);
+  }, []);
+
+  const handleDeleteUnit = useCallback(
+    async (id: string) => {
+      setIsSubmitting(true);
+      try {
+        const res = await api.delete(`/storage-unit/${id}`);
+        if (res.status !== 200) throw new Error('Erro ao eliminar unidade');
+        await fetchStorageUnits();
+      } catch (error) {
+        console.error('Erro ao eliminar unidade:', error);
+        throw error;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [fetchStorageUnits]
+  );
 
   const handleSelectUnit = useCallback((id: string, isChecked: boolean) => {
     if (isChecked) {
@@ -68,27 +86,27 @@ export default function StorageUnit() {
     }
   }, []);
 
-  const handleDeleteWithToast = useCallback(async (id: string) => {
-    await toast.promise(
-      handleDeleteUnit(id),
-      {
+  const handleDeleteWithToast = useCallback(
+    async (id: string) => {
+      await toast.promise(handleDeleteUnit(id), {
         loading: 'Carregando...',
         success: () => 'Unidade de Armazenamento desativada com sucesso',
         error: () => 'Erro ao desativar a Unidade de Armazenamento',
-      }
-    );
-  }, [handleDeleteUnit]);
+      });
+    },
+    [handleDeleteUnit]
+  );
 
   useEffect(() => {
     setPageTitle('Armazenamento');
     setBreadcrumbs([{ label: 'Armazenamento', href: '/portal/storage-unit' }]);
     fetchStorageUnits();
-
+    fetchBrands();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits]);
+  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits, fetchBrands]);
 
   const handleSave = useCallback(async () => {
     await fetchStorageUnits();
@@ -96,7 +114,7 @@ export default function StorageUnit() {
 
   return (
     <section id="storage-unit-page" className="flex flex-col items-center">
-      <StorageUnitForm onSave={handleSave} />
+      <StorageUnitForm onSave={handleSave} brandOptions={brandsOptions} />
       <div className="mt-4 w-full">
         <Table>
           <TableHeader>
@@ -116,7 +134,9 @@ export default function StorageUnit() {
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={selectedUnits.includes(storageUnit.id)}
-                        onCheckedChange={(checked) => handleSelectUnit(storageUnit.id, !!checked)}
+                        onCheckedChange={(checked) =>
+                          handleSelectUnit(storageUnit.id, !!checked)
+                        }
                       />
                       <span className="font-medium">{storageUnit.id}</span>
                     </div>
@@ -139,6 +159,7 @@ export default function StorageUnit() {
                       storageUnitId={storageUnit.id}
                       initialData={storageUnit}
                       onSave={handleSave}
+                      brandOptions={brandsOptions}
                     />
                     <ConfirmDialog
                       trigger={
@@ -158,7 +179,10 @@ export default function StorageUnit() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-6 text-muted-foreground"
+                >
                   Nenhum registro encontrado!
                 </TableCell>
               </TableRow>
