@@ -1,7 +1,7 @@
-import StorageUnit from "./storage-unit";
+'use client';
 
-export default function Index() {
-  return (    
-        <StorageUnit />    
-  );
+import StorageUnit from './storage-unit';
+
+export default function StorageUnitPage() {
+  return <StorageUnit />;
 }

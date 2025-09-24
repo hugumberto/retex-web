@@ -20,7 +20,6 @@ interface DialogFormProps<T extends FieldValues> {
   title?: React.ReactNode;
   description?: React.ReactNode;
   confirmText?: string;
-  triggerText?: string;
   cancelText?: string;
   onConfirm?: () => void | Promise<void>;
   onCancel?: () => void;
@@ -28,21 +27,22 @@ interface DialogFormProps<T extends FieldValues> {
   children: React.ReactNode;
   loading?: boolean;
   errors: FieldErrors<T>;
+  triggerText?: string;
 }
 
 export function DialogForm<T extends FieldValues>({
   open,
   onOpenChange,
-  title = 'Confirm action',
+  title = 'Confirmar ação',
   description,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText = 'Confirmar',
+  cancelText = 'Cancelar',
   onConfirm,
   onCancel,
   trigger,
   children,
   loading = false,
-  errors,
+  errors, 
 }: DialogFormProps<T>) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = open !== undefined;
@@ -56,7 +56,7 @@ export function DialogForm<T extends FieldValues>({
   const handleConfirm = async () => {
     if (onConfirm) {
       await onConfirm();
-      if (!errors) {
+      if (Object.keys(errors).length === 0) {
         handleOpenChange(false);
       }
     }
@@ -86,7 +86,7 @@ export function DialogForm<T extends FieldValues>({
           }}
         >
           {children}
-          <DialogFooter>
+          <DialogFooter className="flex justify-center mt-4">
             <DialogClose asChild>
               <Button
                 type="button"
@@ -98,7 +98,7 @@ export function DialogForm<T extends FieldValues>({
               </Button>
             </DialogClose>
             <Button type="submit" disabled={loading} variant={'secondary'}>
-              {loading ? 'Processing...' : confirmText}
+              {loading ? 'Processando...' : confirmText}
             </Button>
           </DialogFooter>
         </form>

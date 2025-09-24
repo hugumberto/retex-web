@@ -1,6 +1,6 @@
 'use client';
-
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -9,128 +9,187 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PencilIcon, TrashIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { StorageUnitData, StorageUnitDTO } from '../../types/storage-unit';
-import StorageUnitForm from './storage-unit-form';
+import { TrashIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+import { Brand } from '@/app/types/brand';
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import { SelectFieldOption } from '@/components/form/select-form';
 import api from '@/lib/api';
-import { isSuccessStatus } from '@/lib/utils';
+import { useAppStore } from '@/store';
+import { Quality, StorageUnitDTO } from '../../types/storage-unit';
+import StorageUnitForm from './storage-unit-form';
+
+// Constants
+const QUALITY_MAP: Record<Quality, string> = {
+  [Quality.GOOD]: 'Bom',
+  [Quality.MEDIUM]: 'Regular',
+  [Quality.BAD]: 'Ruim',
+};
+
+const STATUS_MAP: Record<string, string> = {
+  ATIVO: 'Ativo',
+  INATIVO: 'Inativo',
+};
 
 export default function StorageUnit() {
-  const [showForm, setShowForm] = useState(false);
-  const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>();
-  const [editingUnit, setEditingUnit] = useState<StorageUnitData | undefined>();
+  const { setPageTitle, setBreadcrumbs } = useAppStore();
+  const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
+  const [brandsOptions, setBrandOptions] = useState<SelectFieldOption[]>([]);
 
-  const fetchData = async () => {
-    const { data, status } = await api.get<StorageUnitDTO[]>(`/storage-unit`);
-    if (!isSuccessStatus(status)) {
-      console.error('Failed to fetch storage units');
-      return;
+  const fetchStorageUnits = useCallback(async () => {
+    try {
+      const { data } = await api.get<StorageUnitDTO[]>('/storage-unit');
+      setStorageUnits(data);
+    } catch (error) {
+      console.error('Failed to fetch storage units', error);
     }
-    setStorageUnits(data);
-  };
-
-  useEffect(() => {
-    fetchData();
   }, []);
 
-  const handleToggleForm = (item?: StorageUnitDTO | undefined) => {
-    if (item) {
-      setEditingUnit({
-        id: item.id,
-        brandId: item.brand.id,
-        quality: item.quality,
-        weight: item.weight,
-      });
-    } else {
-      setEditingUnit(undefined);
-    }
-    setShowForm((prev) => !prev);
-  };
-
-  const handleFormClose = async () => {
-    setShowForm(false);
-    await fetchData();
-  };
-
-  const handleDeleteUnit = async (id: string) => {
+  const fetchBrands = useCallback(async () => {
     try {
-      const res = await api.delete(`/storage-unit/${id}`);
-      if (!isSuccessStatus(res.status))
-        throw new Error('Erro ao eliminar unidade');
-      await fetchData();
+      const { data } = await api.get<Brand[]>('/brand');
+
+      setBrandOptions(
+        data.map((brand) => ({ value: brand.id, label: brand.name }))
+      );
     } catch (error) {
-      console.error('Erro ao eliminar unidade:', error);
+      console.error('Erro ao buscar marcas:', error);
     }
-  };
+  }, []);
+
+  const handleDeleteUnit = useCallback(
+    async (id: string) => {
+      setIsSubmitting(true);
+      try {
+        const res = await api.delete(`/storage-unit/${id}`);
+        if (res.status !== 200) throw new Error('Erro ao eliminar unidade');
+        await fetchStorageUnits();
+      } catch (error) {
+        console.error('Erro ao eliminar unidade:', error);
+        throw error;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [fetchStorageUnits]
+  );
+
+  const handleSelectUnit = useCallback((id: string, isChecked: boolean) => {
+    if (isChecked) {
+      setSelectedUnits((prev) => [...prev, id]);
+    } else {
+      setSelectedUnits((prev) => prev.filter((unitId) => unitId !== id));
+    }
+  }, []);
+
+  const handleDeleteWithToast = useCallback(
+    async (id: string) => {
+      await toast.promise(handleDeleteUnit(id), {
+        loading: 'Carregando...',
+        success: () => 'Unidade de Armazenamento desativada com sucesso',
+        error: () => 'Erro ao desativar a Unidade de Armazenamento',
+      });
+    },
+    [handleDeleteUnit]
+  );
+
+  useEffect(() => {
+    setPageTitle('Armazenamento');
+    setBreadcrumbs([{ label: 'Armazenamento', href: '/portal/storage-unit' }]);
+    fetchStorageUnits();
+    fetchBrands();
+    return () => {
+      setPageTitle('');
+      setBreadcrumbs([]);
+    };
+  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits, fetchBrands]);
+
+  const handleSave = useCallback(async () => {
+    await fetchStorageUnits();
+  }, [fetchStorageUnits]);
 
   return (
-    <section
-      id="storage-unit"
-      className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]"
-    >
-      <h1 className="text-4xl md:text-5xl font-bold text-center text-neutral-950 mb-8">
-        Armazenamento
-      </h1>
-
-      <button
-        className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-        onClick={() => handleToggleForm()}
-      >
-        {showForm ? 'Fechar Formulário' : 'Criar Nova Unidade'}
-      </button>
-
-      {showForm ? (
-        <StorageUnitForm
-          onFormClose={handleFormClose}
-          initialData={editingUnit}
-          onSave={() => {
-            setShowForm(false);
-            setEditingUnit(undefined);
-            fetchData();
-          }}
-        />
-      ) : (
-        <div className="mt-8 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">id</TableHead>
-                <TableHead>Marca</TableHead>
-                <TableHead>Qualidade</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {storageUnits?.map((storageUnit) => (
+    <section id="storage-unit-page" className="flex flex-col items-center">
+      <StorageUnitForm onSave={handleSave} brandOptions={brandsOptions} />
+      <div className="mt-4 w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Id</TableHead>
+              <TableHead>Marca</TableHead>
+              <TableHead>Qualidade</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Ação</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {storageUnits?.length > 0 ? (
+              storageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
-                  <TableCell>{storageUnit.id}</TableCell>
-                  <TableCell>{storageUnit.brand.name}</TableCell>
-                  <TableCell>{storageUnit.quality}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="default"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handleToggleForm(storageUnit)}
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={selectedUnits.includes(storageUnit.id)}
+                        onCheckedChange={(checked) =>
+                          handleSelectUnit(storageUnit.id, !!checked)
+                        }
+                      />
+                      <span className="font-medium">{storageUnit.id}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{storageUnit.brand.name}</TableCell>
+                  <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        storageUnit.status === 'ATIVO'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
                     >
-                      <PencilIcon />
-                    </Button>
-                    <Button
-                      variant="default"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handleDeleteUnit(storageUnit.id)}
-                    >
-                      <TrashIcon />
-                    </Button>
+                      {STATUS_MAP[storageUnit.status]}
+                    </span>
+                  </TableCell>
+                  <TableCell className="space-x-2">
+                    <StorageUnitForm
+                      storageUnitId={storageUnit.id}
+                      initialData={storageUnit}
+                      onSave={handleSave}
+                      brandOptions={brandsOptions}
+                    />
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8"
+                        >
+                          <TrashIcon />
+                        </Button>
+                      }
+                      onConfirm={() => handleDeleteWithToast(storageUnit.id)}
+                    />
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-6 text-muted-foreground"
+                >
+                  Nenhum registro encontrado!
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </section>
   );
 }

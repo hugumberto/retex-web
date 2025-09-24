@@ -1,191 +1,201 @@
 'use client';
+import { PencilIcon } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+import { DialogForm } from '@/components/form/dialog-form';
+import { InputForm } from '@/components/form/input-form';
+import { SelectFieldOption, SelectForm } from '@/components/form/select-form';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { Brand } from '../../types/brand';
-import { Quality, StorageUnitData } from '../../types/storage-unit';
+
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import {
+  Quality,
+  Status,
+  StorageUnitDTO,
+  StorageUnitFormData,
+} from '../../types/storage-unit';
+
+// Constants
+const QUALITY_OPTIONS = [
+  { value: Quality.GOOD, label: 'Bom' },
+  { value: Quality.MEDIUM, label: 'Regular' },
+  { value: Quality.BAD, label: 'Ruim' },
+];
+
+const STATUS_OPTIONS = [
+  { value: Status.ATIVO, label: 'Ativo' },
+  { value: Status.INATIVO, label: 'Inativo' },
+];
 
 interface StorageUnitFormProps {
-  onFormClose: () => void;
-  initialData?: StorageUnitData;
-  onSave?: () => void;
+  storageUnitId?: string;
+  initialData?: StorageUnitDTO;
+  brandOptions: SelectFieldOption[];
+  onSave: () => void;
 }
-const qualityOptions = [
-  { id: Quality.GOOD, name: 'Boa' },
-  { id: Quality.MEDIUM, name: 'Regular' },
-  { id: Quality.BAD, name: 'Ruim' },
-];
+
 export default function StorageUnitForm({
-  onFormClose,
+  storageUnitId,
   initialData,
+  brandOptions,
   onSave,
 }: StorageUnitFormProps) {
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<StorageUnitData>();
-  const [message, setMessage] = useState('');
+  const isEditing = useMemo(() => !!storageUnitId, [storageUnitId]);
+  const [, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [brandOptions, setBrandOptions] = useState<Brand[]>([]);
 
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const { data, status } = await api.get<Brand[]>(`/brand`);
-        if (!isSuccessStatus(status)) throw new Error('Erro ao buscar marcas');
-        setBrandOptions(data);
-      } catch (error) {
-        console.error('Erro ao buscar marcas:', error);
+  const form = useForm<StorageUnitFormData>({
+    defaultValues: initialData
+      ? {
+          brandId: initialData.brand.id,
+          quality: initialData.quality,
+          state: initialData.status,
+          weight: initialData.weight,
+        }
+      : {
+          brandId: '',
+          quality: Quality.GOOD,
+          state: Status.ATIVO,
+          weight: 0,
+        },
+  });
+
+  const {
+    control,
+    formState: { errors },
+  } = form;
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      setIsOpen(open);
+      if (!open) {
+        form.reset();
       }
-    };
-    fetchBrands();
-    return;
-  }, []);
+    },
+    [form]
+  );
 
-  useEffect(() => {
-    if (brandOptions.length > 0 && initialData) {
-      setValue('brandId', initialData.brandId);
-      setValue('quality', initialData.quality);
-    }
-  }, [initialData, brandOptions, setValue]);
-
-  const onSubmit = async (data: StorageUnitData) => {
-    setIsSubmitting(true);
-    try {
-      if (initialData?.id) {
-        const { status } = await api.put(`/storage-unit/${initialData.id}`, {
-          ...data,
-        });
-        if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
-      } else {
-        const { status } = await api.post(`/storage-unit`, {
-          ...data,
-        });
-        if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
-      }
-      setMessage('Formulário enviado com sucesso!');
-      reset();
-    } catch (e) {
-      setMessage('Erro ao enviar o formulário.');
-      console.error(e);
-    } finally {
+  const handleSubmit = useCallback(
+    async (data: StorageUnitFormData) => {
+      setIsSubmitting(true);
+      toast.promise(
+        async () => {
+          if (isEditing) {
+            const res = await api.put(`/storage-unit/${storageUnitId}`, {
+              brandId: data.brandId,
+              quality: data.quality,
+              state: data.state,
+              weight: Number.parseFloat(data.weight.toString()),
+            });
+            if (!isSuccessStatus(res.status))
+              throw new Error('Erro na requisição');
+          } else {
+            const res = await api.post('/storage-unit', {
+              brandId: data.brandId,
+              quality: data.quality,
+              state: data.state,
+              weight: data.weight,
+            });
+            if (!isSuccessStatus(res.status))
+              throw new Error('Erro na requisição');
+          }
+          form.reset();
+        },
+        {
+          loading: 'Carregando...',
+          success: () => {
+            onSave();
+            setIsOpen(false);
+            return `Unidade de Armazenamento ${
+              isEditing ? 'atualizada' : 'criada'
+            } com sucesso!`;
+          },
+          error: () => {
+            return `Erro ao ${
+              isEditing ? 'atualizar' : 'criar'
+            } a Unidade de Armazenamento.`;
+          },
+        }
+      );
       setIsSubmitting(false);
-      onSave?.();
-    }
-  };
+    },
+    [isEditing, storageUnitId, form, onSave]
+  );
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto my-8">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-        {initialData
-          ? 'Editar Unidade de Armazenamento'
-          : 'Criar Nova Unidade de Armazenamento'}
-      </h2>
-      {message && (
-        <p className="text-center text-sm text-gray-700">{message}</p>
-      )}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <DialogForm
+      triggerText={isEditing ? 'Editar' : 'Criar'}
+      title={
+        isEditing
+          ? 'Atualizar Unidade de Armazenamento'
+          : 'Cadastro de Unidade de Armazenamento'
+      }
+      onConfirm={form.handleSubmit(handleSubmit)}
+      onOpenChange={handleOpenChange}
+      loading={isSubmitting}
+      errors={errors}
+      trigger={
+        isEditing ? (
+          <Button variant="ghost" size="icon" className="size-8">
+            <PencilIcon className="size-4" />
+          </Button>
+        ) : (
+          <Button variant="secondary" className="ml-auto block">
+            Criar
+          </Button>
+        )
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label
-            htmlFor="marca"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Marca
-          </label>
-          <Controller
+          <SelectForm
+            label="Marca"
             name="brandId"
             control={control}
-            render={({ field }) => (
-              <>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  {...register('brandId', { required: 'Campo obrigatório' })}
-                >
-                  <SelectTrigger
-                    className={errors.brandId ? 'border-red-500' : ''}
-                  >
-                    <SelectValue placeholder="Marca*" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {brandOptions.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </>
-            )}
+            rules={{ required: 'A marca é obrigatória' }}
+            options={brandOptions}
+            errors={errors}
           />
         </div>
         <div>
-          <label
-            htmlFor="qualidade"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Qualidade
-          </label>
-          <Controller
+          <SelectForm
+            label="Qualidade"
             name="quality"
             control={control}
-            render={({ field }) => (
-              <>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value?.toString()}
-                  {...register('quality', { required: 'Campo obrigatório' })}
-                >
-                  <SelectTrigger
-                    className={errors.quality ? 'border-red-500' : ''}
-                  >
-                    <SelectValue placeholder="Qualidade*" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {qualityOptions.map((option) => (
-                      <SelectItem key={option.id} value={option.id.toString()}>
-                        {option.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.quality?.message}
-                </p>
-              </>
-            )}
+            rules={{ required: 'A qualidade é obrigatória' }}
+            options={QUALITY_OPTIONS}
+            errors={errors}
           />
         </div>
-
-        <div className="flex justify-end space-x-3 mt-6">
-          <Button
-            type="button"
-            onClick={onFormClose}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-          >
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-          >
-            {initialData ? 'Guardar Alterações' : 'Criar'}
-          </Button>
-        </div>
-      </form>
-    </div>
+        {isEditing && (
+          <>
+            <div>
+              <SelectForm
+                label="Estado"
+                name="state"
+                control={control}
+                options={STATUS_OPTIONS}
+                errors={errors}
+              />
+            </div>
+            <div>
+              <InputForm
+                label="Peso"
+                name="weight"
+                type="number"
+                control={control}
+                rules={{
+                  required: 'O peso é obrigatório',
+                }}
+                errors={errors}
+              />
+            </div>
+          </>
+        )}
+      </div>
+    </DialogForm>
   );
 }
