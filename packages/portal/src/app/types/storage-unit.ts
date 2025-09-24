@@ -3,6 +3,10 @@ export enum Quality {
   MEDIUM = 'MEDIUM',
   BAD = 'BAD',
 }
+export enum Status {
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
+}
 
 export type StorageUnitDTO = {
   id: string;
@@ -11,13 +15,13 @@ export type StorageUnitDTO = {
     name: string;
   };
   quality: Quality;
-  status: 'ATIVO' | 'INATIVO';
+  status: Status;
   weight: number; 
 };
 
 export type StorageUnitFormData = {
   brandId: string;
   quality: Quality;
-  state: 'ATIVO' | 'INATIVO';
+  state: Status;
   weight: number; 
 };

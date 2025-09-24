@@ -51,7 +51,7 @@ export default function StorageUnit() {
 
   const fetchBrands = useCallback(async () => {
     try {
-      const { data, status } = await api.get<Brand[]>('/brand');
+      const { data } = await api.get<Brand[]>('/brand');
 
       setBrandOptions(
         data.map((brand) => ({ value: brand.id, label: brand.name }))

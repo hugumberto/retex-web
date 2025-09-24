@@ -13,20 +13,21 @@ import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import {
   Quality,
+  Status,
   StorageUnitDTO,
   StorageUnitFormData,
 } from '../../types/storage-unit';
 
 // Constants
 const QUALITY_OPTIONS = [
-  { value: 'GOOD', label: 'Bom' },
-  { value: 'MEDIUM', label: 'Regular' },
-  { value: 'BAD', label: 'Ruim' },
+  { value: Quality.GOOD, label: 'Bom' },
+  { value: Quality.MEDIUM, label: 'Regular' },
+  { value: Quality.BAD, label: 'Ruim' },
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'ATIVO', label: 'Ativo' },
-  { value: 'INATIVO', label: 'Inativo' },
+  { value: Status.ATIVO, label: 'Ativo' },
+  { value: Status.INATIVO, label: 'Inativo' },
 ];
 
 interface StorageUnitFormProps {
@@ -57,7 +58,7 @@ export default function StorageUnitForm({
       : {
           brandId: '',
           quality: Quality.GOOD,
-          state: 'ATIVO' as 'ATIVO' | 'INATIVO',
+          state: Status.ATIVO,
           weight: 0,
         },
   });
