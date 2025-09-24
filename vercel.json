@@ -1,0 +1,18 @@
+{
+  "github": {
+    "enabled": true,
+    "autoAlias": false
+  },
+  "builds": [
+    {
+      "src": "packages/portal/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/packages/portal/$1"
+    }
+  ]
+}
