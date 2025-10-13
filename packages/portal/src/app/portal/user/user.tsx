@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -9,163 +10,177 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { TrashIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
-import { PencilIcon, TrashIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { UserDTO, UserFormData } from '../../types/user';
+import { useAppStore } from '@/store';
+import { UserDTO, UserStatus } from '../../types/user'; 
 import UserForm from './user-form';
 
+// Constants for display status (Portuguese labels)
+const STATUS_MAP: Record<string, string> = {
+  ACTIVE: 'Ativo',
+  INACTIVE: 'Inativo',
+  ATIVO: 'Ativo',
+  INATIVO: 'Inativo',
+};
+
+
 export default function User() {
-  const [showForm, setShowForm] = useState(false);
+  const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [users, setUsers] = useState<UserDTO[]>([]);
-  const [editingUser, setEditingUser] = useState<UserFormData | undefined>();
-  const fetchData = async () => {
-    const { data, status } = await api.get<UserDTO[]>(`/user`);
-    if (!isSuccessStatus(status)) {
-      console.error('Failed to fetch users');
-      return;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const { data, status } = await api.get<UserDTO[]>(`/user`);
+      if (!isSuccessStatus(status)) {
+        throw new Error('Failed to fetch users');
+      }
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
     }
-    setUsers(data);
-  };
-  useEffect(() => {
-    fetchData();
   }, []);
-  const handleToggleForm = (userToEdit?: UserDTO) => {
-    if (userToEdit) {
-      setEditingUser({
-        id: userToEdit.id,
-        firstName: userToEdit.firstName,
-        lastName: userToEdit.lastName,
-        email: userToEdit.email,
-        contactPhone: userToEdit.contactPhone,
-        documentNumber: userToEdit.documentNumber,
-        role: userToEdit.roles.map((role) => role.role),
-      });
-    } else {
-      setEditingUser(undefined);
-    }
-    setShowForm((prev) => !prev);
-  };
 
-  const handleFormClose = () => {
-    setShowForm(false);
-    setEditingUser(undefined);
-  };
-
-  const handleDeleteUser = async (user: UserDTO) => {
-    if (window.confirm('Tem certeza que deseja eliminar este usuário?')) {
+  const handleDeleteUser = useCallback(
+    async (id: string) => {
+      setIsSubmitting(true);
       try {
-        const res = await api.put(`/user/${user.id}`, {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          contactPhone: user.contactPhone,
-          documentNumber: user.documentNumber,
-          password: user.documentNumber,
-          status: 'INACTIVE',
-        });
-        if (!isSuccessStatus(res.status))
-          throw new Error('Erro ao eliminar usuário');
-        await fetchData();
+        const res = await api.delete(`/user/${id}`);
+        if (res.status !== 200) throw new Error('Erro ao eliminar usuário');
+        await fetchUsers();
       } catch (error) {
         console.error('Erro ao eliminar usuário:', error);
+        throw error;
+      } finally {
+        setIsSubmitting(false);
       }
+    },
+    [fetchUsers]
+  );
+  
+  const handleSelectUser = useCallback((id: string, isChecked: boolean) => {
+    if (isChecked) {
+      setSelectedUsers((prev: string[]) => [...prev, id]);
+    } else {
+      setSelectedUsers((prev: string[]) => prev.filter((userId: string) => userId !== id));
     }
-  };
+  }, []);
+
+  const handleDeleteWithToast = useCallback(
+    async (id: string) => {
+      await toast.promise(handleDeleteUser(id), {
+        loading: 'Carregando...',
+        success: () => 'Utilizador eliminado com sucesso',
+        error: () => 'Erro ao eliminar o Utilizador',
+      });
+    },
+    [handleDeleteUser]
+  );
+  
+  // useEffect for header/breadcrumbs and initial data fetch
+  useEffect(() => {
+    setPageTitle('Utilizadores');
+    setBreadcrumbs([{ label: 'Utilizadores', href: '/portal/user' }]);
+    fetchUsers();
+    
+    return () => {
+      setPageTitle('');
+      setBreadcrumbs([]);
+    };
+  }, [setBreadcrumbs, setPageTitle, fetchUsers]);
+
+  const handleSave = useCallback(async () => {
+    await fetchUsers();
+  }, [fetchUsers]);
 
   return (
-    <section
-      id="user-page"
-      className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]"
-    >
-      <h1 className="text-4xl md:text-5xl font-bold text-center text-neutral-950 mb-8">
-        Usuário
-      </h1>
-
-      <Button
-        className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-        onClick={() => handleToggleForm()}
-      >
-        {showForm ? 'Fechar Formulário' : 'Criar Novo Usuário'}
-      </Button>
-
-      {showForm ? (
-        <UserForm
-          onFormClose={handleFormClose}
-          initialData={editingUser}
-          onSave={() => {
-            setShowForm(false);
-            setEditingUser(undefined);
-            fetchData();
-          }}
-        />
-      ) : (
-        <div className="mt-8 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-          <Table>
-            <caption className="p-4 text-left text-sm text-gray-500">
-              Detalhes dos Usuários.
-            </caption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>id</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Perfil</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users?.map((user) => (
+    <section id="user-page" className="flex flex-col items-center">
+      <UserForm onSave={handleSave} />
+      <div className="mt-4 w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Id</TableHead>
+              <TableHead>Nome</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Telefone</TableHead>
+              <TableHead>Perfil</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Ação</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users?.length > 0 ? (
+              users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.id}</TableCell>
                   <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={selectedUsers.includes(user.id)}
+                        onCheckedChange={(checked: boolean) =>
+                          handleSelectUser(user.id, !!checked)
+                        }
+                      />
+                      <span className="font-medium">{user.id}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">
                     {user.firstName} {user.lastName}
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.contactPhone}</TableCell>
                   <TableCell>
-                    {user.roles.map((role) => role.role).join(', ')}
+                    {user.roles.map((r) => r.role).join(', ')}
                   </TableCell>
-                  <TableCell>{user.status}</TableCell>
-
+                  <TableCell>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        user.status === UserStatus.ATIVO || user.status === UserStatus.ACTIVE
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {STATUS_MAP[user.status]}
+                    </span>
+                  </TableCell>
                   <TableCell className="space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handleToggleForm(user)}
-                    >
-                      <PencilIcon className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handleDeleteUser(user)}
-                    >
-                      <TrashIcon className="size-4" />
-                    </Button>
+                    <UserForm userId={user.id} initialData={user} onSave={handleSave} />
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8"
+                        >
+                          <TrashIcon />
+                        </Button>
+                      }
+                      onConfirm={() => handleDeleteWithToast(user.id)}
+                    />
                   </TableCell>
                 </TableRow>
-              ))}
-              {users.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-sm text-gray-500"
-                  >
-                    {
-                      'Nenhum usuário encontrado. Clique em "Criar Novo Usuário" para adicionar um.'
-                    }
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="text-center py-6 text-muted-foreground"
+                >
+                  Nenhum registro encontrado!
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </section>
   );
 }

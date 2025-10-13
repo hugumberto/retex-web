@@ -22,6 +22,7 @@ export interface UserFormData {
   documentNumber: string;
   password?: string;
   role?: Role[];
+  status: UserStatus; 
 }
 
 export enum Role {
@@ -33,4 +34,6 @@ export enum Role {
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
 }
