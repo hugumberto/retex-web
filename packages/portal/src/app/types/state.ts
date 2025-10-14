@@ -1,4 +1,7 @@
+import React from "react";
+import { Brand } from "./brand";
 import { UserDTO } from "./user";
+import { StorageUnitDTO } from "./storage-unit";
 
 
 export interface AuthSlice {
@@ -17,7 +20,11 @@ export interface UiSlice {
   breadcrumbs: { label: string; href?: string }[];
   setBreadcrumbs: (breadcrumbs: { label: string; href?: string }[]) => void;
 }
+export interface PackageSortingSlice {
+  brandState:[Brand[],React.Dispatch<React.SetStateAction<Brand[]>>];
+  storageUnitState:[StorageUnitDTO[],React.Dispatch<React.SetStateAction<StorageUnitDTO[]>>];
+}
 
 export type State<T> = Partial<T> | T | ((state: T) => Partial<T> | T);
 export type SetState<T> = (partial: State<T>, replace?: boolean, name?: string) => void;
-export interface AppStore extends UiSlice, AuthSlice {}
+export interface AppStore extends UiSlice, AuthSlice, PackageSortingSlice {}
