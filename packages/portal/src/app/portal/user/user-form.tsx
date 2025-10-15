@@ -15,8 +15,8 @@ import { UserFormData, UserDTO, UserStatus } from '../../types/user';
 
 // Constants
 const STATUS_OPTIONS = [
-  { value: UserStatus.ATIVO, label: 'Ativo' }, 
-  { value: UserStatus.INATIVO, label: 'Inativo' },
+  { value: UserStatus.ACTIVE, label: 'Ativo' }, 
+  { value: UserStatus.INACTIVE, label: 'Inativo' },
 ];
 
 interface UserFormProps {
