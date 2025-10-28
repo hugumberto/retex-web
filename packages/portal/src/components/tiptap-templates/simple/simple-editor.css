@@ -8,6 +8,15 @@ body {
 .dark body {
   --tt-theme-text: var(--tt-gray-dark-900);
 }
+.simple-editor-wrapper {
+  --tt-toolbar-height: 44px;
+  --tt-theme-text: var(--tt-gray-light-900);
+}
+
+.dark .simple-editor-wrapper {
+  --tt-theme-text: var(--tt-gray-dark-900);
+  background-color: #000;
+}
 
 body {
   font-family: 'Inter', sans-serif;

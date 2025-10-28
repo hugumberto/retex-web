@@ -78,11 +78,23 @@ function KeywordsInput({
           className="flex items-center gap-1 px-2 py-1"
         >
           {keyword}
-          <X
+          <button
+            type="button"
             aria-label={`Remove ${keyword}`}
-            className="h-3 w-3 cursor-pointer"
-            onClick={() => removeKeyword(keyword)}
-          />
+            onMouseDown={(e) => {
+              // Prevent input blur/focus change when clicking the remove button
+              e.preventDefault();
+            }}
+            onClick={(e) => {
+              // Avoid any parent form handlers; just remove the tag
+              e.preventDefault();
+              e.stopPropagation();
+              removeKeyword(keyword);
+            }}
+            className="inline-flex h-4 w-4 items-center justify-center rounded hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <X className="h-3 w-3" />
+          </button>
         </Badge>
       ))}
       <Input

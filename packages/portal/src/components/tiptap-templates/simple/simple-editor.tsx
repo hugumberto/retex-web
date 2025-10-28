@@ -72,6 +72,8 @@ import { handleImageUpload, MAX_FILE_SIZE } from '@/lib/tiptap-utils';
 
 // --- Styles ---
 import '@/components/tiptap-templates/simple/simple-editor.css';
+import { useAppStore } from '@/store';
+import { cn } from '@/lib/utils';
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -182,6 +184,7 @@ const MobileToolbarContent = ({
 );
 
 export function SimpleEditor() {
+  const { isDarkMode } = useAppStore();
   const isMobile = useIsMobile();
   const { height } = useWindowSize();
   const [mobileView, setMobileView] = React.useState<
@@ -271,7 +274,7 @@ export function SimpleEditor() {
         <EditorContent
           editor={editor}
           role="presentation"
-          className="simple-editor-content"
+          className={cn('simple-editor-content', isDarkMode ? 'dark' : '')}
         />
       </EditorContext.Provider>
     </div>
