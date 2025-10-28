@@ -1,5 +1,12 @@
-import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
+'use client';
+import BlogForm from './blog-form';
 
 export default function BlogPage() {
-  return <SimpleEditor />;
+  return (
+    <BlogForm
+      onSave={() => {
+        console.log('Blog post saved!');
+      }}
+    />
+  );
 }
