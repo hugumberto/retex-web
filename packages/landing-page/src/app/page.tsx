@@ -3,6 +3,7 @@ import HowItWorks from '@/components/landing/HowItWorks';
 import AboutUs from '@/components/landing/AboutUs';
 import ContactForm from '@/components/landing/ContactForm';
 import FAQ from '@/components/landing/FAQ';
+import Blog from '@/components/landing/Blog';
 import { Header } from '@/components/landing/Header';
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
         <AboutUs />
         <ContactForm />
         <FAQ />
+        <Blog />
       </div>
       <footer className="text-xs text-center text-white  bg-gradient-horizontal py-6">
         <p>
