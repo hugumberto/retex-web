@@ -68,6 +68,9 @@ const MobileMenu = () => {
           <ItemMenu href="#faq" onClick={(e) => handleClick(e, 'faq')}>
             FAQ&apos;s
           </ItemMenu>
+          <ItemMenu href="#blog" onClick={(e) => handleClick(e, 'blog')}>
+            Blog
+          </ItemMenu>
         </nav>
       </SheetContent>
     </Sheet>
@@ -90,6 +93,7 @@ export const Header = () => {
           <ItemMenu href="#how-it-works">Como Funciona</ItemMenu>
           <ItemMenu href="#about-us">Sobre nós</ItemMenu>
           <ItemMenu href="#faq">FAQ&apos;s</ItemMenu>
+          <ItemMenu href="#blog">Blog</ItemMenu>
         </nav>
         <div className="md:hidden mr-4 mt-1">
           <MobileMenu />{' '}

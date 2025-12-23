@@ -33,11 +33,10 @@ export default function Blog() {
         );
 
         if (!res.ok) {
-          throw new Error('Failed to fetch blog posts');
+          throw new Error('API not available');
         }
 
         const data = await res.json();
-        
         
         if (data.featured && data.recent) {
           setFeaturedPost(data.featured);
@@ -48,9 +47,10 @@ export default function Blog() {
         } else if (Array.isArray(data.posts) && data.posts.length > 0) {
           setFeaturedPost(data.posts[0]);
           setRecentPosts(data.posts.slice(1, 4));
+        } else {
+          throw new Error('No blog posts available');
         }
-      } catch (err) {
-        console.error('Error fetching blog posts:', err);
+      } catch {
         setFeaturedPost({
           id: '1',
           title: 'Título do post no Blog',
@@ -103,7 +103,7 @@ export default function Blog() {
 
   if (loading) {
     return (
-      <section className="py-16 px-4 md:px-8 font-family-poppins">
+      <section id="blog" className="py-16 px-4 md:px-8 font-family-poppins">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-primary">A carregar blog...</p>
         </div>
@@ -112,9 +112,9 @@ export default function Blog() {
   }
 
   return (
-    <section className="py-16 px-4 md:px-8 font-family-poppins">
+    <section id="blog" className="py-16 px-4 md:px-8 font-family-poppins">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Cabeçalho */}
         <div className="text-center mb-12">
           <p className="text-sm mb-2" style={{ color: '#02748e' }}>
             Novidades
@@ -124,13 +124,13 @@ export default function Blog() {
           </h1>
         </div>
 
-        {/* Two Column Layout */}
+        {/* Layout de Duas Colunas */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Featured Post */}
+          {/* Coluna Esquerda - Post em Destaque */}
           <div className="lg:col-span-2">
             {featuredPost && (
               <article className="bg-white rounded-lg overflow-hidden shadow-sm">
-                {/* Featured Image */}
+                {/* Imagem em Destaque */}
                 <div
                   className="relative w-full h-64 md:h-96"
                   style={{ backgroundColor: '#02748e33' }}
@@ -143,7 +143,7 @@ export default function Blog() {
                   </div>
                 </div>
 
-                {/* Content */}
+                {/* Conteúdo */}
                 <div className="p-6">
                   <span
                     className="inline-block px-3 py-1 text-xs font-medium rounded-full mb-4"
@@ -171,14 +171,14 @@ export default function Blog() {
             )}
           </div>
 
-          {/* Right Column - Recent Posts Sidebar */}
+          {/* Coluna Direita - Barra Lateral de Posts Recentes */}
           <div className="lg:col-span-1 space-y-6">
             {recentPosts.map((post) => (
               <article
                 key={post.id}
                 className="bg-white rounded-lg overflow-hidden shadow-sm"
               >
-                {/* Small Image */}
+                {/* Imagem Pequena */}
                 <div
                   className="relative w-full h-32"
                   style={{ backgroundColor: '#02748e33' }}
@@ -191,7 +191,7 @@ export default function Blog() {
                   </div>
                 </div>
 
-                {/* Content */}
+                {/* Conteúdo */}
                 <div className="p-4">
                   <span
                     className="inline-block px-2 py-1 text-xs font-medium rounded-full mb-2"
