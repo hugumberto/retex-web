@@ -50,7 +50,8 @@ export default function Blog() {
         } else {
           throw new Error('No blog posts available');
         }
-      } catch {
+      } catch (error) {
+        console.error('Error fetching blog posts:', error);
         setFeaturedPost({
           id: '1',
           title: 'Título do post no Blog',
@@ -116,7 +117,7 @@ export default function Blog() {
       <div className="max-w-7xl mx-auto">
         {/* Cabeçalho */}
         <div className="text-center mb-12">
-          <p className="text-sm mb-2" style={{ color: '#02748e' }}>
+          <p className="text-sm mb-2 text-secondary">
             Novidades
           </p>
           <h1 className="text-4xl md:text-5xl font-bold text-primary">
@@ -146,10 +147,9 @@ export default function Blog() {
                 {/* Conteúdo */}
                 <div className="p-6">
                   <span
-                    className="inline-block px-3 py-1 text-xs font-medium rounded-full mb-4"
+                    className="inline-block px-3 py-1 text-xs font-medium rounded-full mb-4 text-secondary"
                     style={{
-                      color: '#02748e',
-                      backgroundColor: '#02748e1a',
+                      backgroundColor: 'rgba(2, 116, 142, 0.1)',
                     }}
                   >
                     {featuredPost.category}
@@ -160,10 +160,7 @@ export default function Blog() {
                   <p className="text-gray-700 mb-4 leading-relaxed">
                     {featuredPost.content}
                   </p>
-                  <p
-                    className="text-sm font-medium"
-                    style={{ color: '#02748e' }}
-                  >
+                  <p className="text-sm font-medium text-secondary">
                     {featuredPost.date}
                   </p>
                 </div>
@@ -194,10 +191,9 @@ export default function Blog() {
                 {/* Conteúdo */}
                 <div className="p-4">
                   <span
-                    className="inline-block px-2 py-1 text-xs font-medium rounded-full mb-2"
+                    className="inline-block px-2 py-1 text-xs font-medium rounded-full mb-2 text-secondary"
                     style={{
-                      color: '#02748e',
-                      backgroundColor: '#02748e1a',
+                      backgroundColor: 'rgba(2, 116, 142, 0.1)',
                     }}
                   >
                     {post.category}
@@ -208,10 +204,7 @@ export default function Blog() {
                   <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                     {post.excerpt}
                   </p>
-                  <p
-                    className="text-xs font-medium"
-                    style={{ color: '#02748e' }}
-                  >
+                  <p className="text-xs font-medium text-secondary">
                     {post.date}
                   </p>
                 </div>
