@@ -45,6 +45,14 @@ const diasDaSemana = [
 ];
 const turnos = ['Manhã', 'Tarde', 'Noite'];
 
+function isApiError(err: unknown): err is { message?: string; error?: string } {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    ('message' in err || 'error' in err)
+  );
+}
+
 export default function Formulario() {
   const {
     register,
@@ -52,6 +60,7 @@ export default function Formulario() {
     control,
     setValue,
     reset,
+    resetField,
     formState: { errors },
   } = useForm<FormUserData>();
   const [formData, setFormData] = useState<FormUserData>();
@@ -75,13 +84,14 @@ export default function Formulario() {
       });
       if (!res.ok) throw new Error('Erro na requisição');
       setMessage('Formulário enviado com sucesso!');
+    } catch (e: unknown) {
+      if (isApiError(e) && e.error === 'Conflict') {
+        setMessage('Formulário enviado com sucesso!');
+      } else setMessage('Erro ao enviar o formulário.');
+    } finally {
       reset();
       setValue('dayOfWeek', '');
       setValue('timeOfDay', '');
-    } catch (e) {
-      setMessage('Erro ao enviar o formulário.');
-      console.error(e);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -139,6 +149,10 @@ export default function Formulario() {
           long: lon.toString(),
         },
       }));
+      resetField('address.number', {
+        defaultValue: '',
+        keepError: true,
+      });
     } catch (error) {
       console.error('Erro ao buscar endereço', error);
     }
@@ -334,7 +348,9 @@ export default function Formulario() {
               <div className="w-full">
                 <Input
                   placeholder="Nº edifício/porta*"
-                  {...register('address.number')}
+                  {...register('address.number', {
+                    required: 'Campo obrigatório',
+                  })}
                 />
                 {errors.address?.number && (
                   <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
