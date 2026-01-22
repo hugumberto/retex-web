@@ -153,7 +153,7 @@ export default function Formulario() {
       }));
       resetField('address.number', {
         defaultValue: '',
-        keepError: true,
+        keepError: false,
       });
     } catch (error) {
       console.error('Erro ao buscar endereço', error);
