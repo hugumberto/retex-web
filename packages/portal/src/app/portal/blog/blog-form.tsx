@@ -1,28 +1,28 @@
 'use client';
 
 import {
-  BlogPostDTO,
   BlogPostFormData,
   BlogPostHighlight,
   BlogPostStatus,
 } from '@/app/types/blog';
-import {
-  PackageCollectionDTO,
-  PackageCollectionFormData,
-  Shift,
-} from '@/app/types/package-collection';
-import { DialogForm } from '@/components/form/dialog-form';
+import ImageUploadForm from '@/components/form/image-upload-form';
+// import {
+//   PackageCollectionDTO,
+//   PackageCollectionFormData,
+//   Shift,
+// } from '@/app/types/package-collection';
+// import { DialogForm } from '@/components/form/dialog-form';
 import { InputForm } from '@/components/form/input-form';
 import { KeywordsForm } from '@/components/form/keyword-form';
-import { SelectFieldOption, SelectForm } from '@/components/form/select-form';
+import { SelectForm } from '@/components/form/select-form';
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
-import { Button } from '@/components/ui/button';
-import api from '@/lib/api';
-import { isSuccessStatus } from '@/lib/utils';
-import { PencilIcon } from 'lucide-react';
-import { useState } from 'react';
+// import { Button } from '@/components/ui/button';
+// import api from '@/lib/api';
+// import { isSuccessStatus } from '@/lib/utils';
+// import { PencilIcon } from 'lucide-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 interface BlogFormProps {
   packageCollectionId?: string;
@@ -33,13 +33,25 @@ export default function BlogForm({
   packageCollectionId,
   onSave,
 }: BlogFormProps) {
+  // Helper to convert a title into a URL-friendly slug
+  const slugify = (input: string): string => {
+    return input
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '') // remove diacritics
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // remove invalid chars
+      .replace(/\s+/g, '-') // spaces to hyphens
+      .replace(/-+/g, '-') // collapse multiple hyphens
+      .replace(/^-+|-+$/g, ''); // trim hyphens at ends
+  };
+
   const {
     control,
-    handleSubmit,
-    reset,
+    // reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<BlogPostFormData>({
     defaultValues: {
       body: '',
@@ -51,9 +63,9 @@ export default function BlogForm({
       highlight: BlogPostHighlight.NONE,
     },
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isEditing] = useState(!!packageCollectionId);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
+  // const [isEditing] = useState(!!packageCollectionId);
   const postHighlightOptions = [
     BlogPostHighlight.NONE,
     BlogPostHighlight.HIGHLIGHTED,
@@ -61,82 +73,93 @@ export default function BlogForm({
   ];
   const statusOptions = [BlogPostStatus.DRAFT, BlogPostStatus.PUBLISHED];
 
-  const fetchCollectionDataById = async (
-    id: string
-  ): Promise<BlogPostDTO | undefined> => {
-    const { data, status } = await api.get<BlogPostDTO>(`/route/${id}`);
-    if (!isSuccessStatus(status)) {
-      console.error('Failed to fetch storage units');
-      return;
-    }
-    return data;
-  };
+  // Auto-fill slug from title continuously until the user edits slug manually
+  const titleValue = watch('title');
 
-  const getEditingItem = async (): Promise<BlogPostFormData | undefined> => {
-    if (packageCollectionId) {
-      const data = await fetchCollectionDataById(packageCollectionId);
-      if (data) {
-        return {
-          body: '',
-          slug: '',
-          title: '',
-          hero: '',
-          tags: [],
-          status: BlogPostStatus.DRAFT,
-          highlight: BlogPostHighlight.NONE,
-        };
-      } else {
-        return undefined;
-      }
+  useEffect(() => {
+    // If user hasn't manually changed slug, keep it in sync with title
+    if (!dirtyFields?.slug) {
+      const next = titleValue ? slugify(titleValue) : '';
+      setValue('slug', next, { shouldValidate: true, shouldDirty: false });
     }
-    return undefined;
-  };
+  }, [titleValue, dirtyFields?.slug, setValue]);
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (open && isEditing && packageCollectionId) {
-      getEditingItem().then((data) => {
-        reset(data);
-      });
-    }
-  };
+  // const fetchCollectionDataById = async (
+  //   id: string
+  // ): Promise<BlogPostDTO | undefined> => {
+  //   const { data, status } = await api.get<BlogPostDTO>(`/route/${id}`);
+  //   if (!isSuccessStatus(status)) {
+  //     console.error('Failed to fetch storage units');
+  //     return;
+  //   }
+  //   return data;
+  // };
 
-  const submit = async (data: BlogPostFormData) => {
-    setIsSubmitting(true);
-    toast.promise(
-      async () => {
-        if (isEditing) {
-          const res = await api.put(`/route/${packageCollectionId}`, {
-            ...data,
-          });
-          if (!isSuccessStatus(res.status))
-            throw new Error('Erro na requisição');
-          reset();
-          return;
-        }
-        const res = await api.post(`/route`, {
-          ...data,
-        });
-        if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
-        reset();
-      },
-      {
-        loading: 'Loading...',
-        success: () => {
-          onSave?.();
-          return `Recolha de Encomendas ${
-            isEditing ? 'atualizada' : 'criada'
-          } com sucesso`;
-        },
-        error: () => {
-          return `Erro ao ${
-            isEditing ? 'atualizar' : 'criar'
-          } a recolha de encomendas`;
-        },
-      }
-    );
-    setIsSubmitting(false);
-  };
+  // const getEditingItem = async (): Promise<BlogPostFormData | undefined> => {
+  //   if (packageCollectionId) {
+  //     const data = await fetchCollectionDataById(packageCollectionId);
+  //     if (data) {
+  //       return {
+  //         body: '',
+  //         slug: '',
+  //         title: '',
+  //         hero: '',
+  //         tags: [],
+  //         status: BlogPostStatus.DRAFT,
+  //         highlight: BlogPostHighlight.NONE,
+  //       };
+  //     } else {
+  //       return undefined;
+  //     }
+  //   }
+  //   return undefined;
+  // };
+
+  // const handleOpenChange = (open: boolean) => {
+  //   setIsOpen(open);
+  //   if (open && isEditing && packageCollectionId) {
+  //     getEditingItem().then((data) => {
+  //       reset(data);
+  //     });
+  //   }
+  // };
+
+  // const submit = async (data: BlogPostFormData) => {
+  //   setIsSubmitting(true);
+  //   toast.promise(
+  //     async () => {
+  //       if (isEditing) {
+  //         const res = await api.put(`/route/${packageCollectionId}`, {
+  //           ...data,
+  //         });
+  //         if (!isSuccessStatus(res.status))
+  //           throw new Error('Erro na requisição');
+  //         reset();
+  //         return;
+  //       }
+  //       const res = await api.post(`/route`, {
+  //         ...data,
+  //       });
+  //       if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
+  //       reset();
+  //     },
+  //     {
+  //       loading: 'Loading...',
+  //       success: () => {
+  //         onSave?.();
+  //         return `Recolha de Encomendas ${
+  //           isEditing ? 'atualizada' : 'criada'
+  //         } com sucesso`;
+  //       },
+  //       error: () => {
+  //         return `Erro ao ${
+  //           isEditing ? 'atualizar' : 'criar'
+  //         } a recolha de encomendas`;
+  //       },
+  //     }
+  //   );
+  //   setIsSubmitting(false);
+  // };
 
   return (
     <>
@@ -177,7 +200,7 @@ export default function BlogForm({
           />
         </div>
         <div>
-          <InputForm
+          <ImageUploadForm
             label="Hero Image"
             name="hero"
             control={control}
