@@ -82,12 +82,14 @@ export default function Formulario() {
           },
         }),
       });
+      if (res.status === 409) {
+        setMessage('Formulário enviado com sucesso!');
+        return;
+      }
       if (!res.ok) throw new Error('Erro na requisição');
       setMessage('Formulário enviado com sucesso!');
     } catch (e: unknown) {
-      if (isApiError(e) && e.error === 'Conflict') {
-        setMessage('Formulário enviado com sucesso!');
-      } else setMessage('Erro ao enviar o formulário.');
+      setMessage('Erro ao enviar o formulário.');
     } finally {
       reset();
       setValue('dayOfWeek', '');
