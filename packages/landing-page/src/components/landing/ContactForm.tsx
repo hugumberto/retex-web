@@ -350,6 +350,7 @@ export default function Formulario() {
                   placeholder="Nº edifício/porta*"
                   {...register('address.number', {
                     required: 'Campo obrigatório',
+                    maxLength: 20,
                   })}
                 />
                 {errors.address?.number && (
