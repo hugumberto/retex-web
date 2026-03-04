@@ -63,7 +63,6 @@ export default function Formulario() {
     resetField,
     formState: { errors },
   } = useForm<FormUserData>();
-  const [formData, setFormData] = useState<FormUserData>();
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -76,7 +75,14 @@ export default function Formulario() {
         body: JSON.stringify({
           ...data,
           address: {
-            ...formData?.address,
+            street: data.address.street,
+            city: data.address.city,
+            cityDivision: data.address.cityDivision,
+            country: data.address.country,
+            countryDivision: data.address.countryDivision,
+            zipCode: data.address.zipCode,
+            lat: data.address.lat.toString(),
+            long: data.address.long.toString(),
             number: data.address.number,
             complement: data.address.complement,
           },
@@ -119,6 +125,7 @@ export default function Formulario() {
         streetName,
         municipality,
         countrySubdivision,
+        countrySecondarySubdivision,
         municipalitySubdivision,
         country,
       } = address;
@@ -126,33 +133,15 @@ export default function Formulario() {
       setValue('address.street', streetName);
       setValue('address.cityDivision', municipalitySubdivision);
       setValue('address.city', municipality);
-      setValue('address.countryDivision', countrySubdivision);
+      setValue(
+        'address.countryDivision',
+        countrySecondarySubdivision ?? countrySubdivision
+      );
       setValue('address.zipCode', postalCode);
       setValue('address.country', country);
       const { lat, lon } = position;
       setValue('address.lat', lat);
       setValue('address.long', lon);
-      setFormData((prev) => ({
-        firstName: prev?.firstName ?? '',
-        lastName: prev?.lastName ?? '',
-        email: prev?.email ?? '',
-        contactPhone: prev?.contactPhone ?? '',
-        dayOfWeek: prev?.dayOfWeek ?? '',
-        timeOfDay: prev?.timeOfDay ?? '',
-        nif: prev?.nif ?? '',
-        address: {
-          street: streetName,
-          number: '',
-          complement: '',
-          city: municipality,
-          cityDivision: municipalitySubdivision,
-          country: country,
-          countryDivision: countrySubdivision,
-          zipCode: postalCode,
-          lat: lat.toString(),
-          long: lon.toString(),
-        },
-      }));
       resetField('address.number', {
         defaultValue: '',
         keepError: true,
@@ -326,26 +315,49 @@ export default function Formulario() {
             {/* Morada e Endereço */}
             <Input
               placeholder="Morada"
-              disabled
-              {...register('address.street')}
+              {...register('address.street', {
+                required: 'Campo obrigatório',
+                maxLength: 20,
+              })}
             />
 
             <div className="flex flex-col md:flex-row gap-4">
-              <Input
-                placeholder="Freguesia"
-                disabled
-                {...register('address.cityDivision')}
-              />
-              <Input
-                placeholder="Concelho"
-                disabled
-                {...register('address.city')}
-              />
-              <Input
-                placeholder="Distrito"
-                disabled
-                {...register('address.countryDivision')}
-              />
+              <div className="w-full">
+                <Input
+                  placeholder="Freguesia"
+                  {...register('address.cityDivision', {
+                    required: 'Campo obrigatório',
+                    maxLength: 20,
+                  })}
+                />
+                {errors.address?.cityDivision && (
+                  <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+                )}
+              </div>
+              <div className="w-full">
+                <Input
+                  placeholder="Concelho"
+                  {...register('address.city', {
+                    required: 'Campo obrigatório',
+                    maxLength: 20,
+                  })}
+                />
+                {errors.address?.city && (
+                  <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+                )}
+              </div>
+              <div className="w-full">
+                <Input
+                  placeholder="Distrito"
+                  {...register('address.countryDivision', {
+                    required: 'Campo obrigatório',
+                    maxLength: 20,
+                  })}
+                />
+                {errors.address?.countryDivision && (
+                  <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4">
