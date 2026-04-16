@@ -62,7 +62,29 @@ export default function Formulario() {
     reset,
     resetField,
     formState: { errors },
-  } = useForm<FormUserData>();
+  } = useForm<FormUserData>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      contactPhone: '',
+      dayOfWeek: '',
+      timeOfDay: '',
+      nif: '',
+      address: {
+        street: '',
+        number: '',
+        complement: '',
+        city: '',
+        cityDivision: '',
+        country: '',
+        countryDivision: '',
+        zipCode: '',
+        lat: '',
+        long: '',
+      },
+    },
+  });
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -130,18 +152,43 @@ export default function Formulario() {
         country,
       } = address;
 
-      setValue('address.street', streetName);
-      setValue('address.cityDivision', municipalitySubdivision);
-      setValue('address.city', municipality);
+      setValue('address.street', streetName, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue('address.cityDivision', municipalitySubdivision, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue('address.city', municipality, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
       setValue(
         'address.countryDivision',
-        countrySecondarySubdivision ?? countrySubdivision
+        countrySecondarySubdivision ?? countrySubdivision,
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        }
       );
-      setValue('address.zipCode', postalCode);
-      setValue('address.country', country);
+      setValue('address.zipCode', postalCode, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue('address.country', country, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
       const { lat, lon } = position;
-      setValue('address.lat', lat);
-      setValue('address.long', lon);
+      setValue('address.lat', lat.toString());
+      setValue('address.long', lon.toString());
       resetField('address.number', {
         defaultValue: '',
         keepError: true,
@@ -313,13 +360,24 @@ export default function Formulario() {
             </div>
 
             {/* Morada e Endereço */}
-            <Input
-              placeholder="Morada"
-              {...register('address.street', {
-                required: 'Campo obrigatório',
-                maxLength: 20,
-              })}
-            />
+            <div>
+              <Input
+                placeholder="Morada"
+                className={errors.address?.street ? 'border-red-500' : ''}
+                {...register('address.street', {
+                  required: 'Campo obrigatório',
+                  maxLength: {
+                    value: 120,
+                    message: 'Morada demasiado longa',
+                  },
+                })}
+              />
+              {errors.address?.street && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.address.street.message}
+                </p>
+              )}
+            </div>
 
             <div className="flex flex-col md:flex-row gap-4">
               <div className="w-full">
