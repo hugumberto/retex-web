@@ -1,0 +1,39 @@
+name: Open PR main to dev
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure there is an open PR from main to dev
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          count=$(gh pr list \
+            --base dev \
+            --head main \
+            --state open \
+            --json number \
+            --jq 'length')
+
+          if [ "$count" -gt 0 ]; then
+            echo "Open PR from main to dev already exists."
+            exit 0
+          fi
+
+          gh pr create \
+            --base dev \
+            --head main \
+            --title "Sync main into dev" \
+            --body "PR criado automaticamente após merge de pull request na branch main."
