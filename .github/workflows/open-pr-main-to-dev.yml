@@ -16,6 +16,11 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Ensure there is an open PR from main to dev
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -29,6 +34,13 @@ jobs:
 
           if [ "$count" -gt 0 ]; then
             echo "Open PR from main to dev already exists."
+            exit 0
+          fi
+
+          git fetch origin main dev
+
+          if git diff --quiet origin/dev..origin/main; then
+            echo "No diff between main and dev."
             exit 0
           fi
 
