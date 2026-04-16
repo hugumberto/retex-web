@@ -8,7 +8,7 @@ on:
       - closed
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -25,15 +25,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          count=$(gh pr list \
+          existing_pr_number=$(gh pr list \
             --base dev \
             --head main \
             --state open \
             --json number \
-            --jq 'length')
+            --jq '.[0].number // ""')
 
-          if [ "$count" -gt 0 ]; then
-            echo "Open PR from main to dev already exists."
+          if [ -n "$existing_pr_number" ]; then
+            echo "Open PR from main to dev already exists: #$existing_pr_number"
+            echo "PR_NUMBER=$existing_pr_number" >> "$GITHUB_ENV"
+            echo "PR_CREATED=false" >> "$GITHUB_ENV"
             exit 0
           fi
 
@@ -44,8 +46,23 @@ jobs:
             exit 0
           fi
 
-          gh pr create \
+          pr_url=$(gh pr create \
             --base dev \
             --head main \
             --title "Sync main into dev" \
-            --body "PR criado automaticamente após merge de pull request na branch main."
+            --body "PR criado automaticamente após merge de pull request na branch main.")
+
+          pr_number=$(gh pr view "$pr_url" --json number --jq '.number')
+          echo "PR_NUMBER=$pr_number" >> "$GITHUB_ENV"
+          echo "PR_CREATED=true" >> "$GITHUB_ENV"
+
+      - name: Enable auto-merge when possible
+        if: env.PR_NUMBER != '' && env.PR_CREATED == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh pr merge "$PR_NUMBER" --auto --merge; then
+            echo "Auto-merge enabled for PR #$PR_NUMBER."
+          else
+            echo "Auto-merge could not be enabled. The PR may have conflicts, branch protections, or auto-merge may be disabled."
+          fi
