@@ -1,0 +1,68 @@
+name: Open PR main to dev
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  open-pr:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure there is an open PR from main to dev
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing_pr_number=$(gh pr list \
+            --base dev \
+            --head main \
+            --state open \
+            --json number \
+            --jq '.[0].number // ""')
+
+          if [ -n "$existing_pr_number" ]; then
+            echo "Open PR from main to dev already exists: #$existing_pr_number"
+            echo "PR_NUMBER=$existing_pr_number" >> "$GITHUB_ENV"
+            echo "PR_CREATED=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          git fetch origin main dev
+
+          if git diff --quiet origin/dev..origin/main; then
+            echo "No diff between main and dev."
+            exit 0
+          fi
+
+          pr_url=$(gh pr create \
+            --base dev \
+            --head main \
+            --title "Sync main into dev" \
+            --body "PR criado automaticamente após merge de pull request na branch main.")
+
+          pr_number=$(gh pr view "$pr_url" --json number --jq '.number')
+          echo "PR_NUMBER=$pr_number" >> "$GITHUB_ENV"
+          echo "PR_CREATED=true" >> "$GITHUB_ENV"
+
+      - name: Enable auto-merge when possible
+        if: env.PR_NUMBER != '' && env.PR_CREATED == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh pr merge "$PR_NUMBER" --auto --merge; then
+            echo "Auto-merge enabled for PR #$PR_NUMBER."
+          else
+            echo "Auto-merge could not be enabled. The PR may have conflicts, branch protections, or auto-merge may be disabled."
+          fi
