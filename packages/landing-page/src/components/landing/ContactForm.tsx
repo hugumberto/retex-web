@@ -63,6 +63,8 @@ export default function Formulario() {
     resetField,
     formState: { errors },
   } = useForm<FormUserData>({
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -87,6 +89,9 @@ export default function Formulario() {
   });
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const zipCodeField = register('address.zipCode', {
+    required: 'Campo obrigatório',
+  });
 
   const onSubmit = async (data: FormUserData) => {
     setIsSubmitting(true);
@@ -103,8 +108,8 @@ export default function Formulario() {
             country: data.address.country,
             countryDivision: data.address.countryDivision,
             zipCode: data.address.zipCode,
-            lat: data.address.lat.toString(),
-            long: data.address.long.toString(),
+            lat: data.address.lat ? data.address.lat.toString() : '0',
+            long: data.address.long ? data.address.long.toString() : '0',
             number: data.address.number,
             complement: data.address.complement,
           },
@@ -191,7 +196,6 @@ export default function Formulario() {
       setValue('address.long', lon.toString());
       resetField('address.number', {
         defaultValue: '',
-        keepError: true,
       });
     } catch (error) {
       console.error('Erro ao buscar endereço', error);
@@ -349,10 +353,11 @@ export default function Formulario() {
                 className={`w-44 ${
                   errors.address?.zipCode ? 'border-red-500' : ''
                 }`}
-                {...register('address.zipCode', {
-                  required: 'Campo obrigatório',
-                })}
-                onBlur={handleBlurPostalCode}
+                {...zipCodeField}
+                onBlur={(event) => {
+                  zipCodeField.onBlur(event);
+                  void handleBlurPostalCode(event);
+                }}
               />
               {errors.address?.zipCode && (
                 <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
