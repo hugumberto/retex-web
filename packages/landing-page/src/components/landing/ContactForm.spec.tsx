@@ -53,6 +53,26 @@ describe('ContactForm', () => {
     expect(requiredMessages.length).toBeGreaterThan(0);
   });
 
+  it('remove o erro obrigatorio quando o campo e preenchido', async () => {
+    render(<ContactForm />);
+
+    const firstNameInput = screen.getByPlaceholderText('Nome*');
+
+    fireEvent.click(screen.getByRole('button', { name: /submeter/i }));
+
+    await waitFor(() => {
+      expect(firstNameInput.className).toContain('border-red-500');
+    });
+
+    fireEvent.change(firstNameInput, {
+      target: { value: 'Ana' },
+    });
+
+    await waitFor(() => {
+      expect(firstNameInput.className).not.toContain('border-red-500');
+    });
+  });
+
   it('preenche a morada pelo codigo postal e envia o formulario', async () => {
     fetchMock
       .mockResolvedValueOnce({
