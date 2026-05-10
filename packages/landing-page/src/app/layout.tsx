@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="pt">
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-X2G04J7NPJ"
         strategy="afterInteractive"
