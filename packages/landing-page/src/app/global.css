@@ -946,6 +946,22 @@ a.nav-cta-btn:hover {
   color: #0f3558;
 }
 
+.landing-form-feedback {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  background: #e8f4f7;
+  color: #0f3558;
+}
+
+.landing-form-feedback--error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
 .landing-form-card label {
   text-align: left;
   display: flex;
@@ -991,10 +1007,29 @@ a.nav-cta-btn:hover {
   padding: 10px 12px;
 }
 
+.landing-form-card input.field-error,
+.landing-form-card textarea.field-error {
+  border-color: #dc2626;
+}
+
+.landing-form-card .form-field-error {
+  display: block;
+  margin: -2px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #dc2626;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+
+@media (max-width: 560px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .landing-form-card button[type='submit'] {
@@ -1015,6 +1050,11 @@ a.nav-cta-btn:hover {
 
 .landing-form-card button[type='submit']:hover {
   opacity: 0.94;
+}
+
+.landing-form-card button[type='submit']:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .faq h2 {

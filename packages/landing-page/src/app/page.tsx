@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import ContactForm from '@/components/landing/ContactForm';
 
 export default function Home() {
   return (
@@ -7,11 +8,12 @@ export default function Home() {
         <section className="landing-hero">
           <header className="landing-header">
             <Image
-              src="/assets/new-layout/RETEX_LOGO.jpg"
+              src="/assets/logo.png"
               alt="RETEX"
-              width={120}
-              height={46}
+              width={196}
+              height={53}
               className="landing-logo"
+              priority
             />
             <nav className="landing-nav">
               <a href="#como-funciona">Como funciona</a>
@@ -471,67 +473,7 @@ export default function Home() {
             <br />
             Menos lixo no planeta, mais futuro para todos.
           </p>
-          <form className="landing-form-card">
-            <div className="form-row">
-              <label>
-                <span className="form-label">
-                  Nome
-                  <span className="form-req">*</span>
-                </span>
-                <input type="text" name="nome" autoComplete="name" required />
-              </label>
-              <label>
-                <span className="form-label">
-                  NIF
-                  <span className="form-req">*</span>
-                </span>
-                <input type="text" name="nif" autoComplete="off" required />
-              </label>
-            </div>
-            <div className="form-row">
-              <label>
-                <span className="form-label">
-                  Email
-                  <span className="form-req">*</span>
-                </span>
-                <input type="email" name="email" autoComplete="email" required />
-              </label>
-              <label>
-                <span className="form-label">
-                  Telemóvel
-                  <span className="form-req">*</span>
-                </span>
-                <input type="tel" name="telemovel" autoComplete="tel" required />
-              </label>
-            </div>
-            <label>
-              <span className="form-label">
-                Local de recolha
-                <span className="form-req">*</span>
-              </span>
-              <input
-                type="text"
-                name="local"
-                placeholder="Rua Eng. Duarte Pacheco, nº33 1º Dto 4470-136 Maia"
-                required
-              />
-            </label>
-            <label>
-              <span className="form-label">
-                Horário de recolha
-                <span className="form-req">*</span>
-              </span>
-              <input type="text" name="horario" required />
-            </label>
-            <label>
-              <span className="form-label">
-                Mensagem
-                <span className="form-req">*</span>
-              </span>
-              <textarea name="mensagem" rows={5} required />
-            </label>
-            <button type="submit">Submeter</button>
-          </form>
+          <ContactForm />
         </section>
 
         <section id="faq" className="landing-section faq">
