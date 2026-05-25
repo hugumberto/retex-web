@@ -5,6 +5,12 @@
   "scripts": {
     "start:web": "nx dev landing-page",
     "start:portal": "nx dev portal",
+    "build:web": "nx build landing-page",
+    "build:portal": "nx build portal",
+    "start:web:prod": "nx start landing-page",
+    "start:portal:prod": "nx start portal",
+    "prod:web": "nx build landing-page && nx start landing-page",
+    "prod:portal": "nx build portal && nx start portal",
     "test:web": "nx test landing-page",
     "test:portal": "nx test portal",
     "prepare": "if [ \"$VERCEL\" != \"1\" ]; then husky install; fi",
