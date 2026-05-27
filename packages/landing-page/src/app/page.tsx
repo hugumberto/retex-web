@@ -14,8 +14,8 @@ import LandingValues from '@/components/landing/LandingValues';
 export default function Home() {
   return (
     <main className="landing-shell">
+      <LandingHero />
       <div className="landing-page">
-        <LandingHero />
         <LandingHowItWorks />
         <LandingServices />
         <LandingAbout />

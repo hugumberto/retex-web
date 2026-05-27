@@ -1,21 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
-/*
-  ---break---
-*/
+
 @custom-variant dark (&:is(.dark *));
 .bg-gradient-horizontal {
   background-image: linear-gradient(to right, #02748e, #013364);
 }
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
   *,
   ::after,
@@ -41,9 +31,6 @@ body {
   margin: 0;
 }
 
-/*
-  ---break---
-*/
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -81,9 +68,7 @@ body {
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 }
-/*
-  ---break---
-*/
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -118,9 +103,6 @@ body {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
-/*
-  ---break---
-*/
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -154,9 +136,7 @@ body {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
-/*
-  ---break---
-*/
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -166,12 +146,12 @@ body {
   }
 }
 
-/* Figma frame "Final": 1440×9733 artboard, #FFFFFF (height is intrinsic on web) */
 .landing-shell {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
   background: #ffffff;
-  padding: 0 12px 24px;
+  padding: 0 0 24px;
 }
 
 .landing-page {
@@ -179,6 +159,7 @@ body {
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
+  padding: 0 12px;
   background: #ffffff;
   font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
   color: #023b66;
@@ -186,14 +167,10 @@ body {
 
 .landing-hero {
   position: relative;
-  height: 338px;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
-}
-
-@media (min-width: 960px) {
-  .landing-hero {
-    height: clamp(400px, 38vw, 640px);
-  }
 }
 
 .landing-header {
