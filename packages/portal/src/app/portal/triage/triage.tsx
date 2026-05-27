@@ -1,94 +1,17 @@
 'use client';
 
-import Barcode from '@/components/custom/bar-code';
+import { Brand } from '@/app/types/brand';
+import { PackageDTO } from '@/app/types/package';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { cn } from '@/lib/utils';
+import api from '@/lib/api';
+import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import {
-  Check,
-  Frown,
-  Meh,
-  QrCode,
-  Shirt,
-  Smile,
-  Snowflake,
-  Sun,
-  X,
-} from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-
-type TriageOption = {
-  value: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-};
-
-const qualityOptions: TriageOption[] = [
-  { value: 'good', label: 'Good', icon: Smile },
-  { value: 'fair', label: 'Fair', icon: Meh },
-  { value: 'bad', label: 'Bad', icon: Frown },
-];
-
-const seasonOptions: TriageOption[] = [
-  { value: 'summer', label: 'Summer', icon: Sun },
-  { value: 'winter', label: 'Winter', icon: Snowflake },
-];
-
-const clothingTypeOptions: TriageOption[] = [
-  { value: 'top', label: 'Top', icon: Shirt },
-  { value: 'bottom', label: 'Bottom', icon: Shirt },
-];
-
-function OptionSelector({
-  options,
-  selected,
-  onSelect,
-}: {
-  options: TriageOption[];
-  selected: string;
-  onSelect: (value: string) => void;
-}) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {options.map((option) => {
-        const Icon = option.icon;
-        const isActive = selected === option.value;
-
-        return (
-          <Button
-            key={option.value}
-            variant={isActive ? 'secondary' : 'outline'}
-            type="button"
-            className={cn(
-              'h-14 min-w-24 flex-col gap-1 rounded-lg px-3',
-              isActive && 'ring-2 ring-secondary/25'
-            )}
-            onClick={() => onSelect(option.value)}
-          >
-            <Icon className="size-4" />
-            <span className="text-[11px]">{option.label}</span>
-          </Button>
-        );
-      })}
-    </div>
-  );
-}
+import { QrCode } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import AddTriage from './components/add-triage';
+import CollectionRecord from './components/collection-record';
 
 export default function Triage() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
@@ -96,23 +19,102 @@ export default function Triage() {
   const [scanCode, setScanCode] = useState('');
   const [weight, setWeight] = useState('');
   const [collectionCode, setCollectionCode] = useState('');
+  const [selectedPackage, setSelectedPackage] = useState<PackageDTO | null>(
+    null
+  );
+  const [isLoadingPackage, setIsLoadingPackage] = useState(false);
+  const [isSavingWeight, setIsSavingWeight] = useState(false);
+  const [brands, setBrands] = useState<string[]>([]);
   const [brand, setBrand] = useState('');
   const [quantity, setQuantity] = useState('0');
   const [quality, setQuality] = useState('good');
   const [season, setSeason] = useState('summer');
   const [clothingType, setClothingType] = useState('top');
 
-  const brands = useMemo(() => ['Nike', 'Zara', 'H&M', "Levi's"], []);
-
   useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const { data, status } = await api.get<Brand[]>('/brand');
+        if (!isSuccessStatus(status)) {
+          throw new Error('Erro ao buscar marcas');
+        }
+
+        setBrands(data.map((item) => item.name));
+      } catch (error) {
+        console.error('Erro ao buscar marcas:', error);
+        toast.error('Não foi possível carregar as marcas');
+      }
+    };
+
     setPageTitle('Triage');
     setBreadcrumbs([{ label: 'Triage', href: '/portal/triage' }]);
+    fetchBrands();
 
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
   }, [setBreadcrumbs, setPageTitle]);
+
+  const handleScanCodeBlur = async () => {
+    const packageId = scanCode.trim();
+    if (!packageId) return;
+
+    setIsLoadingPackage(true);
+    try {
+      const { data, status } = await api.get<PackageDTO>(
+        `/package/${packageId}`
+      );
+      if (!isSuccessStatus(status)) {
+        throw new Error('Erro ao obter package por id');
+      }
+
+      setSelectedPackage(data);
+      setCollectionCode(data.route?.id ?? '');
+      setWeight(data.weight !== undefined ? String(data.weight) : '');
+      toast.success('Package carregado com sucesso');
+    } catch (error) {
+      console.error('Erro ao obter package por id:', error);
+      setSelectedPackage(null);
+      toast.error('Package não encontrado para o código informado');
+    } finally {
+      setIsLoadingPackage(false);
+    }
+  };
+
+  const handleSaveWeight = async () => {
+    if (!selectedPackage?.id) {
+      toast.error('Carregue um package antes de salvar o peso');
+      return;
+    }
+
+    const parsedWeight = Number(weight);
+    if (!weight.trim() || Number.isNaN(parsedWeight)) {
+      toast.error('Informe um peso válido');
+      return;
+    }
+
+    setIsSavingWeight(true);
+    try {
+      const { status } = await api.patch(`/package/${selectedPackage.id}`, {
+        weight: parsedWeight,
+      });
+
+      if (!isSuccessStatus(status)) {
+        throw new Error('Erro ao atualizar package');
+      }
+
+      setSelectedPackage((current) =>
+        current ? { ...current, weight: parsedWeight } : current
+      );
+      toast.success('Peso salvo com sucesso');
+    } catch (error) {
+      console.error('Erro ao atualizar package:', error);
+      toast.error('Não foi possível salvar o peso');
+    } finally {
+      setIsSavingWeight(false);
+    }
+  };
 
   return (
     <section id="triage-page" className="flex flex-col gap-6">
@@ -126,6 +128,7 @@ export default function Triage() {
               <Input
                 value={scanCode}
                 onChange={(e) => setScanCode(e.target.value)}
+                onBlur={handleScanCodeBlur}
                 placeholder="Type code"
               />
             </div>
@@ -138,11 +141,18 @@ export default function Triage() {
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="Weight"
+                disabled={isLoadingPackage}
               />
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="button" variant="outline" className="min-w-24">
+              <Button
+                type="button"
+                variant="outline"
+                className="min-w-24"
+                onClick={handleSaveWeight}
+                disabled={isSavingWeight || isLoadingPackage}
+              >
                 Save
               </Button>
               <Button type="button" variant="secondary" className="min-w-32">
@@ -167,180 +177,24 @@ export default function Triage() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-secondary">
-              Collection Record
-            </h2>
-            <X className="size-5 text-secondary" />
-          </div>
+        <CollectionRecord
+          collectionCode={collectionCode}
+          onCollectionCodeChange={setCollectionCode}
+          selectedPackageId={selectedPackage?.id}
+          brands={brands}
+          brand={brand}
+          onBrandChange={setBrand}
+          quantity={quantity}
+          onQuantityChange={setQuantity}
+          quality={quality}
+          onQualityChange={setQuality}
+          season={season}
+          onSeasonChange={setSeason}
+          clothingType={clothingType}
+          onClothingTypeChange={setClothingType}
+        />
 
-          <div className="space-y-5">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-secondary">
-                Code
-              </label>
-              <Input
-                value={collectionCode}
-                onChange={(e) => setCollectionCode(e.target.value)}
-                placeholder="Collection code"
-              />
-            </div>
-
-            <div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Items</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="h-20 text-center text-secondary/55">
-                      Item table
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-secondary">
-                  Brand
-                </label>
-                <Select value={brand} onValueChange={setBrand}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select brand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {brands.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-secondary">
-                  Quantity
-                </label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-2 text-sm font-medium text-secondary">Quality</p>
-              <OptionSelector
-                options={qualityOptions}
-                selected={quality}
-                onSelect={setQuality}
-              />
-            </div>
-
-            <div>
-              <p className="mb-2 text-sm font-medium text-secondary">Season</p>
-              <OptionSelector
-                options={seasonOptions}
-                selected={season}
-                onSelect={setSeason}
-              />
-            </div>
-
-            <div>
-              <p className="mb-2 text-sm font-medium text-secondary">
-                Clothing Type
-              </p>
-              <OptionSelector
-                options={clothingTypeOptions}
-                selected={clothingType}
-                onSelect={setClothingType}
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-1">
-              <Button type="button" variant="outline" className="min-w-24">
-                Add
-              </Button>
-              <Button type="button" variant="secondary" className="min-w-24">
-                Next
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-secondary">
-              Add - Triage
-            </h2>
-            <X className="size-5 text-secondary" />
-          </div>
-
-          <div className="space-y-6">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Items</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="h-20 text-center text-secondary/55">
-                    Item table
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-24 w-40 rounded-lg border-secondary/40 bg-secondary-muted/30"
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <Barcode
-                    value="TRIAGE-ITEM"
-                    width={1.2}
-                    height={26}
-                    fontSize={10}
-                  />
-                  <span className="text-[11px] text-secondary">Add items</span>
-                </div>
-              </Button>
-            </div>
-
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Storage</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="h-24 text-center text-secondary/55">
-                    Storage table
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-
-            <div className="flex justify-center pt-1">
-              <Button type="button" variant="secondary" className="min-w-40">
-                <Check className="size-4" />
-                Finish Triage
-              </Button>
-            </div>
-          </div>
-        </div>
+        <AddTriage />
       </div>
     </section>
   );

@@ -1,0 +1,222 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+import { Frown, Meh, Shirt, Smile, Snowflake, Sun, X } from 'lucide-react';
+import React from 'react';
+
+type TriageOption = {
+  value: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const qualityOptions: TriageOption[] = [
+  { value: 'good', label: 'Good', icon: Smile },
+  { value: 'fair', label: 'Fair', icon: Meh },
+  { value: 'bad', label: 'Bad', icon: Frown },
+];
+
+const seasonOptions: TriageOption[] = [
+  { value: 'summer', label: 'Summer', icon: Sun },
+  { value: 'winter', label: 'Winter', icon: Snowflake },
+];
+
+const clothingTypeOptions: TriageOption[] = [
+  { value: 'top', label: 'Top', icon: Shirt },
+  { value: 'bottom', label: 'Bottom', icon: Shirt },
+];
+
+function OptionSelector({
+  options,
+  selected,
+  onSelect,
+}: {
+  options: TriageOption[];
+  selected: string;
+  onSelect: (value: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => {
+        const Icon = option.icon;
+        const isActive = selected === option.value;
+
+        return (
+          <Button
+            key={option.value}
+            variant={isActive ? 'secondary' : 'outline'}
+            type="button"
+            className={cn(
+              'h-14 min-w-24 flex-col gap-1 rounded-lg px-3',
+              isActive && 'ring-2 ring-secondary/25'
+            )}
+            onClick={() => onSelect(option.value)}
+          >
+            <Icon className="size-4" />
+            <span className="text-[11px]">{option.label}</span>
+          </Button>
+        );
+      })}
+    </div>
+  );
+}
+
+type CollectionRecordProps = {
+  collectionCode: string;
+  onCollectionCodeChange: (value: string) => void;
+  selectedPackageId?: string;
+  brands: string[];
+  brand: string;
+  onBrandChange: (value: string) => void;
+  quantity: string;
+  onQuantityChange: (value: string) => void;
+  quality: string;
+  onQualityChange: (value: string) => void;
+  season: string;
+  onSeasonChange: (value: string) => void;
+  clothingType: string;
+  onClothingTypeChange: (value: string) => void;
+};
+
+export default function CollectionRecord({
+  collectionCode,
+  onCollectionCodeChange,
+  selectedPackageId,
+  brands,
+  brand,
+  onBrandChange,
+  quantity,
+  onQuantityChange,
+  quality,
+  onQualityChange,
+  season,
+  onSeasonChange,
+  clothingType,
+  onClothingTypeChange,
+}: CollectionRecordProps) {
+  return (
+    <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-secondary">
+          Collection Record
+        </h2>
+        <X className="size-5 text-secondary" />
+      </div>
+
+      <div className="space-y-5">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-secondary">
+            Code
+          </label>
+          <Input
+            value={collectionCode}
+            onChange={(e) => onCollectionCodeChange(e.target.value)}
+            placeholder="Collection code"
+          />
+        </div>
+
+        <div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Items</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="h-20 text-center text-secondary/55">
+                  {selectedPackageId ?? 'Item table'}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-secondary">
+              Brand
+            </label>
+            <Select value={brand} onValueChange={onBrandChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select brand" />
+              </SelectTrigger>
+              <SelectContent>
+                {brands.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-secondary">
+              Quantity
+            </label>
+            <Input
+              type="number"
+              min={0}
+              value={quantity}
+              onChange={(e) => onQuantityChange(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-secondary">Quality</p>
+          <OptionSelector
+            options={qualityOptions}
+            selected={quality}
+            onSelect={onQualityChange}
+          />
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-secondary">Season</p>
+          <OptionSelector
+            options={seasonOptions}
+            selected={season}
+            onSelect={onSeasonChange}
+          />
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-secondary">
+            Clothing Type
+          </p>
+          <OptionSelector
+            options={clothingTypeOptions}
+            selected={clothingType}
+            onSelect={onClothingTypeChange}
+          />
+        </div>
+
+        <div className="flex justify-end gap-2 pt-1">
+          <Button type="button" variant="outline" className="min-w-24">
+            Add
+          </Button>
+          <Button type="button" variant="secondary" className="min-w-24">
+            Next
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
