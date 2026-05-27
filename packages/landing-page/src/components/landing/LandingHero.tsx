@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import { getPortalLoginHref, PORTAL_LOGIN_PLACEHOLDER } from '@/lib/portal';
 
 export default function LandingHero() {
+  const loginHref = getPortalLoginHref();
   return (
     <section className="landing-hero">
       <header className="landing-header">
@@ -16,7 +18,12 @@ export default function LandingHero() {
           <a href="#como-funciona">Como funciona</a>
           <a href="#servicos">Serviços</a>
           <a href="#blog">Blog</a>
-          <a href="#login">Login</a>
+          <a
+            href={loginHref}
+            title={loginHref === PORTAL_LOGIN_PLACEHOLDER ? 'Em breve' : undefined}
+          >
+            Login
+          </a>
           <a href="#faq">FAQ</a>
           <a href="#formulario" className="nav-cta-btn">
             Pedir recolha
