@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { TrashIcon } from 'lucide-react';
+import { PrinterIcon, TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -32,6 +32,14 @@ const STATUS_MAP: Record<string, string> = {
   ATIVO: 'Ativo',
   INATIVO: 'Inativo',
 };
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 
 export default function StorageUnit() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
@@ -97,6 +105,75 @@ export default function StorageUnit() {
     [handleDeleteUnit]
   );
 
+  const handlePrintLabel = useCallback((unit: StorageUnitDTO) => {
+    const printWindow = window.open('', '_blank', 'width=420,height=640');
+    if (!printWindow) {
+      toast.error('Permita pop-ups para imprimir a etiqueta');
+      return;
+    }
+
+    const unitId = escapeHtml(unit.id);
+    const name = escapeHtml(unit.brand.name);
+    const quality = escapeHtml(QUALITY_MAP[unit.quality]);
+    const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+      unit.id
+    )}`;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Etiqueta ${unitId}</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 24px;
+              font-family: Arial, sans-serif;
+              color: #013364;
+            }
+            .label {
+              border: 2px solid #02748e;
+              border-radius: 12px;
+              padding: 20px;
+              width: 320px;
+              margin: 0 auto;
+              text-align: center;
+            }
+            .title {
+              margin: 0 0 12px;
+              font-size: 18px;
+              font-weight: 700;
+            }
+            .qr {
+              width: 220px;
+              height: 220px;
+              margin: 10px auto 16px;
+              display: block;
+            }
+            .text {
+              margin: 6px 0;
+              font-size: 15px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="label">
+            <h1 class="title">Etiqueta do Item</h1>
+            <img class="qr" src="${qrSource}" alt="QR Code ${unitId}" />
+            <p class="text"><strong>ID:</strong> ${unitId}</p>
+            <p class="text"><strong>Nome:</strong> ${name}</p>
+            <p class="text"><strong>Qualidade:</strong> ${quality}</p>
+          </div>
+          <script>
+            window.onload = function () {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }, []);
+
   useEffect(() => {
     setPageTitle('Armazenamento');
     setBreadcrumbs([{ label: 'Armazenamento', href: '/portal/storage-unit' }]);
@@ -155,6 +232,15 @@ export default function StorageUnit() {
                     </span>
                   </TableCell>
                   <TableCell className="space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      onClick={() => handlePrintLabel(storageUnit)}
+                      title="Imprimir etiqueta"
+                    >
+                      <PrinterIcon />
+                    </Button>
                     <StorageUnitForm
                       storageUnitId={storageUnit.id}
                       initialData={storageUnit}
