@@ -1,3 +1,5 @@
+import { Brand } from '@/app/types/brand';
+import { TriageListItem } from './add-triage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -26,19 +28,19 @@ type TriageOption = {
 };
 
 const qualityOptions: TriageOption[] = [
-  { value: 'good', label: 'Good', icon: Smile },
-  { value: 'fair', label: 'Fair', icon: Meh },
-  { value: 'bad', label: 'Bad', icon: Frown },
+  { value: 'GOOD', label: 'Good', icon: Smile },
+  { value: 'MEDIUM', label: 'Fair', icon: Meh },
+  { value: 'BAD', label: 'Bad', icon: Frown },
 ];
 
 const seasonOptions: TriageOption[] = [
-  { value: 'summer', label: 'Summer', icon: Sun },
-  { value: 'winter', label: 'Winter', icon: Snowflake },
+  { value: 'SUMMER', label: 'Summer', icon: Sun },
+  { value: 'WINTER', label: 'Winter', icon: Snowflake },
 ];
 
 const clothingTypeOptions: TriageOption[] = [
-  { value: 'top', label: 'Top', icon: Shirt },
-  { value: 'bottom', label: 'Bottom', icon: Shirt },
+  { value: 'UPPER_PART', label: 'Top', icon: Shirt },
+  { value: 'UNDER_PART', label: 'Bottom', icon: Shirt },
 ];
 
 function OptionSelector({
@@ -47,7 +49,7 @@ function OptionSelector({
   onSelect,
 }: {
   options: TriageOption[];
-  selected: string;
+  selected?: string;
   onSelect: (value: string) => void;
 }) {
   return (
@@ -77,28 +79,28 @@ function OptionSelector({
 }
 
 type CollectionRecordProps = {
-  collectionCode: string;
-  onCollectionCodeChange: (value: string) => void;
   selectedPackageId?: string;
-  brands: string[];
-  brand: string;
+  items: TriageListItem[];
+  brands: Brand[];
+  brandId: string;
   onBrandChange: (value: string) => void;
   quantity: string;
   onQuantityChange: (value: string) => void;
-  quality: string;
-  onQualityChange: (value: string) => void;
-  season: string;
-  onSeasonChange: (value: string) => void;
-  clothingType: string;
-  onClothingTypeChange: (value: string) => void;
+  quality?: 'GOOD' | 'MEDIUM' | 'BAD';
+  onQualityChange: (value: 'GOOD' | 'MEDIUM' | 'BAD') => void;
+  season?: 'SUMMER' | 'WINTER';
+  onSeasonChange: (value: 'SUMMER' | 'WINTER') => void;
+  clothingType?: 'UPPER_PART' | 'UNDER_PART';
+  onClothingTypeChange: (value: 'UPPER_PART' | 'UNDER_PART') => void;
+  onAdd: () => void;
+  isAddDisabled?: boolean;
 };
 
 export default function CollectionRecord({
-  collectionCode,
-  onCollectionCodeChange,
   selectedPackageId,
+  items,
   brands,
-  brand,
+  brandId,
   onBrandChange,
   quantity,
   onQuantityChange,
@@ -108,6 +110,8 @@ export default function CollectionRecord({
   onSeasonChange,
   clothingType,
   onClothingTypeChange,
+  onAdd,
+  isAddDisabled,
 }: CollectionRecordProps) {
   return (
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
@@ -120,29 +124,40 @@ export default function CollectionRecord({
 
       <div className="space-y-5">
         <div>
-          <label className="mb-1 block text-sm font-medium text-secondary">
-            Code
-          </label>
-          <Input
-            value={collectionCode}
-            onChange={(e) => onCollectionCodeChange(e.target.value)}
-            placeholder="Collection code"
-          />
-        </div>
-
-        <div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Items</TableHead>
+                <TableHead>Quality</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Season</TableHead>
+                <TableHead>Brand</TableHead>
+                <TableHead>Quantity</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="h-20 text-center text-secondary/55">
-                  {selectedPackageId ?? 'Item table'}
-                </TableCell>
-              </TableRow>
+              {items.length > 0 ? (
+                items.map((item, index) => (
+                  <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
+                    <TableCell>{item.quality}</TableCell>
+                    <TableCell>{item.type}</TableCell>
+                    <TableCell>{item.season}</TableCell>
+                    <TableCell>
+                      {brands.find((brand) => brand.id === item.brandId)
+                        ?.name ?? item.brandId}
+                    </TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="h-20 text-center text-secondary/55"
+                  >
+                    {selectedPackageId ?? 'Item table'}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
@@ -150,16 +165,16 @@ export default function CollectionRecord({
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-secondary">
-              Brand
+              Brand *
             </label>
-            <Select value={brand} onValueChange={onBrandChange}>
+            <Select value={brandId} onValueChange={onBrandChange}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select brand" />
               </SelectTrigger>
               <SelectContent>
                 {brands.map((item) => (
-                  <SelectItem key={item} value={item}>
-                    {item}
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -168,7 +183,7 @@ export default function CollectionRecord({
 
           <div>
             <label className="mb-1 block text-sm font-medium text-secondary">
-              Quantity
+              Quantity *
             </label>
             <Input
               type="number"
@@ -180,36 +195,46 @@ export default function CollectionRecord({
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-secondary">Quality</p>
+          <p className="mb-2 text-sm font-medium text-secondary">Quality *</p>
           <OptionSelector
             options={qualityOptions}
             selected={quality}
-            onSelect={onQualityChange}
+            onSelect={(value) =>
+              onQualityChange(value as 'GOOD' | 'MEDIUM' | 'BAD')
+            }
           />
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-secondary">Season</p>
+          <p className="mb-2 text-sm font-medium text-secondary">Season *</p>
           <OptionSelector
             options={seasonOptions}
             selected={season}
-            onSelect={onSeasonChange}
+            onSelect={(value) => onSeasonChange(value as 'SUMMER' | 'WINTER')}
           />
         </div>
 
         <div>
           <p className="mb-2 text-sm font-medium text-secondary">
-            Clothing Type
+            Clothing Type *
           </p>
           <OptionSelector
             options={clothingTypeOptions}
             selected={clothingType}
-            onSelect={onClothingTypeChange}
+            onSelect={(value) =>
+              onClothingTypeChange(value as 'UPPER_PART' | 'UNDER_PART')
+            }
           />
         </div>
 
         <div className="flex justify-end gap-2 pt-1">
-          <Button type="button" variant="outline" className="min-w-24">
+          <Button
+            type="button"
+            variant="outline"
+            className="min-w-24"
+            onClick={onAdd}
+            disabled={isAddDisabled}
+          >
             Add
           </Button>
           <Button type="button" variant="secondary" className="min-w-24">

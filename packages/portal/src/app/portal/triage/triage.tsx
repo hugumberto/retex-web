@@ -2,6 +2,7 @@
 
 import { Brand } from '@/app/types/brand';
 import { PackageDTO } from '@/app/types/package';
+import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
@@ -10,26 +11,32 @@ import { useAppStore } from '@/store';
 import { QrCode } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import AddTriage from './components/add-triage';
+import AddTriage, { TriageListItem } from './components/add-triage';
 import CollectionRecord from './components/collection-record';
+import PackageUserData from './components/package-user-data';
 
 export default function Triage() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
 
   const [scanCode, setScanCode] = useState('');
   const [weight, setWeight] = useState('');
-  const [collectionCode, setCollectionCode] = useState('');
   const [selectedPackage, setSelectedPackage] = useState<PackageDTO | null>(
     null
   );
   const [isLoadingPackage, setIsLoadingPackage] = useState(false);
   const [isSavingWeight, setIsSavingWeight] = useState(false);
-  const [brands, setBrands] = useState<string[]>([]);
-  const [brand, setBrand] = useState('');
-  const [quantity, setQuantity] = useState('0');
-  const [quality, setQuality] = useState('good');
-  const [season, setSeason] = useState('summer');
-  const [clothingType, setClothingType] = useState('top');
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandId, setBrandId] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [quality, setQuality] = useState<'GOOD' | 'MEDIUM' | 'BAD'>();
+  const [season, setSeason] = useState<'SUMMER' | 'WINTER'>();
+  const [clothingType, setClothingType] = useState<
+    'UPPER_PART' | 'UNDER_PART'
+  >();
+  const [triageItems, setTriageItems] = useState<TriageListItem[]>([]);
+  const [storageCode, setStorageCode] = useState('');
+  const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
+  const [isLoadingStorageUnit, setIsLoadingStorageUnit] = useState(false);
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -39,7 +46,7 @@ export default function Triage() {
           throw new Error('Erro ao buscar marcas');
         }
 
-        setBrands(data.map((item) => item.name));
+        setBrands(data);
       } catch (error) {
         console.error('Erro ao buscar marcas:', error);
         toast.error('Não foi possível carregar as marcas');
@@ -70,7 +77,6 @@ export default function Triage() {
       }
 
       setSelectedPackage(data);
-      setCollectionCode(data.route?.id ?? '');
       setWeight(data.weight !== undefined ? String(data.weight) : '');
       toast.success('Package carregado com sucesso');
     } catch (error) {
@@ -116,6 +122,110 @@ export default function Triage() {
     }
   };
 
+  const handleAddTriageItem = () => {
+    if (!selectedPackage?.id) {
+      toast.error('Carregue um package antes de adicionar o item');
+      return;
+    }
+
+    if (!brandId) {
+      toast.error('Selecione uma marca');
+      return;
+    }
+
+    if (!quality || !season || !clothingType) {
+      toast.error('Selecione quality, season e clothing type');
+      return;
+    }
+
+    if (!quantity.trim()) {
+      toast.error('Informe a quantidade');
+      return;
+    }
+
+    const parsedQuantity = Number(quantity);
+    if (Number.isNaN(parsedQuantity) || parsedQuantity < 0) {
+      toast.error('Informe uma quantidade válida');
+      return;
+    }
+
+    const item: TriageListItem = {
+      packageId: selectedPackage.id,
+      quality,
+      type: clothingType,
+      season,
+      brandId,
+      quantity: parsedQuantity,
+    };
+
+    const isDuplicatedItem = triageItems.some(
+      (existingItem) =>
+        existingItem.packageId === item.packageId &&
+        existingItem.brandId === item.brandId &&
+        existingItem.quality === item.quality &&
+        existingItem.type === item.type &&
+        existingItem.season === item.season
+    );
+
+    if (isDuplicatedItem) {
+      toast.error('Este item já foi adicionado à lista de triagem');
+      return;
+    }
+
+    setTriageItems((current) => [...current, item]);
+    setBrandId('');
+    setQuantity('');
+    setQuality(undefined);
+    setSeason(undefined);
+    setClothingType(undefined);
+    toast.success('Item adicionado à lista de triagem');
+  };
+
+  const handleStorageCodeSubmit = async () => {
+    const storageUnitId = storageCode.trim();
+    if (!storageUnitId) {
+      toast.error('Informe o código do storage');
+      return;
+    }
+
+    setIsLoadingStorageUnit(true);
+    try {
+      const { data, status } = await api.get<StorageUnitDTO>(
+        `/storage-unit/${storageUnitId}`
+      );
+
+      if (!isSuccessStatus(status)) {
+        throw new Error('Erro ao obter storage unit por id');
+      }
+
+      if (storageUnits.some((unit) => unit.id === data.id)) {
+        toast.error('Este storage já foi adicionado');
+        return;
+      }
+
+      setStorageUnits((current) => [...current, data]);
+      setStorageCode('');
+      toast.success('Storage adicionado com sucesso');
+    } catch (error) {
+      console.error('Erro ao obter storage unit por id:', error);
+      toast.error('Storage não encontrado para o código informado');
+    } finally {
+      setIsLoadingStorageUnit(false);
+    }
+  };
+
+  const isAddFormInvalid =
+    !selectedPackage ||
+    isLoadingPackage ||
+    !brandId ||
+    !quantity.trim() ||
+    !quality ||
+    !season ||
+    !clothingType;
+
+  const isSaveDisabled =
+    isSavingWeight || isLoadingPackage || !selectedPackage || !weight.trim();
+
   return (
     <section id="triage-page" className="flex flex-col gap-6">
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
@@ -123,25 +233,35 @@ export default function Triage() {
           <div className="space-y-3">
             <div>
               <label className="mb-1 block text-sm font-medium text-secondary">
-                Code
+                Code *
               </label>
               <Input
                 value={scanCode}
                 onChange={(e) => setScanCode(e.target.value)}
                 onBlur={handleScanCodeBlur}
+                onKeyDown={async (e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    await handleScanCodeBlur();
+                  }
+                }}
                 placeholder="Type code"
+                autoFocus
+                disabled={!!selectedPackage || isLoadingPackage}
+                required
               />
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-secondary">
-                Weight
+                Weight *
               </label>
               <Input
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="Weight"
                 disabled={isLoadingPackage}
+                required
               />
             </div>
 
@@ -151,7 +271,7 @@ export default function Triage() {
                 variant="outline"
                 className="min-w-24"
                 onClick={handleSaveWeight}
-                disabled={isSavingWeight || isLoadingPackage}
+                disabled={isSaveDisabled}
               >
                 Save
               </Button>
@@ -176,14 +296,20 @@ export default function Triage() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div>
+        <PackageUserData
+          user={selectedPackage?.user}
+          address={selectedPackage?.address}
+        />
+      </div>
+
+      <div className="flex flex-col gap-6">
         <CollectionRecord
-          collectionCode={collectionCode}
-          onCollectionCodeChange={setCollectionCode}
           selectedPackageId={selectedPackage?.id}
+          items={triageItems}
           brands={brands}
-          brand={brand}
-          onBrandChange={setBrand}
+          brandId={brandId}
+          onBrandChange={setBrandId}
           quantity={quantity}
           onQuantityChange={setQuantity}
           quality={quality}
@@ -192,9 +318,19 @@ export default function Triage() {
           onSeasonChange={setSeason}
           clothingType={clothingType}
           onClothingTypeChange={setClothingType}
+          onAdd={handleAddTriageItem}
+          isAddDisabled={isAddFormInvalid}
         />
 
-        <AddTriage />
+        <AddTriage
+          items={triageItems}
+          brands={brands}
+          storageCode={storageCode}
+          onStorageCodeChange={setStorageCode}
+          onStorageCodeSubmit={handleStorageCodeSubmit}
+          storageUnits={storageUnits}
+          isLoadingStorageUnit={isLoadingStorageUnit}
+        />
       </div>
     </section>
   );
