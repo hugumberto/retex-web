@@ -33,6 +33,7 @@ export type TriageListItem = {
 type AddTriageProps = {
   items: TriageListItem[];
   brands: Brand[];
+  isViewMode?: boolean;
   storageCode: string;
   onStorageCodeChange: (value: string) => void;
   onStorageCodeSubmit: () => Promise<void>;
@@ -40,11 +41,14 @@ type AddTriageProps = {
   isLoadingStorageUnit?: boolean;
   onDeleteItem: (item: TriageListItem, index: number) => void | Promise<void>;
   deletingItemIndex?: number | null;
+  onFinishTriage: () => void | Promise<void>;
+  isFinishingTriage?: boolean;
 };
 
 export default function AddTriage({
   items,
   brands,
+  isViewMode,
   storageCode,
   onStorageCodeChange,
   onStorageCodeSubmit,
@@ -52,21 +56,27 @@ export default function AddTriage({
   isLoadingStorageUnit,
   onDeleteItem,
   deletingItemIndex,
+  onFinishTriage,
+  isFinishingTriage,
 }: AddTriageProps) {
   const storageInputRef = useRef<HTMLInputElement>(null);
   const shouldRefocusStorageInputRef = useRef(false);
+  const validStorageUnits = storageUnits.filter(
+    (storageUnit): storageUnit is StorageUnitDTO =>
+      Boolean(storageUnit?.id && storageUnit.brand?.id)
+  );
   const itemBrandQualityKeys = new Set(
-    items
-      .filter((item) => !!item.brandId)
-      .map((item) => `${item.brandId}::${item.quality}`)
+    items.map((item) => `${item.brandId}::${item.quality}`)
   );
   const storageBrandQualityKeys = new Set(
-    storageUnits.map(
+    validStorageUnits.map(
       (storageUnit) => `${storageUnit.brand.id}::${storageUnit.quality}`
     )
   );
 
-  const allStorageBrandQualityInItems = storageUnits.every((storageUnit) =>
+  const hasInvalidItemCombination = items.some((item) => !item.brandId);
+
+  const allStorageBrandQualityInItems = validStorageUnits.every((storageUnit) =>
     itemBrandQualityKeys.has(`${storageUnit.brand.id}::${storageUnit.quality}`)
   );
   const allItemBrandQualityInStorage = [...itemBrandQualityKeys].every((key) =>
@@ -75,7 +85,8 @@ export default function AddTriage({
 
   const isFinishDisabled =
     items.length === 0 ||
-    storageUnits.length === 0 ||
+    validStorageUnits.length === 0 ||
+    hasInvalidItemCombination ||
     !allStorageBrandQualityInItems ||
     !allItemBrandQualityInStorage;
 
@@ -140,7 +151,7 @@ export default function AddTriage({
                           variant="ghost"
                           size="icon"
                           className="size-8"
-                          disabled={deletingItemIndex === index}
+                          disabled={deletingItemIndex === index || isViewMode}
                         >
                           <TrashIcon className="size-4" />
                         </Button>
@@ -178,7 +189,7 @@ export default function AddTriage({
               }
             }}
             placeholder="Digite o código e pressione Enter"
-            disabled={isLoadingStorageUnit}
+            disabled={isLoadingStorageUnit || isViewMode}
           />
         </div>
 
@@ -190,8 +201,8 @@ export default function AddTriage({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {storageUnits.length > 0 ? (
-              storageUnits.map((storageUnit) => (
+            {validStorageUnits.length > 0 ? (
+              validStorageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
                   <TableCell>{storageUnit.brand.name}</TableCell>
                   <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
@@ -215,7 +226,9 @@ export default function AddTriage({
             type="button"
             variant="secondary"
             className="min-w-40"
-            disabled={isFinishDisabled}
+            disabled={isFinishDisabled || isViewMode}
+            onClick={onFinishTriage}
+            aria-busy={isFinishingTriage}
           >
             <Check className="size-4" />
             Finalizar Triagem

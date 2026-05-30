@@ -57,10 +57,12 @@ function OptionSelector({
   options,
   selected,
   onSelect,
+  disabled,
 }: {
   options: TriageOption[];
   selected?: string;
   onSelect: (value: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -78,6 +80,7 @@ function OptionSelector({
               isActive && 'ring-2 ring-secondary/25'
             )}
             onClick={() => onSelect(option.value)}
+            disabled={disabled}
           >
             <Icon className="size-4" />
             <span className="text-[11px]">{option.label}</span>
@@ -106,6 +109,7 @@ type CollectionRecordProps = {
   onDeleteItem: (item: TriageListItem, index: number) => void | Promise<void>;
   deletingItemIndex?: number | null;
   isAddDisabled?: boolean;
+  isViewMode?: boolean;
 };
 
 export default function CollectionRecord({
@@ -126,6 +130,7 @@ export default function CollectionRecord({
   onDeleteItem,
   deletingItemIndex,
   isAddDisabled,
+  isViewMode,
 }: CollectionRecordProps) {
   return (
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
@@ -173,7 +178,7 @@ export default function CollectionRecord({
                             variant="ghost"
                             size="icon"
                             className="size-8"
-                            disabled={deletingItemIndex === index}
+                            disabled={deletingItemIndex === index || isViewMode}
                           >
                             <TrashIcon className="size-4" />
                           </Button>
@@ -203,7 +208,7 @@ export default function CollectionRecord({
               Marca *
             </label>
             <Select value={brandId} onValueChange={onBrandChange}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full" disabled={isViewMode}>
                 <SelectValue placeholder="Selecionar marca" />
               </SelectTrigger>
               <SelectContent>
@@ -225,6 +230,7 @@ export default function CollectionRecord({
               min={0}
               value={quantity}
               onChange={(e) => onQuantityChange(e.target.value)}
+              disabled={isViewMode}
             />
           </div>
         </div>
@@ -234,6 +240,7 @@ export default function CollectionRecord({
           <OptionSelector
             options={qualityOptions}
             selected={quality}
+            disabled={isViewMode}
             onSelect={(value) =>
               onQualityChange(value as 'GOOD' | 'MEDIUM' | 'BAD')
             }
@@ -245,6 +252,7 @@ export default function CollectionRecord({
           <OptionSelector
             options={seasonOptions}
             selected={season}
+            disabled={isViewMode}
             onSelect={(value) => onSeasonChange(value as 'SUMMER' | 'WINTER')}
           />
         </div>
@@ -256,6 +264,7 @@ export default function CollectionRecord({
           <OptionSelector
             options={clothingTypeOptions}
             selected={clothingType}
+            disabled={isViewMode}
             onSelect={(value) =>
               onClothingTypeChange(value as 'UPPER_PART' | 'UNDER_PART')
             }
@@ -268,11 +277,16 @@ export default function CollectionRecord({
             variant="outline"
             className="min-w-24"
             onClick={onAdd}
-            disabled={isAddDisabled}
+            disabled={isAddDisabled || isViewMode}
           >
             Adicionar
           </Button>
-          <Button type="button" variant="secondary" className="min-w-24">
+          <Button
+            type="button"
+            variant="secondary"
+            className="min-w-24"
+            disabled={isViewMode}
+          >
             Próximo
           </Button>
         </div>

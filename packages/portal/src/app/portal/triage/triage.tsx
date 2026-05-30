@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AddTriage, { TriageListItem } from './components/add-triage';
 import CollectionRecord from './components/collection-record';
@@ -16,6 +16,7 @@ import PackageUserData from './components/package-user-data';
 
 export default function Triage() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
+  const scanCodeInputRef = useRef<HTMLInputElement>(null);
 
   const [scanCode, setScanCode] = useState('');
   const [weight, setWeight] = useState('');
@@ -25,6 +26,7 @@ export default function Triage() {
   const [isLoadingPackage, setIsLoadingPackage] = useState(false);
   const [isSavingWeight, setIsSavingWeight] = useState(false);
   const [isStartingTriage, setIsStartingTriage] = useState(false);
+  const [isFinishingTriage, setIsFinishingTriage] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [brandId, setBrandId] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -97,13 +99,40 @@ export default function Triage() {
           quantity: packageItem.quantity,
         };
       });
+      const mappedStorageUnits = (data.items ?? []).reduce<StorageUnitDTO[]>(
+        (accumulator, packageItem) => {
+          const storageUnit = packageItem.storageUnit;
+          const brand = packageItem.brand;
+
+          if (!storageUnit?.id || !brand?.id) {
+            return accumulator;
+          }
+
+          if (
+            accumulator.some(
+              (currentStorageUnit) => currentStorageUnit.id === storageUnit.id
+            )
+          ) {
+            return accumulator;
+          }
+
+          accumulator.push({
+            ...storageUnit,
+            brand,
+          });
+          return accumulator;
+        },
+        []
+      );
 
       setTriageItems(mappedItems);
+      setStorageUnits(mappedStorageUnits);
       toast.success('Pacote carregado com sucesso');
     } catch (error) {
       console.error('Erro ao obter pacote por id:', error);
       setSelectedPackage(null);
       setTriageItems([]);
+      setStorageUnits([]);
       toast.error('Pacote não encontrado para o código informado');
     } finally {
       setIsLoadingPackage(false);
@@ -286,6 +315,103 @@ export default function Triage() {
     }
   };
 
+  const resetTriageState = () => {
+    setScanCode('');
+    setWeight('');
+    setSelectedPackage(null);
+    setBrandId('');
+    setQuantity('');
+    setQuality(undefined);
+    setSeason(undefined);
+    setClothingType(undefined);
+    setTriageItems([]);
+    setStorageCode('');
+    setStorageUnits([]);
+  };
+
+  const handleFinishTriage = async () => {
+    if (!selectedPackage?.id) {
+      toast.error('Carregue um pacote antes de finalizar a triagem');
+      return;
+    }
+
+    if (triageItems.length === 0 || storageUnits.length === 0) {
+      toast.error(
+        'Adicione itens e unidades de armazenamento antes de finalizar'
+      );
+      return;
+    }
+
+    const itemBrandQualityKeys = new Set(
+      triageItems.map((item) => `${item.brandId}::${item.quality}`)
+    );
+    const storageBrandQualityKeys = new Set(
+      storageUnits.map(
+        (storageUnit) => `${storageUnit.brand.id}::${storageUnit.quality}`
+      )
+    );
+
+    const isValidCombination =
+      [...itemBrandQualityKeys].every((key) =>
+        storageBrandQualityKeys.has(key)
+      ) &&
+      [...storageBrandQualityKeys].every((key) =>
+        itemBrandQualityKeys.has(key)
+      );
+
+    if (!isValidCombination) {
+      toast.error('As combinações de marca e qualidade não conferem');
+      return;
+    }
+
+    if (triageItems.some((item) => !item.id)) {
+      toast.error('Todos os itens devem ser persistidos antes de finalizar');
+      return;
+    }
+
+    const itemIds = triageItems
+      .map((item) => item.id)
+      .filter((itemId): itemId is string => Boolean(itemId));
+    const storageUnitIds = storageUnits.map((storageUnit) => storageUnit.id);
+
+    setIsFinishingTriage(true);
+    try {
+      const { status: bindStatus } = await api.post(
+        '/items/bind-storage-units',
+        {
+          items: itemIds,
+          storageUnits: storageUnitIds,
+        }
+      );
+
+      if (!isSuccessStatus(bindStatus)) {
+        throw new Error('Erro ao vincular itens às unidades de armazenamento');
+      }
+
+      const { status: packageStatus } = await api.patch(
+        `/package/${selectedPackage.id}`,
+        {
+          status: PackageStatus.STOCKED,
+        }
+      );
+
+      if (!isSuccessStatus(packageStatus)) {
+        throw new Error('Erro ao atualizar status do pacote');
+      }
+
+      toast.success('Triagem finalizada com sucesso');
+      resetTriageState();
+      requestAnimationFrame(() => {
+        scanCodeInputRef.current?.focus();
+      });
+    } catch (error) {
+      console.error('Erro ao finalizar triagem:', error);
+      toast.error('Não foi possível finalizar a triagem');
+    } finally {
+      setIsFinishingTriage(false);
+    }
+  };
+
   const handleStorageCodeSubmit = async () => {
     const storageUnitId = storageCode.trim();
     if (!storageUnitId) {
@@ -353,15 +479,21 @@ export default function Triage() {
   const isWeightStatusAllowed = selectedPackage
     ? weightAllowedStatuses.has(selectedPackage.status)
     : true;
+  const isViewMode = selectedPackage?.status === PackageStatus.STOCKED;
 
   const isSaveDisabled =
     isSavingWeight ||
     isLoadingPackage ||
     !selectedPackage ||
     !weight.trim() ||
-    !isWeightStatusAllowed;
+    !isWeightStatusAllowed ||
+    isViewMode;
   const isStartTriageDisabled =
-    isStartingTriage || isLoadingPackage || !selectedPackage || !weight.trim();
+    isStartingTriage ||
+    isLoadingPackage ||
+    !selectedPackage ||
+    !weight.trim() ||
+    isViewMode;
 
   return (
     <section id="triage-page" className="flex flex-col gap-6">
@@ -373,6 +505,7 @@ export default function Triage() {
                 Código *
               </label>
               <Input
+                ref={scanCodeInputRef}
                 value={scanCode}
                 onChange={(e) => setScanCode(e.target.value)}
                 onBlur={handleScanCodeBlur}
@@ -397,7 +530,9 @@ export default function Triage() {
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="Peso"
-                disabled={isLoadingPackage || !isWeightStatusAllowed}
+                disabled={
+                  isLoadingPackage || !isWeightStatusAllowed || isViewMode
+                }
                 required
               />
             </div>
@@ -436,6 +571,7 @@ export default function Triage() {
       <div className="flex flex-col gap-6">
         <CollectionRecord
           selectedPackageId={selectedPackage?.id}
+          isViewMode={isViewMode}
           items={triageItems}
           brands={brands}
           brandId={brandId}
@@ -457,6 +593,7 @@ export default function Triage() {
         <AddTriage
           items={triageItems}
           brands={brands}
+          isViewMode={isViewMode}
           storageCode={storageCode}
           onStorageCodeChange={setStorageCode}
           onStorageCodeSubmit={handleStorageCodeSubmit}
@@ -464,6 +601,8 @@ export default function Triage() {
           isLoadingStorageUnit={isLoadingStorageUnit}
           onDeleteItem={handleDeleteTriageItem}
           deletingItemIndex={deletingItemIndex}
+          onFinishTriage={handleFinishTriage}
+          isFinishingTriage={isFinishingTriage}
         />
       </div>
     </section>
