@@ -1,6 +1,5 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -45,7 +44,6 @@ export default function StorageUnit() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
   const [brandsOptions, setBrandOptions] = useState<SelectFieldOption[]>([]);
 
   const fetchStorageUnits = useCallback(async () => {
@@ -85,14 +83,6 @@ export default function StorageUnit() {
     },
     [fetchStorageUnits]
   );
-
-  const handleSelectUnit = useCallback((id: string, isChecked: boolean) => {
-    if (isChecked) {
-      setSelectedUnits((prev) => [...prev, id]);
-    } else {
-      setSelectedUnits((prev) => prev.filter((unitId) => unitId !== id));
-    }
-  }, []);
 
   const handleDeleteWithToast = useCallback(
     async (id: string) => {
@@ -196,7 +186,6 @@ export default function StorageUnit() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Id</TableHead>
               <TableHead>Marca</TableHead>
               <TableHead>Qualidade</TableHead>
               <TableHead>Status</TableHead>
@@ -207,17 +196,6 @@ export default function StorageUnit() {
             {storageUnits?.length > 0 ? (
               storageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={selectedUnits.includes(storageUnit.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectUnit(storageUnit.id, !!checked)
-                        }
-                      />
-                      <span className="font-medium">{storageUnit.id}</span>
-                    </div>
-                  </TableCell>
                   <TableCell>{storageUnit.brand.name}</TableCell>
                   <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
                   <TableCell>

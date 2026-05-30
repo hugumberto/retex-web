@@ -53,8 +53,8 @@ export default function Triage() {
       }
     };
 
-    setPageTitle('Triage');
-    setBreadcrumbs([{ label: 'Triage', href: '/portal/triage' }]);
+    setPageTitle('Triagem');
+    setBreadcrumbs([{ label: 'Triagem', href: '/portal/triage' }]);
     fetchBrands();
 
     return () => {
@@ -73,16 +73,16 @@ export default function Triage() {
         `/package/${packageId}`
       );
       if (!isSuccessStatus(status)) {
-        throw new Error('Erro ao obter package por id');
+        throw new Error('Erro ao obter pacote por id');
       }
 
       setSelectedPackage(data);
       setWeight(data.weight !== undefined ? String(data.weight) : '');
-      toast.success('Package carregado com sucesso');
+      toast.success('Pacote carregado com sucesso');
     } catch (error) {
-      console.error('Erro ao obter package por id:', error);
+      console.error('Erro ao obter pacote por id:', error);
       setSelectedPackage(null);
-      toast.error('Package não encontrado para o código informado');
+      toast.error('Pacote não encontrado para o código informado');
     } finally {
       setIsLoadingPackage(false);
     }
@@ -90,7 +90,7 @@ export default function Triage() {
 
   const handleSaveWeight = async () => {
     if (!selectedPackage?.id) {
-      toast.error('Carregue um package antes de salvar o peso');
+      toast.error('Carregue um pacote antes de salvar o peso');
       return;
     }
 
@@ -107,7 +107,7 @@ export default function Triage() {
       });
 
       if (!isSuccessStatus(status)) {
-        throw new Error('Erro ao atualizar package');
+        throw new Error('Erro ao atualizar pacote');
       }
 
       setSelectedPackage((current) =>
@@ -115,7 +115,7 @@ export default function Triage() {
       );
       toast.success('Peso salvo com sucesso');
     } catch (error) {
-      console.error('Erro ao atualizar package:', error);
+      console.error('Erro ao atualizar pacote:', error);
       toast.error('Não foi possível salvar o peso');
     } finally {
       setIsSavingWeight(false);
@@ -124,7 +124,7 @@ export default function Triage() {
 
   const handleAddTriageItem = () => {
     if (!selectedPackage?.id) {
-      toast.error('Carregue um package antes de adicionar o item');
+      toast.error('Carregue um pacote antes de adicionar o item');
       return;
     }
 
@@ -134,7 +134,7 @@ export default function Triage() {
     }
 
     if (!quality || !season || !clothingType) {
-      toast.error('Selecione quality, season e clothing type');
+      toast.error('Selecione qualidade, estação e tipo de roupa');
       return;
     }
 
@@ -184,7 +184,7 @@ export default function Triage() {
   const handleStorageCodeSubmit = async () => {
     const storageUnitId = storageCode.trim();
     if (!storageUnitId) {
-      toast.error('Informe o código do storage');
+      toast.error('Informe o código do armazenamento');
       return;
     }
 
@@ -195,20 +195,22 @@ export default function Triage() {
       );
 
       if (!isSuccessStatus(status)) {
-        throw new Error('Erro ao obter storage unit por id');
+        throw new Error('Erro ao obter unidade de armazenamento por id');
       }
 
       if (storageUnits.some((unit) => unit.id === data.id)) {
-        toast.error('Este storage já foi adicionado');
+        toast.error('Esta unidade de armazenamento já foi adicionada');
         return;
       }
 
       setStorageUnits((current) => [...current, data]);
       setStorageCode('');
-      toast.success('Storage adicionado com sucesso');
+      toast.success('Unidade de armazenamento adicionada com sucesso');
     } catch (error) {
-      console.error('Erro ao obter storage unit por id:', error);
-      toast.error('Storage não encontrado para o código informado');
+      console.error('Erro ao obter unidade de armazenamento por id:', error);
+      toast.error(
+        'Unidade de armazenamento não encontrada para o código informado'
+      );
     } finally {
       setIsLoadingStorageUnit(false);
     }
@@ -233,7 +235,7 @@ export default function Triage() {
           <div className="space-y-3">
             <div>
               <label className="mb-1 block text-sm font-medium text-secondary">
-                Code *
+                Código *
               </label>
               <Input
                 value={scanCode}
@@ -245,7 +247,7 @@ export default function Triage() {
                     await handleScanCodeBlur();
                   }
                 }}
-                placeholder="Type code"
+                placeholder="Digite o código"
                 autoFocus
                 disabled={!!selectedPackage || isLoadingPackage}
                 required
@@ -254,12 +256,12 @@ export default function Triage() {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-secondary">
-                Weight *
+                Peso *
               </label>
               <Input
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                placeholder="Weight"
+                placeholder="Peso"
                 disabled={isLoadingPackage}
                 required
               />
@@ -273,10 +275,10 @@ export default function Triage() {
                 onClick={handleSaveWeight}
                 disabled={isSaveDisabled}
               >
-                Save
+                Guardar
               </Button>
               <Button type="button" variant="secondary" className="min-w-32">
-                Start Triage
+                Iniciar Triagem
               </Button>
             </div>
           </div>
@@ -289,7 +291,7 @@ export default function Triage() {
             <div className="flex flex-col items-center gap-2">
               <QrCode className="size-9" />
               <span className="text-[11px] font-semibold tracking-wide">
-                SCAN CODE
+                LER CÓDIGO
               </span>
             </div>
           </Button>

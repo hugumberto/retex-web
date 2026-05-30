@@ -28,19 +28,19 @@ type TriageOption = {
 };
 
 const qualityOptions: TriageOption[] = [
-  { value: 'GOOD', label: 'Good', icon: Smile },
-  { value: 'MEDIUM', label: 'Fair', icon: Meh },
-  { value: 'BAD', label: 'Bad', icon: Frown },
+  { value: 'GOOD', label: 'Boa', icon: Smile },
+  { value: 'MEDIUM', label: 'Regular', icon: Meh },
+  { value: 'BAD', label: 'Má', icon: Frown },
 ];
 
 const seasonOptions: TriageOption[] = [
-  { value: 'SUMMER', label: 'Summer', icon: Sun },
-  { value: 'WINTER', label: 'Winter', icon: Snowflake },
+  { value: 'SUMMER', label: 'Verão', icon: Sun },
+  { value: 'WINTER', label: 'Inverno', icon: Snowflake },
 ];
 
 const clothingTypeOptions: TriageOption[] = [
-  { value: 'UPPER_PART', label: 'Top', icon: Shirt },
-  { value: 'UNDER_PART', label: 'Bottom', icon: Shirt },
+  { value: 'UPPER_PART', label: 'Parte de cima', icon: Shirt },
+  { value: 'UNDER_PART', label: 'Parte de baixo', icon: Shirt },
 ];
 
 function OptionSelector({
@@ -117,7 +117,7 @@ export default function CollectionRecord({
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-secondary">
-          Collection Record
+          Registo de Triagem
         </h2>
         <X className="size-5 text-secondary" />
       </div>
@@ -127,11 +127,11 @@ export default function CollectionRecord({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Quality</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Season</TableHead>
-                <TableHead>Brand</TableHead>
-                <TableHead>Quantity</TableHead>
+                <TableHead>Qualidade</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Estação</TableHead>
+                <TableHead>Marca</TableHead>
+                <TableHead>Quantidade</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -154,7 +154,7 @@ export default function CollectionRecord({
                     colSpan={5}
                     className="h-20 text-center text-secondary/55"
                   >
-                    {selectedPackageId ?? 'Item table'}
+                    {selectedPackageId ?? 'Tabela de itens'}
                   </TableCell>
                 </TableRow>
               )}
@@ -165,11 +165,11 @@ export default function CollectionRecord({
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-secondary">
-              Brand *
+              Marca *
             </label>
             <Select value={brandId} onValueChange={onBrandChange}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select brand" />
+                <SelectValue placeholder="Selecionar marca" />
               </SelectTrigger>
               <SelectContent>
                 {brands.map((item) => (
@@ -183,7 +183,7 @@ export default function CollectionRecord({
 
           <div>
             <label className="mb-1 block text-sm font-medium text-secondary">
-              Quantity *
+              Quantidade *
             </label>
             <Input
               type="number"
@@ -195,7 +195,7 @@ export default function CollectionRecord({
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-secondary">Quality *</p>
+          <p className="mb-2 text-sm font-medium text-secondary">Qualidade *</p>
           <OptionSelector
             options={qualityOptions}
             selected={quality}
@@ -206,7 +206,7 @@ export default function CollectionRecord({
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-secondary">Season *</p>
+          <p className="mb-2 text-sm font-medium text-secondary">Estação *</p>
           <OptionSelector
             options={seasonOptions}
             selected={season}
@@ -216,7 +216,7 @@ export default function CollectionRecord({
 
         <div>
           <p className="mb-2 text-sm font-medium text-secondary">
-            Clothing Type *
+            Tipo de Roupa *
           </p>
           <OptionSelector
             options={clothingTypeOptions}
@@ -235,10 +235,10 @@ export default function CollectionRecord({
             onClick={onAdd}
             disabled={isAddDisabled}
           >
-            Add
+            Adicionar
           </Button>
           <Button type="button" variant="secondary" className="min-w-24">
-            Next
+            Próximo
           </Button>
         </div>
       </div>

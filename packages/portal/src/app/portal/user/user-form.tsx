@@ -1,5 +1,6 @@
 'use client';
 
+import { DialogForm } from '@/components/form/dialog-form';
 import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
@@ -8,29 +9,25 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { PencilIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { Role, UserFormData } from '../../types/user';
 
 interface UserFormProps {
-  onFormClose: () => void;
   initialData?: UserFormData;
   onSave?: () => void;
 }
 
-export default function UserForm({
-  onFormClose,
-  initialData,
-  onSave,
-}: UserFormProps) {
+export default function UserForm({ initialData, onSave }: UserFormProps) {
+  const isEditing = !!initialData?.id;
+  const [isOpen, setIsOpen] = useState(false);
   const {
     control,
     handleSubmit,
     register,
     reset,
     formState: { errors, isSubmitting },
-    setValue,
   } = useForm<UserFormData>();
-
-  const [message, setMessage] = useState<string | null>(null);
 
   const roleOptions = [
     { id: Role.ADMIN, label: 'Admin' },
@@ -39,24 +36,28 @@ export default function UserForm({
   ];
 
   useEffect(() => {
-    if (initialData) {
-      setValue('firstName', initialData.firstName);
-      setValue('lastName', initialData.lastName);
-      setValue('email', initialData.email);
-      setValue('contactPhone', initialData.contactPhone);
-      setValue('documentNumber', initialData.documentNumber);
-      setValue('role', initialData.role || []);
-    } else {
-      reset();
-    }
-  }, [initialData, setValue, reset]);
+    if (!isOpen) return;
+
+    reset({
+      id: initialData?.id,
+      firstName: initialData?.firstName ?? '',
+      lastName: initialData?.lastName ?? '',
+      email: initialData?.email ?? '',
+      contactPhone: initialData?.contactPhone ?? '',
+      documentNumber: initialData?.documentNumber ?? '',
+      role: initialData?.role ?? [],
+    });
+  }, [initialData, isOpen, reset]);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
 
   const onSubmit: SubmitHandler<UserFormData> = async (formData) => {
     let userId = '';
     try {
-      // Primeiro, cria o usuário
       if (initialData?.id) {
-        const { data, status } = await api.put(`/user${initialData?.id}`, {
+        const { data, status } = await api.put(`/user/${initialData?.id}`, {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
@@ -68,47 +69,57 @@ export default function UserForm({
         if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
         userId = data.id;
       } else {
-        const { status } = await api.post(`/user`, {
+        const { data, status } = await api.post(`/user`, {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           contactPhone: formData.contactPhone,
           documentNumber: formData.documentNumber,
-          password: formData.documentNumber, // senha fixa conforme solicitado
+          password: formData.documentNumber,
         });
         if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
-        userId = initialData?.id ?? '';
+        userId = data.id;
       }
 
-      // Depois, atribui as roles selecionadas
       if (Array.isArray(formData.role) && formData.role.length > 0) {
         await api.post(`/user/${userId}/roles`, { roles: formData.role });
       }
 
-      setMessage('Usuário salvo com sucesso!');
+      toast.success('Usuário salvo com sucesso!');
+      setIsOpen(false);
       onSave?.();
       reset();
     } catch (e) {
-      setMessage('Erro ao salvar o usuário.');
+      toast.error('Erro ao salvar o usuário.');
       console.error(e);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto my-8">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-        {initialData ? 'Editar Usuário' : 'Cadastro de Usuário'}
-      </h2>
-
-      {message && (
-        <p className="text-center text-sm text-gray-700">{message}</p>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <DialogForm<UserFormData>
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      title={initialData ? 'Editar Usuário' : 'Cadastro de Usuário'}
+      onConfirm={handleSubmit(onSubmit)}
+      loading={isSubmitting}
+      errors={errors}
+      trigger={
+        isEditing ? (
+          <Button variant="ghost" size="icon" className="size-8">
+            <PencilIcon className="size-4" />
+          </Button>
+        ) : (
+          <Button variant="secondary" className="ml-auto block">
+            Criar
+          </Button>
+        )
+      }
+    >
+      <div className="space-y-4">
         <div>
           <label
             htmlFor="firstName"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-secondary"
           >
             Primeiro Nome
           </label>
@@ -127,7 +138,7 @@ export default function UserForm({
         <div>
           <label
             htmlFor="lastName"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-secondary"
           >
             Último Nome
           </label>
@@ -146,7 +157,7 @@ export default function UserForm({
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-secondary"
           >
             Email
           </label>
@@ -173,7 +184,7 @@ export default function UserForm({
         <div>
           <label
             htmlFor="phone"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-secondary"
           >
             Telefone
           </label>
@@ -191,7 +202,7 @@ export default function UserForm({
         <div>
           <label
             htmlFor="documentNumber"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-secondary"
           >
             NIF
           </label>
@@ -210,7 +221,7 @@ export default function UserForm({
         <div>
           <label
             htmlFor="profile"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-secondary"
           >
             Perfil
           </label>
@@ -249,28 +260,7 @@ export default function UserForm({
             )}
           />
         </div>
-
-        <div className="flex justify-end space-x-3 mt-6">
-          <Button
-            type="button"
-            onClick={onFormClose}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-          >
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-          >
-            {isSubmitting
-              ? 'Salvando...'
-              : initialData
-              ? 'Guardar Alterações'
-              : 'Criar'}
-          </Button>
-        </div>
-      </form>
-    </div>
+      </div>
+    </DialogForm>
   );
 }

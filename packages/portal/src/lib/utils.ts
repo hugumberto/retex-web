@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   ClipboardList,
   Boxes,
+  Tag,
   UserIcon,
   RefreshCw,
 } from 'lucide-react';
@@ -20,6 +21,7 @@ export const NAV_ITEMS = [
     icon: ClipboardList,
   },
   { href: '/portal/storage-unit', label: 'ARMAZENAMENTO', icon: Boxes },
+  { href: '/portal/brand', label: 'MARCA', icon: Tag },
   { href: '/portal/user', label: 'UTILIZADOR', icon: UserIcon },
 ];
 

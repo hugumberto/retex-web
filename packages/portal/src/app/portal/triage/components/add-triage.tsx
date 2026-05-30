@@ -14,9 +14,9 @@ import {
 import { Check, X } from 'lucide-react';
 
 const QUALITY_MAP: Record<Quality, string> = {
-  [Quality.GOOD]: 'Good',
-  [Quality.MEDIUM]: 'Fair',
-  [Quality.BAD]: 'Bad',
+  [Quality.GOOD]: 'Boa',
+  [Quality.MEDIUM]: 'Regular',
+  [Quality.BAD]: 'Má',
 };
 
 export type TriageListItem = {
@@ -70,7 +70,9 @@ export default function AddTriage({
   return (
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-secondary">Add - Triage</h2>
+        <h2 className="text-xl font-semibold text-secondary">
+          Adicionar - Triagem
+        </h2>
         <X className="size-5 text-secondary" />
       </div>
 
@@ -78,11 +80,11 @@ export default function AddTriage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Quality</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Season</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead>Quantity</TableHead>
+              <TableHead>Qualidade</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Estação</TableHead>
+              <TableHead>Marca</TableHead>
+              <TableHead>Quantidade</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -105,7 +107,7 @@ export default function AddTriage({
                   colSpan={5}
                   className="h-20 text-center text-secondary/55"
                 >
-                  Item table
+                  Tabela de itens
                 </TableCell>
               </TableRow>
             )}
@@ -114,7 +116,7 @@ export default function AddTriage({
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-secondary">
-            Storage Code *
+            Código de Armazenamento *
           </label>
           <Input
             ref={storageInputRef}
@@ -126,7 +128,7 @@ export default function AddTriage({
                 await handleStorageCodeEnter();
               }
             }}
-            placeholder="Type storage code and press Enter"
+            placeholder="Digite o código e pressione Enter"
             disabled={isLoadingStorageUnit}
           />
         </div>
@@ -134,8 +136,8 @@ export default function AddTriage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Brand</TableHead>
-              <TableHead>Quality</TableHead>
+              <TableHead>Marca</TableHead>
+              <TableHead>Qualidade</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -152,7 +154,7 @@ export default function AddTriage({
                   colSpan={2}
                   className="h-24 text-center text-secondary/55"
                 >
-                  No storage units added
+                  Nenhuma unidade de armazenamento adicionada
                 </TableCell>
               </TableRow>
             )}
@@ -162,7 +164,7 @@ export default function AddTriage({
         <div className="flex justify-center pt-1">
           <Button type="button" variant="secondary" className="min-w-40">
             <Check className="size-4" />
-            Finish Triage
+            Finalizar Triagem
           </Button>
         </div>
       </div>
