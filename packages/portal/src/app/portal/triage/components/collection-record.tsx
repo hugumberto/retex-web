@@ -1,4 +1,5 @@
 import { Brand } from '@/app/types/brand';
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { TriageListItem } from './add-triage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { Frown, Meh, Shirt, Smile, Snowflake, Sun, X } from 'lucide-react';
+import {
+  Frown,
+  Meh,
+  Shirt,
+  Smile,
+  Snowflake,
+  Sun,
+  TrashIcon,
+  X,
+} from 'lucide-react';
 import React from 'react';
 
 type TriageOption = {
@@ -92,7 +102,9 @@ type CollectionRecordProps = {
   onSeasonChange: (value: 'SUMMER' | 'WINTER') => void;
   clothingType?: 'UPPER_PART' | 'UNDER_PART';
   onClothingTypeChange: (value: 'UPPER_PART' | 'UNDER_PART') => void;
-  onAdd: () => void;
+  onAdd: () => void | Promise<void>;
+  onDeleteItem: (item: TriageListItem, index: number) => void | Promise<void>;
+  deletingItemIndex?: number | null;
   isAddDisabled?: boolean;
 };
 
@@ -111,6 +123,8 @@ export default function CollectionRecord({
   clothingType,
   onClothingTypeChange,
   onAdd,
+  onDeleteItem,
+  deletingItemIndex,
   isAddDisabled,
 }: CollectionRecordProps) {
   return (
@@ -132,6 +146,7 @@ export default function CollectionRecord({
                 <TableHead>Estação</TableHead>
                 <TableHead>Marca</TableHead>
                 <TableHead>Quantidade</TableHead>
+                <TableHead>Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -142,16 +157,36 @@ export default function CollectionRecord({
                     <TableCell>{item.type}</TableCell>
                     <TableCell>{item.season}</TableCell>
                     <TableCell>
-                      {brands.find((brand) => brand.id === item.brandId)
-                        ?.name ?? item.brandId}
+                      {(brands.find((brand) => brand.id === item.brandId)
+                        ?.name ??
+                        item.brandId) ||
+                        '-'}
                     </TableCell>
                     <TableCell>{item.quantity}</TableCell>
+                    <TableCell>
+                      <ConfirmDialog
+                        title="Remover item?"
+                        description="Tem certeza que deseja remover este item da triagem?"
+                        trigger={
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            disabled={deletingItemIndex === index}
+                          >
+                            <TrashIcon className="size-4" />
+                          </Button>
+                        }
+                        onConfirm={() => onDeleteItem(item, index)}
+                      />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="h-20 text-center text-secondary/55"
                   >
                     {selectedPackageId ?? 'Tabela de itens'}

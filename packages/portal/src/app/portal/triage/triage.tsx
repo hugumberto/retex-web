@@ -1,14 +1,13 @@
 'use client';
 
 import { Brand } from '@/app/types/brand';
-import { PackageDTO } from '@/app/types/package';
+import { PackageDTO, PackageStatus } from '@/app/types/package';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import { QrCode } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import AddTriage, { TriageListItem } from './components/add-triage';
@@ -25,6 +24,7 @@ export default function Triage() {
   );
   const [isLoadingPackage, setIsLoadingPackage] = useState(false);
   const [isSavingWeight, setIsSavingWeight] = useState(false);
+  const [isStartingTriage, setIsStartingTriage] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [brandId, setBrandId] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -34,6 +34,10 @@ export default function Triage() {
     'UPPER_PART' | 'UNDER_PART'
   >();
   const [triageItems, setTriageItems] = useState<TriageListItem[]>([]);
+  const [isCreatingItem, setIsCreatingItem] = useState(false);
+  const [deletingItemIndex, setDeletingItemIndex] = useState<number | null>(
+    null
+  );
   const [storageCode, setStorageCode] = useState('');
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isLoadingStorageUnit, setIsLoadingStorageUnit] = useState(false);
@@ -78,10 +82,28 @@ export default function Triage() {
 
       setSelectedPackage(data);
       setWeight(data.weight !== undefined ? String(data.weight) : '');
+      const mappedItems = (data.items ?? []).map((packageItem) => {
+        const fallbackBrandId = (packageItem as { brandId?: string }).brandId;
+        const resolvedBrandId = packageItem.brand?.id ?? fallbackBrandId ?? '';
+        const itemId = (packageItem as { id?: string }).id;
+
+        return {
+          id: itemId,
+          packageId: data.id,
+          quality: packageItem.quality,
+          type: packageItem.type,
+          season: packageItem.season,
+          brandId: resolvedBrandId,
+          quantity: packageItem.quantity,
+        };
+      });
+
+      setTriageItems(mappedItems);
       toast.success('Pacote carregado com sucesso');
     } catch (error) {
       console.error('Erro ao obter pacote por id:', error);
       setSelectedPackage(null);
+      setTriageItems([]);
       toast.error('Pacote não encontrado para o código informado');
     } finally {
       setIsLoadingPackage(false);
@@ -104,6 +126,7 @@ export default function Triage() {
     try {
       const { status } = await api.patch(`/package/${selectedPackage.id}`, {
         weight: parsedWeight,
+        status: 'IN_HOUSE',
       });
 
       if (!isSuccessStatus(status)) {
@@ -122,7 +145,48 @@ export default function Triage() {
     }
   };
 
-  const handleAddTriageItem = () => {
+  const handleStartTriage = async () => {
+    if (!selectedPackage?.id) {
+      toast.error('Carregue um pacote antes de iniciar a triagem');
+      return;
+    }
+
+    const parsedWeight = Number(weight);
+    if (!weight.trim() || Number.isNaN(parsedWeight)) {
+      toast.error('Informe um peso válido');
+      return;
+    }
+
+    setIsStartingTriage(true);
+    try {
+      const { status } = await api.patch(`/package/${selectedPackage.id}`, {
+        weight: parsedWeight,
+        status: 'SCREENING',
+      });
+
+      if (!isSuccessStatus(status)) {
+        throw new Error('Erro ao iniciar triagem do pacote');
+      }
+
+      setSelectedPackage((current) =>
+        current
+          ? {
+              ...current,
+              weight: parsedWeight,
+              status: PackageStatus.SCREENING,
+            }
+          : current
+      );
+      toast.success('Triagem iniciada com sucesso');
+    } catch (error) {
+      console.error('Erro ao iniciar triagem do pacote:', error);
+      toast.error('Não foi possível iniciar a triagem');
+    } finally {
+      setIsStartingTriage(false);
+    }
+  };
+
+  const handleAddTriageItem = async () => {
     if (!selectedPackage?.id) {
       toast.error('Carregue um pacote antes de adicionar o item');
       return;
@@ -172,13 +236,54 @@ export default function Triage() {
       return;
     }
 
-    setTriageItems((current) => [...current, item]);
-    setBrandId('');
-    setQuantity('');
-    setQuality(undefined);
-    setSeason(undefined);
-    setClothingType(undefined);
-    toast.success('Item adicionado à lista de triagem');
+    setIsCreatingItem(true);
+    try {
+      const { data, status } = await api.post<{ id?: string }>('/items', item);
+      if (!isSuccessStatus(status)) {
+        throw new Error('Erro ao criar item');
+      }
+
+      setTriageItems((current) => [...current, { ...item, id: data?.id }]);
+      setBrandId('');
+      setQuantity('');
+      setQuality(undefined);
+      setSeason(undefined);
+      setClothingType(undefined);
+      toast.success('Item adicionado à lista de triagem');
+    } catch (error) {
+      console.error('Erro ao criar item:', error);
+      toast.error('Não foi possível adicionar o item');
+    } finally {
+      setIsCreatingItem(false);
+    }
+  };
+
+  const handleDeleteTriageItem = async (
+    item: TriageListItem,
+    index: number
+  ) => {
+    if (!item.id) {
+      toast.error('Este item não possui identificador para remoção');
+      return;
+    }
+
+    setDeletingItemIndex(index);
+    try {
+      const { status } = await api.delete(`/items/${item.id}`);
+      if (!isSuccessStatus(status)) {
+        throw new Error('Erro ao remover item');
+      }
+
+      setTriageItems((current) =>
+        current.filter((_, currentIndex) => currentIndex !== index)
+      );
+      toast.success('Item removido com sucesso');
+    } catch (error) {
+      console.error('Erro ao remover item:', error);
+      toast.error('Não foi possível remover o item');
+    } finally {
+      setDeletingItemIndex(null);
+    }
   };
 
   const handleStorageCodeSubmit = async () => {
@@ -203,6 +308,17 @@ export default function Triage() {
         return;
       }
 
+      const hasMatchingBrandInItems = triageItems.some(
+        (item) => item.brandId && item.brandId === data.brand.id
+      );
+
+      if (!hasMatchingBrandInItems) {
+        toast.error(
+          'A marca desta unidade de armazenamento não está na lista de itens'
+        );
+        return;
+      }
+
       setStorageUnits((current) => [...current, data]);
       setStorageCode('');
       toast.success('Unidade de armazenamento adicionada com sucesso');
@@ -219,14 +335,33 @@ export default function Triage() {
   const isAddFormInvalid =
     !selectedPackage ||
     isLoadingPackage ||
+    isCreatingItem ||
     !brandId ||
     !quantity.trim() ||
     !quality ||
     !season ||
     !clothingType;
 
+  const weightAllowedStatuses = new Set<PackageStatus>([
+    PackageStatus.CREATED,
+    PackageStatus.OUT_OF_ZONE,
+    PackageStatus.WAITING_FOR_COLLECTION,
+    PackageStatus.COLLECTED,
+    PackageStatus.IN_TRANSIT,
+  ]);
+
+  const isWeightStatusAllowed = selectedPackage
+    ? weightAllowedStatuses.has(selectedPackage.status)
+    : true;
+
   const isSaveDisabled =
-    isSavingWeight || isLoadingPackage || !selectedPackage || !weight.trim();
+    isSavingWeight ||
+    isLoadingPackage ||
+    !selectedPackage ||
+    !weight.trim() ||
+    !isWeightStatusAllowed;
+  const isStartTriageDisabled =
+    isStartingTriage || isLoadingPackage || !selectedPackage || !weight.trim();
 
   return (
     <section id="triage-page" className="flex flex-col gap-6">
@@ -262,7 +397,7 @@ export default function Triage() {
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="Peso"
-                disabled={isLoadingPackage}
+                disabled={isLoadingPackage || !isWeightStatusAllowed}
                 required
               />
             </div>
@@ -277,24 +412,17 @@ export default function Triage() {
               >
                 Guardar
               </Button>
-              <Button type="button" variant="secondary" className="min-w-32">
+              <Button
+                type="button"
+                variant="secondary"
+                className="min-w-32"
+                onClick={handleStartTriage}
+                disabled={isStartTriageDisabled}
+              >
                 Iniciar Triagem
               </Button>
             </div>
           </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="h-28 w-full rounded-xl border-secondary/45 bg-secondary-muted/30 text-secondary lg:w-32"
-          >
-            <div className="flex flex-col items-center gap-2">
-              <QrCode className="size-9" />
-              <span className="text-[11px] font-semibold tracking-wide">
-                LER CÓDIGO
-              </span>
-            </div>
-          </Button>
         </div>
       </div>
 
@@ -321,6 +449,8 @@ export default function Triage() {
           clothingType={clothingType}
           onClothingTypeChange={setClothingType}
           onAdd={handleAddTriageItem}
+          onDeleteItem={handleDeleteTriageItem}
+          deletingItemIndex={deletingItemIndex}
           isAddDisabled={isAddFormInvalid}
         />
 
@@ -332,6 +462,8 @@ export default function Triage() {
           onStorageCodeSubmit={handleStorageCodeSubmit}
           storageUnits={storageUnits}
           isLoadingStorageUnit={isLoadingStorageUnit}
+          onDeleteItem={handleDeleteTriageItem}
+          deletingItemIndex={deletingItemIndex}
         />
       </div>
     </section>
