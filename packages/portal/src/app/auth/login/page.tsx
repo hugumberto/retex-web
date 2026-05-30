@@ -30,7 +30,7 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password);
       router.push('/portal');
-    } catch (err: unknown) {
+    } catch {
       // Optionally handle error (e.g., show toast)
     }
   }

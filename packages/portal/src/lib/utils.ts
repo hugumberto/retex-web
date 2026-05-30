@@ -6,6 +6,7 @@ import {
   Tag,
   UserIcon,
   RefreshCw,
+  HandHelping,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
@@ -15,6 +16,11 @@ export function cn(...inputs: ClassValue[]) {
 export const NAV_ITEMS = [
   { href: '/portal', label: 'HOME', icon: LayoutDashboard },
   { href: '/portal/triage', label: 'TRIAGE', icon: RefreshCw },
+  {
+    href: '/portal/collection-request',
+    label: 'SOLICITAR COLETA',
+    icon: HandHelping,
+  },
   {
     href: '/portal/package-collection',
     label: 'RECOLHA',
