@@ -9,26 +9,61 @@ import {
   HandHelping,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
+import { Role } from '@/app/types/user';
+
+export type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: Role[];
+};
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-export const NAV_ITEMS = [
-  { href: '/portal', label: 'HOME', icon: LayoutDashboard },
-  { href: '/portal/triage', label: 'TRIAGE', icon: RefreshCw },
+export const NAV_ITEMS: NavItem[] = [
+  {
+    href: '/portal',
+    label: 'HOME',
+    icon: LayoutDashboard,
+    roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+  },
+  {
+    href: '/portal/triage',
+    label: 'TRIAGE',
+    icon: RefreshCw,
+    roles: [Role.ADMIN, Role.OPS],
+  },
   {
     href: '/portal/collection-request',
     label: 'SOLICITAR COLETA',
     icon: HandHelping,
+    roles: [Role.ADMIN, Role.OPS, Role.USER],
   },
   {
     href: '/portal/package-collection',
     label: 'RECOLHA',
     icon: ClipboardList,
+    roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
   },
-  { href: '/portal/storage-unit', label: 'ARMAZENAMENTO', icon: Boxes },
-  { href: '/portal/brand', label: 'MARCA', icon: Tag },
-  { href: '/portal/user', label: 'UTILIZADOR', icon: UserIcon },
+  {
+    href: '/portal/storage-unit',
+    label: 'ARMAZENAMENTO',
+    icon: Boxes,
+    roles: [Role.ADMIN, Role.OPS],
+  },
+  {
+    href: '/portal/brand',
+    label: 'MARCA',
+    icon: Tag,
+    roles: [Role.ADMIN, Role.OPS],
+  },
+  {
+    href: '/portal/user',
+    label: 'UTILIZADOR',
+    icon: UserIcon,
+    roles: [Role.ADMIN],
+  },
 ];
 
 export function isSuccessStatus(status: number): boolean {

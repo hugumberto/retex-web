@@ -18,6 +18,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { UserDTO } from '../../types/user';
 import UserForm from './user-form';
+import ResetPasswordForm from './reset-password-form';
 
 export default function User() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
@@ -130,6 +131,7 @@ export default function User() {
                       }}
                       onSave={fetchData}
                     />
+                    <ResetPasswordForm user={user} />
                     <ConfirmDialog
                       trigger={
                         <Button
