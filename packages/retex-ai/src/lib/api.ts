@@ -22,10 +22,9 @@ const flush = () => queue.splice(0).forEach((cb) => cb());
 
 async function refreshAccessToken(): Promise<string | null> {
   try {
-    const { data, status } = await api.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-      { refresh_token: useAppStore.getState().refreshToken },
-    );
+    const { data, status } = await api.post('/auth/refresh', {
+      refresh_token: useAppStore.getState().refreshToken,
+    });
     if (!isSuccessStatus(status)) return null;
     return data.access_token ?? data.accessToken ?? null;
   } catch {

@@ -24,6 +24,10 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginFormData) {
     try {
+      console.log(
+        '[xxx] ~ onSubmit ~  process.env.NEXT_PUBLIC_API_URL;:',
+        process.env.NEXT_PUBLIC_API_URL
+      );
       await login(data.email, data.password);
       router.push('/portal');
     } catch {}
@@ -60,7 +64,12 @@ export default function LoginPage() {
           errors={errors}
         />
 
-        <Button type="submit" variant="secondary" className="w-full" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          variant="secondary"
+          className="w-full"
+          disabled={isSubmitting}
+        >
           {isSubmitting ? 'Entrando...' : 'Entrar'}
         </Button>
       </form>

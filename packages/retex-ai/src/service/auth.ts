@@ -14,10 +14,13 @@ export async function login(email: string, password: string) {
 }
 
 export async function bootstrapAuth() {
+  const refreshToken = useAppStore.getState().refreshToken;
+  if (!refreshToken) {
+    useAppStore.getState().setAccessToken(null);
+    return;
+  }
   try {
-    const { data } = await api.post('/auth/refresh', {
-      refresh_token: useAppStore.getState().refreshToken,
-    });
+    const { data } = await api.post('/auth/refresh', { refresh_token: refreshToken });
     if (data) {
       const access = data.access_token ?? data.accessToken ?? null;
       useAppStore.getState().setAccessToken(access);

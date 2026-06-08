@@ -6,8 +6,12 @@ interface Detection {
   bbox: [number, number, number, number];
 }
 
+// COCO-SSD has no classes for garments (shirt, pants, jacket, etc.).
+// These are the only fashion-accessory classes available in the model.
 const CLOTHING_CLASSES = new Set([
-  'person', 'tie', 'backpack', 'umbrella', 'handbag', 'suitcase',
+  'tie',      // necktie / scarf
+  'backpack', // backpack / shoulder bag
+  'handbag',  // handbag / purse
 ]);
 
 export function useTensorflow(videoRef: React.RefObject<HTMLVideoElement | null>, enabled: boolean) {

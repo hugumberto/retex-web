@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCamera } from '@/hooks/use-camera';
-import { useTensorflow } from '@/hooks/use-tensorflow';
+import { useMotionDetection } from '@/hooks/use-motion-detection';
 import { analyzeImage } from '@/service/vision';
 import { VisionResult } from '@/app/types/vision';
 import { Button } from '@/components/ui/button';
@@ -15,27 +15,26 @@ interface CameraCaptureProps {
 
 export function CameraCapture({ deviceId, onResult }: CameraCaptureProps) {
   const { videoRef, error, captureFrame } = useCamera(deviceId);
-  const { hasClothingDetected, modelReady } = useTensorflow(videoRef, true);
+  const { isSettled, state, reset } = useMotionDetection(videoRef, true);
   const [analyzing, setAnalyzing] = useState(false);
-  const autoCaptureDone = useRef(false);
 
   useEffect(() => {
-    if (hasClothingDetected && !autoCaptureDone.current && !analyzing) {
-      autoCaptureDone.current = true;
+    if (isSettled && !analyzing) {
       handleCapture();
     }
-  }, [hasClothingDetected]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSettled]);
 
   async function handleCapture() {
     const base64 = captureFrame();
     if (!base64) return;
+    reset();
     setAnalyzing(true);
     try {
       const result = await analyzeImage(base64);
       onResult(result);
     } finally {
       setAnalyzing(false);
-      setTimeout(() => { autoCaptureDone.current = false; }, 3000);
     }
   }
 
@@ -58,20 +57,15 @@ export function CameraCapture({ deviceId, onResult }: CameraCaptureProps) {
           className="w-full h-full object-cover"
         />
 
-        {/* Indicador de deteção */}
+        {/* Motion state indicator dot */}
         <div
           className={cn(
             'absolute top-3 right-3 size-4 rounded-full transition-colors duration-300',
-            hasClothingDetected ? 'bg-green-400 shadow-lg shadow-green-400/50' : 'bg-gray-400',
+            state === 'settled' && 'bg-green-400 shadow-lg shadow-green-400/50',
+            state === 'moving' && 'bg-amber-400 shadow-lg shadow-amber-400/50 animate-pulse',
+            state === 'idle' && 'bg-gray-400',
           )}
         />
-
-        {/* Estado do modelo */}
-        {!modelReady && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-            <span className="text-white text-sm">A carregar modelo TF.js...</span>
-          </div>
-        )}
 
         {analyzing && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
@@ -82,9 +76,10 @@ export function CameraCapture({ deviceId, onResult }: CameraCaptureProps) {
 
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">
-          {hasClothingDetected
-            ? 'Roupa detetada — captura automática ativa'
-            : 'Aponte a câmera para uma peça de roupa'}
+          {analyzing && 'A enviar para análise...'}
+          {!analyzing && state === 'idle' && 'Coloque uma peça de roupa à frente da câmera'}
+          {!analyzing && state === 'moving' && 'Movimento detetado — aguardar que pare...'}
+          {!analyzing && state === 'settled' && 'Peça detetada — captura automática ativa'}
         </span>
         <Button
           variant="secondary"
