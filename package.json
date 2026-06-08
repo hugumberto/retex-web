@@ -5,6 +5,7 @@
   "scripts": {
     "start:web": "nx dev landing-page",
     "start:portal": "nx dev portal",
+    "start:retex-ai": "nx dev retex-ai",
     "test:web": "nx test landing-page",
     "test:portal": "nx test portal",
     "prepare": "if [ \"$VERCEL\" != \"1\" ]; then husky install; fi",
