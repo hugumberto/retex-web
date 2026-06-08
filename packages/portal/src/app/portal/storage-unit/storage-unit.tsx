@@ -1,6 +1,5 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -9,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { TrashIcon } from 'lucide-react';
+import { PrinterIcon, TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -33,11 +32,18 @@ const STATUS_MAP: Record<string, string> = {
   INATIVO: 'Inativo',
 };
 
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 export default function StorageUnit() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
   const [brandsOptions, setBrandOptions] = useState<SelectFieldOption[]>([]);
 
   const fetchStorageUnits = useCallback(async () => {
@@ -78,14 +84,6 @@ export default function StorageUnit() {
     [fetchStorageUnits]
   );
 
-  const handleSelectUnit = useCallback((id: string, isChecked: boolean) => {
-    if (isChecked) {
-      setSelectedUnits((prev) => [...prev, id]);
-    } else {
-      setSelectedUnits((prev) => prev.filter((unitId) => unitId !== id));
-    }
-  }, []);
-
   const handleDeleteWithToast = useCallback(
     async (id: string) => {
       await toast.promise(handleDeleteUnit(id), {
@@ -96,6 +94,75 @@ export default function StorageUnit() {
     },
     [handleDeleteUnit]
   );
+
+  const handlePrintLabel = useCallback((unit: StorageUnitDTO) => {
+    const printWindow = window.open('', '_blank', 'width=420,height=640');
+    if (!printWindow) {
+      toast.error('Permita pop-ups para imprimir a etiqueta');
+      return;
+    }
+
+    const unitId = escapeHtml(unit.id);
+    const name = escapeHtml(unit.brand.name);
+    const quality = escapeHtml(QUALITY_MAP[unit.quality]);
+    const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+      unit.id
+    )}`;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Etiqueta ${unitId}</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 24px;
+              font-family: Arial, sans-serif;
+              color: #013364;
+            }
+            .label {
+              border: 2px solid #02748e;
+              border-radius: 12px;
+              padding: 20px;
+              width: 320px;
+              margin: 0 auto;
+              text-align: center;
+            }
+            .title {
+              margin: 0 0 12px;
+              font-size: 18px;
+              font-weight: 700;
+            }
+            .qr {
+              width: 220px;
+              height: 220px;
+              margin: 10px auto 16px;
+              display: block;
+            }
+            .text {
+              margin: 6px 0;
+              font-size: 15px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="label">
+            <h1 class="title">Etiqueta do Item</h1>
+            <img class="qr" src="${qrSource}" alt="QR Code ${unitId}" />
+            <p class="text"><strong>ID:</strong> ${unitId}</p>
+            <p class="text"><strong>Nome:</strong> ${name}</p>
+            <p class="text"><strong>Qualidade:</strong> ${quality}</p>
+          </div>
+          <script>
+            window.onload = function () {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }, []);
 
   useEffect(() => {
     setPageTitle('Armazenamento');
@@ -119,7 +186,6 @@ export default function StorageUnit() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Id</TableHead>
               <TableHead>Marca</TableHead>
               <TableHead>Qualidade</TableHead>
               <TableHead>Status</TableHead>
@@ -130,17 +196,6 @@ export default function StorageUnit() {
             {storageUnits?.length > 0 ? (
               storageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={selectedUnits.includes(storageUnit.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectUnit(storageUnit.id, !!checked)
-                        }
-                      />
-                      <span className="font-medium">{storageUnit.id}</span>
-                    </div>
-                  </TableCell>
                   <TableCell>{storageUnit.brand.name}</TableCell>
                   <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
                   <TableCell>
@@ -155,6 +210,15 @@ export default function StorageUnit() {
                     </span>
                   </TableCell>
                   <TableCell className="space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      onClick={() => handlePrintLabel(storageUnit)}
+                      title="Imprimir etiqueta"
+                    >
+                      <PrinterIcon />
+                    </Button>
                     <StorageUnitForm
                       storageUnitId={storageUnit.id}
                       initialData={storageUnit}

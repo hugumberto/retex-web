@@ -23,9 +23,16 @@ import { cn, NAV_ITEMS } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { Label } from '../ui/label';
 import Title from './title';
+import { getUserRoles } from '@/lib/access-control';
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { user } = useAppStore();
+  const userRoles = getUserRoles(user);
+
+  const visibleNavItems = NAV_ITEMS.filter((item) =>
+    item.roles.some((role) => userRoles.includes(role))
+  );
 
   return (
     <Sidebar
@@ -48,7 +55,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel className="sr-only">Navigation</SidebarGroupLabel>
           <SidebarMenu>
-            {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            {visibleNavItems.map(({ href, label, icon: Icon }) => {
               const active =
                 href === '/portal'
                   ? pathname === '/portal'
@@ -97,7 +104,9 @@ export function AppSidebar() {
               background: 'linear-gradient(180deg, #0b6b79 0%, #00364a 100%)',
             }}
           />
-          <div className="text-sm font-semibold">Nome de utilizador</div>
+          <div className="text-sm font-semibold">
+            {user ? `${user.firstName} ${user.lastName}` : 'Utilizador'}
+          </div>
         </div>
       </SidebarFooter>
 
