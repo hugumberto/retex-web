@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
-import { LayoutDashboard, ClipboardList, Boxes, UserIcon } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Boxes, UserIcon, Camera } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -14,6 +14,7 @@ export const NAV_ITEMS = [
   },
   { href: '/portal/storage-unit', label: 'ARMAZENAMENTO', icon: Boxes },
   { href: '/portal/user', label: 'UTILIZADOR', icon: UserIcon },
+  { href: '/portal/camera', label: 'CÂMERA', icon: Camera },
 ];
 
 export function isSuccessStatus(status: number): boolean {
