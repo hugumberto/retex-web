@@ -69,7 +69,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/portal/camera',
     label: 'CÂMERA',
     icon: Camera,
-    roles: [Role.ADMIN, Role.OPS],
+    roles: [Role.ADMIN],
   },
 ];
 

@@ -4,9 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { createDeviceSession } from '@/service/device-session';
 import { analyzeImage } from '@/service/vision';
-import { VisionLabel, VisionResult, ClothingColor } from '@/app/types/vision';
+import { VisionLabel, VisionResult, ClothingColor, ClothingClassification } from '@/app/types/vision';
 
 // ─── Motion detection constants ─────────────────────────────────────────────
 const SAMPLE_W = 160;
@@ -70,6 +69,58 @@ function ResultSection({
         {title}
       </p>
       <LabelList items={items} />
+    </div>
+  );
+}
+
+const POSITION_LABELS: Record<string, string> = {
+  superior: 'Superior',
+  inferior: 'Inferior',
+  completo: 'Completo',
+};
+
+const SEASON_LABELS: Record<string, string> = {
+  'primavera-verao': 'Primavera / Verão',
+  'outono-inverno': 'Outono / Inverno',
+};
+
+const GENDER_LABELS: Record<string, string> = {
+  masculino: 'Masculino',
+  feminino: 'Feminino',
+  unisex: 'Unisex',
+};
+
+const AGE_LABELS: Record<string, string> = {
+  adulto: 'Adulto',
+  infantil: 'Infantil',
+};
+
+function Badge({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="rounded-full bg-secondary/15 px-2.5 py-0.5 text-xs font-medium text-secondary">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function ClassificationBadges({ c }: { c: ClothingClassification }) {
+  const hasAny = c.position || c.season || c.gender || c.ageGroup || c.brand;
+  if (!hasAny) return null;
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        Classificação
+      </p>
+      <div className="flex flex-wrap gap-x-4 gap-y-2">
+        {c.position && <Badge label="Posição" value={POSITION_LABELS[c.position]} />}
+        {c.season && <Badge label="Estação" value={SEASON_LABELS[c.season]} />}
+        {c.gender && <Badge label="Género" value={GENDER_LABELS[c.gender]} />}
+        {c.ageGroup && <Badge label="Idade" value={AGE_LABELS[c.ageGroup]} />}
+        {c.brand && <Badge label="Marca" value={c.brand} />}
+      </div>
     </div>
   );
 }
@@ -262,13 +313,15 @@ export default function Camera() {
   function captureFrame(): string | null {
     const video = videoRef.current;
     if (!video) return null;
+    const MAX_WIDTH = 1280;
+    const scale = Math.min(1, MAX_WIDTH / video.videoWidth);
     const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
-    ctx.drawImage(video, 0, 0);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
     return dataUrl.replace(/^data:image\/jpeg;base64,/, '');
   }
 
@@ -293,12 +346,6 @@ export default function Camera() {
     if (!device) return;
     setActiveDeviceId(device.deviceId);
     setVisionResult(null);
-    try {
-      await createDeviceSession({
-        deviceId: device.deviceId,
-        deviceLabel: device.label || `Câmera ${devices.indexOf(device) + 1}`,
-      });
-    } catch {}
   }
 
   // ── Derived values for results ───────────────────────────────────────────
@@ -372,7 +419,7 @@ export default function Camera() {
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="relative overflow-hidden rounded-xl border bg-black aspect-video">
+              <div className="relative overflow-hidden rounded-xl border bg-black w-[200px] h-[200px]">
                 <video
                   ref={videoRef}
                   autoPlay
@@ -427,6 +474,8 @@ export default function Camera() {
       {visionResult && (
         <div className="rounded-lg border bg-card p-4 space-y-4">
           <h3 className="text-sm font-semibold">Resultado da identificação</h3>
+
+          <ClassificationBadges c={visionResult.clothing.classification} />
 
           <ColorSwatches colors={visionResult.colors} />
 
