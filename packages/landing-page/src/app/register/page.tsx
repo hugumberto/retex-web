@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import NavCtaLink from '@/components/landing/NavCtaLink';
 import RegistrationForm from '@/components/landing/RegistrationForm';
-import { getPortalLoginHref } from '@/lib/portal';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default function RegisterPage() {
-  const loginHref = getPortalLoginHref();
   return (
     <section className="register-hero">
       <header className="landing-header">
@@ -29,9 +28,7 @@ export default function RegisterPage() {
           <Link href="/#servicos">Serviços</Link>
           <Link href="/#blog">Blog</Link>
           <Link href="/#faq">FAQ</Link>
-          <Link href={loginHref} className="nav-cta-btn">
-            Registo/Login
-          </Link>
+          <NavCtaLink />
         </nav>
       </header>
 
@@ -46,7 +43,7 @@ export default function RegisterPage() {
       <div className="landing-hero-overlay" />
 
       <div className="register-body">
-        <RegistrationForm loginHref={loginHref} />
+        <RegistrationForm />
       </div>
     </section>
   );

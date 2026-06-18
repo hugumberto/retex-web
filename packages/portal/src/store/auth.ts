@@ -12,6 +12,7 @@ export const createAuthSlice = (
   setUser: (u) => set({ user: u }),
   logout: async () => {
     set({ accessToken: null, user: null });
+    document.cookie = 'retex_session=; max-age=0; path=/; SameSite=Lax';
     // limpa refresh cookie no servidor
     await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
   },

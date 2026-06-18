@@ -3,12 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:local": "next dev",
-    "dev:env": "next dev",
+    "dev": "next dev -p 3001",
+    "dev:local": "next dev -p 3001",
+    "dev:env": "next dev -p 3001",
     "build": "next build",
-    "start": "next start",
-    "prod": "next build && next start"
+    "start": "next start -p 3001",
+    "prod": "next build && next start -p 3001"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.11",

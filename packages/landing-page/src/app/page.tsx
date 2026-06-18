@@ -26,8 +26,8 @@ export default function Home() {
         <LandingContactSection />
         <LandingFaq />
         <LandingBlog />
-        <LandingFooter />
       </div>
+      <LandingFooter />
     </main>
   );
 }

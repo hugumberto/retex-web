@@ -11,6 +11,7 @@ export async function login(email: string, password: string) {
   if (!access) throw new Error('API não devolveu access_token');
   useAppStore.getState().setAccessToken(access);
   useAppStore.getState().setRefreshToken(data.refresh_token);
+  document.cookie = 'retex_session=1; max-age=86400; path=/; SameSite=Lax';
 
   // Opcional: obter user já de seguida
   try {

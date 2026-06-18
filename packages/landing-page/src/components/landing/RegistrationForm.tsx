@@ -22,7 +22,12 @@ type FormValues = {
   long: string;
 };
 
-export default function RegistrationForm({ loginHref }: { loginHref: string }) {
+const portalLoginHref = (() => {
+  const base = process.env.NEXT_PUBLIC_PORTAL_URL?.trim() ?? '';
+  return base ? `${base.replace(/\/$/, '')}/auth/login` : '#';
+})();
+
+export default function RegistrationForm() {
   const {
     register,
     handleSubmit,
@@ -311,7 +316,7 @@ export default function RegistrationForm({ loginHref }: { loginHref: string }) {
 
       <p className="register-login-link">
         Já tens conta?{' '}
-        <a href={loginHref}>Login</a>
+        <a href={portalLoginHref} target="_blank" rel="noopener noreferrer">Login</a>
       </p>
 
       <div className="register-social-row" aria-label="Entrar com conta social">
