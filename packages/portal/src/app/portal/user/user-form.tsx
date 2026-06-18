@@ -44,7 +44,6 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
       lastName: initialData?.lastName ?? '',
       email: initialData?.email ?? '',
       contactPhone: initialData?.contactPhone ?? '',
-      documentNumber: initialData?.documentNumber ?? '',
       role: initialData?.role ?? [],
     });
   }, [initialData, isOpen, reset]);
@@ -62,8 +61,7 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
           lastName: formData.lastName,
           email: formData.email,
           contactPhone: formData.contactPhone,
-          documentNumber: formData.documentNumber,
-          password: formData.documentNumber, // senha fixa conforme solicitado
+          password: formData.contactPhone,
         });
 
         if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
@@ -74,8 +72,7 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
           lastName: formData.lastName,
           email: formData.email,
           contactPhone: formData.contactPhone,
-          documentNumber: formData.documentNumber,
-          password: formData.documentNumber,
+          password: formData.contactPhone,
         });
         if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
         userId = data.id;
@@ -199,25 +196,6 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
             )}
           </div>
         </div>
-        <div>
-          <label
-            htmlFor="documentNumber"
-            className="block text-sm font-medium text-secondary"
-          >
-            NIF
-          </label>
-          <div className="w-full">
-            <Input
-              placeholder="NIF*"
-              className={errors.documentNumber ? 'border-red-500' : ''}
-              {...register('documentNumber', { required: 'Campo obrigatório' })}
-            />
-            {errors.documentNumber && (
-              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
-            )}
-          </div>
-        </div>
-
         <div>
           <label
             htmlFor="profile"

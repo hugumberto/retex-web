@@ -34,7 +34,6 @@ interface CollectionRequestFormData {
   contactPhone: string;
   dayOfWeek: string;
   timeOfDay: string;
-  nif: string;
   address: {
     street: string;
     number: string;
@@ -98,7 +97,6 @@ export default function CollectionRequest() {
       contactPhone: '',
       dayOfWeek: '',
       timeOfDay: '',
-      nif: '',
       address: {
         street: '',
         number: '',
@@ -318,14 +316,6 @@ export default function CollectionRequest() {
               />
             </div>
 
-            <div>
-              <Input
-                tabIndex={5}
-                placeholder="NIF*"
-                className={errors.nif ? 'border-red-500' : ''}
-                {...register('nif', { required: 'Campo obrigatório' })}
-              />
-            </div>
             <div>
               <Controller
                 name="dayOfWeek"

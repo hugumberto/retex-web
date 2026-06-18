@@ -18,15 +18,9 @@ export default function LandingHero() {
           <a href="#como-funciona">Como funciona</a>
           <a href="#servicos">Serviços</a>
           <a href="#blog">Blog</a>
-          <a
-            href={loginHref}
-            title={loginHref === PORTAL_LOGIN_PLACEHOLDER ? 'Em breve' : undefined}
-          >
-            Login
-          </a>
           <a href="#faq">FAQ</a>
-          <a href="#formulario" className="nav-cta-btn">
-            Pedir recolha
+          <a href="/register" className="nav-cta-btn">
+            Registo/Login
           </a>
         </nav>
       </header>

@@ -5,7 +5,6 @@ export interface UserDTO extends Entity {
   lastName: string;
   email: string;
   contactPhone: string;
-  documentNumber: string;
   status: UserStatus;
   roles: RoleResponse[];
 }
@@ -19,7 +18,6 @@ export interface UserFormData {
   lastName: string;
   email: string;
   contactPhone: string;
-  documentNumber: string;
   password?: string;
   role?: Role[];
 }

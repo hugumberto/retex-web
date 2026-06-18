@@ -5,7 +5,6 @@ import { useState } from 'react';
 
 type LandingFormValues = {
   nome: string;
-  nif: string;
   email: string;
   telemovel: string;
   local: string;
@@ -65,7 +64,6 @@ export default function ContactForm() {
     mode: 'onChange',
     defaultValues: {
       nome: '',
-      nif: '',
       email: '',
       telemovel: '',
       local: '',
@@ -92,7 +90,6 @@ export default function ContactForm() {
       lastName,
       email: data.email,
       contactPhone: data.telemovel,
-      nif: data.nif,
       dayOfWeek: inferDayOfWeek(data.horario),
       timeOfDay: inferTimeOfDay(data.horario),
       address: {
@@ -169,22 +166,6 @@ export default function ContactForm() {
           />
           {errors.nome ? (
             <span className="form-field-error">{errors.nome.message}</span>
-          ) : null}
-        </label>
-        <label>
-          <span className="form-label">
-            NIF
-            <span className="form-req">*</span>
-          </span>
-          <input
-            type="text"
-            autoComplete="off"
-            className={errors.nif ? 'field-error' : undefined}
-            aria-invalid={errors.nif ? true : undefined}
-            {...register('nif', req)}
-          />
-          {errors.nif ? (
-            <span className="form-field-error">{errors.nif.message}</span>
           ) : null}
         </label>
       </div>
