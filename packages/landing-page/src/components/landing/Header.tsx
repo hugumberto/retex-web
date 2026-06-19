@@ -65,7 +65,7 @@ const MobileMenu = () => {
           >
             Sobre nós
           </ItemMenu>
-          <ItemMenu href="#faq" onClick={(e) => handleClick(e, 'faq')}>
+          <ItemMenu href="/faq">
             FAQ&apos;s
           </ItemMenu>
         </nav>
@@ -89,7 +89,7 @@ export const Header = () => {
         <nav className=" justify-between items-center hidden md:flex  mr-14 gap-14">
           <ItemMenu href="#how-it-works">Como Funciona</ItemMenu>
           <ItemMenu href="#about-us">Sobre nós</ItemMenu>
-          <ItemMenu href="#faq">FAQ&apos;s</ItemMenu>
+          <ItemMenu href="/faq">FAQ&apos;s</ItemMenu>
         </nav>
         <div className="md:hidden mr-4 mt-1">
           <MobileMenu />{' '}
