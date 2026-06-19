@@ -9,9 +9,9 @@ export const metadata = {
 
 export default function FaqPage() {
   return (
-    <main className="landing-shell">
+    <main className="landing-shell flex flex-col min-h-screen">
       <Header />
-      <div className="landing-page">
+      <div className="landing-page flex-1">
         <LandingFaq />
       </div>
       <LandingFooter />
