@@ -2,6 +2,14 @@
   "name": "@retex-web/landing-page",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "dev:local": "next dev -p 3001",
+    "dev:env": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "prod": "next build && next start -p 3001"
+  },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.11",
     "@radix-ui/react-dialog": "1.1.14",

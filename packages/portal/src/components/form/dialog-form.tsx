@@ -42,7 +42,7 @@ export function DialogForm<T extends FieldValues>({
   trigger,
   children,
   loading = false,
-  errors, 
+  errors,
 }: DialogFormProps<T>) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = open !== undefined;
@@ -56,7 +56,7 @@ export function DialogForm<T extends FieldValues>({
   const handleConfirm = async () => {
     if (onConfirm) {
       await onConfirm();
-      if (Object.keys(errors).length === 0) {
+      if (!isControlled && Object.keys(errors).length === 0) {
         handleOpenChange(false);
       }
     }

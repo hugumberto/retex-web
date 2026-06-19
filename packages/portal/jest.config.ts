@@ -1,4 +1,4 @@
-export default {
+const config = {
   displayName: '@retex-web/portal',
   preset: '../../jest.preset.js',
   transform: {
@@ -8,3 +8,5 @@ export default {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
 };
+
+export default config;

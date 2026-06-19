@@ -1,28 +1,31 @@
-import Hero from '@/components/landing/Hero';
-import HowItWorks from '@/components/landing/HowItWorks';
-import AboutUs from '@/components/landing/AboutUs';
-import ContactForm from '@/components/landing/ContactForm';
-import FAQ from '@/components/landing/FAQ';
-import { Header } from '@/components/landing/Header';
+import LandingAbout from '@/components/landing/LandingAbout';
+import LandingBlog from '@/components/landing/LandingBlog';
+import LandingContactSection from '@/components/landing/LandingContactSection';
+import LandingFooter from '@/components/landing/LandingFooter';
+import LandingHero from '@/components/landing/LandingHero';
+import LandingHowItWorks from '@/components/landing/LandingHowItWorks';
+import LandingPartners from '@/components/landing/LandingPartners';
+import LandingQuote from '@/components/landing/LandingQuote';
+import LandingServices from '@/components/landing/LandingServices';
+import LandingUpcycling from '@/components/landing/LandingUpcycling';
+import LandingValues from '@/components/landing/LandingValues';
 
 export default function Home() {
- 
   return (
-    <div className="font-family-poppins">
-      <Header />
-      <div>
-        <Hero />
-        <HowItWorks />
-        <AboutUs />
-        <ContactForm />
-        <FAQ />
+    <main className="landing-shell">
+      <LandingHero />
+      <div className="landing-page">
+        <LandingHowItWorks />
+        <LandingServices />
+        <LandingAbout />
+        <LandingValues />
+        <LandingQuote />
+        <LandingUpcycling />
+        <LandingPartners />
+        <LandingContactSection />
+        <LandingBlog />
       </div>
-      <footer className="text-xs text-center text-white  bg-gradient-horizontal py-6">
-        <p>
-          Política de Privacidade | Política de Cookies | Livro de Reclamações
-          Online
-        </p>
-      </footer>
-    </div>
+      <LandingFooter />
+    </main>
   );
 }

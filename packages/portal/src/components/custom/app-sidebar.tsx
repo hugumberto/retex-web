@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Info } from 'lucide-react';
+import { Bell, Info, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -23,9 +23,16 @@ import { cn, NAV_ITEMS } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { Label } from '../ui/label';
 import Title from './title';
+import { getUserRoles } from '@/lib/access-control';
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { user } = useAppStore();
+  const userRoles = getUserRoles(user);
+
+  const visibleNavItems = NAV_ITEMS.filter((item) =>
+    item.roles.some((role) => userRoles.includes(role))
+  );
 
   return (
     <Sidebar
@@ -48,7 +55,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel className="sr-only">Navigation</SidebarGroupLabel>
           <SidebarMenu>
-            {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            {visibleNavItems.map(({ href, label, icon: Icon }) => {
               const active =
                 href === '/portal'
                   ? pathname === '/portal'
@@ -92,12 +99,21 @@ export function AppSidebar() {
 
         <div className="mt-6 flex items-center gap-3">
           <div
-            className="size-10 rounded-full"
+            className="size-10 rounded-full shrink-0"
             style={{
               background: 'linear-gradient(180deg, #0b6b79 0%, #00364a 100%)',
             }}
           />
-          <div className="text-sm font-semibold">Nome de utilizador</div>
+          <div className="text-sm font-semibold min-w-0 truncate flex-1">
+            {user ? `${user.firstName} ${user.lastName}` : 'Utilizador'}
+          </div>
+          <button
+            onClick={() => useAppStore.getState().logout()}
+            title="Terminar sessão"
+            className="shrink-0 text-secondary hover:text-destructive transition-colors"
+          >
+            <LogOut className="size-4" />
+          </button>
         </div>
       </SidebarFooter>
 
