@@ -1,47 +1,49 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+interface FaqItem {
+  title: string;
+  description: string;
+}
+
+interface FaqCategory {
+  title: string;
+  description: string;
+  status: string;
+  items: FaqItem[];
+}
+
 export default function LandingFaq() {
+  const [categories, setCategories] = useState<FaqCategory[]>([]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}faq`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: Array<{ category: FaqCategory }>) =>
+        setCategories(data.map((d) => d.category))
+      )
+      .catch(() => {});
+  }, []);
+
+  if (categories.length === 0) return null;
+
   return (
-    <section id="faq" className="landing-section faq">
-      <h2>Perguntas frequentes</h2>
-      <p className="faq-subtitle">
-        Tens dúvidas sobre a RETEX? Aqui encontras as respostas às questões mais
-        comuns
-      </p>
-      <div className="faq-list">
-        <details>
-          <summary>O que é a RETEX?</summary>
-          <p>
-            Plataforma de economia circular para recolha, triagem e reutilização
-            têxtil.
-          </p>
-        </details>
-        <details>
-          <summary>Como posso contribuir para a RETEX?</summary>
-          <p>
-            Agenda a recolha no formulário e entrega roupa em bom estado.
-          </p>
-        </details>
-        <details>
-          <summary>O que acontece às roupas recolhidas?</summary>
-          <p>
-            São triadas e encaminhadas para reutilização, doação ou reciclagem.
-          </p>
-        </details>
-        <details>
-          <summary>A RETEX só trabalha com roupa usada?</summary>
-          <p>
-            Recolhemos têxteis e vestuário pós-consumo limpos e em condições
-            adequadas para triagem.
-          </p>
-        </details>
-        <details>
-          <summary>Como posso trabalhar convosco?</summary>
-          <p>
-            Enviamos oportunidades e parcerias através dos nossos canais oficiais.
-            Deixa contacto no formulário com o assunto &quot;Carreiras&quot; ou
-            &quot;Parcerias&quot;.
-          </p>
-        </details>
-      </div>
-    </section>
+    <>
+      {categories.map((category) => (
+        <section key={category.title} id="faq" className="landing-section faq">
+          <h2>{category.title}</h2>
+          <p className="faq-subtitle">{category.description}</p>
+          <div className="faq-list">
+            {category.items.map((item) => (
+              <details key={item.title}>
+                <summary>{item.title}</summary>
+                <p>{item.description}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))}
+    </>
   );
 }

@@ -14,6 +14,7 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal/brand', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/user', roles: [Role.ADMIN] },
   { path: '/portal/zona', roles: [Role.ADMIN] },
+  { path: '/portal/faq', roles: [Role.ADMIN, Role.OPS] },
 ];
 
 const matchesRoute = (pathname: string, routePath: string) => {

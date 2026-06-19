@@ -9,6 +9,7 @@ import {
   HandHelping,
   CircleUser,
   MapPin,
+  HelpCircle,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -77,6 +78,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'ZONA',
     icon: MapPin,
     roles: [Role.ADMIN],
+  },
+  {
+    href: '/portal/faq',
+    label: 'FAQ',
+    icon: HelpCircle,
+    roles: [Role.ADMIN, Role.OPS],
   },
 ];
 

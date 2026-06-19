@@ -1,18 +1,13 @@
 'use client';
 
-import { PackageDTO } from '@/app/types/package';
+import { PackageDTO, PackageStatus } from '@/app/types/package';
 import { AddressDTO, Role } from '@/app/types/user';
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import { TrashIcon } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DialogForm } from '@/components/form/dialog-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -54,16 +49,7 @@ interface UserFormData {
   addressId: string;
 }
 
-const getSafePackages = (payload: unknown): PackageDTO[] => {
-  if (Array.isArray(payload)) return payload as PackageDTO[];
-  if (payload && typeof payload === 'object' && 'data' in payload && Array.isArray((payload as { data: unknown }).data)) {
-    return (payload as { data: PackageDTO[] }).data;
-  }
-  return [];
-};
 
-const formatAddress = (addr: AddressDTO) =>
-  `${addr.street}, ${addr.number} — ${addr.city}`;
 
 export default function CollectionRequest() {
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
@@ -75,7 +61,11 @@ export default function CollectionRequest() {
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
   const inZoneAddresses = addresses.filter((a) => a.isInServiceZone);
   const canRequest = inZoneAddresses.length > 0;
+  const hasActiveRequest = isUserRole && requests.some(
+    (r) => r.status !== PackageStatus.CANCELLED && r.status !== PackageStatus.STOCKED
+  );
 
+  const [userFormOpen, setUserFormOpen] = useState(false);
   const userForm = useForm<UserFormData>({ defaultValues: { addressId: '' } });
   const adminForm = useForm<AdminFormData>({
     defaultValues: {
@@ -86,13 +76,29 @@ export default function CollectionRequest() {
 
   const fetchRequests = useCallback(async () => {
     try {
-      const { data, status } = await api.get<unknown>('/package');
+      const endpoint = isUserRole ? '/me/packages' : '/package';
+      const { data, status } = await api.get<PackageDTO[]>(endpoint);
       if (!isSuccessStatus(status)) throw new Error();
-      setRequests(getSafePackages(data));
+      setRequests(Array.isArray(data) ? data : []);
     } catch {
       toast.error('Não foi possível carregar as solicitações de coleta');
     }
-  }, []);
+  }, [isUserRole]);
+
+  const cancelRequest = useCallback(async (id: string) => {
+    await toast.promise(
+      async () => {
+        const res = await api.patch(`/package/${id}`, { status: PackageStatus.CANCELLED });
+        if (!isSuccessStatus(res.status)) throw new Error();
+        await fetchRequests();
+      },
+      {
+        loading: 'A cancelar...',
+        success: 'Solicitação cancelada',
+        error: 'Não foi possível cancelar a solicitação',
+      }
+    );
+  }, [fetchRequests]);
 
   useEffect(() => {
     setPageTitle('Solicitação de Coleta');
@@ -113,16 +119,18 @@ export default function CollectionRequest() {
 
   const submitUser = userForm.handleSubmit(async (data) => {
     setIsSubmitting(true);
-    await toast.promise(
-      async () => {
-        const response = await api.post('/package', { userId: user!.id, addressId: data.addressId });
-        if (!isSuccessStatus(response.status) && response.status !== 409) throw new Error();
-        userForm.reset();
-        await fetchRequests();
-      },
-      { loading: 'A criar solicitação...', success: 'Solicitação de coleta criada com sucesso', error: 'Não foi possível criar a solicitação de coleta' }
-    );
-    setIsSubmitting(false);
+    try {
+      const response = await api.post('/package', { userId: user!.id, addressId: data.addressId });
+      if (!isSuccessStatus(response.status) && response.status !== 409) throw new Error();
+      userForm.reset();
+      await fetchRequests();
+      setUserFormOpen(false);
+      toast.success('Solicitação de coleta criada com sucesso');
+    } catch {
+      toast.error('Não foi possível criar a solicitação de coleta');
+    } finally {
+      setIsSubmitting(false);
+    }
   });
 
   const submitAdmin = adminForm.handleSubmit(async (data) => {
@@ -186,6 +194,13 @@ export default function CollectionRequest() {
         {isUserRole ? (
           isLoadingAddresses ? (
             <Button variant="secondary" disabled>A carregar...</Button>
+          ) : hasActiveRequest ? (
+            <Alert className="max-w-md ml-auto">
+              <AlertTitle>Solicitação em curso</AlertTitle>
+              <AlertDescription>
+                Já tem uma solicitação de coleta activa. Aguarde a conclusão ou cancelamento antes de criar uma nova.
+              </AlertDescription>
+            </Alert>
           ) : canRequest ? (
             <DialogForm<UserFormData>
               title="Nova Solicitação de Coleta"
@@ -193,6 +208,8 @@ export default function CollectionRequest() {
               loading={isSubmitting}
               errors={userForm.formState.errors}
               onConfirm={submitUser}
+              open={userFormOpen}
+              onOpenChange={(open) => { setUserFormOpen(open); if (!open) userForm.reset(); }}
               trigger={<Button variant="secondary" disabled={isSubmitting}>Criar Solicitação</Button>}
             >
               <div className="grid grid-cols-1 gap-4">
@@ -206,18 +223,36 @@ export default function CollectionRequest() {
                   control={userForm.control}
                   rules={{ required: 'Selecione um endereço' }}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className={userForm.formState.errors.addressId ? 'border-red-500' : ''}>
-                        <SelectValue placeholder="Selecionar endereço*" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {inZoneAddresses.map((addr) => (
-                          <SelectItem key={addr.id} value={addr.id}>
-                            {formatAddress(addr)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-col gap-2">
+                      {userForm.formState.errors.addressId && (
+                        <p className="text-xs text-destructive">Selecione um endereço</p>
+                      )}
+                      {inZoneAddresses.map((addr) => (
+                        <label
+                          key={addr.id}
+                          className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${
+                            field.value === addr.id
+                              ? 'border-secondary bg-secondary/5'
+                              : 'border-border hover:bg-muted/40'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            className="mt-0.5 accent-secondary"
+                            value={addr.id}
+                            checked={field.value === addr.id}
+                            onChange={() => field.onChange(addr.id)}
+                          />
+                          <div className="text-sm">
+                            <p className="font-medium text-foreground">
+                              {addr.street}, {addr.number}
+                              {addr.complement ? ` ${addr.complement}` : ''}
+                            </p>
+                            <p className="text-muted-foreground">{addr.zipCode} — {addr.city}</p>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
                   )}
                 />
               </div>
@@ -274,33 +309,40 @@ export default function CollectionRequest() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Contacto</TableHead>
-                <TableHead>Dia</TableHead>
-                <TableHead>Turno</TableHead>
                 <TableHead>Morada</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Acção</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {requests.length > 0 ? (
                 requests.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell>{request.id}</TableCell>
                     <TableCell>{`${request.user?.firstName ?? '-'} ${request.user?.lastName ?? ''}`.trim()}</TableCell>
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
                     <TableCell>{request.user?.contactPhone ?? '-'}</TableCell>
-                    <TableCell>{request.collectDay ?? '-'}</TableCell>
-                    <TableCell>{request.collectTime ?? '-'}</TableCell>
                     <TableCell>{`${request.address?.street ?? '-'} ${request.address?.number ?? ''}`.trim()}</TableCell>
                     <TableCell>{request.status}</TableCell>
+                    <TableCell>
+                      {(request.status === PackageStatus.CREATED || request.status === PackageStatus.OUT_OF_ZONE) && (
+                        <ConfirmDialog
+                          trigger={
+                            <Button variant="ghost" size="icon" className="size-8">
+                              <TrashIcon />
+                            </Button>
+                          }
+                          onConfirm={() => cancelRequest(request.id)}
+                        />
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
                     Nenhum registro encontrado!
                   </TableCell>
                 </TableRow>
