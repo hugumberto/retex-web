@@ -40,7 +40,7 @@ const STATUS_CLASS: Record<PackageStatus, string> = {
 };
 
 export default function Index() {
-  const { setPageTitle, user } = useAppStore();
+  const { setPageTitle, setBreadcrumbs, user } = useAppStore();
   const [requests, setRequests] = useState<PackageDTO[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -59,9 +59,11 @@ export default function Index() {
   }, []);
 
   useEffect(() => {
-    setPageTitle('Home');
+    setPageTitle('');
+    setBreadcrumbs([]);
     if (isUserRole) fetchRequests();
-  }, [setPageTitle, isUserRole, fetchRequests]);
+    return () => { setPageTitle(''); setBreadcrumbs([]); };
+  }, [setPageTitle, setBreadcrumbs, isUserRole, fetchRequests]);
 
   return (
     <section className="flex flex-col gap-6">
