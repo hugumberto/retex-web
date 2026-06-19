@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { AxiosError } from 'axios';
 import { CheckCircle2, MapPin, Phone, Star, XCircle } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -66,8 +67,10 @@ export default function Perfil() {
       if (user) setUser({ ...user, contactPhone: data.contactPhone });
       setContactOpen(false);
       toast.success('Contacto actualizado');
-    } catch {
-      toast.error('Não foi possível actualizar o contacto');
+    } catch (err) {
+      const message = (err as AxiosError<{ message: string }>)?.response?.data?.message
+        ?? 'Não foi possível actualizar o contacto';
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -85,8 +88,10 @@ export default function Perfil() {
       passwordForm.reset();
       setPasswordOpen(false);
       toast.success('Palavra-passe alterada com sucesso');
-    } catch {
-      toast.error('Não foi possível alterar a palavra-passe');
+    } catch (err) {
+      const message = (err as AxiosError<{ message: string }>)?.response?.data?.message
+        ?? 'Não foi possível alterar a palavra-passe';
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
