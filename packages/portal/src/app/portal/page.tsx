@@ -2,7 +2,6 @@
 
 import { PackageDTO, PackageStatus } from '@/app/types/package';
 import { Role } from '@/app/types/user';
-import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -28,16 +27,16 @@ const STATUS_LABEL: Record<PackageStatus, string> = {
   [PackageStatus.STOCKED]: 'Concluído',
 };
 
-const STATUS_VARIANT: Record<PackageStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  [PackageStatus.CREATED]: 'secondary',
-  [PackageStatus.OUT_OF_ZONE]: 'outline',
-  [PackageStatus.WAITING_FOR_COLLECTION]: 'secondary',
-  [PackageStatus.COLLECTED]: 'secondary',
-  [PackageStatus.IN_TRANSIT]: 'secondary',
-  [PackageStatus.IN_HOUSE]: 'secondary',
-  [PackageStatus.CANCELLED]: 'destructive',
-  [PackageStatus.SCREENING]: 'secondary',
-  [PackageStatus.STOCKED]: 'default',
+const STATUS_CLASS: Record<PackageStatus, string> = {
+  [PackageStatus.CREATED]: 'bg-blue-100 text-blue-700',
+  [PackageStatus.OUT_OF_ZONE]: 'bg-amber-100 text-amber-700',
+  [PackageStatus.WAITING_FOR_COLLECTION]: 'bg-yellow-100 text-yellow-700',
+  [PackageStatus.COLLECTED]: 'bg-teal-100 text-teal-700',
+  [PackageStatus.IN_TRANSIT]: 'bg-purple-100 text-purple-700',
+  [PackageStatus.IN_HOUSE]: 'bg-indigo-100 text-indigo-700',
+  [PackageStatus.CANCELLED]: 'bg-red-100 text-red-600',
+  [PackageStatus.SCREENING]: 'bg-cyan-100 text-cyan-700',
+  [PackageStatus.STOCKED]: 'bg-emerald-100 text-emerald-700',
 };
 
 export default function Index() {
@@ -100,9 +99,9 @@ export default function Index() {
                         </TableCell>
                         <TableCell>{req.address?.city ?? '—'}</TableCell>
                         <TableCell>
-                          <Badge variant={STATUS_VARIANT[req.status]}>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_CLASS[req.status] ?? 'bg-muted text-muted-foreground'}`}>
                             {STATUS_LABEL[req.status] ?? req.status}
-                          </Badge>
+                          </span>
                         </TableCell>
                       </TableRow>
                     ))
