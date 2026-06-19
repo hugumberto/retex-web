@@ -19,6 +19,7 @@ interface ContactFormData {
 }
 
 interface PasswordFormData {
+  currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
@@ -34,7 +35,7 @@ export default function Perfil() {
     defaultValues: { contactPhone: user?.contactPhone ?? '' },
   });
   const passwordForm = useForm<PasswordFormData>({
-    defaultValues: { newPassword: '', confirmPassword: '' },
+    defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
   });
 
   const fetchAddresses = useCallback(async () => {
@@ -79,7 +80,7 @@ export default function Perfil() {
     }
     setIsSubmitting(true);
     try {
-      const res = await api.patch('/me/password', { newPassword: data.newPassword });
+      const res = await api.patch('/me/password', { currentPassword: data.currentPassword, newPassword: data.newPassword });
       if (!isSuccessStatus(res.status) && res.status !== 204) throw new Error();
       passwordForm.reset();
       setPasswordOpen(false);
@@ -182,6 +183,17 @@ export default function Perfil() {
               trigger={<Button variant="outline" size="sm">Alterar Palavra-passe</Button>}
             >
               <div className="flex flex-col gap-3">
+                <Input
+                  type="password"
+                  placeholder="Palavra-passe actual*"
+                  className={passwordForm.formState.errors.currentPassword ? 'border-red-500' : ''}
+                  {...passwordForm.register('currentPassword', { required: 'Campo obrigatório' })}
+                />
+                {passwordForm.formState.errors.currentPassword && (
+                  <p className="text-xs text-destructive">
+                    {passwordForm.formState.errors.currentPassword.message}
+                  </p>
+                )}
                 <Input
                   type="password"
                   placeholder="Nova palavra-passe*"
