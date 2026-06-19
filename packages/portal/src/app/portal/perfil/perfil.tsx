@@ -2,19 +2,40 @@
 
 import { AddressDTO } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import { DialogForm } from '@/components/form/dialog-form';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import { CheckCircle2, MapPin, Star, XCircle } from 'lucide-react';
+import { CheckCircle2, MapPin, Phone, Star, XCircle } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import AddressForm from './address-form';
 
+interface ContactFormData {
+  contactPhone: string;
+}
+
+interface PasswordFormData {
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export default function Perfil() {
-  const { setPageTitle, setBreadcrumbs } = useAppStore();
+  const { setPageTitle, setBreadcrumbs, user, setUser } = useAppStore();
   const [addresses, setAddresses] = useState<AddressDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+
+  const contactForm = useForm<ContactFormData>({
+    defaultValues: { contactPhone: user?.contactPhone ?? '' },
+  });
+  const passwordForm = useForm<PasswordFormData>({
+    defaultValues: { newPassword: '', confirmPassword: '' },
+  });
 
   const fetchAddresses = useCallback(async () => {
     try {
@@ -35,6 +56,40 @@ export default function Perfil() {
       setBreadcrumbs([]);
     };
   }, [fetchAddresses, setBreadcrumbs, setPageTitle]);
+
+  const submitContact = contactForm.handleSubmit(async (data) => {
+    setIsSubmitting(true);
+    try {
+      const res = await api.patch('/me', { contactPhone: data.contactPhone });
+      if (!isSuccessStatus(res.status)) throw new Error();
+      if (user) setUser({ ...user, contactPhone: data.contactPhone });
+      setContactOpen(false);
+      toast.success('Contacto actualizado');
+    } catch {
+      toast.error('Não foi possível actualizar o contacto');
+    } finally {
+      setIsSubmitting(false);
+    }
+  });
+
+  const submitPassword = passwordForm.handleSubmit(async (data) => {
+    if (data.newPassword !== data.confirmPassword) {
+      passwordForm.setError('confirmPassword', { message: 'As palavras-passe não coincidem' });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await api.patch('/me/password', { newPassword: data.newPassword });
+      if (!isSuccessStatus(res.status) && res.status !== 204) throw new Error();
+      passwordForm.reset();
+      setPasswordOpen(false);
+      toast.success('Palavra-passe alterada com sucesso');
+    } catch {
+      toast.error('Não foi possível alterar a palavra-passe');
+    } finally {
+      setIsSubmitting(false);
+    }
+  });
 
   const handleSetDefault = useCallback(
     async (id: string) => {
@@ -78,6 +133,87 @@ export default function Perfil() {
 
   return (
     <section id="perfil-page" className="flex flex-col gap-6">
+      {/* User info card */}
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <h2 className="text-lg font-semibold text-secondary mb-4">Dados Pessoais</h2>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p className="font-medium text-foreground">
+              {user?.firstName} {user?.lastName}
+            </p>
+            <p className="text-sm text-muted-foreground">{user?.email}</p>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Phone className="size-3.5" />
+              <span>{user?.contactPhone || '—'}</span>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <DialogForm<ContactFormData>
+              title="Editar Contacto"
+              confirmText="Guardar"
+              loading={isSubmitting}
+              errors={contactForm.formState.errors}
+              onConfirm={submitContact}
+              open={contactOpen}
+              onOpenChange={(open) => {
+                setContactOpen(open);
+                if (!open) contactForm.reset({ contactPhone: user?.contactPhone ?? '' });
+              }}
+              trigger={<Button variant="outline" size="sm">Editar Contacto</Button>}
+            >
+              <Input
+                placeholder="Contacto telefónico*"
+                className={contactForm.formState.errors.contactPhone ? 'border-red-500' : ''}
+                {...contactForm.register('contactPhone', { required: 'Campo obrigatório' })}
+              />
+            </DialogForm>
+
+            <DialogForm<PasswordFormData>
+              title="Alterar Palavra-passe"
+              confirmText="Alterar"
+              loading={isSubmitting}
+              errors={passwordForm.formState.errors}
+              onConfirm={submitPassword}
+              open={passwordOpen}
+              onOpenChange={(open) => {
+                setPasswordOpen(open);
+                if (!open) passwordForm.reset();
+              }}
+              trigger={<Button variant="outline" size="sm">Alterar Palavra-passe</Button>}
+            >
+              <div className="flex flex-col gap-3">
+                <Input
+                  type="password"
+                  placeholder="Nova palavra-passe*"
+                  className={passwordForm.formState.errors.newPassword ? 'border-red-500' : ''}
+                  {...passwordForm.register('newPassword', {
+                    required: 'Campo obrigatório',
+                    minLength: { value: 6, message: 'Mínimo 6 caracteres' },
+                  })}
+                />
+                {passwordForm.formState.errors.newPassword && (
+                  <p className="text-xs text-destructive">
+                    {passwordForm.formState.errors.newPassword.message}
+                  </p>
+                )}
+                <Input
+                  type="password"
+                  placeholder="Confirmar palavra-passe*"
+                  className={passwordForm.formState.errors.confirmPassword ? 'border-red-500' : ''}
+                  {...passwordForm.register('confirmPassword', { required: 'Campo obrigatório' })}
+                />
+                {passwordForm.formState.errors.confirmPassword && (
+                  <p className="text-xs text-destructive">
+                    {passwordForm.formState.errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+            </DialogForm>
+          </div>
+        </div>
+      </div>
+
+      {/* Address section */}
       <div className="flex justify-end">
         <AddressForm onSave={fetchAddresses} />
       </div>
