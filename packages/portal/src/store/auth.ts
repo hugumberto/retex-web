@@ -11,9 +11,13 @@ export const createAuthSlice = (
   setRefreshToken: (t) => set({ refreshToken: t }),
   setUser: (u) => set({ user: u }),
   logout: async () => {
-    set({ accessToken: null, user: null });
+    set({ accessToken: null, refreshToken: null, user: null });
     document.cookie = 'retex_session=; max-age=0; path=/; SameSite=Lax';
-    // limpa refresh cookie no servidor
-    await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+    document.cookie = 'sidebar_state=; max-age=0; path=/; SameSite=Strict';
+    localStorage.removeItem('app-storage');
+    try {
+      await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch { /* ignore network errors on logout */ }
+    window.location.replace('/auth/login');
   },
 });

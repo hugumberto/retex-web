@@ -7,6 +7,8 @@ import {
   UserIcon,
   RefreshCw,
   HandHelping,
+  CircleUser,
+  MapPin,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -62,6 +64,18 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/portal/user',
     label: 'UTILIZADOR',
     icon: UserIcon,
+    roles: [Role.ADMIN],
+  },
+  {
+    href: '/portal/perfil',
+    label: 'PERFIL',
+    icon: CircleUser,
+    roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+  },
+  {
+    href: '/portal/zona',
+    label: 'ZONA',
+    icon: MapPin,
     roles: [Role.ADMIN],
   },
 ];

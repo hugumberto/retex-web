@@ -13,6 +13,7 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal/storage-unit', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/brand', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/user', roles: [Role.ADMIN] },
+  { path: '/portal/zona', roles: [Role.ADMIN] },
 ];
 
 const matchesRoute = (pathname: string, routePath: string) => {

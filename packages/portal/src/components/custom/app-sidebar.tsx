@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Info } from 'lucide-react';
+import { Bell, Info, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -99,14 +99,21 @@ export function AppSidebar() {
 
         <div className="mt-6 flex items-center gap-3">
           <div
-            className="size-10 rounded-full"
+            className="size-10 rounded-full shrink-0"
             style={{
               background: 'linear-gradient(180deg, #0b6b79 0%, #00364a 100%)',
             }}
           />
-          <div className="text-sm font-semibold">
+          <div className="text-sm font-semibold min-w-0 truncate flex-1">
             {user ? `${user.firstName} ${user.lastName}` : 'Utilizador'}
           </div>
+          <button
+            onClick={() => useAppStore.getState().logout()}
+            title="Terminar sessão"
+            className="shrink-0 text-secondary hover:text-destructive transition-colors"
+          >
+            <LogOut className="size-4" />
+          </button>
         </div>
       </SidebarFooter>
 

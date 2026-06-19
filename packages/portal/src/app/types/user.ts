@@ -1,5 +1,22 @@
 import { Entity } from "./helper";
 
+export interface AddressDTO {
+  id: string;
+  userId: string;
+  street: string;
+  number: string;
+  complement?: string;
+  city: string;
+  cityDivision: string;
+  country: string;
+  countryDivision: string;
+  zipCode: string;
+  lat: number;
+  long: number;
+  isDefault: boolean;
+  isInServiceZone: boolean;
+}
+
 export interface UserDTO extends Entity {
   firstName: string;
   lastName: string;
