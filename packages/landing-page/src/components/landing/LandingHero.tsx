@@ -1,26 +1,10 @@
+import { Header } from '@/components/landing/Header';
 import Image from 'next/image';
-import NavCtaLink from './NavCtaLink';
 
 export default function LandingHero() {
   return (
     <section className="landing-hero">
-      <header className="landing-header">
-        <Image
-          src="/assets/logo.png"
-          alt="RETEX"
-          width={196}
-          height={53}
-          className="landing-logo"
-          priority
-        />
-        <nav className="landing-nav">
-          <a href="#como-funciona">Como funciona</a>
-          <a href="#servicos">Serviços</a>
-          <a href="#blog">Blog</a>
-          <a href="#faq">FAQ</a>
-          <NavCtaLink />
-        </nav>
-      </header>
+      <Header />
       <Image
         src="/assets/new-layout/FUNDO_HOMEPAGE.jpg"
         alt=""
