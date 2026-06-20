@@ -17,8 +17,8 @@ export const Header = () => {
         />
       </Link>
       <nav className="landing-nav">
-        <Link href="#como-funciona">Como funciona</Link>
-        <Link href="#servicos">Serviços</Link>
+        <Link href="/#como-funciona">Como funciona</Link>
+        <Link href="/#servicos">Serviços</Link>
         <Link href="/blog">Blog</Link>
         <Link href="/faq">FAQ&apos;s</Link>
         <NavCtaLink />

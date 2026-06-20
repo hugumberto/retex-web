@@ -3,22 +3,29 @@ import { useEffect, useState } from 'react';
 
 export default function NavCtaLink() {
   const [href, setHref] = useState('/register');
+  const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
-    const hasSession = document.cookie
+    const session = document.cookie
       .split(';')
       .some((c) => c.trim().startsWith('retex_session=1'));
-    if (hasSession) {
+    setHasSession(session);
+    if (session) {
       const base = process.env.NEXT_PUBLIC_PORTAL_URL?.trim() ?? '';
-      setHref(base ? `${base}/portal` : '/register');
+      if (base) {
+        setHref(`${base}/portal`);
+      }
     }
   }, []);
+
+  // Login (sessão ativa + portal) abre numa nova aba; registo abre na mesma aba.
+  const isLogin = hasSession && href !== '/register';
 
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={isLogin ? '_blank' : undefined}
+      rel={isLogin ? 'noopener noreferrer' : undefined}
       className="nav-cta-btn"
     >
       Registo/Login

@@ -24,14 +24,15 @@ type ResetPasswordFormData = {
 export default function LoginPage() {
   const router = useRouter();
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const isDev = process.env.NODE_ENV !== 'production';
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     defaultValues: {
-      email: 'admin@retex.pt',
-      password: '123456',
+      email: isDev ? (process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL ?? '') : '',
+      password: isDev ? (process.env.NEXT_PUBLIC_DEV_LOGIN_PASSWORD ?? '') : '',
     },
   });
   const {
