@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Boxes,
   Tag,
+  Tags,
   UserIcon,
   RefreshCw,
   HandHelping,
@@ -11,21 +12,39 @@ import {
   MapPin,
   HelpCircle,
   NewspaperIcon,
+  Globe,
+  Settings,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
 
-export type NavItem = {
+export type NavLeaf = {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   roles: Role[];
 };
 
+export type NavGroup = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: Role[];
+  children: NavLeaf[];
+};
+
+export type NavEntry = NavLeaf | NavGroup;
+
+/** Backwards-compatible alias. */
+export type NavItem = NavLeaf;
+
+export function isNavGroup(entry: NavEntry): entry is NavGroup {
+  return (entry as NavGroup).children !== undefined;
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-export const NAV_ITEMS: NavItem[] = [
+export const NAV_ITEMS: NavEntry[] = [
   {
     href: '/portal',
     label: 'HOME',
@@ -63,35 +82,54 @@ export const NAV_ITEMS: NavItem[] = [
     roles: [Role.ADMIN, Role.OPS],
   },
   {
-    href: '/portal/user',
-    label: 'UTILIZADOR',
-    icon: UserIcon,
-    roles: [Role.ADMIN],
+    label: 'LANDING PAGE',
+    icon: Globe,
+    roles: [Role.ADMIN, Role.OPS],
+    children: [
+      {
+        href: '/portal/blog',
+        label: 'Blog',
+        icon: NewspaperIcon,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+      {
+        href: '/portal/blog-categories',
+        label: 'Categorias',
+        icon: Tags,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+      {
+        href: '/portal/faq',
+        label: 'FAQ',
+        icon: HelpCircle,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+    ],
   },
   {
-    href: '/portal/perfil',
-    label: 'PERFIL',
-    icon: CircleUser,
+    label: 'CONFIGURAÇÕES',
+    icon: Settings,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
-  },
-  {
-    href: '/portal/zona',
-    label: 'ZONA',
-    icon: MapPin,
-    roles: [Role.ADMIN],
-  },
-  {
-    href: '/portal/faq',
-    label: 'FAQ',
-    icon: HelpCircle,
-    roles: [Role.ADMIN, Role.OPS],
-  },
-
-  {
-    href: '/portal/blog',
-    label: 'BLOG',
-    icon: NewspaperIcon,
-    roles: [Role.ADMIN, Role.OPS],
+    children: [
+      {
+        href: '/portal/perfil',
+        label: 'Conta',
+        icon: CircleUser,
+        roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+      },
+      {
+        href: '/portal/user',
+        label: 'Utilizadores',
+        icon: UserIcon,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/zona',
+        label: 'Zonas',
+        icon: MapPin,
+        roles: [Role.ADMIN],
+      },
+    ],
   },
 ];
 

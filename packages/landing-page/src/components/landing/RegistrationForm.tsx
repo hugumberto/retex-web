@@ -116,8 +116,13 @@ export default function RegistrationForm() {
         return;
       }
       if (!res.ok) throw new Error();
+      const body = await res.json().catch(() => null);
       setMessageTone('success');
-      setMessage('Registo realizado com sucesso! Pode agora fazer login.');
+      setMessage(
+        body?.inServiceZone
+          ? 'Registo realizado! Enviámos um email para definir a sua password e ativar a conta. Verifique a sua caixa de entrada.'
+          : 'Registo realizado! O seu endereço está fora da zona de atuação — iremos notificá-lo por email assim que estiver disponível.'
+      );
     } catch {
       setMessageTone('error');
       setMessage('Erro ao realizar o registo. Tente novamente.');

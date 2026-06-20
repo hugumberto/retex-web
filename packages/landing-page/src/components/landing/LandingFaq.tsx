@@ -23,7 +23,9 @@ export default function LandingFaq() {
       .then((data: Array<{ category: FaqCategory }>) =>
         setCategories(data.map((d) => d.category))
       )
-      .catch(() => {});
+      .catch(() => {
+        /* secção fica escondida quando a API não responde */
+      });
   }, []);
 
   if (categories.length === 0) return null;

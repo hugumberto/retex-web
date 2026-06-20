@@ -14,7 +14,7 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import { TrashIcon } from 'lucide-react';
+import { SendIcon, TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import ZonaForm from './zona-form';
@@ -65,6 +65,23 @@ export default function Zona() {
     [handleDelete]
   );
 
+  const handleNotify = useCallback(async (id: string) => {
+    setIsSubmitting(true);
+    await toast.promise(
+      (async () => {
+        const res = await api.post<{ notified: number }>(`/zone/${id}/notify`);
+        if (!isSuccessStatus(res.status)) throw new Error('Erro ao notificar');
+        return res.data?.notified ?? 0;
+      })(),
+      {
+        loading: 'A notificar utilizadores...',
+        success: (n: number) => `${n} utilizador(es) notificado(s)`,
+        error: () => 'Não foi possível notificar os utilizadores',
+      }
+    );
+    setIsSubmitting(false);
+  }, []);
+
   useEffect(() => {
     setPageTitle('Zonas de Actuação');
     setBreadcrumbs([{ label: 'Zonas de Actuação', href: '/portal/zona' }]);
@@ -102,19 +119,38 @@ export default function Zona() {
                     {new Date(zone.createdAt).toLocaleDateString('pt-PT')}
                   </TableCell>
                   <TableCell>
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isSubmitting}
-                          className="size-8"
-                        >
-                          <TrashIcon />
-                        </Button>
-                      }
-                      onConfirm={() => handleDeleteWithToast(zone.id)}
-                    />
+                    <div className="flex items-center gap-1">
+                      <ConfirmDialog
+                        title="Notificar utilizadores"
+                        description="Enviar email de ativação a todos os utilizadores inativos desta zona para definirem a password?"
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8"
+                            title="Notificar utilizadores inativos"
+                          >
+                            <SendIcon />
+                          </Button>
+                        }
+                        onConfirm={() => handleNotify(zone.id)}
+                      />
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8"
+                            title="Eliminar zona"
+                          >
+                            <TrashIcon />
+                          </Button>
+                        }
+                        onConfirm={() => handleDeleteWithToast(zone.id)}
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

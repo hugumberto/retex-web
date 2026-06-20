@@ -1,12 +1,7 @@
 'use client';
-import BlogForm from './blog-form';
+
+import BlogCrud from './blog';
 
 export default function BlogPage() {
-  return (
-    <BlogForm
-      onSave={() => {
-        console.log('Blog post saved!');
-      }}
-    />
-  );
+  return <BlogCrud />;
 }

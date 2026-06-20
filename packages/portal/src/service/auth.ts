@@ -40,6 +40,13 @@ export async function bootstrapAuth() {
   }
 }
 
+export async function activateUser(token: string, password: string) {
+  const { status } = await api.post('/user/activate', { token, password });
+  if (!isSuccessStatus(status)) {
+    throw new Error('Erro ao ativar conta');
+  }
+}
+
 export async function resetUserPassword(email: string, password: string) {
   const { status } = await api.put('/user/reset-password', {
     email,
