@@ -47,6 +47,20 @@ export async function activateUser(token: string, password: string) {
   }
 }
 
+export async function forgotPassword(email: string) {
+  const { status } = await api.post('/user/forgot-password', { email });
+  if (!isSuccessStatus(status)) {
+    throw new Error('Erro ao pedir reposição de senha');
+  }
+}
+
+export async function resetPasswordWithToken(token: string, password: string) {
+  const { status } = await api.post('/user/reset-password', { token, password });
+  if (!isSuccessStatus(status)) {
+    throw new Error('Erro ao repor a senha');
+  }
+}
+
 export async function resetUserPassword(email: string, password: string) {
   const { status } = await api.put('/user/reset-password', {
     email,

@@ -1,6 +1,6 @@
 'use client';
 
-import { login, resetUserPassword } from '@/service/auth';
+import { forgotPassword, login } from '@/service/auth';
 import { DialogForm } from '@/components/form/dialog-form';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,6 @@ type LoginFormData = {
 
 type ResetPasswordFormData = {
   email: string;
-  password: string;
 };
 
 export default function LoginPage() {
@@ -43,7 +42,6 @@ export default function LoginPage() {
   } = useForm<ResetPasswordFormData>({
     defaultValues: {
       email: '',
-      password: '',
     },
   });
 
@@ -57,18 +55,17 @@ export default function LoginPage() {
   }
 
   async function onResetPasswordSubmit(data: ResetPasswordFormData) {
-    await toast.promise(
-      async () => {
-        await resetUserPassword(data.email, data.password);
-        reset();
-        setIsResetModalOpen(false);
-      },
-      {
-        loading: 'Resetando senha...',
-        success: 'Senha resetada com sucesso',
-        error: 'Não foi possível resetar a senha',
-      }
-    );
+    try {
+      await forgotPassword(data.email);
+    } catch {
+      // Anti-enumeração: não revelamos falhas (ex.: email inexistente).
+    } finally {
+      reset();
+      setIsResetModalOpen(false);
+      toast.success(
+        'Se este email estiver registado, enviámos um link para repor a palavra-passe.'
+      );
+    }
   }
 
   return (
@@ -133,9 +130,9 @@ export default function LoginPage() {
       <DialogForm<ResetPasswordFormData>
         open={isResetModalOpen}
         onOpenChange={setIsResetModalOpen}
-        title="Resetar senha"
-        description="Informe seu email e defina uma nova senha para acessar o portal."
-        confirmText="Resetar"
+        title="Repor palavra-passe"
+        description="Indique o seu email. Se estiver registado, enviámos um link para repor a palavra-passe."
+        confirmText="Enviar link"
         loading={isResetSubmitting}
         errors={resetErrors}
         onConfirm={handleResetSubmit(onResetPasswordSubmit)}
@@ -160,34 +157,6 @@ export default function LoginPage() {
             {resetErrors.email?.message && (
               <p className="mt-1 text-xs text-red-500">
                 {resetErrors.email.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-secondary">
-              Nova senha
-            </label>
-            <Input
-              type="password"
-              placeholder="Informe a nova senha"
-              className={`mt-1 ${resetErrors.password ? 'border-red-500' : ''}`}
-              {...register('password', {
-                required: 'A nova senha é obrigatória',
-                minLength: {
-                  value: 8,
-                  message: 'A senha deve ter pelo menos 8 caracteres',
-                },
-                pattern: {
-                  value: /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/,
-                  message:
-                    'A senha deve conter ao menos 1 letra maiúscula, 1 número e 1 caractere especial',
-                },
-              })}
-            />
-            {resetErrors.password?.message && (
-              <p className="mt-1 text-xs text-red-500">
-                {resetErrors.password.message}
               </p>
             )}
           </div>
