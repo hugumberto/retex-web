@@ -109,7 +109,7 @@ export function ColorHighlightPopoverContent({
     items: menuItems,
     orientation: "both",
     onSelect: (item) => {
-      if (!containerRef.current) return false
+      if (!containerRef.current) return
       const highlightedElement = containerRef.current.querySelector(
         '[data-highlighted="true"]'
       ) as HTMLElement

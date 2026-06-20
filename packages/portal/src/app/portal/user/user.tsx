@@ -59,8 +59,6 @@ export default function User() {
           lastName: user.lastName,
           email: user.email,
           contactPhone: user.contactPhone,
-          documentNumber: user.documentNumber,
-          password: user.documentNumber,
           status: 'INACTIVE',
         });
         if (!isSuccessStatus(res.status)) {
@@ -126,7 +124,6 @@ export default function User() {
                         lastName: user.lastName,
                         email: user.email,
                         contactPhone: user.contactPhone,
-                        documentNumber: user.documentNumber,
                         role: user.roles.map((role) => role.role),
                       }}
                       onSave={fetchData}

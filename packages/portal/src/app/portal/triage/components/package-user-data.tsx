@@ -59,15 +59,6 @@ export default function PackageUserData({
           </p>
         </div>
 
-        <div className="rounded-xl border border-secondary/20 bg-secondary-muted/10 p-4">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-secondary/70">
-            Número de Documento
-          </p>
-          <p className="text-sm font-medium text-secondary">
-            {user?.documentNumber || '-'}
-          </p>
-        </div>
-
         <div className="rounded-xl border border-secondary/20 bg-secondary-muted/10 p-4 sm:col-span-2">
           <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-secondary/70">
             Endereço
