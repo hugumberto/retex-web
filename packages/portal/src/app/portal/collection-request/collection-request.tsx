@@ -31,6 +31,7 @@ interface AdminFormData {
   lastName: string;
   email: string;
   contactPhone: string;
+  estimatedVolumes: string;
   address: {
     street: string;
     number: string;
@@ -47,6 +48,7 @@ interface AdminFormData {
 
 interface UserFormData {
   addressId: string;
+  estimatedVolumes: string;
 }
 
 
@@ -66,10 +68,10 @@ export default function CollectionRequest() {
   );
 
   const [userFormOpen, setUserFormOpen] = useState(false);
-  const userForm = useForm<UserFormData>({ defaultValues: { addressId: '' } });
+  const userForm = useForm<UserFormData>({ defaultValues: { addressId: '', estimatedVolumes: '' } });
   const adminForm = useForm<AdminFormData>({
     defaultValues: {
-      firstName: '', lastName: '', email: '', contactPhone: '',
+      firstName: '', lastName: '', email: '', contactPhone: '', estimatedVolumes: '',
       address: { street: '', number: '', complement: '', city: '', cityDivision: '', country: '', countryDivision: '', zipCode: '', lat: '', long: '' },
     },
   });
@@ -120,7 +122,11 @@ export default function CollectionRequest() {
   const submitUser = userForm.handleSubmit(async (data) => {
     setIsSubmitting(true);
     try {
-      const response = await api.post('/package', { userId: user!.id, addressId: data.addressId });
+      const response = await api.post('/package', {
+        userId: user!.id,
+        addressId: data.addressId,
+        estimatedVolumes: Number(data.estimatedVolumes),
+      });
       if (!isSuccessStatus(response.status) && response.status !== 409) throw new Error();
       userForm.reset();
       await fetchRequests();
@@ -139,6 +145,7 @@ export default function CollectionRequest() {
       async () => {
         const response = await api.post('/package', {
           ...data,
+          estimatedVolumes: Number(data.estimatedVolumes),
           address: {
             street: data.address.street, city: data.address.city, cityDivision: data.address.cityDivision,
             country: data.address.country, countryDivision: data.address.countryDivision,
@@ -255,6 +262,23 @@ export default function CollectionRequest() {
                     </div>
                   )}
                 />
+                <div>
+                  <Input
+                    type="number"
+                    min={1}
+                    placeholder="Estimativa de volumes*"
+                    className={userForm.formState.errors.estimatedVolumes ? 'border-red-500' : ''}
+                    {...userForm.register('estimatedVolumes', {
+                      required: 'Campo obrigatório',
+                      min: { value: 1, message: 'Mínimo 1 volume' },
+                    })}
+                  />
+                  {userForm.formState.errors.estimatedVolumes && (
+                    <p className="text-xs text-destructive mt-1">
+                      {userForm.formState.errors.estimatedVolumes.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </DialogForm>
           ) : (
@@ -298,6 +322,7 @@ export default function CollectionRequest() {
               <Input tabIndex={12} placeholder="Complemento Morada" {...adminRegister('address.complement')} />
               <Input tabIndex={13} placeholder="Latitude*" className={adminErrors.address?.lat ? 'border-red-500' : ''} {...adminRegister('address.lat', { required: 'Campo obrigatório' })} />
               <Input tabIndex={14} placeholder="Longitude*" className={adminErrors.address?.long ? 'border-red-500' : ''} {...adminRegister('address.long', { required: 'Campo obrigatório' })} />
+              <Input tabIndex={15} type="number" min={1} placeholder="Estimativa de volumes*" className={adminErrors.estimatedVolumes ? 'border-red-500' : ''} {...adminRegister('estimatedVolumes', { required: 'Campo obrigatório', min: { value: 1, message: 'Mínimo 1 volume' } })} />
             </div>
           </DialogForm>
         )}
@@ -313,6 +338,7 @@ export default function CollectionRequest() {
                 <TableHead>Email</TableHead>
                 <TableHead>Contacto</TableHead>
                 <TableHead>Morada</TableHead>
+                <TableHead>Volumes (est.)</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Acção</TableHead>
               </TableRow>
@@ -325,6 +351,7 @@ export default function CollectionRequest() {
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
                     <TableCell>{request.user?.contactPhone ?? '-'}</TableCell>
                     <TableCell>{`${request.address?.street ?? '-'} ${request.address?.number ?? ''}`.trim()}</TableCell>
+                    <TableCell>{request.estimatedVolumes ?? '-'}</TableCell>
                     <TableCell>{request.status}</TableCell>
                     <TableCell>
                       {(request.status === PackageStatus.CREATED || request.status === PackageStatus.OUT_OF_ZONE) && (
@@ -342,7 +369,7 @@ export default function CollectionRequest() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
                     Nenhum registro encontrado!
                   </TableCell>
                 </TableRow>

@@ -22,6 +22,7 @@ export interface PackageDTO extends Entity {
   user: UserDTO
   route?: PackageCollectionDTO
   weight?: number
+  estimatedVolumes?: number
   collectDay: string
   collectTime: string
   address: Address
