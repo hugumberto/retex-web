@@ -17,10 +17,10 @@ export default function LandingFooter() {
         </div>
 
         <nav className="footer-col--nav">
-          <a href="#como-funciona">COMO FUNCIONA</a>
-          <a href="#faq">FAQ&apos;S</a>
-          <a href="#blog">BLOG</a>
-          <a href="#sobre-nos">SOBRE NÓS</a>
+          <a href="/#como-funciona">COMO FUNCIONA</a>
+          <a href="/faq">FAQ&apos;S</a>
+          <a href="/#blog">BLOG</a>
+          <a href="/#sobre-nos">SOBRE NÓS</a>
         </nav>
 
         <div className="footer-col--contact">
