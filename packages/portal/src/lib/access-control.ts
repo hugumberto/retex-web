@@ -17,6 +17,7 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal/faq', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/blog', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/blog-categories', roles: [Role.ADMIN, Role.OPS] },
+  { path: '/portal/perfil', roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER] },
 ];
 
 const matchesRoute = (pathname: string, routePath: string) => {
@@ -37,8 +38,9 @@ export const getUserRoles = (user: UserDTO | null): Role[] => {
 export const canAccessPath = (pathname: string, user: UserDTO | null): boolean => {
   const permission = ROUTE_PERMISSIONS.find((route) => matchesRoute(pathname, route.path));
 
+  // Negar por omissão: rotas não listadas não são acessíveis (defesa em profundidade).
   if (!permission) {
-    return true;
+    return false;
   }
 
   const userRoles = getUserRoles(user);
