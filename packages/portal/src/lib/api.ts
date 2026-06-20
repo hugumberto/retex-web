@@ -29,6 +29,10 @@ async function refreshAccessToken(): Promise<string | null> {
       }
     );
     if (!isSuccessStatus(status)) return null;
+    // O backend roda o refresh token a cada refresh (revoga o antigo e devolve
+    // um novo). É obrigatório guardar o novo, senão o próximo refresh dá 401.
+    const newRefresh = data.refresh_token ?? data.refreshToken ?? null;
+    if (newRefresh) useAppStore.getState().setRefreshToken(newRefresh);
     return data.access_token ?? data.accessToken ?? null;
   } catch {
     return null;

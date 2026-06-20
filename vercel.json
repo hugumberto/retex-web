@@ -1,4 +1,4 @@
 {
   "installCommand": "npm install --include=dev",
-  "buildCommand": "npx nx build landing-page"
+  "buildCommand": "npx nx build ${NX_APP:-landing-page}"
 }

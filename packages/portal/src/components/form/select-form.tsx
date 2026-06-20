@@ -56,7 +56,11 @@ export function SelectForm<T extends FieldValues>({
         rules={rules}
         render={({ field }) => (
           <>
-            <Select onValueChange={field.onChange} value={field.value}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value != null ? String(field.value) : undefined}
+            >
+
               <SelectTrigger
                 id={id || name}
                 className={`mt-1 w-full px-3 py-2 border ${

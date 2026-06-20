@@ -51,9 +51,6 @@ describe('ContactForm', () => {
     fireEvent.change(screen.getByRole('textbox', { name: /nome/i }), {
       target: { value: 'Ana Silva' },
     });
-    fireEvent.change(screen.getByRole('textbox', { name: /nif/i }), {
-      target: { value: '123456789' },
-    });
     fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
       target: { value: 'ana@example.com' },
     });
