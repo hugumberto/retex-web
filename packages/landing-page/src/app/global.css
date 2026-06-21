@@ -498,6 +498,22 @@ a.nav-cta-btn:hover {
     grid-template-columns: 1fr;
   }
 
+  /* Empilha como o mockup: cada serviço = imagem em cima + texto à esquerda,
+     com Particulares primeiro. Ordem no DOM: 1=Empresas-txt, 2=img Empresas,
+     3=img Particulares, 4=Particulares-txt. */
+  .landing-grid-two > :nth-child(1) {
+    order: 4;
+  }
+  .landing-grid-two > :nth-child(2) {
+    order: 3;
+  }
+  .landing-grid-two > :nth-child(3) {
+    order: 1;
+  }
+  .landing-grid-two > :nth-child(4) {
+    order: 2;
+  }
+
   .icon-cards {
     grid-template-columns: 1fr;
   }
@@ -592,6 +608,29 @@ a.nav-cta-btn:hover {
 
 .primary-pill:hover {
   opacity: 0.92;
+}
+
+/* Serviços em mobile: texto alinhado à esquerda (depois das regras base
+   para vencer por ordem de origem, já que media queries não somam especificidade). */
+@media (max-width: 640px) {
+  .split-text {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .split-card h3,
+  .split-card p {
+    text-align: left;
+  }
+
+  .split-card p {
+    max-width: 100%;
+  }
+
+  .landing-outline-btn {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 .who-section {
