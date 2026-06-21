@@ -278,8 +278,12 @@ a.nav-cta-btn:hover {
     display: flex;
   }
 
-  .landing-nav a {
+  .landing-nav a:not(.nav-cta-btn) {
     padding: 4px 0;
+  }
+
+  .nav-cta-btn {
+    margin-top: 4px;
   }
 }
 
