@@ -1,6 +1,12 @@
+import type { Viewport } from 'next';
 import { Montserrat, Playfair_Display } from 'next/font/google';
 import Script from 'next/script';
 import './global.css';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 const montserrat = Montserrat({
   subsets: ['latin'],
