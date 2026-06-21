@@ -15,7 +15,12 @@ export default function LandingHero() {
       />
       <div className="landing-hero-overlay" />
       <div className="landing-hero-content">
-        <h1>wear.care.share.repeat.</h1>
+        <h1 className="landing-hero-title">
+          <span>wear.</span>
+          <span>care.</span>
+          <span>share.</span>
+          <span>repeat.</span>
+        </h1>
         <p>
           Ligamos Famílias, Empresas e Municípios numa missão:
           <br />
