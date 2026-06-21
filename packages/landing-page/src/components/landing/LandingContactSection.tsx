@@ -5,9 +5,9 @@ export default function LandingContactSection() {
     <section className="landing-form" id="formulario">
       <h2>Formulário</h2>
       <p>
-        Agenda a tua recolha e dá uma nova vida aos teus têxteis.
+        <strong>Tem dúvidas? Estamos aqui para ajudar!</strong>
         <br />
-        Menos lixo no planeta, mais futuro para todos.
+        Preencha o formulário e entre em contacto connosco.
       </p>
       <ContactForm />
     </section>
