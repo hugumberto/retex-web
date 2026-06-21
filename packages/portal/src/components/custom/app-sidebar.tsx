@@ -54,7 +54,11 @@ function NavLeafItem({ item, active }: { item: NavLeaf; active: boolean }) {
   const Icon = item.icon;
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={active} className={leafButtonClasses(active)}>
+      <SidebarMenuButton
+        asChild
+        isActive={active}
+        className={leafButtonClasses(active)}
+      >
         <Link href={item.href}>
           <Icon className={cn('size-5')} />
           <Label className="text-[13px]">{item.label}</Label>
@@ -76,7 +80,9 @@ function NavGroupItem({
   const children = group.children.filter((child) =>
     child.roles.some((role) => userRoles.includes(role))
   );
-  const anyActive = children.some((child) => isPathActive(pathname, child.href));
+  const anyActive = children.some((child) =>
+    isPathActive(pathname, child.href)
+  );
   const [open, setOpen] = useState(anyActive);
 
   // Keep the group open when navigating into one of its children.
@@ -219,7 +225,7 @@ export function RetexTopBar() {
     <header className="sticky top-0 z-40 bg-white">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <SidebarTrigger className="-ml-1 md:hidden" />
-        <Title>{pageTitle || 'Page Title'}</Title>
+        <Title>{pageTitle || 'Home'}</Title>
 
         <div className="ml-auto flex items-center gap-5">
           <Bell className="size-5" />
