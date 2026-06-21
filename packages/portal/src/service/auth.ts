@@ -76,3 +76,14 @@ export async function resetUserPassword(email: string, password: string) {
     throw new Error('Erro ao resetar senha');
   }
 }
+
+/**
+ * Envia ao utilizador um email de ativação para ele (re)definir a própria senha
+ * (admin). A conta fica inativa até o utilizador concluir a ativação pelo link.
+ */
+export async function sendActivationEmail(email: string) {
+  const { status } = await api.post('/user/send-activation', { email });
+  if (!isSuccessStatus(status)) {
+    throw new Error('Erro ao enviar email de ativação');
+  }
+}

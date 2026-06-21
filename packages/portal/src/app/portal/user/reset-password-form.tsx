@@ -1,11 +1,15 @@
 'use client';
 
-import { UserDTO } from '@/app/types/user';
+import { Role, UserDTO } from '@/app/types/user';
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { DialogForm } from '@/components/form/dialog-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
+import { getUserRoles } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
+import { sendActivationEmail } from '@/service/auth';
+import { useAppStore } from '@/store';
 import { KeyRound } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -20,7 +24,46 @@ type ResetPasswordFormProps = {
   user: UserDTO;
 };
 
+const triggerButton = (
+  <Button variant="ghost" size="icon" className="size-8" title="Repor senha">
+    <KeyRound className="size-4" />
+  </Button>
+);
+
 export default function ResetPasswordForm({ user }: ResetPasswordFormProps) {
+  const { user: currentUser } = useAppStore();
+  const isAdmin = getUserRoles(currentUser).includes(Role.ADMIN);
+
+  // Admin: em vez de definir a senha manualmente, envia o email de ativação para
+  // o utilizador (re)definir a própria senha pelo link.
+  if (isAdmin) {
+    const handleSend = async () => {
+      try {
+        toast.loading('A enviar email de ativação...', { id: 'send-activation' });
+        await sendActivationEmail(user.email);
+        toast.success('Email de ativação enviado', { id: 'send-activation' });
+      } catch (error) {
+        toast.error('Não foi possível enviar o email', { id: 'send-activation' });
+        console.error('Erro ao enviar email de ativação:', error);
+      }
+    };
+
+    return (
+      <ConfirmDialog
+        trigger={triggerButton}
+        title="Enviar email de ativação"
+        description={`Vai ser enviado um email para ${user.firstName} ${user.lastName} definir uma nova senha. A conta fica inativa até concluir a ativação.`}
+        confirmText="Enviar"
+        onConfirm={handleSend}
+      />
+    );
+  }
+
+  // Fallback (não-admin): reposição manual da senha.
+  return <ManualResetForm user={user} />;
+}
+
+function ManualResetForm({ user }: ResetPasswordFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -69,16 +112,7 @@ export default function ResetPasswordForm({ user }: ResetPasswordFormProps) {
       loading={isSubmitting}
       onConfirm={handleSubmit(onSubmit)}
       errors={errors}
-      trigger={
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8"
-          title="Resetar senha"
-        >
-          <KeyRound className="size-4" />
-        </Button>
-      }
+      trigger={triggerButton}
     >
       <div className="space-y-4">
         <div>
