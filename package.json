@@ -31,6 +31,7 @@
     "@nx/js": "21.1.0",
     "@nx/next": "21.1.0",
     "@nx/react": "21.1.0",
+    "@playwright/test": "^1.61.0",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.6.0",
     "@swc/core": "~1.5.7",

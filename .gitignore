@@ -49,3 +49,6 @@ out
 test-output
 
 .env.local
+
+# Playwright visual-check screenshots (geradas localmente)
+shots/
