@@ -4,7 +4,6 @@ import LandingContactSection from '@/components/landing/LandingContactSection';
 import LandingFooter from '@/components/landing/LandingFooter';
 import LandingHero from '@/components/landing/LandingHero';
 import LandingHowItWorks from '@/components/landing/LandingHowItWorks';
-import LandingPartners from '@/components/landing/LandingPartners';
 import LandingQuote from '@/components/landing/LandingQuote';
 import LandingServices from '@/components/landing/LandingServices';
 import LandingUpcycling from '@/components/landing/LandingUpcycling';
@@ -21,7 +20,7 @@ export default function Home() {
         <LandingValues />
         <LandingQuote />
         <LandingUpcycling />
-        <LandingPartners />
+        {/* <LandingPartners /> */}
         <LandingContactSection />
         <LandingBlog />
       </div>

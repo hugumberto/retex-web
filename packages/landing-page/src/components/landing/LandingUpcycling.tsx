@@ -1,6 +1,9 @@
 export default function LandingUpcycling() {
   return (
-    <section className="upcycling-strip" aria-labelledby="upcycling-heading">
+    <section
+      className="upcycling-strip mb-12"
+      aria-labelledby="upcycling-heading"
+    >
       <p className="upcycling-banner">
         ESTA PEÇA FOI REINVENTADA COM MATERIAIS REUTILIZADOS
       </p>
@@ -13,8 +16,20 @@ export default function LandingUpcycling() {
               strokeWidth="1.6"
               strokeLinecap="round"
             />
-            <circle cx="6" cy="18" r="2" stroke="currentColor" strokeWidth="1.4" />
-            <circle cx="18" cy="18" r="2" stroke="currentColor" strokeWidth="1.4" />
+            <circle
+              cx="6"
+              cy="18"
+              r="2"
+              stroke="currentColor"
+              strokeWidth="1.4"
+            />
+            <circle
+              cx="18"
+              cy="18"
+              r="2"
+              stroke="currentColor"
+              strokeWidth="1.4"
+            />
           </svg>
         </span>
       </div>
@@ -23,10 +38,11 @@ export default function LandingUpcycling() {
           <p className="upcycling-kicker">UPCYCLING TÊXTIL</p>
           <h3 id="upcycling-heading">Dar uma nova vida ao material</h3>
           <p>
-            Na RETEX, o upcycling é a forma mais criativa de prolongar a vida dos
-            têxteis. Em vez de irem para o lixo, resíduos de produção, stock
-            excedente e uniformes antigos são transformados em novos produtos com
-            mais valor — acessórios, peças para o lar e brindes corporativos.
+            Na RETEX, o upcycling é a forma mais criativa de prolongar a vida
+            dos têxteis. Em vez de irem para o lixo, resíduos de produção, stock
+            excedente e uniformes antigos são transformados em novos produtos
+            com mais valor — acessórios, peças para o lar e brindes
+            corporativos.
           </p>
           <small>RETEX</small>
           <small className="upcycling-made">Made in Portugal</small>
@@ -89,7 +105,13 @@ export default function LandingUpcycling() {
                 stroke="currentColor"
                 strokeWidth="1.4"
               />
-              <circle cx="12" cy="12.5" r="3" stroke="currentColor" strokeWidth="1.4" />
+              <circle
+                cx="12"
+                cy="12.5"
+                r="3"
+                stroke="currentColor"
+                strokeWidth="1.4"
+              />
               <path
                 d="M7.5 7.5l9 10"
                 stroke="currentColor"
@@ -113,7 +135,13 @@ export default function LandingUpcycling() {
               <circle cx="12" cy="19" r="1.2" fill="currentColor" />
             </svg>
             <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
-              <circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.4" />
+              <circle
+                cx="12"
+                cy="12"
+                r="7"
+                stroke="currentColor"
+                strokeWidth="1.4"
+              />
               <path
                 d="M9 9l6 6M15 9l-6 6"
                 stroke="currentColor"
