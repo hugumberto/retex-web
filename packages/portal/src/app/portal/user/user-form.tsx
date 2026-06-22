@@ -67,12 +67,16 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
         if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
         userId = data.id;
       } else {
+        // Senha temporária aleatória; o utilizador define a senha real pelo
+        // email de ativação. Cumpre o mínimo de 8 caracteres exigido pela API.
+        const tempPassword = `Aa1!${crypto.randomUUID().slice(0, 12)}`;
         const { data, status } = await api.post(`/user`, {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           contactPhone: formData.contactPhone,
-          password: formData.contactPhone,
+          password: tempPassword,
+          userType: 'PERSON',
         });
         if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
         userId = data.id;
