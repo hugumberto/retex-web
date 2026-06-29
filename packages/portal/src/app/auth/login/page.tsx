@@ -11,6 +11,7 @@ import Title from '@/components/custom/title';
 import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
 
 type LoginFormData = {
   email: string;
@@ -50,8 +51,13 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password);
       router.push('/portal');
-    } catch {
-      // Optionally handle error (e.g., show toast)
+    } catch (err) {
+      const status = isAxiosError(err) ? err.response?.status : undefined;
+      toast.error(
+        status === 401
+          ? 'Email ou senha inválidos'
+          : 'Não foi possível entrar. Tente novamente mais tarde.'
+      );
     }
   }
 
