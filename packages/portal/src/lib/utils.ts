@@ -1,19 +1,136 @@
 import { clsx, type ClassValue } from 'clsx';
-import { LayoutDashboard, ClipboardList, Boxes, UserIcon } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Boxes,
+  Tag,
+  Tags,
+  UserIcon,
+  RefreshCw,
+  HandHelping,
+  CircleUser,
+  MapPin,
+  HelpCircle,
+  NewspaperIcon,
+  Globe,
+  Settings,
+} from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
+import { Role } from '@/app/types/user';
+
+export type NavLeaf = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: Role[];
+};
+
+export type NavGroup = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: Role[];
+  children: NavLeaf[];
+};
+
+export type NavEntry = NavLeaf | NavGroup;
+
+/** Backwards-compatible alias. */
+export type NavItem = NavLeaf;
+
+export function isNavGroup(entry: NavEntry): entry is NavGroup {
+  return (entry as NavGroup).children !== undefined;
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-export const NAV_ITEMS = [
-  { href: '/portal', label: 'HOME', icon: LayoutDashboard },
+export const NAV_ITEMS: NavEntry[] = [
+  {
+    href: '/portal',
+    label: 'HOME',
+    icon: LayoutDashboard,
+    roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+  },
+  {
+    href: '/portal/triage',
+    label: 'TRIAGE',
+    icon: RefreshCw,
+    roles: [Role.ADMIN, Role.OPS],
+  },
+  {
+    href: '/portal/collection-request',
+    label: 'SOLICITAR COLETA',
+    icon: HandHelping,
+    roles: [Role.ADMIN, Role.OPS, Role.USER],
+  },
   {
     href: '/portal/package-collection',
     label: 'RECOLHA',
     icon: ClipboardList,
+    roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
   },
-  { href: '/portal/storage-unit', label: 'ARMAZENAMENTO', icon: Boxes },
-  { href: '/portal/user', label: 'UTILIZADOR', icon: UserIcon },
+  {
+    href: '/portal/storage-unit',
+    label: 'ARMAZENAMENTO',
+    icon: Boxes,
+    roles: [Role.ADMIN, Role.OPS],
+  },
+  {
+    href: '/portal/brand',
+    label: 'MARCA',
+    icon: Tag,
+    roles: [Role.ADMIN, Role.OPS],
+  },
+  {
+    label: 'LANDING PAGE',
+    icon: Globe,
+    roles: [Role.ADMIN, Role.OPS],
+    children: [
+      {
+        href: '/portal/blog',
+        label: 'Blog',
+        icon: NewspaperIcon,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+      {
+        href: '/portal/blog-categories',
+        label: 'Categorias',
+        icon: Tags,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+      {
+        href: '/portal/faq',
+        label: 'FAQ',
+        icon: HelpCircle,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+    ],
+  },
+  {
+    label: 'CONFIGURAÇÕES',
+    icon: Settings,
+    roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+    children: [
+      {
+        href: '/portal/perfil',
+        label: 'Conta',
+        icon: CircleUser,
+        roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+      },
+      {
+        href: '/portal/user',
+        label: 'Utilizadores',
+        icon: UserIcon,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/zona',
+        label: 'Zonas',
+        icon: MapPin,
+        roles: [Role.ADMIN],
+      },
+    ],
+  },
 ];
 
 export function isSuccessStatus(status: number): boolean {

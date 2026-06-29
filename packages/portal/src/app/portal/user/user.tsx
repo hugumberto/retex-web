@@ -1,5 +1,6 @@
 'use client';
 
+import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -11,50 +12,46 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
-import { PencilIcon, TrashIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { UserDTO, UserFormData } from '../../types/user';
+import { useAppStore } from '@/store';
+import { TrashIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { UserDTO } from '../../types/user';
 import UserForm from './user-form';
+import ResetPasswordForm from './reset-password-form';
 
 export default function User() {
-  const [showForm, setShowForm] = useState(false);
+  const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [users, setUsers] = useState<UserDTO[]>([]);
-  const [editingUser, setEditingUser] = useState<UserFormData | undefined>();
-  const fetchData = async () => {
-    const { data, status } = await api.get<UserDTO[]>(`/user`);
-    if (!isSuccessStatus(status)) {
-      console.error('Failed to fetch users');
-      return;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const { data, status } = await api.get<UserDTO[]>('/user');
+      if (!isSuccessStatus(status)) {
+        throw new Error('Erro ao buscar utilizadores');
+      }
+      setUsers(data);
+    } catch (error) {
+      console.error('Erro ao buscar utilizadores:', error);
+      toast.error('Não foi possível carregar os utilizadores');
     }
-    setUsers(data);
-  };
-  useEffect(() => {
-    fetchData();
   }, []);
-  const handleToggleForm = (userToEdit?: UserDTO) => {
-    if (userToEdit) {
-      setEditingUser({
-        id: userToEdit.id,
-        firstName: userToEdit.firstName,
-        lastName: userToEdit.lastName,
-        email: userToEdit.email,
-        contactPhone: userToEdit.contactPhone,
-        documentNumber: userToEdit.documentNumber,
-        role: userToEdit.roles.map((role) => role.role),
-      });
-    } else {
-      setEditingUser(undefined);
-    }
-    setShowForm((prev) => !prev);
-  };
 
-  const handleFormClose = () => {
-    setShowForm(false);
-    setEditingUser(undefined);
-  };
+  useEffect(() => {
+    setPageTitle('Utilizador');
+    setBreadcrumbs([{ label: 'Utilizador', href: '/portal/user' }]);
+    fetchData();
 
-  const handleDeleteUser = async (user: UserDTO) => {
-    if (window.confirm('Tem certeza que deseja eliminar este usuário?')) {
+    return () => {
+      setPageTitle('');
+      setBreadcrumbs([]);
+    };
+  }, [fetchData, setBreadcrumbs, setPageTitle]);
+
+  const handleDeleteUser = useCallback(
+    async (user: UserDTO) => {
+      setIsSubmitting(true);
       try {
         const res = await api.put(`/user/${user.id}`, {
           id: user.id,
@@ -62,65 +59,54 @@ export default function User() {
           lastName: user.lastName,
           email: user.email,
           contactPhone: user.contactPhone,
-          documentNumber: user.documentNumber,
-          password: user.documentNumber,
           status: 'INACTIVE',
         });
-        if (!isSuccessStatus(res.status))
-          throw new Error('Erro ao eliminar usuário');
+        if (!isSuccessStatus(res.status)) {
+          throw new Error('Erro ao eliminar utilizador');
+        }
         await fetchData();
       } catch (error) {
-        console.error('Erro ao eliminar usuário:', error);
+        console.error('Erro ao eliminar utilizador:', error);
+        throw error;
+      } finally {
+        setIsSubmitting(false);
       }
-    }
-  };
+    },
+    [fetchData]
+  );
+
+  const handleDeleteWithToast = useCallback(
+    async (user: UserDTO) => {
+      await toast.promise(handleDeleteUser(user), {
+        loading: 'Carregando...',
+        success: () => 'Utilizador eliminado com sucesso',
+        error: () => 'Erro ao eliminar o utilizador',
+      });
+    },
+    [handleDeleteUser]
+  );
 
   return (
-    <section
-      id="user-page"
-      className="py-16 px-4 flex flex-col items-center min-h-[calc(100vh-80px)]"
-    >
-      <h1 className="text-4xl md:text-5xl font-bold text-center text-neutral-950 mb-8">
-        Usuário
-      </h1>
+    <section id="user-page" className="flex flex-col items-center">
+      <div className="w-full flex justify-end">
+        <UserForm onSave={fetchData} />
+      </div>
 
-      <Button
-        className="mt-6 mb-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-        onClick={() => handleToggleForm()}
-      >
-        {showForm ? 'Fechar Formulário' : 'Criar Novo Usuário'}
-      </Button>
-
-      {showForm ? (
-        <UserForm
-          onFormClose={handleFormClose}
-          initialData={editingUser}
-          onSave={() => {
-            setShowForm(false);
-            setEditingUser(undefined);
-            fetchData();
-          }}
-        />
-      ) : (
-        <div className="mt-8 w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-          <Table>
-            <caption className="p-4 text-left text-sm text-gray-500">
-              Detalhes dos Usuários.
-            </caption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>id</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Perfil</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users?.map((user) => (
+      <div className="mt-4 w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Perfil</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.length > 0 ? (
+              users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.id}</TableCell>
                   <TableCell>
                     {user.firstName} {user.lastName}
                   </TableCell>
@@ -131,41 +117,47 @@ export default function User() {
                   <TableCell>{user.status}</TableCell>
 
                   <TableCell className="space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handleToggleForm(user)}
-                    >
-                      <PencilIcon className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handleDeleteUser(user)}
-                    >
-                      <TrashIcon className="size-4" />
-                    </Button>
+                    <UserForm
+                      initialData={{
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email,
+                        contactPhone: user.contactPhone,
+                        role: user.roles.map((role) => role.role),
+                      }}
+                      onSave={fetchData}
+                    />
+                    <ResetPasswordForm user={user} />
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8"
+                          disabled={isSubmitting}
+                        >
+                          <TrashIcon className="size-4" />
+                        </Button>
+                      }
+                      onConfirm={() => handleDeleteWithToast(user)}
+                    />
                   </TableCell>
                 </TableRow>
-              ))}
-              {users.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-sm text-gray-500"
-                  >
-                    {
-                      'Nenhum usuário encontrado. Clique em "Criar Novo Usuário" para adicionar um.'
-                    }
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-6 text-muted-foreground"
+                >
+                  Nenhum registro encontrado!
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </section>
   );
 }
