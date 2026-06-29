@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function LandingServices() {
   return (
@@ -6,15 +7,19 @@ export default function LandingServices() {
       <article className="split-card split-text split-text--empresas">
         <h3>Empresas e Municípios</h3>
         <p>
-          A nossa solução permite às empresas e municípios fortalecerem a sua
-          responsabilidade ambiental através de Créditos de Circularidade, ativos
-          digitais que refletem o impacto positivo de doações têxteis e podem ser
-          usados para compensar emissões, com visibilidade para os teus
-          indicadores ESG e dashboards de impacto.
+          A nossa solução permite a municípios e empresas reforçarem a gestão
+          sustentável dos têxteis através de um sistema de recolha seletiva e
+          economia circular. Os municípios beneficiam de maior desvio de
+          resíduos têxteis de aterro, melhoria das taxas de reciclagem e acesso
+          a dados de impacto ambiental através de dashboards digitais. As
+          empresas, por sua vez, podem obter Créditos de Circularidade
+          associados à recolha e valorização de têxteis, apoiando a compensação
+          de emissões e o reporte de indicadores ESG de forma mais transparente
+          e mensurável.
         </p>
-        <button type="button" className="primary-pill">
+        <a href="#formulario" className="primary-pill">
           Entrar em contacto
-        </button>
+        </a>
       </article>
       <article className="split-card split-image-only">
         <Image
@@ -28,7 +33,7 @@ export default function LandingServices() {
       </article>
       <article className="split-card split-image-only">
         <Image
-          src="/assets/new-layout/PARTICULARES.jpg"
+          src="/assets/new-layout/PARTICULARES.jpeg"
           alt="Costura e reutilização têxtil"
           width={1073}
           height={679}
@@ -39,13 +44,14 @@ export default function LandingServices() {
       <article className="split-card split-text split-text--particular">
         <h3>Particulares</h3>
         <p>
-          Tens roupa que já não usas? Dá-lhe um novo propósito! Se tens roupas em
-          bom estado que já não usas, a RETEX ajuda-te a encaminhá-las para
-          reutilização.
+          Tem roupa que já não usa? Dê-lhe um novo propósito. Através do serviço
+          de recolha seletiva de têxteis, a RETEX encaminha peças em bom estado
+          para reutilização, contribuindo para a redução de resíduos e para a
+          promoção da economia circular.
         </p>
-        <button type="button" className="landing-outline-btn">
+        <Link href="/register" className="landing-outline-btn">
           Agendar recolha
-        </button>
+        </Link>
       </article>
     </section>
   );

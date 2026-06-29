@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "start": "npm run start:web && npm run start:portal",
     "start:web": "nx dev landing-page",
     "start:portal": "nx dev portal",
     "build:web": "nx build landing-page",

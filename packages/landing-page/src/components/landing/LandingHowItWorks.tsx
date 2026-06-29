@@ -1,7 +1,7 @@
 const steps = [
   {
-    title: 'Preenche o formulário',
-    description: 'Basta seguir até ao final da página e submeter os dados.',
+    title: 'Faz o teu registo',
+    description: 'Preenche a informação necessária para ficares registado.',
     icon: (
       <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden>
         <path
@@ -21,7 +21,7 @@ const steps = [
   },
   {
     title: 'Agenda a tua recolha',
-    description: 'Menciona o local e a hora mais indicado para ti.',
+    description: 'Menciona o local mais indicado para ti ',
     icon: (
       <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden>
         <rect
@@ -44,8 +44,7 @@ const steps = [
   },
   {
     title: 'Agora é connosco',
-    description:
-      'Aguarda que um dos nossos transportadores entre em contacto contigo.',
+    description: 'Aguardar o contacto de um dos nossos transportadores.',
     icon: (
       <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden>
         <path
