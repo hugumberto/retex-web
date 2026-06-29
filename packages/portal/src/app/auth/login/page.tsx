@@ -75,6 +75,20 @@ export default function LoginPage() {
     }
   }
 
+  async function onResetPasswordSubmit(data: ResetPasswordFormData) {
+    try {
+      await forgotPassword(data.email);
+    } catch {
+      // Anti-enumeração: não revelamos falhas (ex.: email inexistente).
+    } finally {
+      reset();
+      setIsResetModalOpen(false);
+      toast.success(
+        'Se este email estiver registado, enviámos um link para repor a palavra-passe.'
+      );
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-sm space-y-4 rounded-xl border bg-white p-6 shadow-md">
