@@ -32,8 +32,8 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     defaultValues: {
-      email: isDev ? (process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL ?? '') : '',
-      password: isDev ? (process.env.NEXT_PUBLIC_DEV_LOGIN_PASSWORD ?? '') : '',
+      email: isDev ? process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL ?? '' : '',
+      password: isDev ? process.env.NEXT_PUBLIC_DEV_LOGIN_PASSWORD ?? '' : '',
     },
   });
   const {
@@ -57,20 +57,6 @@ export default function LoginPage() {
         status === 401
           ? 'Email ou senha inválidos'
           : 'Não foi possível entrar. Tente novamente mais tarde.'
-      );
-    }
-  }
-
-  async function onResetPasswordSubmit(data: ResetPasswordFormData) {
-    try {
-      await forgotPassword(data.email);
-    } catch {
-      // Anti-enumeração: não revelamos falhas (ex.: email inexistente).
-    } finally {
-      reset();
-      setIsResetModalOpen(false);
-      toast.success(
-        'Se este email estiver registado, enviámos um link para repor a palavra-passe.'
       );
     }
   }

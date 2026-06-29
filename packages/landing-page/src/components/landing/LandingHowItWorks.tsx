@@ -79,7 +79,7 @@ export default function LandingHowItWorks() {
           </article>
         ))}
       </div>
-      <h2 className="section-title-alt section-heading-spaced">Até agora...</h2>
+      {/* <h2 className="section-title-alt section-heading-spaced">Até agora...</h2>
       <div className="stats-bar" role="list">
         <div className="stat-item" role="listitem">
           <span className="stat-icon" aria-hidden>
@@ -142,7 +142,7 @@ export default function LandingHowItWorks() {
             <span>Peças em circuito fechado</span>
           </div>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }
