@@ -32,8 +32,8 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     defaultValues: {
-      email: isDev ? (process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL ?? '') : '',
-      password: isDev ? (process.env.NEXT_PUBLIC_DEV_LOGIN_PASSWORD ?? '') : '',
+      email: isDev ? process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL ?? '' : '',
+      password: isDev ? process.env.NEXT_PUBLIC_DEV_LOGIN_PASSWORD ?? '' : '',
     },
   });
   const {
