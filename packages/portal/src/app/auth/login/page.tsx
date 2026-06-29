@@ -11,6 +11,7 @@ import Title from '@/components/custom/title';
 import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
 
 type LoginFormData = {
   email: string;
@@ -50,8 +51,27 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password);
       router.push('/portal');
+    } catch (err) {
+      const status = isAxiosError(err) ? err.response?.status : undefined;
+      toast.error(
+        status === 401
+          ? 'Email ou senha inválidos'
+          : 'Não foi possível entrar. Tente novamente mais tarde.'
+      );
+    }
+  }
+
+  async function onResetPasswordSubmit(data: ResetPasswordFormData) {
+    try {
+      await forgotPassword(data.email);
     } catch {
-      // Optionally handle error (e.g., show toast)
+      // Anti-enumeração: não revelamos falhas (ex.: email inexistente).
+    } finally {
+      reset();
+      setIsResetModalOpen(false);
+      toast.success(
+        'Se este email estiver registado, enviámos um link para repor a palavra-passe.'
+      );
     }
   }
 
