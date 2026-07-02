@@ -1,0 +1,41 @@
+name: Recreate dev from main
+
+# Após um PR ser mergeado em main (ex.: dev -> main), se a branch `dev` já não
+# existir (foi apagada no merge), recria-a a partir de main. Se `dev` ainda
+# existir, este workflow não faz nada — a sincronização é tratada pelo
+# open-pr-main-to-dev.yml.
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: write
+
+jobs:
+  recreate-dev:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Recriar dev a partir de main (apenas se não existir)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
+            echo "A branch 'dev' já existe — nada a fazer (sync tratado por open-pr-main-to-dev)."
+            exit 0
+          fi
+
+          echo "A branch 'dev' não existe. A recriar a partir de main..."
+          git fetch origin main
+          git push origin origin/main:refs/heads/dev
+          echo "Branch 'dev' recriada a partir de main."

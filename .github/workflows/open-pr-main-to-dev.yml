@@ -25,6 +25,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Só sincroniza se a branch dev existir. Se não existir, a recriação
+          # a partir de main é feita pelo workflow recreate-dev-from-main.yml.
+          if ! git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
+            echo "A branch 'dev' não existe — recriação tratada por recreate-dev-from-main. A ignorar o sync PR."
+            exit 0
+          fi
+
           existing_pr_number=$(gh pr list \
             --base dev \
             --head main \
