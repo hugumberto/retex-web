@@ -1,31 +1,21 @@
-import Image from 'next/image';
-
 const values = [
   {
-    icon: '/assets/new-layout/1.svg',
-    w: 34,
-    h: 28,
+    icon: '/assets/new-layout/values/fi-rs-truck-side.svg',
     title: 'Recolha Sustentável',
     text: 'Em Portugal, são mais de 200 mil. O problema cresce, mas temos solução.',
   },
   {
-    icon: '/assets/new-layout/2.svg',
-    w: 36,
-    h: 30,
+    icon: '/assets/new-layout/values/fi-rs-hand-holding-heart.svg',
     title: 'Redução do Desperdício Têxtil',
     text: 'Damos nova vida a cada peça, evitando que toneladas acabem em aterros.',
   },
   {
-    icon: '/assets/new-layout/4.svg',
-    w: 34,
-    h: 30,
+    icon: '/assets/new-layout/values/fi-rs-leaf.svg',
     title: 'Impacto Social e Ambiental',
     text: 'Apoiamos causas sociais e práticas sustentáveis para reduzir a pegada ecológica.',
   },
   {
-    icon: '/assets/new-layout/5.svg',
-    w: 36,
-    h: 24,
+    icon: '/assets/new-layout/values/fi-rr-refresh.svg',
     title: 'Economia Circular',
     text: 'Transformamos resíduos em recursos, promovendo um consumo mais consciente.',
   },
@@ -34,13 +24,19 @@ const values = [
 export default function LandingValues() {
   return (
     <section className="values-section">
-      <p className="values-kicker">Estes são os</p>
-      <h2>Nossos valores</h2>
+      <p className="values-kicker">Descobre mais sobre</p>
+      <h2>Os nossos valores</h2>
       <div className="values-grid">
         {values.map((item) => (
           <article key={item.title} className="value-card">
             <span className="value-card-icon">
-              <Image src={item.icon} alt="" width={item.w} height={item.h} />
+              <span
+                className="value-card-glyph"
+                style={{
+                  WebkitMaskImage: `url(${item.icon})`,
+                  maskImage: `url(${item.icon})`,
+                }}
+              />
             </span>
             <h3>{item.title}</h3>
             <p>{item.text}</p>
