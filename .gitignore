@@ -52,3 +52,6 @@ test-output
 
 # Playwright visual-check screenshots (geradas localmente)
 shots/
+
+# Evidências (screenshots/PDF) geradas localmente para apresentação
+evidencias/

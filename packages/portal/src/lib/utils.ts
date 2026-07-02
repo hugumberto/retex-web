@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import {
   LayoutDashboard,
+  BarChart3,
   ClipboardList,
   Boxes,
   Tag,
@@ -50,6 +51,12 @@ export const NAV_ITEMS: NavEntry[] = [
     label: 'HOME',
     icon: LayoutDashboard,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+  },
+  {
+    href: '/portal/dashboard',
+    label: 'DASHBOARD',
+    icon: BarChart3,
+    roles: [Role.ADMIN],
   },
   {
     href: '/portal/triage',

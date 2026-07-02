@@ -7,6 +7,7 @@ export type RoutePermission = {
 
 export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal', roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER] },
+  { path: '/portal/dashboard', roles: [Role.ADMIN] },
   { path: '/portal/collection-request', roles: [Role.ADMIN, Role.OPS, Role.USER] },
   { path: '/portal/triage', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/package-collection', roles: [Role.ADMIN, Role.OPS, Role.DRIVER] },
