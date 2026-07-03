@@ -12,6 +12,8 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal/triage', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/package-collection', roles: [Role.ADMIN, Role.OPS, Role.DRIVER] },
   { path: '/portal/storage-unit', roles: [Role.ADMIN, Role.OPS] },
+  { path: '/portal/qr-code', roles: [Role.ADMIN, Role.OPS, Role.DRIVER] },
+  { path: '/portal/coleta', roles: [Role.ADMIN, Role.DRIVER] },
   { path: '/portal/brand', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/user', roles: [Role.ADMIN] },
   { path: '/portal/zona', roles: [Role.ADMIN] },

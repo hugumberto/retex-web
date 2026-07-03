@@ -1,5 +1,12 @@
 import { Brand } from '@/app/types/brand';
-import { Quality, StorageUnitDTO } from '@/app/types/storage-unit';
+import {
+  AgeGroup,
+  Quality,
+  Season,
+  Sex,
+  StorageUnitDTO,
+  Type,
+} from '@/app/types/storage-unit';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,15 +27,47 @@ const QUALITY_MAP: Record<Quality, string> = {
   [Quality.BAD]: 'Má',
 };
 
+const SEX_MAP: Record<Sex, string> = {
+  [Sex.MALE]: 'Homem',
+  [Sex.FEMALE]: 'Mulher',
+};
+
+const AGE_GROUP_MAP: Record<AgeGroup, string> = {
+  [AgeGroup.ADULT]: 'Adulto',
+  [AgeGroup.CHILD]: 'Infantil',
+};
+
+const TYPE_MAP: Record<Type, string> = {
+  [Type.UPPER_PART]: 'Superior',
+  [Type.UNDER_PART]: 'Inferior',
+};
+
+const SEASON_MAP: Record<Season, string> = {
+  [Season.SUMMER]: 'Verão',
+  [Season.WINTER]: 'Inverno',
+};
+
 export type TriageListItem = {
   id?: string;
   packageId: string;
   quality: 'GOOD' | 'MEDIUM' | 'BAD';
   type: 'UPPER_PART' | 'UNDER_PART';
   season: 'SUMMER' | 'WINTER';
+  sex: 'MALE' | 'FEMALE';
+  ageGroup: 'ADULT' | 'CHILD';
   brandId: string;
   quantity: number;
 };
+
+// Chave de casamento item <-> unidade de armazenamento (atributos de triagem).
+export const buildTriageKey = (attrs: {
+  quality: string;
+  sex: string;
+  ageGroup: string;
+  type: string;
+  season: string;
+}) =>
+  `${attrs.quality}::${attrs.sex}::${attrs.ageGroup}::${attrs.type}::${attrs.season}`;
 
 type AddTriageProps = {
   items: TriageListItem[];
@@ -62,33 +101,35 @@ export default function AddTriage({
   const storageInputRef = useRef<HTMLInputElement>(null);
   const shouldRefocusStorageInputRef = useRef(false);
   const validStorageUnits = storageUnits.filter(
-    (storageUnit): storageUnit is StorageUnitDTO =>
-      Boolean(storageUnit?.id && storageUnit.brand?.id)
+    (storageUnit): storageUnit is StorageUnitDTO => Boolean(storageUnit?.id)
   );
-  const itemBrandQualityKeys = new Set(
-    items.map((item) => `${item.brandId}::${item.quality}`)
-  );
-  const storageBrandQualityKeys = new Set(
-    validStorageUnits.map(
-      (storageUnit) => `${storageUnit.brand.id}::${storageUnit.quality}`
-    )
+  const itemTriageKeys = new Set(items.map((item) => buildTriageKey(item)));
+  const storageTriageKeys = new Set(
+    validStorageUnits.map((storageUnit) => buildTriageKey(storageUnit))
   );
 
-  const hasInvalidItemCombination = items.some((item) => !item.brandId);
-
-  const allStorageBrandQualityInItems = validStorageUnits.every((storageUnit) =>
-    itemBrandQualityKeys.has(`${storageUnit.brand.id}::${storageUnit.quality}`)
+  const hasInvalidItemCombination = items.some(
+    (item) =>
+      !item.quality ||
+      !item.sex ||
+      !item.ageGroup ||
+      !item.type ||
+      !item.season
   );
-  const allItemBrandQualityInStorage = [...itemBrandQualityKeys].every((key) =>
-    storageBrandQualityKeys.has(key)
+
+  const allStorageKeysInItems = validStorageUnits.every((storageUnit) =>
+    itemTriageKeys.has(buildTriageKey(storageUnit))
+  );
+  const allItemKeysInStorage = [...itemTriageKeys].every((key) =>
+    storageTriageKeys.has(key)
   );
 
   const isFinishDisabled =
     items.length === 0 ||
     validStorageUnits.length === 0 ||
     hasInvalidItemCombination ||
-    !allStorageBrandQualityInItems ||
-    !allItemBrandQualityInStorage;
+    !allStorageKeysInItems ||
+    !allItemKeysInStorage;
 
   useEffect(() => {
     if (!isLoadingStorageUnit && shouldRefocusStorageInputRef.current) {
@@ -196,22 +237,28 @@ export default function AddTriage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Marca</TableHead>
               <TableHead>Qualidade</TableHead>
+              <TableHead>Sexo</TableHead>
+              <TableHead>Faixa etária</TableHead>
+              <TableHead>Parte</TableHead>
+              <TableHead>Estação</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {validStorageUnits.length > 0 ? (
               validStorageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
-                  <TableCell>{storageUnit.brand.name}</TableCell>
                   <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
+                  <TableCell>{SEX_MAP[storageUnit.sex]}</TableCell>
+                  <TableCell>{AGE_GROUP_MAP[storageUnit.ageGroup]}</TableCell>
+                  <TableCell>{TYPE_MAP[storageUnit.type]}</TableCell>
+                  <TableCell>{SEASON_MAP[storageUnit.season]}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={2}
+                  colSpan={5}
                   className="h-24 text-center text-secondary/55"
                 >
                   Nenhuma unidade de armazenamento adicionada

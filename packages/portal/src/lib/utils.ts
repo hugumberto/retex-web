@@ -15,6 +15,9 @@ import {
   NewspaperIcon,
   Globe,
   Settings,
+  QrCode,
+  PackageCheck,
+  Truck,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -71,22 +74,35 @@ export const NAV_ITEMS: NavEntry[] = [
     roles: [Role.ADMIN, Role.OPS, Role.USER],
   },
   {
-    href: '/portal/package-collection',
-    label: 'RECOLHA',
-    icon: ClipboardList,
+    label: 'LOGÍSTICA',
+    icon: Truck,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
-  },
-  {
-    href: '/portal/storage-unit',
-    label: 'ARMAZENAMENTO',
-    icon: Boxes,
-    roles: [Role.ADMIN, Role.OPS],
-  },
-  {
-    href: '/portal/brand',
-    label: 'MARCA',
-    icon: Tag,
-    roles: [Role.ADMIN, Role.OPS],
+    children: [
+      {
+        href: '/portal/package-collection',
+        label: 'RECOLHA',
+        icon: ClipboardList,
+        roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
+      },
+      {
+        href: '/portal/storage-unit',
+        label: 'ARMAZENAMENTO',
+        icon: Boxes,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+      {
+        href: '/portal/qr-code',
+        label: 'QR CODES',
+        icon: QrCode,
+        roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
+      },
+      {
+        href: '/portal/coleta',
+        label: 'COLETA',
+        icon: PackageCheck,
+        roles: [Role.ADMIN, Role.DRIVER],
+      },
+    ],
   },
   {
     label: 'LANDING PAGE',
@@ -123,6 +139,12 @@ export const NAV_ITEMS: NavEntry[] = [
         label: 'Conta',
         icon: CircleUser,
         roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
+      },
+      {
+        href: '/portal/brand',
+        label: 'MARCA',
+        icon: Tag,
+        roles: [Role.ADMIN, Role.OPS],
       },
       {
         href: '/portal/user',

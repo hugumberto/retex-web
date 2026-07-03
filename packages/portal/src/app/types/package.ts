@@ -34,6 +34,8 @@ export interface PackageItemDTO extends Entity {
   type: Type
   storageUnit: StorageUnitDTO
   season: Season
+  sex: Sex
+  ageGroup: AgeGroup
   brand: Brand
   quantity: number
 }
@@ -52,6 +54,16 @@ export enum Type {
 export enum Season {
   SUMMER = "SUMMER",
   WINTER = "WINTER",
+}
+
+export enum Sex {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+}
+
+export enum AgeGroup {
+  ADULT = "ADULT",
+  CHILD = "CHILD",
 }
 
 export enum PackageStatus {

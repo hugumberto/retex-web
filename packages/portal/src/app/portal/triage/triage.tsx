@@ -10,7 +10,7 @@ import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import AddTriage, { TriageListItem } from './components/add-triage';
+import AddTriage, { buildTriageKey, TriageListItem } from './components/add-triage';
 import CollectionRecord from './components/collection-record';
 import PackageUserData from './components/package-user-data';
 
@@ -35,6 +35,8 @@ export default function Triage() {
   const [clothingType, setClothingType] = useState<
     'UPPER_PART' | 'UNDER_PART'
   >();
+  const [sex, setSex] = useState<'MALE' | 'FEMALE'>();
+  const [ageGroup, setAgeGroup] = useState<'ADULT' | 'CHILD'>();
   const [triageItems, setTriageItems] = useState<TriageListItem[]>([]);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [deletingItemIndex, setDeletingItemIndex] = useState<number | null>(
@@ -95,6 +97,8 @@ export default function Triage() {
           quality: packageItem.quality,
           type: packageItem.type,
           season: packageItem.season,
+          sex: packageItem.sex,
+          ageGroup: packageItem.ageGroup,
           brandId: resolvedBrandId,
           quantity: packageItem.quantity,
         };
@@ -102,9 +106,8 @@ export default function Triage() {
       const mappedStorageUnits = (data.items ?? []).reduce<StorageUnitDTO[]>(
         (accumulator, packageItem) => {
           const storageUnit = packageItem.storageUnit;
-          const brand = packageItem.brand;
 
-          if (!storageUnit?.id || !brand?.id) {
+          if (!storageUnit?.id) {
             return accumulator;
           }
 
@@ -116,10 +119,7 @@ export default function Triage() {
             return accumulator;
           }
 
-          accumulator.push({
-            ...storageUnit,
-            brand,
-          });
+          accumulator.push(storageUnit);
           return accumulator;
         },
         []
@@ -226,8 +226,10 @@ export default function Triage() {
       return;
     }
 
-    if (!quality || !season || !clothingType) {
-      toast.error('Selecione qualidade, estação e tipo de roupa');
+    if (!quality || !season || !clothingType || !sex || !ageGroup) {
+      toast.error(
+        'Selecione qualidade, estação, tipo de roupa, sexo e faixa etária'
+      );
       return;
     }
 
@@ -247,6 +249,8 @@ export default function Triage() {
       quality,
       type: clothingType,
       season,
+      sex,
+      ageGroup,
       brandId,
       quantity: parsedQuantity,
     };
@@ -257,7 +261,9 @@ export default function Triage() {
         existingItem.brandId === item.brandId &&
         existingItem.quality === item.quality &&
         existingItem.type === item.type &&
-        existingItem.season === item.season
+        existingItem.season === item.season &&
+        existingItem.sex === item.sex &&
+        existingItem.ageGroup === item.ageGroup
     );
 
     if (isDuplicatedItem) {
@@ -278,6 +284,8 @@ export default function Triage() {
       setQuality(undefined);
       setSeason(undefined);
       setClothingType(undefined);
+      setSex(undefined);
+      setAgeGroup(undefined);
       toast.success('Item adicionado à lista de triagem');
     } catch (error) {
       console.error('Erro ao criar item:', error);
@@ -324,6 +332,8 @@ export default function Triage() {
     setQuality(undefined);
     setSeason(undefined);
     setClothingType(undefined);
+    setSex(undefined);
+    setAgeGroup(undefined);
     setTriageItems([]);
     setStorageCode('');
     setStorageUnits([]);
@@ -342,25 +352,19 @@ export default function Triage() {
       return;
     }
 
-    const itemBrandQualityKeys = new Set(
-      triageItems.map((item) => `${item.brandId}::${item.quality}`)
+    const itemTriageKeys = new Set(
+      triageItems.map((item) => buildTriageKey(item))
     );
-    const storageBrandQualityKeys = new Set(
-      storageUnits.map(
-        (storageUnit) => `${storageUnit.brand.id}::${storageUnit.quality}`
-      )
+    const storageTriageKeys = new Set(
+      storageUnits.map((storageUnit) => buildTriageKey(storageUnit))
     );
 
     const isValidCombination =
-      [...itemBrandQualityKeys].every((key) =>
-        storageBrandQualityKeys.has(key)
-      ) &&
-      [...storageBrandQualityKeys].every((key) =>
-        itemBrandQualityKeys.has(key)
-      );
+      [...itemTriageKeys].every((key) => storageTriageKeys.has(key)) &&
+      [...storageTriageKeys].every((key) => itemTriageKeys.has(key));
 
     if (!isValidCombination) {
-      toast.error('As combinações de marca e qualidade não conferem');
+      toast.error('As combinações de atributos de triagem não conferem');
       return;
     }
 
@@ -434,13 +438,14 @@ export default function Triage() {
         return;
       }
 
-      const hasMatchingBrandInItems = triageItems.some(
-        (item) => item.brandId && item.brandId === data.brand.id
+      const storageKey = buildTriageKey(data);
+      const hasMatchingItem = triageItems.some(
+        (item) => buildTriageKey(item) === storageKey
       );
 
-      if (!hasMatchingBrandInItems) {
+      if (!hasMatchingItem) {
         toast.error(
-          'A marca desta unidade de armazenamento não está na lista de itens'
+          'Os atributos desta unidade de armazenamento não conferem com nenhum item da lista'
         );
         return;
       }
@@ -466,7 +471,9 @@ export default function Triage() {
     !quantity.trim() ||
     !quality ||
     !season ||
-    !clothingType;
+    !clothingType ||
+    !sex ||
+    !ageGroup;
 
   const weightAllowedStatuses = new Set<PackageStatus>([
     PackageStatus.CREATED,
@@ -584,6 +591,10 @@ export default function Triage() {
           onSeasonChange={setSeason}
           clothingType={clothingType}
           onClothingTypeChange={setClothingType}
+          sex={sex}
+          onSexChange={setSex}
+          ageGroup={ageGroup}
+          onAgeGroupChange={setAgeGroup}
           onAdd={handleAddTriageItem}
           onDeleteItem={handleDeleteTriageItem}
           deletingItemIndex={deletingItemIndex}
