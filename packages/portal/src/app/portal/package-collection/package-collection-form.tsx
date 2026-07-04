@@ -460,7 +460,6 @@ export default function PackageCollectionForm({
                 <TableHead></TableHead>
                 <TableHead>Morada</TableHead>
                 <TableHead>Cidade</TableHead>
-                <TableHead>Dia da semana</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -479,13 +478,12 @@ export default function PackageCollectionForm({
                     </TableCell>
                     <TableCell>{addressLabel(item)}</TableCell>
                     <TableCell>{item.address.city}</TableCell>
-                    <TableCell>{item.collectDay}</TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={4}
+                    colSpan={3}
                     className="text-center py-6 text-muted-foreground"
                   >
                     Nenhuma solicitação elegível!

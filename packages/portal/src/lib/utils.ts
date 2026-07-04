@@ -18,6 +18,7 @@ import {
   QrCode,
   PackageCheck,
   Truck,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -156,6 +157,12 @@ export const NAV_ITEMS: NavEntry[] = [
         href: '/portal/zona',
         label: 'Zonas',
         icon: MapPin,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/parametros',
+        label: 'Parâmetros',
+        icon: SlidersHorizontal,
         roles: [Role.ADMIN],
       },
     ],
