@@ -425,7 +425,7 @@ export default function PackageCollection() {
               <img class="qr" src="${qrSource}" alt="QR ${routeId}" />
             </header>
             <section class="content">
-              <h2 class="table-title">Itens da Rota</h2>
+              <h2 class="table-title">Peças da Rota</h2>
               <table>
                 <thead>
                   <tr>

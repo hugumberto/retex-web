@@ -52,7 +52,7 @@ export function cn(...inputs: ClassValue[]) {
 export const NAV_ITEMS: NavEntry[] = [
   {
     href: '/portal',
-    label: 'HOME',
+    label: 'INÍCIO',
     icon: LayoutDashboard,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
   },
@@ -64,13 +64,13 @@ export const NAV_ITEMS: NavEntry[] = [
   },
   {
     href: '/portal/triage',
-    label: 'TRIAGE',
+    label: 'TRIAGEM',
     icon: RefreshCw,
     roles: [Role.ADMIN, Role.OPS],
   },
   {
     href: '/portal/collection-request',
-    label: 'SOLICITAR COLETA',
+    label: 'SOLICITAR RECOLHA',
     icon: HandHelping,
     roles: [Role.ADMIN, Role.OPS, Role.USER],
   },
@@ -99,7 +99,7 @@ export const NAV_ITEMS: NavEntry[] = [
       },
       {
         href: '/portal/coleta',
-        label: 'COLETA',
+        label: 'RECOLHA NO LOCAL',
         icon: PackageCheck,
         roles: [Role.ADMIN, Role.DRIVER],
       },

@@ -72,7 +72,7 @@ export default function Parametros() {
       <form onSubmit={handleSubmit(handleSave)} className="space-y-6">
         <div>
           <InputForm
-            label="Prazo de confirmação da coleta (dias antes)"
+            label="Prazo de confirmação da recolha (dias antes)"
             name="collectionConfirmationDeadlineDays"
             type="number"
             control={control}
@@ -84,7 +84,7 @@ export default function Parametros() {
             errors={errors}
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Até quantos dias antes da coleta o cliente pode confirmar. Sem
+            Até quantos dias antes da recolha o cliente pode confirmar. Sem
             confirmação até o prazo, a solicitação sai da rota.
           </p>
         </div>

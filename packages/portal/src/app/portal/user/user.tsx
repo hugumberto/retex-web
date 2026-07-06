@@ -168,7 +168,7 @@ export default function User() {
             }
           >
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Estado" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={ALL}>Todos os status</SelectItem>
@@ -195,7 +195,7 @@ export default function User() {
               <TableHead>Nome</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Perfil</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Estado</TableHead>
               <TableHead>Criado em</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>

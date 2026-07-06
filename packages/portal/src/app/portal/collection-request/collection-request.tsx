@@ -83,7 +83,7 @@ export default function CollectionRequest() {
       if (!isSuccessStatus(status)) throw new Error();
       setRequests(Array.isArray(data) ? data : []);
     } catch {
-      toast.error('Não foi possível carregar as solicitações de coleta');
+      toast.error('Não foi possível carregar as solicitações de recolha');
     }
   }, [isUserRole]);
 
@@ -103,8 +103,8 @@ export default function CollectionRequest() {
   }, [fetchRequests]);
 
   useEffect(() => {
-    setPageTitle('Solicitação de Coleta');
-    setBreadcrumbs([{ label: 'Solicitação de Coleta', href: '/portal/collection-request' }]);
+    setPageTitle('Solicitação de Recolha');
+    setBreadcrumbs([{ label: 'Solicitação de Recolha', href: '/portal/collection-request' }]);
     fetchRequests();
 
     if (isUserRole) {
@@ -131,9 +131,9 @@ export default function CollectionRequest() {
       userForm.reset();
       await fetchRequests();
       setUserFormOpen(false);
-      toast.success('Solicitação de coleta criada com sucesso');
+      toast.success('Solicitação de recolha criada com sucesso');
     } catch {
-      toast.error('Não foi possível criar a solicitação de coleta');
+      toast.error('Não foi possível criar a solicitação de recolha');
     } finally {
       setIsSubmitting(false);
     }
@@ -158,7 +158,7 @@ export default function CollectionRequest() {
         adminForm.reset();
         await fetchRequests();
       },
-      { loading: 'A criar solicitação...', success: 'Solicitação de coleta criada com sucesso', error: 'Não foi possível criar a solicitação de coleta' }
+      { loading: 'A criar solicitação...', success: 'Solicitação de recolha criada com sucesso', error: 'Não foi possível criar a solicitação de recolha' }
     );
     setIsSubmitting(false);
   });
@@ -205,12 +205,12 @@ export default function CollectionRequest() {
             <Alert className="max-w-md ml-auto">
               <AlertTitle>Solicitação em curso</AlertTitle>
               <AlertDescription>
-                Já tem uma solicitação de coleta activa. Aguarde a conclusão ou cancelamento antes de criar uma nova.
+                Já tem uma solicitação de recolha activa. Aguarde a conclusão ou cancelamento antes de criar uma nova.
               </AlertDescription>
             </Alert>
           ) : canRequest ? (
             <DialogForm<UserFormData>
-              title="Nova Solicitação de Coleta"
+              title="Nova Solicitação de Recolha"
               confirmText="Criar Solicitação"
               loading={isSubmitting}
               errors={userForm.formState.errors}
@@ -294,7 +294,7 @@ export default function CollectionRequest() {
           )
         ) : (
           <DialogForm<AdminFormData>
-            title="Nova Solicitação de Coleta"
+            title="Nova Solicitação de Recolha"
             confirmText="Criar Solicitação"
             loading={isSubmitting}
             errors={adminErrors}
@@ -329,7 +329,7 @@ export default function CollectionRequest() {
       </div>
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
-        <h2 className="text-lg font-semibold text-secondary">Solicitações de Coleta</h2>
+        <h2 className="text-lg font-semibold text-secondary">Solicitações de Recolha</h2>
         <div className="mt-4 w-full overflow-x-auto">
           <Table>
             <TableHeader>
@@ -339,8 +339,8 @@ export default function CollectionRequest() {
                 <TableHead>Contacto</TableHead>
                 <TableHead>Morada</TableHead>
                 <TableHead>Volumes (est.)</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Acção</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

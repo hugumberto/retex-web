@@ -84,7 +84,7 @@ export default function BlogCategories() {
                 <TableHead>Título</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Estado</TableHead>
-                <TableHead>Acção</TableHead>
+                <TableHead>Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -29,7 +29,7 @@ import StorageUnitForm from './storage-unit-form';
 const QUALITY_MAP: Record<Quality, string> = {
   [Quality.GOOD]: 'Bom',
   [Quality.MEDIUM]: 'Regular',
-  [Quality.BAD]: 'Ruim',
+  [Quality.BAD]: 'Mau',
 };
 
 const SEX_MAP: Record<Sex, string> = {
@@ -208,7 +208,7 @@ export default function StorageUnit() {
               <TableHead>Faixa etária</TableHead>
               <TableHead>Parte</TableHead>
               <TableHead>Estação</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Estado</TableHead>
               <TableHead>Ação</TableHead>
             </TableRow>
           </TableHeader>

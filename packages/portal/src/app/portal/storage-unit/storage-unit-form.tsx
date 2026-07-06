@@ -26,7 +26,7 @@ import {
 const QUALITY_OPTIONS = [
   { value: Quality.GOOD, label: 'Bom' },
   { value: Quality.MEDIUM, label: 'Regular' },
-  { value: Quality.BAD, label: 'Ruim' },
+  { value: Quality.BAD, label: 'Mau' },
 ];
 
 const SEX_OPTIONS = [

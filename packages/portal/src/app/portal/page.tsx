@@ -64,7 +64,7 @@ export default function Index() {
                   <TableRow>
                     <TableHead>Morada</TableHead>
                     <TableHead>Cidade</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Estado</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -87,7 +87,7 @@ export default function Index() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-6 text-muted-foreground">
-                        Não tens solicitações de coleta.
+                        Não tens solicitações de recolha.
                       </TableCell>
                     </TableRow>
                   )}

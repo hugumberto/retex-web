@@ -364,7 +364,7 @@ export default function PackageCollectionForm({
         {isEditing && (
           <div className="md:col-span-2">
             <SelectForm
-              label="Status"
+              label="Estado"
               name="status"
               control={control}
               options={statusOptions}

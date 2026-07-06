@@ -110,7 +110,7 @@ export default function BlogCrud() {
         <TableHeader>
           <TableRow>
             <TableHead>Título</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Estado</TableHead>
             <TableHead>Destaque</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>

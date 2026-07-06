@@ -129,7 +129,7 @@ export default function LoginPage() {
             className="w-full"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Entrando...' : 'Entrar'}
+            {isSubmitting ? 'A entrar...' : 'Entrar'}
           </Button>
         </form>
       </div>
