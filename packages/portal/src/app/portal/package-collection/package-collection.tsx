@@ -49,8 +49,8 @@ export default function PackageCollection() {
   };
 
   useEffect(() => {
-    setPageTitle('Recolha');
-    setBreadcrumbs([{ label: 'Recolha', href: '/portal/package-collection' }]);
+    setPageTitle('Gerir Recolha');
+    setBreadcrumbs([{ label: 'Gerir Recolha', href: '/portal/package-collection' }]);
     fetchData();
     return () => {
       setPageTitle('');

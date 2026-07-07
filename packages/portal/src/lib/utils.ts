@@ -81,7 +81,7 @@ export const NAV_ITEMS: NavEntry[] = [
     children: [
       {
         href: '/portal/package-collection',
-        label: 'RECOLHA',
+        label: 'GERIR RECOLHA',
         icon: ClipboardList,
         roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
       },
@@ -99,7 +99,7 @@ export const NAV_ITEMS: NavEntry[] = [
       },
       {
         href: '/portal/coleta',
-        label: 'RECOLHA NO LOCAL',
+        label: 'RECOLHA',
         icon: PackageCheck,
         roles: [Role.ADMIN, Role.DRIVER],
       },

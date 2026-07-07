@@ -49,8 +49,8 @@ export default function Coleta() {
   const qrRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setPageTitle('Recolha no local');
-    setBreadcrumbs([{ label: 'Recolha no local', href: '/portal/coleta' }]);
+    setPageTitle('Recolha');
+    setBreadcrumbs([{ label: 'Recolha', href: '/portal/coleta' }]);
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
