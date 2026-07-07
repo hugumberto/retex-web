@@ -33,6 +33,7 @@ interface SelectFieldProps<T extends FieldValues> {
   >;
   errors?: FieldErrors<T>;
   className?: string;
+  disabled?: boolean;
 }
 
 export function SelectForm<T extends FieldValues>({
@@ -45,6 +46,7 @@ export function SelectForm<T extends FieldValues>({
   rules,
   errors,
   className,
+  disabled,
 }: SelectFieldProps<T>) {
   const error = errors?.[name];
   return (
@@ -57,6 +59,7 @@ export function SelectForm<T extends FieldValues>({
         render={({ field }) => (
           <>
             <Select
+              disabled={disabled}
               onValueChange={field.onChange}
               value={field.value != null ? String(field.value) : undefined}
             >

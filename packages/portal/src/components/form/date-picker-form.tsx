@@ -21,6 +21,7 @@ interface DatePickerFormProps<T extends FieldValues> {
   >;
   errors?: FieldErrors<T>;
   className?: string;
+  disabled?: boolean;
 }
 
 export function DatePickerForm<T extends FieldValues>({
@@ -32,6 +33,7 @@ export function DatePickerForm<T extends FieldValues>({
   rules,
   errors,
   className,
+  disabled,
 }: DatePickerFormProps<T>) {
   const error = errors?.[name];
   return (
@@ -45,6 +47,7 @@ export function DatePickerForm<T extends FieldValues>({
           <>
             <DatePicker
               {...field}
+              disabled={disabled}
               selected={field.value}
               onChange={(date: unknown) => field.onChange(date)}
               className={`mt-1  w-full px-3 py-2 ${

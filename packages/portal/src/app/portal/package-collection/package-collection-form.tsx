@@ -47,6 +47,17 @@ const CollectionMap = dynamic(() => import('./components/collection-map'), {
 const NEARBY_THRESHOLD_KM = 2;
 const MAX_SUGGESTIONS = 10;
 
+// Une listas de solicitações removendo duplicados por id (preserva a ordem).
+const mergeById = (...lists: PackageDTO[][]): PackageDTO[] => {
+  const byId = new Map<string, PackageDTO>();
+  for (const list of lists) {
+    for (const pkg of list) {
+      if (!byId.has(pkg.id)) byId.set(pkg.id, pkg);
+    }
+  }
+  return Array.from(byId.values());
+};
+
 interface PackageCollectionFormProps {
   packageCollectionId?: string;
   onSave: () => void;
@@ -73,13 +84,21 @@ export default function PackageCollectionForm({
   });
 
   const [driverOptions, setDriverOptions] = useState<SelectFieldOption[]>([]);
-  const [packages, setPackages] = useState<PackageDTO[]>([]);
+  // Elegíveis (CREATED sem rota) e as já atribuídas à rota (modo edição) são
+  // mantidas separadas; a lista exibida é a união determinística das duas.
+  const [eligiblePackages, setEligiblePackages] = useState<PackageDTO[]>([]);
+  const [routePackages, setRoutePackages] = useState<PackageDTO[]>([]);
+  const packages = useMemo(
+    () => mergeById(routePackages, eligiblePackages),
+    [routePackages, eligiblePackages]
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing] = useState(!!packageCollectionId);
   const [routeGeoJson, setRouteGeoJson] = useState<FeatureCollection | null>(null);
   const [optimizedOrderIds, setOptimizedOrderIds] = useState<string[]>([]);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [loadedStatus, setLoadedStatus] = useState<CollectionStatus | null>(null);
 
   const statusOptions = [
     CollectionStatus.DRAFTING,
@@ -87,6 +106,10 @@ export default function PackageCollectionForm({
     CollectionStatus.IN_TRANSIT,
     CollectionStatus.FINISHED,
   ];
+
+  // Rota já confirmada (não-DRAFTING) trava a composição; só o estado avança.
+  const isLocked =
+    isEditing && loadedStatus != null && loadedStatus !== CollectionStatus.DRAFTING;
 
   const packageIds = watch('packageIds');
 
@@ -154,14 +177,48 @@ export default function PackageCollectionForm({
     const { data } = await api.get<PaginatedResult<PackageDTO>>(
       `/package/created`
     );
-    setPackages(data.data);
+    setEligiblePackages(data.data);
   }, []);
+
+  // Carrega os dados da rota em edição (motorista, data, solicitações já
+  // atribuídas). Executado no effect de abertura para garantir que os campos
+  // já estão montados quando o reset acontece.
+  const loadEditingData = useCallback(async () => {
+    if (!packageCollectionId) return;
+    const { data, status } = await api.get<PackageCollectionDTO>(
+      `/route/${packageCollectionId}`
+    );
+    if (!isSuccessStatus(status) || !data) {
+      console.error('Failed to fetch route');
+      return;
+    }
+    reset({
+      id: data.id,
+      driverId: data.driver?.id ?? '',
+      startDate: new Date(data.startDate),
+      packageIds: (data.packages ?? []).map((pkg) => pkg.id),
+      status: data.status,
+    });
+    setLoadedStatus(data.status);
+    // As solicitações da rota não vêm em /package/created (têm route_id).
+    setRoutePackages(data.packages ?? []);
+  }, [packageCollectionId, reset]);
 
   useEffect(() => {
     if (!isOpen) return;
     fetchDrivers();
     fetchEligiblePackages();
-  }, [isOpen, fetchDrivers, fetchEligiblePackages]);
+    if (isEditing && packageCollectionId) {
+      loadEditingData();
+    }
+  }, [
+    isOpen,
+    isEditing,
+    packageCollectionId,
+    fetchDrivers,
+    fetchEligiblePackages,
+    loadEditingData,
+  ]);
 
   const invalidateRoute = useCallback(() => {
     setRouteGeoJson(null);
@@ -233,44 +290,10 @@ export default function PackageCollectionForm({
     }
   }, [selectedWithCoords]);
 
-  const fetchCollectionDataById = async (
-    id: string
-  ): Promise<PackageCollectionDTO | undefined> => {
-    const { data, status } = await api.get<PackageCollectionDTO>(
-      `/route/${id}`
-    );
-    if (!isSuccessStatus(status)) {
-      console.error('Failed to fetch route');
-      return;
-    }
-    return data;
-  };
-
-  const getEditingItem = async (): Promise<
-    PackageCollectionFormData | undefined
-  > => {
-    if (!packageCollectionId) return undefined;
-    const data = await fetchCollectionDataById(packageCollectionId);
-    if (!data) return undefined;
-    return {
-      id: data.id,
-      driverId: data.driver.id,
-      startDate: new Date(data.startDate),
-      packageIds: data.packages.map((pkg) => pkg.id),
-      status: data.status,
-    };
-  };
-
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
       invalidateRoute();
-      return;
-    }
-    if (isEditing && packageCollectionId) {
-      getEditingItem().then((data) => {
-        if (data) reset(data);
-      });
     }
   };
 
@@ -281,12 +304,15 @@ export default function PackageCollectionForm({
         const formattedDate = data.startDate
           ? format(data.startDate, "yyyy-MM-dd HH:mm:ss'.000000+00'")
           : undefined;
-        const payload = {
-          driverId: data.driverId,
-          startDate: formattedDate,
-          packageIds: data.packageIds,
-          status: data.status,
-        };
+        // Rota travada: só o estado avança (a composição fica congelada).
+        const payload = isLocked
+          ? { status: data.status }
+          : {
+              driverId: data.driverId,
+              startDate: formattedDate,
+              packageIds: data.packageIds,
+              status: data.status,
+            };
         if (isEditing) {
           const res = await api.put(`/route/${packageCollectionId}`, payload);
           if (!isSuccessStatus(res.status))
@@ -348,6 +374,7 @@ export default function PackageCollectionForm({
             rules={{ required: 'O motorista é obrigatório' }}
             options={driverOptions}
             errors={errors}
+            disabled={isLocked}
           />
         </div>
 
@@ -358,8 +385,18 @@ export default function PackageCollectionForm({
             control={control}
             rules={{ required: 'A data é obrigatória' }}
             errors={errors}
+            disabled={isLocked}
           />
         </div>
+
+        {isLocked && (
+          <div className="md:col-span-2">
+            <p className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
+              Rota confirmada — motorista, solicitações e data ficam bloqueados.
+              Apenas o estado pode avançar.
+            </p>
+          </div>
+        )}
 
         {isEditing && (
           <div className="md:col-span-2">
@@ -381,7 +418,7 @@ export default function PackageCollectionForm({
             type="button"
             variant="secondary"
             onClick={optimizeRoute}
-            disabled={isOptimizing || selectedWithCoords.length < 2}
+            disabled={isOptimizing || selectedWithCoords.length < 2 || isLocked}
           >
             {isOptimizing ? 'A otimizar...' : 'Otimizar rota'}
           </Button>
@@ -391,7 +428,7 @@ export default function PackageCollectionForm({
           selectedIds={packageIds ?? []}
           suggestedIds={suggestedIds}
           routeGeoJson={routeGeoJson}
-          onToggle={togglePackage}
+          onToggle={isLocked ? () => undefined : togglePackage}
         />
         <p className="mt-2 text-xs text-muted-foreground">
           Azul: selecionadas · Laranja: sugeridas (≤ {NEARBY_THRESHOLD_KM} km) ·
@@ -437,6 +474,7 @@ export default function PackageCollectionForm({
                           variant="outline"
                           size="sm"
                           onClick={() => togglePackage(id)}
+                          disabled={isLocked}
                         >
                           Adicionar
                         </Button>
@@ -474,6 +512,7 @@ export default function PackageCollectionForm({
                         onCheckedChange={() => togglePackage(item.id)}
                         label=""
                         id={item.id}
+                        disabled={isLocked}
                       />
                     </TableCell>
                     <TableCell>{addressLabel(item)}</TableCell>
@@ -523,6 +562,7 @@ export default function PackageCollectionForm({
                         onCheckedChange={() => togglePackage(item.id)}
                         label=""
                         id={`no-coords-${item.id}`}
+                        disabled={isLocked}
                       />
                     </TableCell>
                     <TableCell>{addressLabel(item)}</TableCell>
