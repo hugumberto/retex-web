@@ -430,6 +430,19 @@ export default function Triage() {
       toast.error('Todos os itens devem ser persistidos antes de finalizar');
       return;
     }
+    // Cada combinação de item precisa de uma unidade compatível (mesmo gate do
+    // servidor). Evita o round-trip: dá mensagem imediata em vez de erro 400.
+    const storageUnitKeys = new Set(
+      storageUnits
+        .filter((unit) => !!unit?.id)
+        .map((unit) => buildTriageKey(unit))
+    );
+    if (triageItems.some((item) => !storageUnitKeys.has(buildTriageKey(item)))) {
+      toast.error(
+        'Cada combinação de itens precisa de uma unidade de armazenamento correspondente'
+      );
+      return;
+    }
     const itemIds = triageItems
       .map((item) => item.id)
       .filter((id): id is string => Boolean(id));
