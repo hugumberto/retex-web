@@ -19,12 +19,11 @@ export interface Address {
 
 export interface PackageDTO extends Entity {
   status: PackageStatus
+  friendlyCode?: string
   user: UserDTO
   route?: PackageCollectionDTO
   weight?: number
   estimatedVolumes?: number
-  collectDay: string
-  collectTime: string
   address: Address
   items?: PackageItemDTO[]
 }
@@ -34,8 +33,11 @@ export interface PackageItemDTO extends Entity {
   type: Type
   storageUnit: StorageUnitDTO
   season: Season
+  sex: Sex
+  ageGroup: AgeGroup
   brand: Brand
   quantity: number
+  qrCode?: { id: string; friendlyCode?: string } | null
 }
 
 export enum Quality {
@@ -54,8 +56,19 @@ export enum Season {
   WINTER = "WINTER",
 }
 
+export enum Sex {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+}
+
+export enum AgeGroup {
+  ADULT = "ADULT",
+  CHILD = "CHILD",
+}
+
 export enum PackageStatus {
   CREATED = 'CREATED',
+  CONFIRMED = 'CONFIRMED',
   OUT_OF_ZONE = 'OUT_OF_ZONE',
   WAITING_FOR_COLLECTION = 'WAITING_FOR_COLLECTION',
   COLLECTED = 'COLLECTED',

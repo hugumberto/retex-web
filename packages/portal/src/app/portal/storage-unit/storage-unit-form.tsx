@@ -6,23 +6,47 @@ import { toast } from 'sonner';
 
 import { DialogForm } from '@/components/form/dialog-form';
 import { InputForm } from '@/components/form/input-form';
-import { SelectFieldOption, SelectForm } from '@/components/form/select-form';
+import { SelectForm } from '@/components/form/select-form';
 import { Button } from '@/components/ui/button';
 
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import {
+  AgeGroup,
   Quality,
+  Season,
+  Sex,
   Status,
   StorageUnitDTO,
   StorageUnitFormData,
+  Type,
 } from '../../types/storage-unit';
 
 // Constants
 const QUALITY_OPTIONS = [
   { value: Quality.GOOD, label: 'Bom' },
   { value: Quality.MEDIUM, label: 'Regular' },
-  { value: Quality.BAD, label: 'Ruim' },
+  { value: Quality.BAD, label: 'Mau' },
+];
+
+const SEX_OPTIONS = [
+  { value: Sex.MALE, label: 'Homem' },
+  { value: Sex.FEMALE, label: 'Mulher' },
+];
+
+const AGE_GROUP_OPTIONS = [
+  { value: AgeGroup.ADULT, label: 'Adulto' },
+  { value: AgeGroup.CHILD, label: 'Infantil' },
+];
+
+const TYPE_OPTIONS = [
+  { value: Type.UPPER_PART, label: 'Superior' },
+  { value: Type.UNDER_PART, label: 'Inferior' },
+];
+
+const SEASON_OPTIONS = [
+  { value: Season.SUMMER, label: 'Verão' },
+  { value: Season.WINTER, label: 'Inverno' },
 ];
 
 const STATUS_OPTIONS = [
@@ -33,14 +57,12 @@ const STATUS_OPTIONS = [
 interface StorageUnitFormProps {
   storageUnitId?: string;
   initialData?: StorageUnitDTO;
-  brandOptions: SelectFieldOption[];
   onSave: () => void;
 }
 
 export default function StorageUnitForm({
   storageUnitId,
   initialData,
-  brandOptions,
   onSave,
 }: StorageUnitFormProps) {
   const isEditing = useMemo(() => !!storageUnitId, [storageUnitId]);
@@ -50,14 +72,20 @@ export default function StorageUnitForm({
   const form = useForm<StorageUnitFormData>({
     defaultValues: initialData
       ? {
-          brandId: initialData.brand.id,
           quality: initialData.quality,
+          sex: initialData.sex,
+          ageGroup: initialData.ageGroup,
+          type: initialData.type,
+          season: initialData.season,
           state: initialData.status,
           weight: initialData.weight,
         }
       : {
-          brandId: '',
           quality: Quality.GOOD,
+          sex: Sex.MALE,
+          ageGroup: AgeGroup.ADULT,
+          type: Type.UPPER_PART,
+          season: Season.SUMMER,
           state: Status.ATIVO,
           weight: 0,
         },
@@ -85,19 +113,23 @@ export default function StorageUnitForm({
         async () => {
           if (isEditing) {
             const res = await api.put(`/storage-unit/${storageUnitId}`, {
-              brandId: data.brandId,
               quality: data.quality,
-              state: data.state,
+              sex: data.sex,
+              ageGroup: data.ageGroup,
+              type: data.type,
+              season: data.season,
+              status: data.state,
               weight: Number.parseFloat(data.weight.toString()),
             });
             if (!isSuccessStatus(res.status))
               throw new Error('Erro na requisição');
           } else {
             const res = await api.post('/storage-unit', {
-              brandId: data.brandId,
               quality: data.quality,
-              state: data.state,
-              weight: data.weight,
+              sex: data.sex,
+              ageGroup: data.ageGroup,
+              type: data.type,
+              season: data.season,
             });
             if (!isSuccessStatus(res.status))
               throw new Error('Erro na requisição');
@@ -152,21 +184,51 @@ export default function StorageUnitForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <SelectForm
-            label="Marca"
-            name="brandId"
-            control={control}
-            rules={{ required: 'A marca é obrigatória' }}
-            options={brandOptions}
-            errors={errors}
-          />
-        </div>
-        <div>
-          <SelectForm
             label="Qualidade"
             name="quality"
             control={control}
             rules={{ required: 'A qualidade é obrigatória' }}
             options={QUALITY_OPTIONS}
+            errors={errors}
+          />
+        </div>
+        <div>
+          <SelectForm
+            label="Sexo"
+            name="sex"
+            control={control}
+            rules={{ required: 'O sexo é obrigatório' }}
+            options={SEX_OPTIONS}
+            errors={errors}
+          />
+        </div>
+        <div>
+          <SelectForm
+            label="Faixa etária"
+            name="ageGroup"
+            control={control}
+            rules={{ required: 'A faixa etária é obrigatória' }}
+            options={AGE_GROUP_OPTIONS}
+            errors={errors}
+          />
+        </div>
+        <div>
+          <SelectForm
+            label="Parte da peça"
+            name="type"
+            control={control}
+            rules={{ required: 'A parte da peça é obrigatória' }}
+            options={TYPE_OPTIONS}
+            errors={errors}
+          />
+        </div>
+        <div>
+          <SelectForm
+            label="Estação"
+            name="season"
+            control={control}
+            rules={{ required: 'A estação é obrigatória' }}
+            options={SEASON_OPTIONS}
             errors={errors}
           />
         </div>

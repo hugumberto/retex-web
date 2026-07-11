@@ -12,19 +12,44 @@ import { PrinterIcon, TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { Brand } from '@/app/types/brand';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
-import { SelectFieldOption } from '@/components/form/select-form';
 import api from '@/lib/api';
 import { useAppStore } from '@/store';
-import { Quality, StorageUnitDTO } from '../../types/storage-unit';
+import {
+  AgeGroup,
+  Quality,
+  Season,
+  Sex,
+  StorageUnitDTO,
+  Type,
+} from '../../types/storage-unit';
 import StorageUnitForm from './storage-unit-form';
 
 // Constants
 const QUALITY_MAP: Record<Quality, string> = {
   [Quality.GOOD]: 'Bom',
   [Quality.MEDIUM]: 'Regular',
-  [Quality.BAD]: 'Ruim',
+  [Quality.BAD]: 'Mau',
+};
+
+const SEX_MAP: Record<Sex, string> = {
+  [Sex.MALE]: 'Homem',
+  [Sex.FEMALE]: 'Mulher',
+};
+
+const AGE_GROUP_MAP: Record<AgeGroup, string> = {
+  [AgeGroup.ADULT]: 'Adulto',
+  [AgeGroup.CHILD]: 'Infantil',
+};
+
+const TYPE_MAP: Record<Type, string> = {
+  [Type.UPPER_PART]: 'Superior',
+  [Type.UNDER_PART]: 'Inferior',
+};
+
+const SEASON_MAP: Record<Season, string> = {
+  [Season.SUMMER]: 'Verão',
+  [Season.WINTER]: 'Inverno',
 };
 
 const STATUS_MAP: Record<string, string> = {
@@ -44,7 +69,6 @@ export default function StorageUnit() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [brandsOptions, setBrandOptions] = useState<SelectFieldOption[]>([]);
 
   const fetchStorageUnits = useCallback(async () => {
     try {
@@ -52,18 +76,6 @@ export default function StorageUnit() {
       setStorageUnits(data);
     } catch (error) {
       console.error('Failed to fetch storage units', error);
-    }
-  }, []);
-
-  const fetchBrands = useCallback(async () => {
-    try {
-      const { data } = await api.get<Brand[]>('/brand');
-
-      setBrandOptions(
-        data.map((brand) => ({ value: brand.id, label: brand.name }))
-      );
-    } catch (error) {
-      console.error('Erro ao buscar marcas:', error);
     }
   }, []);
 
@@ -103,8 +115,12 @@ export default function StorageUnit() {
     }
 
     const unitId = escapeHtml(unit.id);
-    const name = escapeHtml(unit.brand.name);
+    const friendlyCode = escapeHtml(unit.friendlyCode ?? '-');
     const quality = escapeHtml(QUALITY_MAP[unit.quality]);
+    const sex = escapeHtml(SEX_MAP[unit.sex]);
+    const ageGroup = escapeHtml(AGE_GROUP_MAP[unit.ageGroup]);
+    const type = escapeHtml(TYPE_MAP[unit.type]);
+    const season = escapeHtml(SEASON_MAP[unit.season]);
     const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
       unit.id
     )}`;
@@ -143,15 +159,26 @@ export default function StorageUnit() {
               margin: 6px 0;
               font-size: 15px;
             }
+            .code {
+              margin: 0 0 12px;
+              font-size: 22px;
+              font-weight: 700;
+              letter-spacing: 1px;
+              color: #02748e;
+            }
           </style>
         </head>
         <body>
           <div class="label">
             <h1 class="title">Etiqueta do Item</h1>
+            <p class="code">${friendlyCode}</p>
             <img class="qr" src="${qrSource}" alt="QR Code ${unitId}" />
-            <p class="text"><strong>ID:</strong> ${unitId}</p>
-            <p class="text"><strong>Nome:</strong> ${name}</p>
+            <p class="text"><strong>Código:</strong> ${friendlyCode}</p>
             <p class="text"><strong>Qualidade:</strong> ${quality}</p>
+            <p class="text"><strong>Sexo:</strong> ${sex}</p>
+            <p class="text"><strong>Faixa etária:</strong> ${ageGroup}</p>
+            <p class="text"><strong>Parte:</strong> ${type}</p>
+            <p class="text"><strong>Estação:</strong> ${season}</p>
           </div>
           <script>
             window.onload = function () {
@@ -168,12 +195,11 @@ export default function StorageUnit() {
     setPageTitle('Armazenamento');
     setBreadcrumbs([{ label: 'Armazenamento', href: '/portal/storage-unit' }]);
     fetchStorageUnits();
-    fetchBrands();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits, fetchBrands]);
+  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits]);
 
   const handleSave = useCallback(async () => {
     await fetchStorageUnits();
@@ -181,14 +207,18 @@ export default function StorageUnit() {
 
   return (
     <section id="storage-unit-page" className="flex flex-col items-center">
-      <StorageUnitForm onSave={handleSave} brandOptions={brandsOptions} />
+      <StorageUnitForm onSave={handleSave} />
       <div className="mt-4 w-full">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Marca</TableHead>
+              <TableHead>Código</TableHead>
               <TableHead>Qualidade</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Sexo</TableHead>
+              <TableHead>Faixa etária</TableHead>
+              <TableHead>Parte</TableHead>
+              <TableHead>Estação</TableHead>
+              <TableHead>Estado</TableHead>
               <TableHead>Ação</TableHead>
             </TableRow>
           </TableHeader>
@@ -196,8 +226,14 @@ export default function StorageUnit() {
             {storageUnits?.length > 0 ? (
               storageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
-                  <TableCell>{storageUnit.brand.name}</TableCell>
+                  <TableCell className="font-medium">
+                    {storageUnit.friendlyCode ?? '-'}
+                  </TableCell>
                   <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
+                  <TableCell>{SEX_MAP[storageUnit.sex]}</TableCell>
+                  <TableCell>{AGE_GROUP_MAP[storageUnit.ageGroup]}</TableCell>
+                  <TableCell>{TYPE_MAP[storageUnit.type]}</TableCell>
+                  <TableCell>{SEASON_MAP[storageUnit.season]}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -223,7 +259,6 @@ export default function StorageUnit() {
                       storageUnitId={storageUnit.id}
                       initialData={storageUnit}
                       onSave={handleSave}
-                      brandOptions={brandsOptions}
                     />
                     <ConfirmDialog
                       trigger={
@@ -244,7 +279,7 @@ export default function StorageUnit() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={8}
                   className="text-center py-6 text-muted-foreground"
                 >
                   Nenhum registro encontrado!

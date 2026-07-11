@@ -7,7 +7,6 @@ import {
 } from '@/app/types/package-collection';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -18,12 +17,27 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { useAppStore } from '@/store';
-import { PrinterIcon, TrashIcon } from 'lucide-react';
+import {
+  CheckCircle2Icon,
+  ChevronsRightIcon,
+  PrinterIcon,
+  QrCodeIcon,
+  TrashIcon,
+} from 'lucide-react';
+import { QrCodeDTO } from '@/app/types/qr-code';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
 import Barcode from '@/components/custom/bar-code';
+
+// Próximo estado no ciclo da rota. DRAFTING→CREATED tem botão próprio
+// ("Confirmar recolha", que dispara os emails); FINISHED é terminal.
+const NEXT_STATUS: Partial<Record<CollectionStatus, CollectionStatus>> = {
+  [CollectionStatus.CREATED]: CollectionStatus.WAITING_TO_START,
+  [CollectionStatus.WAITING_TO_START]: CollectionStatus.IN_TRANSIT,
+  [CollectionStatus.IN_TRANSIT]: CollectionStatus.FINISHED,
+};
 
 const escapeHtml = (value: string) =>
   value
@@ -49,8 +63,8 @@ export default function PackageCollection() {
   };
 
   useEffect(() => {
-    setPageTitle('Recolha');
-    setBreadcrumbs([{ label: 'Recolha', href: '/portal/package-collection' }]);
+    setPageTitle('Gerir Recolha');
+    setBreadcrumbs([{ label: 'Gerir Recolha', href: '/portal/package-collection' }]);
     fetchData();
     return () => {
       setPageTitle('');
@@ -75,6 +89,85 @@ export default function PackageCollection() {
     }
   };
 
+  const handleSetCreated = async (id: string) => {
+    setIsSubmitting(true);
+    try {
+      const res = await api.put(`/route/${id}`, {
+        status: CollectionStatus.CREATED,
+      });
+      if (res.status !== 200) throw new Error('Erro na requisição');
+      await fetchData();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAdvanceStatus = async (
+    id: string,
+    next: CollectionStatus
+  ) => {
+    setIsSubmitting(true);
+    try {
+      const res = await api.put(`/route/${id}`, { status: next });
+      if (res.status !== 200) throw new Error('Erro na requisição');
+      await fetchData();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePrintQrCodes = async (id: string) => {
+    const { data, status } = await api.get<QrCodeDTO[]>(
+      `/route/${id}/qr-codes`
+    );
+    if (status !== 200) {
+      throw new Error('Erro ao buscar os QR codes da rota');
+    }
+    if (!data.length) {
+      throw new Error('Nenhum QR code gerado para esta rota');
+    }
+
+    const printWindow = window.open('', '_blank', 'width=1024,height=900');
+    if (!printWindow) {
+      throw new Error('Permita pop-ups para imprimir');
+    }
+
+    const cards = data
+      .map((qr) => {
+        const code = escapeHtml(qr.friendlyCode);
+        const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+          qr.token
+        )}`;
+        return `<div class="card"><img src="${qrSource}" alt="QR ${code}" /><div class="code">${code}</div></div>`;
+      })
+      .join('');
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>QR Codes da Rota</title>
+          <style>
+            body { margin:0; padding:24px; font-family: Arial, sans-serif; color:#013364; }
+            h1 { font-size:18px; text-align:center; margin:0 0 20px; }
+            .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
+            .card { border:1px solid #cbd5e1; border-radius:10px; padding:12px; text-align:center; }
+            .card img { width:180px; height:180px; object-fit:contain; }
+            .code { margin-top:8px; font-size:15px; font-weight:700; letter-spacing:1px; color:#02748e; }
+            @media print { body { padding:0; } }
+          </style>
+        </head>
+        <body>
+          <h1>QR Codes da Rota</h1>
+          <div class="grid">${cards}</div>
+          <script>
+            window.onload = function () { window.print(); };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   const handlePrintRoute = async (id: string) => {
     const { data, status } = await api.get<PackageCollectionDTO>(
       `/route/${id}`
@@ -89,6 +182,7 @@ export default function PackageCollection() {
     }
 
     const routeId = escapeHtml(data.id);
+    const routeCode = escapeHtml(data.friendlyCode ?? '-');
     const driverName = escapeHtml(
       `${data.driver.firstName ?? ''} ${data.driver.lastName ?? ''}`.trim() ||
         '-'
@@ -110,18 +204,20 @@ export default function PackageCollection() {
             pkg.address.city ?? ''
           }`.trim() || '-'
         );
+        const code = escapeHtml(pkg.friendlyCode ?? '-');
 
-        return `<tr><td>${requester}</td><td>${address}</td></tr>`;
+        return `<tr><td>${code}</td><td>${requester}</td><td>${address}</td></tr>`;
       })
       .join('');
 
     const tableRows =
       rows ||
-      '<tr><td colspan="2" style="text-align:center;color:#6b7280;">Sem itens na rota</td></tr>';
+      '<tr><td colspan="3" style="text-align:center;color:#6b7280;">Sem itens na rota</td></tr>';
 
     const itemPages = data.packages
       .map((pkg, index) => {
         const itemId = escapeHtml(pkg.id);
+        const itemCode = escapeHtml(pkg.friendlyCode ?? '-');
         const requesterName = escapeHtml(
           `${pkg.user.firstName ?? ''} ${pkg.user.lastName ?? ''}`.trim() || '-'
         );
@@ -143,8 +239,8 @@ export default function PackageCollection() {
             <header class="item-header">
               <img class="logo small" src="${logoSource}" alt="Retex" />
               <div class="meta">
-                <p><strong>Rota:</strong> ${routeId}</p>
-                <p><strong>Item:</strong> ${itemId}</p>
+                <p><strong>Rota:</strong> ${routeCode}</p>
+                <p><strong>Item:</strong> ${itemCode}</p>
                 <p><strong>Data:</strong> ${safeDate}</p>
                 <p><strong>Página:</strong> ${index + 2}</p>
               </div>
@@ -180,7 +276,8 @@ export default function PackageCollection() {
                   <div class="receipt-header">RECIBO DO CLIENTE</div>
                   <div class="receipt-content">
                     <div class="receipt-body">
-                      <p><strong>ID do Item:</strong> ${itemId}</p>
+                      <p><strong>Código do Item:</strong> ${itemCode}</p>
+                      <p><strong>Rota:</strong> ${routeCode}</p>
                       <p><strong>Data:</strong> ${safeDate}</p>
                       <p><strong>Motorista:</strong> ${driverName}</p>
                       <p><strong>Cliente:</strong> ${requesterName}</p>
@@ -417,7 +514,7 @@ export default function PackageCollection() {
               <div>
                 <img class="logo" src="${logoSource}" alt="Retex" />
                 <div class="meta">
-                  <p><strong>ID da Rota:</strong> ${routeId}</p>
+                  <p><strong>Código da Rota:</strong> ${routeCode}</p>
                   <p><strong>Data:</strong> ${safeDate}</p>
                   <p><strong>Motorista:</strong> ${driverName}</p>
                 </div>
@@ -425,10 +522,11 @@ export default function PackageCollection() {
               <img class="qr" src="${qrSource}" alt="QR ${routeId}" />
             </header>
             <section class="content">
-              <h2 class="table-title">Itens da Rota</h2>
+              <h2 class="table-title">Peças da Rota</h2>
               <table>
                 <thead>
                   <tr>
+                    <th>Código</th>
                     <th>Requerente</th>
                     <th>Endereço</th>
                   </tr>
@@ -463,10 +561,11 @@ export default function PackageCollection() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead></TableHead>
               <TableHead>Motorista</TableHead>
               <TableHead>Recolha</TableHead>
+              <TableHead>Data de Recolha</TableHead>
               <TableHead>Qtd. Encomendas</TableHead>
+              <TableHead>Confirmações</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Ação</TableHead>
             </TableRow>
@@ -474,9 +573,6 @@ export default function PackageCollection() {
           <TableBody>
             {packageCollections?.map((packageCollection) => (
               <TableRow key={packageCollection.id}>
-                <TableCell>
-                  <Checkbox className="h-4 w-4 " />
-                </TableCell>
                 <TableCell className="font-medium">
                   {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}
                 </TableCell>
@@ -485,12 +581,27 @@ export default function PackageCollection() {
                     <Barcode value={packageCollection.id} />
                   </div>
                 </TableCell>
+                <TableCell>
+                  {packageCollection.startDate
+                    ? new Date(packageCollection.startDate).toLocaleDateString(
+                        'pt-PT'
+                      )
+                    : '-'}
+                </TableCell>
                 <TableCell>{packageCollection.packagesCount}</TableCell>
+                <TableCell>
+                  {packageCollection.confirmedCount ?? 0}
+                  {' / '}
+                  {packageCollection.packagesCount}
+                </TableCell>
                 <TableCell>
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       packageCollection.status === CollectionStatus.IN_TRANSIT
                         ? 'bg-yellow-100 text-yellow-800'
+                        : packageCollection.status ===
+                          CollectionStatus.WAITING_TO_START
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-green-100 text-green-800'
                     }`}
                   >
@@ -516,10 +627,90 @@ export default function PackageCollection() {
                   >
                     <PrinterIcon />
                   </Button>
+                  {(packageCollection.status ===
+                    CollectionStatus.IN_TRANSIT ||
+                    packageCollection.status ===
+                      CollectionStatus.FINISHED) && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      onClick={async () => {
+                        await toast.promise(
+                          handlePrintQrCodes(packageCollection.id),
+                          {
+                            loading: 'A preparar QR codes...',
+                            success: () => 'Impressão de QR codes pronta',
+                            error: (e) =>
+                              (e as Error)?.message ||
+                              'Erro ao imprimir QR codes',
+                          }
+                        );
+                      }}
+                      title="Imprimir QR codes da rota"
+                    >
+                      <QrCodeIcon />
+                    </Button>
+                  )}
                   <PackageCollectionForm
                     packageCollectionId={packageCollection.id}
                     onSave={() => onSave()}
                   />
+                  {packageCollection.status === CollectionStatus.DRAFTING && (
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8 text-green-600 hover:text-green-700"
+                          title="Confirmar recolha (estado Created)"
+                        >
+                          <CheckCircle2Icon />
+                        </Button>
+                      }
+                      onConfirm={async () => {
+                        await toast.promise(
+                          handleSetCreated(packageCollection.id),
+                          {
+                            loading: 'Loading...',
+                            success: () =>
+                              'Recolha confirmada e emails enviados aos clientes',
+                            error: () => 'Erro ao confirmar a recolha',
+                          }
+                        );
+                      }}
+                    />
+                  )}
+                  {NEXT_STATUS[packageCollection.status] && (
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8 text-blue-600 hover:text-blue-700"
+                          title={`Avançar para ${
+                            NEXT_STATUS[packageCollection.status]
+                          }`}
+                        >
+                          <ChevronsRightIcon />
+                        </Button>
+                      }
+                      onConfirm={async () => {
+                        const next = NEXT_STATUS[packageCollection.status];
+                        if (!next) return;
+                        await toast.promise(
+                          handleAdvanceStatus(packageCollection.id, next),
+                          {
+                            loading: 'Loading...',
+                            success: () => `Estado atualizado para ${next}`,
+                            error: () => 'Erro ao atualizar o estado',
+                          }
+                        );
+                      }}
+                    />
+                  )}
                   <ConfirmDialog
                     trigger={
                       <Button
@@ -549,7 +740,7 @@ export default function PackageCollection() {
             {packageCollections.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={7}
                   className="text-center text-sm text-gray-500"
                 >
                   {

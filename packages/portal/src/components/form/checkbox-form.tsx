@@ -22,6 +22,7 @@ interface CheckboxFormProps<T extends FieldValues> {
   className?: string;
   checked?: boolean;
   onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
 }
 
 export function CheckboxForm<T extends FieldValues>({
@@ -34,6 +35,7 @@ export function CheckboxForm<T extends FieldValues>({
   className,
   checked,
   onCheckedChange,
+  disabled,
 }: CheckboxFormProps<T>) {
   const error = errors?.[name];
   return (
@@ -48,6 +50,7 @@ export function CheckboxForm<T extends FieldValues>({
               id={id || name}
               checked={checked}
               onCheckedChange={onCheckedChange}
+              disabled={disabled}
               className={className}
             />
           )}

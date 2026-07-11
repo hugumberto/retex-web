@@ -1,6 +1,6 @@
 // app/auth/actions.ts
 'use client';
-import api from '@/lib/api';
+import api, { refreshAccessToken } from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
 
@@ -22,24 +22,15 @@ export async function login(email: string, password: string) {
 }
 
 export async function bootstrapAuth() {
-  // chama refresh logo ao montar a app para obter um access a partir do refresh token
+  // Chama refresh logo ao montar a app para obter um access a partir do refresh
+  // token. Usa o mesmo single-flight do interceptor: se já houver um refresh em
+  // curso (ex.: um pedido de dados que tomou 401, ou um segundo mount em
+  // StrictMode), reusa a mesma promise em vez de gastar o token uma 2ª vez.
   const refreshToken = useAppStore.getState().refreshToken;
   if (!refreshToken) return; // sem sessão guardada — nada a fazer
-  try {
-    const { data } = await api.post(`/auth/refresh`, {
-      refresh_token: refreshToken,
-    });
-    if (data) {
-      const access = data.access_token ?? data.accessToken ?? null;
-      useAppStore.getState().setAccessToken(access);
-      // Guardar o refresh token rotacionado (o backend revoga o anterior).
-      const newRefresh = data.refresh_token ?? data.refreshToken ?? null;
-      if (newRefresh) useAppStore.getState().setRefreshToken(newRefresh);
-      if (data.user) {
-        useAppStore.getState().setUser(data.user);
-      }
-    }
-  } catch {
+
+  const access = await refreshAccessToken();
+  if (!access) {
     useAppStore.getState().setAccessToken(null);
     useAppStore.getState().setUser(null);
   }

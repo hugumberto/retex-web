@@ -2,6 +2,7 @@ import { PackageStatus } from '@/app/types/package';
 
 export const STATUS_LABEL: Record<PackageStatus, string> = {
   [PackageStatus.CREATED]: 'Criado',
+  [PackageStatus.CONFIRMED]: 'Confirmado',
   [PackageStatus.OUT_OF_ZONE]: 'Fora da Zona',
   [PackageStatus.WAITING_FOR_COLLECTION]: 'Aguarda Recolha',
   [PackageStatus.COLLECTED]: 'Recolhido',
@@ -14,6 +15,7 @@ export const STATUS_LABEL: Record<PackageStatus, string> = {
 
 export const STATUS_CLASS: Record<PackageStatus, string> = {
   [PackageStatus.CREATED]: 'bg-blue-100 text-blue-700',
+  [PackageStatus.CONFIRMED]: 'bg-green-100 text-green-700',
   [PackageStatus.OUT_OF_ZONE]: 'bg-amber-100 text-amber-700',
   [PackageStatus.WAITING_FOR_COLLECTION]: 'bg-yellow-100 text-yellow-700',
   [PackageStatus.COLLECTED]: 'bg-teal-100 text-teal-700',
@@ -27,6 +29,7 @@ export const STATUS_CLASS: Record<PackageStatus, string> = {
 /** Cor (hex) por status, para usar em gráficos (recharts). */
 export const STATUS_COLOR: Record<PackageStatus, string> = {
   [PackageStatus.CREATED]: '#3b82f6',
+  [PackageStatus.CONFIRMED]: '#22c55e',
   [PackageStatus.OUT_OF_ZONE]: '#f59e0b',
   [PackageStatus.WAITING_FOR_COLLECTION]: '#eab308',
   [PackageStatus.COLLECTED]: '#14b8a6',

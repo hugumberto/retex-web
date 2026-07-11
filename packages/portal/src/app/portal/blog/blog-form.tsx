@@ -160,7 +160,7 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
         </div>
         <div>
           <SelectForm
-            label="Status"
+            label="Estado"
             name="status"
             control={control}
             options={[BlogPostStatus.DRAFT, BlogPostStatus.PUBLISHED]}

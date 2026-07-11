@@ -235,7 +235,7 @@ export default function Dashboard() {
       <div>
         <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Visão geral de coletas, triagem, impacto e utilizadores.
+          Visão geral de recolhas, triagem, impacto e utilizadores.
         </p>
       </div>
 
@@ -254,7 +254,7 @@ export default function Dashboard() {
         />
         <KpiCard
           icon={Recycle}
-          label="Total de Itens Triados"
+          label="Total de Peças Triadas"
           value={fmt(triage.totalItems)}
         />
         <KpiCard icon={Users} label="Utilizadores" value={fmt(users.total)} />
@@ -329,7 +329,7 @@ export default function Dashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Tendência de Peso Coletado"
+          title="Tendência de Peso Recolhido"
           description="Últimos 12 meses (kg)"
           isEmpty={trendData.length === 0}
         >
@@ -350,7 +350,7 @@ export default function Dashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Qualidade dos Itens"
+          title="Qualidade das peças"
           description="Quantidade por qualidade"
           isEmpty={qualityData.length === 0}
         >
@@ -394,7 +394,7 @@ export default function Dashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Itens por Estação"
+          title="Peças por estação"
           isEmpty={seasonData.length === 0}
         >
           <ResponsiveContainer width="100%" height={260}>
@@ -407,7 +407,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Itens por Tipo" isEmpty={typeData.length === 0}>
+        <ChartCard title="Tipo de peça" isEmpty={typeData.length === 0}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={typeData} margin={{ left: -16 }}>
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
@@ -424,7 +424,7 @@ export default function Dashboard() {
         <CardHeader>
           <CardTitle>Cidades Fora da Zona de Atuação</CardTitle>
           <CardDescription>
-            Procura por cidades ainda não atendidas (demanda potencial).
+            Procura por cidades ainda não abrangidas (potencial procura).
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -15,6 +15,9 @@ import {
   NewspaperIcon,
   Globe,
   Settings,
+  PackageCheck,
+  Truck,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -48,7 +51,7 @@ export function cn(...inputs: ClassValue[]) {
 export const NAV_ITEMS: NavEntry[] = [
   {
     href: '/portal',
-    label: 'HOME',
+    label: 'INÍCIO',
     icon: LayoutDashboard,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
   },
@@ -60,33 +63,40 @@ export const NAV_ITEMS: NavEntry[] = [
   },
   {
     href: '/portal/triage',
-    label: 'TRIAGE',
+    label: 'TRIAGEM',
     icon: RefreshCw,
     roles: [Role.ADMIN, Role.OPS],
   },
   {
     href: '/portal/collection-request',
-    label: 'SOLICITAR COLETA',
+    label: 'SOLICITAR RECOLHA',
     icon: HandHelping,
     roles: [Role.ADMIN, Role.OPS, Role.USER],
   },
   {
-    href: '/portal/package-collection',
-    label: 'RECOLHA',
-    icon: ClipboardList,
+    label: 'LOGÍSTICA',
+    icon: Truck,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
-  },
-  {
-    href: '/portal/storage-unit',
-    label: 'ARMAZENAMENTO',
-    icon: Boxes,
-    roles: [Role.ADMIN, Role.OPS],
-  },
-  {
-    href: '/portal/brand',
-    label: 'MARCA',
-    icon: Tag,
-    roles: [Role.ADMIN, Role.OPS],
+    children: [
+      {
+        href: '/portal/package-collection',
+        label: 'GERIR RECOLHA',
+        icon: ClipboardList,
+        roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
+      },
+      {
+        href: '/portal/storage-unit',
+        label: 'ARMAZENAMENTO',
+        icon: Boxes,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+      {
+        href: '/portal/coleta',
+        label: 'RECOLHA',
+        icon: PackageCheck,
+        roles: [Role.ADMIN, Role.DRIVER],
+      },
+    ],
   },
   {
     label: 'LANDING PAGE',
@@ -125,6 +135,12 @@ export const NAV_ITEMS: NavEntry[] = [
         roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
       },
       {
+        href: '/portal/brand',
+        label: 'MARCA',
+        icon: Tag,
+        roles: [Role.ADMIN, Role.OPS],
+      },
+      {
         href: '/portal/user',
         label: 'Utilizadores',
         icon: UserIcon,
@@ -134,6 +150,12 @@ export const NAV_ITEMS: NavEntry[] = [
         href: '/portal/zona',
         label: 'Zonas',
         icon: MapPin,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/parametros',
+        label: 'Parâmetros',
+        icon: SlidersHorizontal,
         roles: [Role.ADMIN],
       },
     ],

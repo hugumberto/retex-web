@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import {
+  Baby,
   Frown,
   Meh,
   Shirt,
@@ -27,6 +28,8 @@ import {
   Snowflake,
   Sun,
   TrashIcon,
+  User,
+  UserRound,
   X,
 } from 'lucide-react';
 import React from 'react';
@@ -51,6 +54,16 @@ const seasonOptions: TriageOption[] = [
 const clothingTypeOptions: TriageOption[] = [
   { value: 'UPPER_PART', label: 'Parte de cima', icon: Shirt },
   { value: 'UNDER_PART', label: 'Parte de baixo', icon: Shirt },
+];
+
+const sexOptions: TriageOption[] = [
+  { value: 'MALE', label: 'Homem', icon: User },
+  { value: 'FEMALE', label: 'Mulher', icon: UserRound },
+];
+
+const ageGroupOptions: TriageOption[] = [
+  { value: 'ADULT', label: 'Adulto', icon: User },
+  { value: 'CHILD', label: 'Infantil', icon: Baby },
 ];
 
 function OptionSelector({
@@ -105,6 +118,10 @@ type CollectionRecordProps = {
   onSeasonChange: (value: 'SUMMER' | 'WINTER') => void;
   clothingType?: 'UPPER_PART' | 'UNDER_PART';
   onClothingTypeChange: (value: 'UPPER_PART' | 'UNDER_PART') => void;
+  sex?: 'MALE' | 'FEMALE';
+  onSexChange: (value: 'MALE' | 'FEMALE') => void;
+  ageGroup?: 'ADULT' | 'CHILD';
+  onAgeGroupChange: (value: 'ADULT' | 'CHILD') => void;
   onAdd: () => void | Promise<void>;
   onDeleteItem: (item: TriageListItem, index: number) => void | Promise<void>;
   deletingItemIndex?: number | null;
@@ -126,6 +143,10 @@ export default function CollectionRecord({
   onSeasonChange,
   clothingType,
   onClothingTypeChange,
+  sex,
+  onSexChange,
+  ageGroup,
+  onAgeGroupChange,
   onAdd,
   onDeleteItem,
   deletingItemIndex,
@@ -147,6 +168,8 @@ export default function CollectionRecord({
             <TableHeader>
               <TableRow>
                 <TableHead>Qualidade</TableHead>
+                <TableHead>Sexo</TableHead>
+                <TableHead>Faixa etária</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Estação</TableHead>
                 <TableHead>Marca</TableHead>
@@ -159,6 +182,8 @@ export default function CollectionRecord({
                 items.map((item, index) => (
                   <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
                     <TableCell>{item.quality}</TableCell>
+                    <TableCell>{item.sex}</TableCell>
+                    <TableCell>{item.ageGroup}</TableCell>
                     <TableCell>{item.type}</TableCell>
                     <TableCell>{item.season}</TableCell>
                     <TableCell>
@@ -191,7 +216,7 @@ export default function CollectionRecord({
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={8}
                     className="h-20 text-center text-secondary/55"
                   >
                     {selectedPackageId ?? 'Tabela de itens'}
@@ -268,6 +293,28 @@ export default function CollectionRecord({
             onSelect={(value) =>
               onClothingTypeChange(value as 'UPPER_PART' | 'UNDER_PART')
             }
+          />
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-secondary">Sexo *</p>
+          <OptionSelector
+            options={sexOptions}
+            selected={sex}
+            disabled={isViewMode}
+            onSelect={(value) => onSexChange(value as 'MALE' | 'FEMALE')}
+          />
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-secondary">
+            Faixa etária *
+          </p>
+          <OptionSelector
+            options={ageGroupOptions}
+            selected={ageGroup}
+            disabled={isViewMode}
+            onSelect={(value) => onAgeGroupChange(value as 'ADULT' | 'CHILD')}
           />
         </div>
 

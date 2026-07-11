@@ -120,7 +120,7 @@ export default function Faq() {
                 <TableHead>Título</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Itens</TableHead>
-                <TableHead>Acção</TableHead>
+                <TableHead>Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -201,7 +201,7 @@ export default function Faq() {
               <TableRow>
                 <TableHead>Pergunta</TableHead>
                 <TableHead>Resposta</TableHead>
-                <TableHead>Acção</TableHead>
+                <TableHead>Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

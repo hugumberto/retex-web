@@ -107,7 +107,7 @@ export default function Zona() {
             <TableRow>
               <TableHead>Cidade</TableHead>
               <TableHead>Criada em</TableHead>
-              <TableHead>Acção</TableHead>
+              <TableHead>Ação</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

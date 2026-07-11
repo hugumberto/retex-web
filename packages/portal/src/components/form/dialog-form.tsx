@@ -28,6 +28,8 @@ interface DialogFormProps<T extends FieldValues> {
   loading?: boolean;
   errors: FieldErrors<T>;
   triggerText?: string;
+  /** Classes extra no DialogContent (ex.: largura do modal). */
+  contentClassName?: string;
 }
 
 export function DialogForm<T extends FieldValues>({
@@ -43,6 +45,7 @@ export function DialogForm<T extends FieldValues>({
   children,
   loading = false,
   errors,
+  contentClassName,
 }: DialogFormProps<T>) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = open !== undefined;
@@ -70,7 +73,7 @@ export function DialogForm<T extends FieldValues>({
   return (
     <Dialog open={actualOpen} onOpenChange={handleOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent aria-describedby={undefined} className={contentClassName}>
         <DialogHeader>
           <DialogTitle className="text-secondary">{title}</DialogTitle>
           {description && (

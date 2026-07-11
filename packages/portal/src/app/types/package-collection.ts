@@ -2,41 +2,39 @@ import { Entity } from "./helper";
 import { PackageDTO } from "./package";
 import { UserDTO } from "./user";
 
-export enum Shift {
-    MORNING = 'Manhã',
-    AFTERNOON = 'Tarde',
-    NIGHT = 'Noite',
-  }
     export interface PackageCollectionFormData {
     id?: string;
-    driverId: string; 
+    driverId: string;
     startDate: Date;
-    shift: Shift;
     packageIds: string[];
     status: CollectionStatus;
-  }
-  
-  export interface CollectionItemResponse {
-    id: string;
-    address: string;
-    dayOfWeek: string;
-    shift: Shift;
+    collectionInterval: CollectionInterval;
   }
 
  export interface PackageCollectionDTO extends Entity {
   status: CollectionStatus
+  friendlyCode?: string
+  collectionInterval?: CollectionInterval
   driver: UserDTO
   packages: PackageDTO[]
   startDate: Date
   endDate?: Date
 }
- export interface PackageCollectionTableDTO extends Exclude<PackageCollectionDTO, 'packages'> {  
+
+export enum CollectionInterval {
+  MORNING = '09:00 - 13:00',
+  AFTERNOON = '13:00 - 17:00',
+  EVENING = '17:00 - 21:00',
+}
+ export interface PackageCollectionTableDTO extends Exclude<PackageCollectionDTO, 'packages'> {
   packagesCount: number
+  confirmedCount: number
 }
 
 export enum CollectionStatus {
   DRAFTING = 'DRAFTING',
   CREATED = 'CREATED',
+  WAITING_TO_START = 'WAITING_TO_START',
   IN_TRANSIT = 'IN_TRANSIT',
   FINISHED = 'FINISHED',
 }
