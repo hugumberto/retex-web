@@ -265,6 +265,12 @@ export default function PackageCollectionForm({
       return;
     }
 
+    const apiKey = process.env.NEXT_PUBLIC_TOMTOM_API_KEY;
+    if (!apiKey) {
+      toast.error('Configuração do mapa indisponível');
+      return;
+    }
+
     setIsOptimizing(true);
     try {
       const locations = selectedWithCoords.map((pkg) => {
@@ -273,7 +279,7 @@ export default function PackageCollectionForm({
       });
 
       const response = await ttServices.services.calculateRoute({
-        key: process.env.NEXT_PUBLIC_TOMTOM_API_KEY as string,
+        key: apiKey,
         locations,
         // Otimiza a ordem dos pontos intermédios (mantém origem/destino).
         computeBestOrder: selectedWithCoords.length >= 3,

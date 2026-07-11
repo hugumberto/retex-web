@@ -43,8 +43,15 @@ export default function CollectionMap({
   // Inicializa o mapa uma única vez.
   useEffect(() => {
     if (!containerRef.current) return;
+    const apiKey = process.env.NEXT_PUBLIC_TOMTOM_API_KEY;
+    if (!apiKey) {
+      console.error(
+        'NEXT_PUBLIC_TOMTOM_API_KEY não está definida; o mapa não será inicializado.'
+      );
+      return;
+    }
     const map = tt.map({
-      key: process.env.NEXT_PUBLIC_TOMTOM_API_KEY as string,
+      key: apiKey,
       container: containerRef.current,
       center: DEFAULT_CENTER,
       zoom: 9,
