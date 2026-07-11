@@ -597,12 +597,13 @@ export default function Triage() {
                     (item) => item.qrCodeId === qr.id
                   ).length;
                   const processed = qr.processedAt != null;
-                  const displayWeight = processed
-                    ? qr.weight != null
-                      ? Number(qr.weight).toFixed(2)
-                      : '-'
-                    : volumeWeight.trim()
-                      ? Number(volumeWeight).toFixed(2)
+                  const rawWeight = processed ? qr.weight : volumeWeight;
+                  const numWeight = Number(rawWeight);
+                  const displayWeight =
+                    rawWeight != null &&
+                    `${rawWeight}`.trim() !== '' &&
+                    Number.isFinite(numWeight)
+                      ? numWeight.toFixed(2)
                       : '-';
                   return (
                     <TableRow key={qr.id}>
