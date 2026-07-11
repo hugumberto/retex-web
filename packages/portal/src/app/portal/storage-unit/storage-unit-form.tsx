@@ -118,7 +118,7 @@ export default function StorageUnitForm({
               ageGroup: data.ageGroup,
               type: data.type,
               season: data.season,
-              state: data.state,
+              status: data.state,
               weight: Number.parseFloat(data.weight.toString()),
             });
             if (!isSuccessStatus(res.status))

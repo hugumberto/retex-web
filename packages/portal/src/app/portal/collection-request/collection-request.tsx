@@ -334,6 +334,7 @@ export default function CollectionRequest() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Código</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Contacto</TableHead>
@@ -347,6 +348,7 @@ export default function CollectionRequest() {
               {requests.length > 0 ? (
                 requests.map((request) => (
                   <TableRow key={request.id}>
+                    <TableCell className="font-medium">{request.friendlyCode ?? '-'}</TableCell>
                     <TableCell>{`${request.user?.firstName ?? '-'} ${request.user?.lastName ?? ''}`.trim()}</TableCell>
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
                     <TableCell>{request.user?.contactPhone ?? '-'}</TableCell>
@@ -369,7 +371,7 @@ export default function CollectionRequest() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
                     Nenhum registro encontrado!
                   </TableCell>
                 </TableRow>

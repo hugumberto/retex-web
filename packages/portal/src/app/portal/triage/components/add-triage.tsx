@@ -50,6 +50,7 @@ const SEASON_MAP: Record<Season, string> = {
 export type TriageListItem = {
   id?: string;
   packageId: string;
+  qrCodeId?: string;
   quality: 'GOOD' | 'MEDIUM' | 'BAD';
   type: 'UPPER_PART' | 'UNDER_PART';
   season: 'SUMMER' | 'WINTER';
@@ -82,6 +83,8 @@ type AddTriageProps = {
   deletingItemIndex?: number | null;
   onFinishTriage: () => void | Promise<void>;
   isFinishingTriage?: boolean;
+  disableFinish?: boolean;
+  hideFinishButton?: boolean;
 };
 
 export default function AddTriage({
@@ -97,6 +100,8 @@ export default function AddTriage({
   deletingItemIndex,
   onFinishTriage,
   isFinishingTriage,
+  disableFinish,
+  hideFinishButton,
 }: AddTriageProps) {
   const storageInputRef = useRef<HTMLInputElement>(null);
   const shouldRefocusStorageInputRef = useRef(false);
@@ -125,6 +130,7 @@ export default function AddTriage({
   );
 
   const isFinishDisabled =
+    disableFinish ||
     items.length === 0 ||
     validStorageUnits.length === 0 ||
     hasInvalidItemCombination ||
@@ -268,19 +274,21 @@ export default function AddTriage({
           </TableBody>
         </Table>
 
-        <div className="flex justify-center pt-1">
-          <Button
-            type="button"
-            variant="secondary"
-            className="min-w-40"
-            disabled={isFinishDisabled || isViewMode}
-            onClick={onFinishTriage}
-            aria-busy={isFinishingTriage}
-          >
-            <Check className="size-4" />
-            Finalizar Triagem
-          </Button>
-        </div>
+        {!hideFinishButton && (
+          <div className="flex justify-center pt-1">
+            <Button
+              type="button"
+              variant="secondary"
+              className="min-w-40"
+              disabled={isFinishDisabled || isViewMode}
+              onClick={onFinishTriage}
+              aria-busy={isFinishingTriage}
+            >
+              <Check className="size-4" />
+              Finalizar Triagem
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

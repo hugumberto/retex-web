@@ -19,6 +19,7 @@ export interface Address {
 
 export interface PackageDTO extends Entity {
   status: PackageStatus
+  friendlyCode?: string
   user: UserDTO
   route?: PackageCollectionDTO
   weight?: number
@@ -36,6 +37,7 @@ export interface PackageItemDTO extends Entity {
   ageGroup: AgeGroup
   brand: Brand
   quantity: number
+  qrCode?: { id: string; friendlyCode?: string } | null
 }
 
 export enum Quality {
@@ -66,6 +68,7 @@ export enum AgeGroup {
 
 export enum PackageStatus {
   CREATED = 'CREATED',
+  CONFIRMED = 'CONFIRMED',
   OUT_OF_ZONE = 'OUT_OF_ZONE',
   WAITING_FOR_COLLECTION = 'WAITING_FOR_COLLECTION',
   COLLECTED = 'COLLECTED',

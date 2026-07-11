@@ -115,6 +115,7 @@ export default function StorageUnit() {
     }
 
     const unitId = escapeHtml(unit.id);
+    const friendlyCode = escapeHtml(unit.friendlyCode ?? '-');
     const quality = escapeHtml(QUALITY_MAP[unit.quality]);
     const sex = escapeHtml(SEX_MAP[unit.sex]);
     const ageGroup = escapeHtml(AGE_GROUP_MAP[unit.ageGroup]);
@@ -158,13 +159,21 @@ export default function StorageUnit() {
               margin: 6px 0;
               font-size: 15px;
             }
+            .code {
+              margin: 0 0 12px;
+              font-size: 22px;
+              font-weight: 700;
+              letter-spacing: 1px;
+              color: #02748e;
+            }
           </style>
         </head>
         <body>
           <div class="label">
             <h1 class="title">Etiqueta do Item</h1>
+            <p class="code">${friendlyCode}</p>
             <img class="qr" src="${qrSource}" alt="QR Code ${unitId}" />
-            <p class="text"><strong>ID:</strong> ${unitId}</p>
+            <p class="text"><strong>Código:</strong> ${friendlyCode}</p>
             <p class="text"><strong>Qualidade:</strong> ${quality}</p>
             <p class="text"><strong>Sexo:</strong> ${sex}</p>
             <p class="text"><strong>Faixa etária:</strong> ${ageGroup}</p>
@@ -203,6 +212,7 @@ export default function StorageUnit() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Código</TableHead>
               <TableHead>Qualidade</TableHead>
               <TableHead>Sexo</TableHead>
               <TableHead>Faixa etária</TableHead>
@@ -216,6 +226,9 @@ export default function StorageUnit() {
             {storageUnits?.length > 0 ? (
               storageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
+                  <TableCell className="font-medium">
+                    {storageUnit.friendlyCode ?? '-'}
+                  </TableCell>
                   <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
                   <TableCell>{SEX_MAP[storageUnit.sex]}</TableCell>
                   <TableCell>{AGE_GROUP_MAP[storageUnit.ageGroup]}</TableCell>
@@ -266,7 +279,7 @@ export default function StorageUnit() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={8}
                   className="text-center py-6 text-muted-foreground"
                 >
                   Nenhum registro encontrado!

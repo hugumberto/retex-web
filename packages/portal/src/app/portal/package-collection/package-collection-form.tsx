@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  CollectionInterval,
   CollectionStatus,
   PackageCollectionDTO,
   PackageCollectionFormData,
@@ -30,7 +31,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
-import { PackageDTO } from '../../types/package';
+import { PackageDTO, PackageStatus } from '../../types/package';
 import { Role, UserDTO, UserStatus } from '../../types/user';
 import { hasValidCoords, minDistanceKm, readCoords } from './utils';
 
@@ -80,36 +81,57 @@ export default function PackageCollectionForm({
       startDate: undefined,
       packageIds: [],
       status: CollectionStatus.DRAFTING,
+      collectionInterval: undefined,
     },
   });
+
+  const intervalOptions: SelectFieldOption[] = [
+    { value: CollectionInterval.MORNING, label: CollectionInterval.MORNING },
+    {
+      value: CollectionInterval.AFTERNOON,
+      label: CollectionInterval.AFTERNOON,
+    },
+    { value: CollectionInterval.EVENING, label: CollectionInterval.EVENING },
+  ];
 
   const [driverOptions, setDriverOptions] = useState<SelectFieldOption[]>([]);
   // Elegíveis (CREATED sem rota) e as já atribuídas à rota (modo edição) são
   // mantidas separadas; a lista exibida é a união determinística das duas.
   const [eligiblePackages, setEligiblePackages] = useState<PackageDTO[]>([]);
   const [routePackages, setRoutePackages] = useState<PackageDTO[]>([]);
-  const packages = useMemo(
-    () => mergeById(routePackages, eligiblePackages),
-    [routePackages, eligiblePackages]
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const [isEditing] = useState(!!packageCollectionId);
-  const [routeGeoJson, setRouteGeoJson] = useState<FeatureCollection | null>(null);
-  const [optimizedOrderIds, setOptimizedOrderIds] = useState<string[]>([]);
-  const [isOptimizing, setIsOptimizing] = useState(false);
-  const [loadedStatus, setLoadedStatus] = useState<CollectionStatus | null>(null);
-
-  const statusOptions = [
-    CollectionStatus.DRAFTING,
-    CollectionStatus.CREATED,
-    CollectionStatus.IN_TRANSIT,
-    CollectionStatus.FINISHED,
-  ];
+  const [loadedStatus, setLoadedStatus] = useState<CollectionStatus | null>(
+    null
+  );
 
   // Rota já confirmada (não-DRAFTING) trava a composição; só o estado avança.
   const isLocked =
-    isEditing && loadedStatus != null && loadedStatus !== CollectionStatus.DRAFTING;
+    isEditing &&
+    loadedStatus != null &&
+    loadedStatus !== CollectionStatus.DRAFTING;
+
+  // Lista exibida: em modo de visualização (rota travada) mostra apenas os
+  // pacotes vinculados à rota; caso contrário, os da rota + os elegíveis
+  // (CREATED, sem rota).
+  const packages = useMemo(
+    () =>
+      isLocked
+        ? routePackages
+        : mergeById(
+            routePackages,
+            eligiblePackages.filter(
+              (pkg) => pkg.status === PackageStatus.CREATED
+            )
+          ),
+    [isLocked, routePackages, eligiblePackages]
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [routeGeoJson, setRouteGeoJson] = useState<FeatureCollection | null>(
+    null
+  );
+  const [optimizedOrderIds, setOptimizedOrderIds] = useState<string[]>([]);
+  const [isOptimizing, setIsOptimizing] = useState(false);
 
   const packageIds = watch('packageIds');
 
@@ -129,8 +151,7 @@ export default function PackageCollectionForm({
   );
 
   const selectedWithCoords = useMemo(
-    () =>
-      eligibleWithCoords.filter((pkg) => packageIds?.includes(pkg.id)),
+    () => eligibleWithCoords.filter((pkg) => packageIds?.includes(pkg.id)),
     [eligibleWithCoords, packageIds]
   );
 
@@ -198,6 +219,7 @@ export default function PackageCollectionForm({
       startDate: new Date(data.startDate),
       packageIds: (data.packages ?? []).map((pkg) => pkg.id),
       status: data.status,
+      collectionInterval: data.collectionInterval,
     });
     setLoadedStatus(data.status);
     // As solicitações da rota não vêm em /package/created (têm route_id).
@@ -259,13 +281,20 @@ export default function PackageCollectionForm({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
-      const geojson = (response as { toGeoJson: () => FeatureCollection }).toGeoJson();
+      const geojson = (
+        response as { toGeoJson: () => FeatureCollection }
+      ).toGeoJson();
       setRouteGeoJson(geojson);
 
       // Reordena a lista conforme a melhor ordem, quando disponível.
-      const optimized = (response as {
-        optimizedWaypoints?: { providedIndex: number; optimizedIndex: number }[];
-      }).optimizedWaypoints;
+      const optimized = (
+        response as {
+          optimizedWaypoints?: {
+            providedIndex: number;
+            optimizedIndex: number;
+          }[];
+        }
+      ).optimizedWaypoints;
 
       if (optimized?.length) {
         const middle = [...optimized]
@@ -312,6 +341,7 @@ export default function PackageCollectionForm({
               startDate: formattedDate,
               packageIds: data.packageIds,
               status: data.status,
+              collectionInterval: data.collectionInterval,
             };
         if (isEditing) {
           const res = await api.put(`/route/${packageCollectionId}`, payload);
@@ -345,6 +375,9 @@ export default function PackageCollectionForm({
   const addressLabel = (pkg: PackageDTO) =>
     `${pkg.address.street} ${pkg.address.number}`.trim() || '-';
 
+  const userName = (pkg: PackageDTO) =>
+    `${pkg.user?.firstName ?? ''} ${pkg.user?.lastName ?? ''}`.trim() || '-';
+
   return (
     <DialogForm
       triggerText="Criar"
@@ -353,6 +386,7 @@ export default function PackageCollectionForm({
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
       errors={errors}
+      contentClassName="sm:max-w-6xl max-h-[90vh] overflow-y-auto"
       trigger={
         isEditing ? (
           <Button variant="ghost" size="icon" className="size-8">
@@ -365,8 +399,8 @@ export default function PackageCollectionForm({
         )
       }
     >
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div className="md:col-span-2">
           <SelectForm
             label="Motorista"
             name="driverId"
@@ -389,191 +423,223 @@ export default function PackageCollectionForm({
           />
         </div>
 
+        <div>
+          <SelectForm
+            label="Intervalo da Recolha"
+            name="collectionInterval"
+            control={control}
+            rules={{ required: 'O intervalo é obrigatório' }}
+            options={intervalOptions}
+            errors={errors}
+            disabled={isLocked}
+          />
+        </div>
+
         {isLocked && (
-          <div className="md:col-span-2">
+          <div className="md:col-span-4">
             <p className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
               Rota confirmada — motorista, solicitações e data ficam bloqueados.
               Apenas o estado pode avançar.
             </p>
           </div>
         )}
+      </div>
 
-        {isEditing && (
-          <div className="md:col-span-2">
-            <SelectForm
-              label="Estado"
-              name="status"
-              control={control}
-              options={statusOptions}
+      {/* Mapa e listas lado a lado no desktop; empilhados no mobile. */}
+      <div className="grid grid-cols-1 gap-x-6 lg:grid-cols-2">
+        {/* Coluna do mapa */}
+        <div>
+          {/* Mapa das solicitações elegíveis */}
+          <div className="pt-6">
+            <div className="mb-3 flex items-center justify-between">
+              <Title as="h3">Mapa das solicitações</Title>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={optimizeRoute}
+                disabled={
+                  isOptimizing || selectedWithCoords.length < 2 || isLocked
+                }
+              >
+                {isOptimizing ? 'A otimizar...' : 'Otimizar rota'}
+              </Button>
+            </div>
+            <CollectionMap
+              packages={eligibleWithCoords}
+              selectedIds={packageIds ?? []}
+              suggestedIds={suggestedIds}
+              routeGeoJson={routeGeoJson}
+              onToggle={isLocked ? () => undefined : togglePackage}
             />
+            <p className="mt-2 text-xs text-muted-foreground">
+              Azul: selecionadas · Laranja: sugeridas (≤ {NEARBY_THRESHOLD_KM}{' '}
+              km) · Cinza: elegíveis. Clique num marcador para selecionar.
+            </p>
           </div>
-        )}
-      </div>
 
-      {/* Mapa das solicitações elegíveis */}
-      <div className="pt-6">
-        <div className="mb-3 flex items-center justify-between">
-          <Title as="h3">Mapa das solicitações</Title>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={optimizeRoute}
-            disabled={isOptimizing || selectedWithCoords.length < 2 || isLocked}
-          >
-            {isOptimizing ? 'A otimizar...' : 'Otimizar rota'}
-          </Button>
-        </div>
-        <CollectionMap
-          packages={eligibleWithCoords}
-          selectedIds={packageIds ?? []}
-          suggestedIds={suggestedIds}
-          routeGeoJson={routeGeoJson}
-          onToggle={isLocked ? () => undefined : togglePackage}
-        />
-        <p className="mt-2 text-xs text-muted-foreground">
-          Azul: selecionadas · Laranja: sugeridas (≤ {NEARBY_THRESHOLD_KM} km) ·
-          Cinza: elegíveis. Clique num marcador para selecionar.
-        </p>
-      </div>
-
-      {/* Ordem sugerida da rota */}
-      {optimizedOrderIds.length > 0 && (
-        <div className="pt-6">
-          <Title as="h3">Ordem sugerida da rota</Title>
-          <ol className="mt-3 list-decimal space-y-1 pl-6 text-sm">
-            {optimizedOrderIds.map((id) => {
-              const pkg = packagesById.get(id);
-              return <li key={id}>{pkg ? addressLabel(pkg) : id}</li>;
-            })}
-          </ol>
-        </div>
-      )}
-
-      {/* Sugeridas perto da rota */}
-      {suggestedIds.length > 0 && (
-        <div className="pt-6">
-          <Title as="h3">Sugeridas perto da rota</Title>
-          <div className="mt-4 w-full">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Morada</TableHead>
-                  <TableHead>Ação</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {suggestedIds.map((id) => {
+          {/* Ordem sugerida da rota */}
+          {optimizedOrderIds.length > 0 && (
+            <div className="pt-6">
+              <Title as="h3">Ordem sugerida da rota</Title>
+              <ol className="mt-3 list-decimal space-y-1 pl-6 text-sm">
+                {optimizedOrderIds.map((id) => {
                   const pkg = packagesById.get(id);
-                  if (!pkg) return null;
-                  return (
-                    <TableRow key={id}>
-                      <TableCell>{addressLabel(pkg)}</TableCell>
-                      <TableCell>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => togglePackage(id)}
-                          disabled={isLocked}
-                        >
-                          Adicionar
-                        </Button>
+                  return <li key={id}>{pkg ? addressLabel(pkg) : id}</li>;
+                })}
+              </ol>
+            </div>
+          )}
+
+          {/* fim da coluna do mapa */}
+        </div>
+
+        {/* Coluna das listas */}
+        <div>
+          {/* Sugeridas perto da rota */}
+          {suggestedIds.length > 0 && (
+            <div className="pt-6">
+              <Title as="h3">Sugeridas perto da rota</Title>
+              <div className="mt-4 w-full">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Solicitante</TableHead>
+                      <TableHead>Volumes</TableHead>
+                      <TableHead>Ação</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {suggestedIds.map((id) => {
+                      const pkg = packagesById.get(id);
+                      if (!pkg) return null;
+                      return (
+                        <TableRow key={id}>
+                          <TableCell>
+                            {userName(pkg)}
+                            <br />
+                            {addressLabel(pkg)}
+                          </TableCell>
+                          <TableCell>{pkg.estimatedVolumes ?? '-'}</TableCell>
+                          <TableCell>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => togglePackage(id)}
+                              disabled={isLocked}
+                            >
+                              Adicionar
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+
+          {/* Seleção de solicitações elegíveis */}
+          <div className="pt-6">
+            <Title as="h3">Seleção de Recolhas</Title>
+            <div className="mt-4 w-full">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead></TableHead>
+                    <TableHead>Solicitante</TableHead>
+                    <TableHead>Cidade</TableHead>
+                    <TableHead>Volumes</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {packages.length > 0 ? (
+                    packages.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <CheckboxForm
+                            control={control}
+                            name="packageIds"
+                            checked={packageIds?.includes(item.id)}
+                            onCheckedChange={() => togglePackage(item.id)}
+                            label=""
+                            id={item.id}
+                            disabled={isLocked}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {userName(item)}
+                          <br />
+                          {addressLabel(item)}
+                        </TableCell>
+                        <TableCell>{item.address.city}</TableCell>
+                        <TableCell>{item.estimatedVolumes ?? '-'}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-center py-6 text-muted-foreground"
+                      >
+                        Nenhuma solicitação elegível!
                       </TableCell>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Seleção de solicitações elegíveis */}
-      <div className="pt-6">
-        <Title as="h3">Seleção de Recolhas</Title>
-        <div className="mt-4 w-full">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead></TableHead>
-                <TableHead>Morada</TableHead>
-                <TableHead>Cidade</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {packages.length > 0 ? (
-                packages.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <CheckboxForm
-                        control={control}
-                        name="packageIds"
-                        checked={packageIds?.includes(item.id)}
-                        onCheckedChange={() => togglePackage(item.id)}
-                        label=""
-                        id={item.id}
-                        disabled={isLocked}
-                      />
-                    </TableCell>
-                    <TableCell>{addressLabel(item)}</TableCell>
-                    <TableCell>{item.address.city}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    className="text-center py-6 text-muted-foreground"
-                  >
-                    Nenhuma solicitação elegível!
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          {/* Solicitações sem localização (não aparecem no mapa) */}
+          {eligibleWithoutCoords.length > 0 && (
+            <div className="pt-6">
+              <Title as="h3">Sem localização</Title>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Sem coordenadas válidas — não aparecem no mapa, mas podem ser
+                selecionadas.
+              </p>
+              <div className="mt-3 w-full">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead></TableHead>
+                      <TableHead>Solicitante</TableHead>
+                      <TableHead>Morada</TableHead>
+                      <TableHead>Cidade</TableHead>
+                      <TableHead>Volumes</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {eligibleWithoutCoords.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <CheckboxForm
+                            control={control}
+                            name="packageIds"
+                            checked={packageIds?.includes(item.id)}
+                            onCheckedChange={() => togglePackage(item.id)}
+                            label=""
+                            id={`no-coords-${item.id}`}
+                            disabled={isLocked}
+                          />
+                        </TableCell>
+                        <TableCell>{userName(item)}</TableCell>
+                        <TableCell>{addressLabel(item)}</TableCell>
+                        <TableCell>{item.address.city}</TableCell>
+                        <TableCell>{item.estimatedVolumes ?? '-'}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+
+          {/* fim da coluna das listas */}
         </div>
       </div>
-
-      {/* Solicitações sem localização (não aparecem no mapa) */}
-      {eligibleWithoutCoords.length > 0 && (
-        <div className="pt-6">
-          <Title as="h3">Sem localização</Title>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Sem coordenadas válidas — não aparecem no mapa, mas podem ser
-            selecionadas.
-          </p>
-          <div className="mt-3 w-full">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead></TableHead>
-                  <TableHead>Morada</TableHead>
-                  <TableHead>Cidade</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {eligibleWithoutCoords.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <CheckboxForm
-                        control={control}
-                        name="packageIds"
-                        checked={packageIds?.includes(item.id)}
-                        onCheckedChange={() => togglePackage(item.id)}
-                        label=""
-                        id={`no-coords-${item.id}`}
-                        disabled={isLocked}
-                      />
-                    </TableCell>
-                    <TableCell>{addressLabel(item)}</TableCell>
-                    <TableCell>{item.address.city}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      )}
     </DialogForm>
   );
 }

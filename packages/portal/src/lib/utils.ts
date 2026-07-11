@@ -15,7 +15,6 @@ import {
   NewspaperIcon,
   Globe,
   Settings,
-  QrCode,
   PackageCheck,
   Truck,
   SlidersHorizontal,
@@ -90,12 +89,6 @@ export const NAV_ITEMS: NavEntry[] = [
         label: 'ARMAZENAMENTO',
         icon: Boxes,
         roles: [Role.ADMIN, Role.OPS],
-      },
-      {
-        href: '/portal/qr-code',
-        label: 'QR CODES',
-        icon: QrCode,
-        roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
       },
       {
         href: '/portal/coleta',

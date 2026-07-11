@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 
 interface ParametrosFormData {
   collectionConfirmationDeadlineDays: number;
+  qrCodeThresholdPercentage: number;
 }
 
 export default function Parametros() {
@@ -24,7 +25,10 @@ export default function Parametros() {
     reset,
     formState: { errors },
   } = useForm<ParametrosFormData>({
-    defaultValues: { collectionConfirmationDeadlineDays: 2 },
+    defaultValues: {
+      collectionConfirmationDeadlineDays: 2,
+      qrCodeThresholdPercentage: 10,
+    },
   });
 
   const fetchParameters = useCallback(async () => {
@@ -33,6 +37,7 @@ export default function Parametros() {
       reset({
         collectionConfirmationDeadlineDays:
           data.collectionConfirmationDeadlineDays,
+        qrCodeThresholdPercentage: data.qrCodeThresholdPercentage,
       });
     } catch (error) {
       console.error('Erro ao buscar parâmetros:', error);
@@ -56,6 +61,7 @@ export default function Parametros() {
         collectionConfirmationDeadlineDays: Number(
           data.collectionConfirmationDeadlineDays
         ),
+        qrCodeThresholdPercentage: Number(data.qrCodeThresholdPercentage),
       });
       if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
       toast.success('Parâmetros atualizados');
@@ -86,6 +92,24 @@ export default function Parametros() {
           <p className="mt-1 text-xs text-muted-foreground">
             Até quantos dias antes da recolha o cliente pode confirmar. Sem
             confirmação até o prazo, a solicitação sai da rota.
+          </p>
+        </div>
+        <div>
+          <InputForm
+            label="Threshold de QR codes (%)"
+            name="qrCodeThresholdPercentage"
+            type="number"
+            control={control}
+            rules={{
+              required: 'Informe o percentual',
+              min: { value: 0, message: 'Mínimo de 0' },
+              max: { value: 100, message: 'Máximo de 100' },
+            }}
+            errors={errors}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Percentual extra de QR codes gerados sobre os volumes informados ao
+            iniciar a rota (ex.: 10% → 3 volumes geram 4 códigos).
           </p>
         </div>
         <Button type="submit" variant="secondary" disabled={isSubmitting}>

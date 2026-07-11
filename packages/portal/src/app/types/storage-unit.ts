@@ -26,6 +26,7 @@ export enum Season {
 
 export type StorageUnitDTO = {
   id: string;
+  friendlyCode?: string;
   quality: Quality;
   sex: Sex;
   ageGroup: AgeGroup;
