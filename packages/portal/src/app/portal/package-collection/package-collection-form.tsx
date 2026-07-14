@@ -392,7 +392,7 @@ export default function PackageCollectionForm({
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
       errors={errors}
-      contentClassName="sm:max-w-6xl max-h-[90vh] overflow-y-auto"
+      contentClassName="w-[95vw] sm:max-w-[92rem] max-h-[90vh] overflow-y-auto"
       trigger={
         isEditing ? (
           <Button variant="ghost" size="icon" className="size-8">
@@ -454,7 +454,7 @@ export default function PackageCollectionForm({
       {/* Mapa e listas lado a lado no desktop; empilhados no mobile. */}
       <div className="grid grid-cols-1 gap-x-6 lg:grid-cols-2">
         {/* Coluna do mapa */}
-        <div>
+        <div className="min-w-0">
           {/* Mapa das solicitações elegíveis */}
           <div className="pt-6">
             <div className="mb-3 flex items-center justify-between">
@@ -496,20 +496,15 @@ export default function PackageCollectionForm({
             </div>
           )}
 
-          {/* fim da coluna do mapa */}
-        </div>
-
-        {/* Coluna das listas */}
-        <div>
-          {/* Sugeridas perto da rota */}
+          {/* Sugeridas perto da rota (abaixo do mapa) */}
           {suggestedIds.length > 0 && (
             <div className="pt-6">
               <Title as="h3">Sugeridas perto da rota</Title>
               <div className="mt-4 w-full">
-                <Table>
-                  <TableHeader>
+                <Table containerClassName="max-h-[18vh]">
+                  <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                     <TableRow>
-                      <TableHead>Solicitante</TableHead>
+                      <TableHead className="whitespace-normal">Solicitante</TableHead>
                       <TableHead>Volumes</TableHead>
                       <TableHead>Ação</TableHead>
                     </TableRow>
@@ -520,7 +515,7 @@ export default function PackageCollectionForm({
                       if (!pkg) return null;
                       return (
                         <TableRow key={id}>
-                          <TableCell>
+                          <TableCell className="whitespace-normal break-words align-top max-w-[280px]">
                             {userName(pkg)}
                             <br />
                             {addressLabel(pkg)}
@@ -546,15 +541,20 @@ export default function PackageCollectionForm({
             </div>
           )}
 
+          {/* fim da coluna do mapa */}
+        </div>
+
+        {/* Coluna das listas */}
+        <div className="min-w-0">
           {/* Seleção de solicitações elegíveis */}
           <div className="pt-6">
             <Title as="h3">Seleção de Recolhas</Title>
             <div className="mt-4 w-full">
-              <Table>
-                <TableHeader>
+              <Table containerClassName="max-h-[50vh]">
+                <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                   <TableRow>
-                    <TableHead></TableHead>
-                    <TableHead>Solicitante</TableHead>
+                    <TableHead className="w-10"></TableHead>
+                    <TableHead className="whitespace-normal">Solicitante</TableHead>
                     <TableHead>Cidade</TableHead>
                     <TableHead>Volumes</TableHead>
                   </TableRow>
@@ -563,7 +563,7 @@ export default function PackageCollectionForm({
                   {packages.length > 0 ? (
                     packages.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell>
+                        <TableCell className="align-top">
                           <CheckboxForm
                             control={control}
                             name="packageIds"
@@ -574,12 +574,12 @@ export default function PackageCollectionForm({
                             disabled={isLocked}
                           />
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="whitespace-normal break-words align-top max-w-[280px]">
                           {userName(item)}
                           <br />
                           {addressLabel(item)}
                         </TableCell>
-                        <TableCell>{item.address.city}</TableCell>
+                        <TableCell className="whitespace-normal break-words align-top">{item.address.city}</TableCell>
                         <TableCell>{item.estimatedVolumes ?? '-'}</TableCell>
                       </TableRow>
                     ))
@@ -607,8 +607,8 @@ export default function PackageCollectionForm({
                 selecionadas.
               </p>
               <div className="mt-3 w-full">
-                <Table>
-                  <TableHeader>
+                <Table containerClassName="max-h-[32vh]">
+                  <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                     <TableRow>
                       <TableHead></TableHead>
                       <TableHead>Solicitante</TableHead>
