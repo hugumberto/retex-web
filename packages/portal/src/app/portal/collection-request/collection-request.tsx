@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { firstAddressPart } from '@/utils/address';
 import { useAppStore } from '@/store';
 import { MapPinOff } from 'lucide-react';
 import Link from 'next/link';
@@ -177,9 +178,9 @@ export default function CollectionRequest() {
       const { streetName, municipality, countrySubdivision, countrySecondarySubdivision, municipalitySubdivision, country } = address;
       const { setValue, resetField } = adminForm;
       setValue('address.street', streetName ?? '', { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.cityDivision', municipalitySubdivision ?? '', { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.city', municipality ?? '', { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.countryDivision', countrySecondarySubdivision ?? countrySubdivision ?? '', { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+      setValue('address.cityDivision', firstAddressPart(municipalitySubdivision), { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+      setValue('address.city', firstAddressPart(municipality), { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+      setValue('address.countryDivision', firstAddressPart(countrySecondarySubdivision ?? countrySubdivision), { shouldDirty: true, shouldTouch: true, shouldValidate: true });
       setValue('address.zipCode', postalCode, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
       setValue('address.country', country ?? '', { shouldDirty: true, shouldTouch: true, shouldValidate: true });
       const { lat, lon } = position ?? {};

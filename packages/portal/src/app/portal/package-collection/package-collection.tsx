@@ -132,13 +132,14 @@ export default function PackageCollection() {
       throw new Error('Permita pop-ups para imprimir');
     }
 
-    const cards = data
+    // A impressora usa etiquetas de 40x60mm (retrato): um QR code por página/etiqueta.
+    const labels = data
       .map((qr) => {
         const code = escapeHtml(qr.friendlyCode);
-        const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+        const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=${encodeURIComponent(
           qr.token
         )}`;
-        return `<div class="card"><img src="${qrSource}" alt="QR ${code}" /><div class="code">${code}</div></div>`;
+        return `<div class="label"><img src="${qrSource}" alt="QR ${code}" /><div class="code">${code}</div></div>`;
       })
       .join('');
 
@@ -147,18 +148,29 @@ export default function PackageCollection() {
         <head>
           <title>QR Codes da Rota</title>
           <style>
-            body { margin:0; padding:24px; font-family: Arial, sans-serif; color:#013364; }
-            h1 { font-size:18px; text-align:center; margin:0 0 20px; }
-            .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
-            .card { border:1px solid #cbd5e1; border-radius:10px; padding:12px; text-align:center; }
-            .card img { width:180px; height:180px; object-fit:contain; }
-            .code { margin-top:8px; font-size:15px; font-weight:700; letter-spacing:1px; color:#02748e; }
-            @media print { body { padding:0; } }
+            @page { size: 40mm 60mm; margin: 0; }
+            html, body { margin:0; padding:0; font-family: Arial, sans-serif; color:#013364; }
+            .label {
+              width: 40mm;
+              height: 60mm;
+              box-sizing: border-box;
+              padding: 3mm 2mm;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              gap: 3mm;
+              page-break-after: always;
+              break-after: page;
+            }
+            .label:last-child { page-break-after: auto; break-after: auto; }
+            .label img { width: 34mm; height: 34mm; object-fit: contain; }
+            .code { font-size: 13pt; font-weight:700; letter-spacing:1px; color:#02748e; text-align:center; }
+            @media print { .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
           </style>
         </head>
         <body>
-          <h1>QR Codes da Rota</h1>
-          <div class="grid">${cards}</div>
+          ${labels}
           <script>
             window.onload = function () { window.print(); };
           </script>
