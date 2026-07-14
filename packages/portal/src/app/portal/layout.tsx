@@ -32,7 +32,7 @@ export default function PortalLayout({
         <Toaster richColors />
         <SidebarProvider>
           <AppSidebar />
-          <SidebarInset className="bg-white">
+          <SidebarInset className="bg-white min-w-0">
             <RetexTopBar />
 
             {/* Breadcrumbs */}
