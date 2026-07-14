@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { firstAddressPart } from '@/utils/address';
 import { PlusIcon } from 'lucide-react';
 import { FocusEvent, useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -76,10 +77,10 @@ export default function AddressForm({ onSave }: Props) {
           setValue(field, val, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
 
         set('street', address.streetName ?? '');
-        set('city', address.municipality ?? '');
-        set('cityDivision', address.municipalitySubdivision ?? '');
+        set('city', firstAddressPart(address.municipality));
+        set('cityDivision', firstAddressPart(address.municipalitySubdivision));
         set('country', address.country ?? '');
-        set('countryDivision', address.countrySecondarySubdivision ?? address.countrySubdivision ?? '');
+        set('countryDivision', firstAddressPart(address.countrySecondarySubdivision ?? address.countrySubdivision));
         setValue('lat', position?.lat ? String(position.lat) : '');
         setValue('long', position?.lon ? String(position.lon) : '');
       } catch {
