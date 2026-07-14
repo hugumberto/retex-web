@@ -40,7 +40,7 @@ describe('ContactForm', () => {
     });
   });
 
-  it('envia o formulario para a API de contacto', async () => {
+  it('envia o formulário para a API de contacto', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
