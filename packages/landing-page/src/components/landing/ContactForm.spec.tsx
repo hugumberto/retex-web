@@ -40,7 +40,7 @@ describe('ContactForm', () => {
     });
   });
 
-  it('envia o formulario para a API package', async () => {
+  it('envia o formulário para a API de contacto', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -51,24 +51,15 @@ describe('ContactForm', () => {
     fireEvent.change(screen.getByRole('textbox', { name: /nome/i }), {
       target: { value: 'Ana Silva' },
     });
-    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
-      target: { value: 'ana@example.com' },
-    });
     fireEvent.change(screen.getByRole('textbox', { name: /telemóvel/i }), {
       target: { value: '912345678' },
     });
-    fireEvent.change(
-      screen.getByRole('textbox', { name: /local de recolha/i }),
-      {
-        target: { value: 'Rua das Flores 1, Lisboa' },
-      }
-    );
-    fireEvent.change(
-      screen.getByRole('textbox', { name: /horário de recolha/i }),
-      {
-        target: { value: 'Segunda de manhã' },
-      }
-    );
+    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
+      target: { value: 'ana@example.com' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /título/i }), {
+      target: { value: 'Dúvida sobre recolha' },
+    });
     fireEvent.change(screen.getByRole('textbox', { name: /mensagem/i }), {
       target: { value: 'Tenho sacos para recolher.' },
     });
@@ -79,18 +70,16 @@ describe('ContactForm', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
-    expect(fetchMock.mock.calls[0][0]).toBe('https://api.test/package');
+    expect(fetchMock.mock.calls[0][0]).toBe('https://api.test/contact');
 
     const submitRequest = fetchMock.mock.calls[0][1] as RequestInit;
     const submitBody = JSON.parse(String(submitRequest.body));
 
-    expect(submitBody.firstName).toBe('Ana');
-    expect(submitBody.lastName).toBe('Silva');
+    expect(submitBody.name).toBe('Ana Silva');
+    expect(submitBody.phone).toBe('912345678');
     expect(submitBody.email).toBe('ana@example.com');
-    expect(submitBody.contactPhone).toBe('912345678');
-    expect(submitBody.dayOfWeek).toBe('Segunda-Feira');
-    expect(submitBody.timeOfDay).toBe('Manhã');
-    expect(submitBody.address.street).toBe('Rua das Flores 1, Lisboa');
+    expect(submitBody.title).toBe('Dúvida sobre recolha');
+    expect(submitBody.message).toBe('Tenho sacos para recolher.');
 
     await waitFor(() => {
       expect(
