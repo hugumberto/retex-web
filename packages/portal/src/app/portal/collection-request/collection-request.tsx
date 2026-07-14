@@ -339,7 +339,7 @@ export default function CollectionRequest() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Contacto</TableHead>
-                <TableHead>Morada</TableHead>
+                <TableHead className="whitespace-normal">Morada</TableHead>
                 <TableHead>Volumes (est.)</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Ação</TableHead>
@@ -353,7 +353,7 @@ export default function CollectionRequest() {
                     <TableCell>{`${request.user?.firstName ?? '-'} ${request.user?.lastName ?? ''}`.trim()}</TableCell>
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
                     <TableCell>{request.user?.contactPhone ?? '-'}</TableCell>
-                    <TableCell>{`${request.address?.street ?? '-'} ${request.address?.number ?? ''}`.trim()}</TableCell>
+                    <TableCell className="whitespace-normal break-words max-w-[220px] min-w-[160px]">{`${request.address?.street ?? '-'} ${request.address?.number ?? ''}`.trim()}</TableCell>
                     <TableCell>{request.estimatedVolumes ?? '-'}</TableCell>
                     <TableCell>{request.status}</TableCell>
                     <TableCell>
