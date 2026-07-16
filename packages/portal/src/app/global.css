@@ -94,7 +94,7 @@ h1 {
   --color-table-header: color-mix(
     in srgb,
     var(--color-primary) 34%,
-    transparent
+    white
   );
 }
 /*

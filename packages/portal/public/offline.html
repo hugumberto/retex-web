@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sem ligação — Retex</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #ffffff;
+        color: #013364;
+      }
+      .wrap {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 24px;
+        text-align: center;
+      }
+      img { width: 96px; height: 96px; }
+      h1 { font-size: 20px; margin: 8px 0 0; }
+      p { color: #02748e; margin: 0; max-width: 28rem; line-height: 1.5; }
+      button {
+        margin-top: 8px;
+        border: 0;
+        background: #013364;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 9999px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <img src="/icons/icon-192.png" alt="Retex" />
+      <h1>Sem ligação à internet</h1>
+      <p>Não foi possível carregar esta página. Verifique a sua ligação e tente novamente.</p>
+      <button onclick="location.reload()">Tentar novamente</button>
+    </div>
+  </body>
+</html>
