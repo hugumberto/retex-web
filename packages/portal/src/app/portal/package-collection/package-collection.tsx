@@ -3,6 +3,7 @@
 import {
   PackageCollectionDTO,
   CollectionStatus,
+  COLLECTION_STATUS_LABEL,
   PackageCollectionTableDTO,
 } from '@/app/types/package-collection';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
@@ -20,6 +21,7 @@ import { useAppStore } from '@/store';
 import {
   CheckCircle2Icon,
   ChevronsRightIcon,
+  MailIcon,
   PrinterIcon,
   QrCodeIcon,
   TrashIcon,
@@ -29,7 +31,6 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
-import Barcode from '@/components/custom/bar-code';
 
 // Próximo estado no ciclo da rota. DRAFTING→CREATED tem botão próprio
 // ("Confirmar recolha", que dispara os emails); FINISHED é terminal.
@@ -111,6 +112,20 @@ export default function PackageCollection() {
       const res = await api.put(`/route/${id}`, { status: next });
       if (res.status !== 200) throw new Error('Erro na requisição');
       await fetchData();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Disparo manual do questionário de satisfação aos clientes da recolha
+  // (apenas quando a recolha está FINISHED).
+  const handleDispatchSurvey = async (id: string) => {
+    setIsSubmitting(true);
+    try {
+      const res = await api.post(`/route/${id}/send-survey`);
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error('Erro na requisição');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -573,8 +588,8 @@ export default function PackageCollection() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Código</TableHead>
               <TableHead>Motorista</TableHead>
-              <TableHead>Recolha</TableHead>
               <TableHead>Data de Recolha</TableHead>
               <TableHead>Qtd. Encomendas</TableHead>
               <TableHead>Confirmações</TableHead>
@@ -586,12 +601,10 @@ export default function PackageCollection() {
             {packageCollections?.map((packageCollection) => (
               <TableRow key={packageCollection.id}>
                 <TableCell className="font-medium">
-                  {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}
+                  {packageCollection.friendlyCode ?? '-'}
                 </TableCell>
                 <TableCell className="font-medium">
-                  <div className="flex justify-center">
-                    <Barcode value={packageCollection.id} />
-                  </div>
+                  {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}
                 </TableCell>
                 <TableCell>
                   {packageCollection.startDate
@@ -617,7 +630,8 @@ export default function PackageCollection() {
                         : 'bg-green-100 text-green-800'
                     }`}
                   >
-                    {packageCollection.status}
+                    {COLLECTION_STATUS_LABEL[packageCollection.status] ??
+                      packageCollection.status}
                   </span>
                 </TableCell>
                 <TableCell className="space-x-2">
@@ -664,6 +678,36 @@ export default function PackageCollection() {
                       <QrCodeIcon />
                     </Button>
                   )}
+                  {packageCollection.status ===
+                    CollectionStatus.FINISHED && (
+                    <ConfirmDialog
+                      title="Disparar questionário"
+                      description="Enviar o questionário de satisfação a todos os clientes desta recolha?"
+                      confirmText="Disparar"
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8 text-secondary hover:text-secondary/80"
+                          title="Disparar questionário de satisfação"
+                        >
+                          <MailIcon />
+                        </Button>
+                      }
+                      onConfirm={async () => {
+                        await toast.promise(
+                          handleDispatchSurvey(packageCollection.id),
+                          {
+                            loading: 'A enviar questionário...',
+                            success: () =>
+                              'Questionário enviado aos clientes',
+                            error: () => 'Erro ao enviar o questionário',
+                          }
+                        );
+                      }}
+                    />
+                  )}
                   <PackageCollectionForm
                     packageCollectionId={packageCollection.id}
                     onSave={() => onSave()}
@@ -703,7 +747,9 @@ export default function PackageCollection() {
                           disabled={isSubmitting}
                           className="size-8 text-blue-600 hover:text-blue-700"
                           title={`Avançar para ${
-                            NEXT_STATUS[packageCollection.status]
+                            COLLECTION_STATUS_LABEL[
+                              NEXT_STATUS[packageCollection.status]!
+                            ]
                           }`}
                         >
                           <ChevronsRightIcon />
@@ -716,7 +762,10 @@ export default function PackageCollection() {
                           handleAdvanceStatus(packageCollection.id, next),
                           {
                             loading: 'Loading...',
-                            success: () => `Estado atualizado para ${next}`,
+                            success: () =>
+                              `Estado atualizado para ${
+                                COLLECTION_STATUS_LABEL[next] ?? next
+                              }`,
                             error: () => 'Erro ao atualizar o estado',
                           }
                         );

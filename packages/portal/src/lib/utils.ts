@@ -18,6 +18,7 @@ import {
   PackageCheck,
   Truck,
   SlidersHorizontal,
+  Mail,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -156,6 +157,12 @@ export const NAV_ITEMS: NavEntry[] = [
         href: '/portal/parametros',
         label: 'Parâmetros',
         icon: SlidersHorizontal,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/email-log',
+        label: 'Registo de Emails',
+        icon: Mail,
         roles: [Role.ADMIN],
       },
     ],

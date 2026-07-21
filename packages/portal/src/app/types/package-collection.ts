@@ -38,3 +38,12 @@ export enum CollectionStatus {
   IN_TRANSIT = 'IN_TRANSIT',
   FINISHED = 'FINISHED',
 }
+
+// Rótulos PT-PT do estado da recolha, apresentados ao utilizador.
+export const COLLECTION_STATUS_LABEL: Record<CollectionStatus, string> = {
+  [CollectionStatus.DRAFTING]: 'Rascunho',
+  [CollectionStatus.CREATED]: 'Criada',
+  [CollectionStatus.WAITING_TO_START]: 'Aguarda início',
+  [CollectionStatus.IN_TRANSIT]: 'Em trânsito',
+  [CollectionStatus.FINISHED]: 'Concluída',
+};
