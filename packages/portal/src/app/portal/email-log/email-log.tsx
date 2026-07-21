@@ -43,18 +43,27 @@ export default function EmailLog() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const fetchLogs = useCallback(
-    async (targetPage: number) => {
+    async (
+      targetPage: number,
+      filters: {
+        type: string;
+        recipient: string;
+        from: string;
+        to: string;
+      } = { type, recipient, from, to }
+    ) => {
       setIsLoading(true);
       try {
         const params: Record<string, string | number> = {
           page: targetPage,
           limit: PAGE_SIZE,
         };
-        if (type) params.type = type;
-        if (recipient) params.recipient = recipient;
-        if (from) params.from = new Date(from).toISOString();
-        // `to` inclusivo até ao fim do dia selecionado.
-        if (to) params.to = new Date(`${to}T23:59:59`).toISOString();
+        if (filters.type) params.type = filters.type;
+        if (filters.recipient) params.recipient = filters.recipient;
+        // Datas enviadas como dia (YYYY-MM-DD); o backend normaliza para início
+        // (from) e fim (to) do dia, tornando o intervalo inclusivo.
+        if (filters.from) params.from = filters.from;
+        if (filters.to) params.to = filters.to;
 
         const { data } = await api.get<PaginatedResult<EmailLogDTO>>(
           '/email-log',
@@ -90,8 +99,8 @@ export default function EmailLog() {
     setRecipient('');
     setFrom('');
     setTo('');
-    // Refetch sem filtros no próximo tick (estado já limpo).
-    setTimeout(() => fetchLogs(1), 0);
+    // Passa filtros vazios explicitamente (o estado só atualiza no próximo render).
+    fetchLogs(1, { type: '', recipient: '', from: '', to: '' });
   };
 
   return (
