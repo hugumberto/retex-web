@@ -19,6 +19,7 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
+import { STATUS_LABEL } from '@/lib/package-status';
 import { useAppStore } from '@/store';
 import { MapPinOff } from 'lucide-react';
 import Link from 'next/link';
@@ -52,8 +53,6 @@ interface UserFormData {
   estimatedVolumes: string;
 }
 
-
-
 export default function CollectionRequest() {
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
   const [requests, setRequests] = useState<PackageDTO[]>([]);
@@ -64,16 +63,37 @@ export default function CollectionRequest() {
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
   const inZoneAddresses = addresses.filter((a) => a.isInServiceZone);
   const canRequest = inZoneAddresses.length > 0;
-  const hasActiveRequest = isUserRole && requests.some(
-    (r) => r.status !== PackageStatus.CANCELLED && r.status !== PackageStatus.STOCKED
-  );
+  const hasActiveRequest =
+    isUserRole &&
+    requests.some(
+      (r) =>
+        r.status !== PackageStatus.CANCELLED &&
+        r.status !== PackageStatus.STOCKED
+    );
 
   const [userFormOpen, setUserFormOpen] = useState(false);
-  const userForm = useForm<UserFormData>({ defaultValues: { addressId: '', estimatedVolumes: '' } });
+  const userForm = useForm<UserFormData>({
+    defaultValues: { addressId: '', estimatedVolumes: '' },
+  });
   const adminForm = useForm<AdminFormData>({
     defaultValues: {
-      firstName: '', lastName: '', email: '', contactPhone: '', estimatedVolumes: '',
-      address: { street: '', number: '', complement: '', city: '', cityDivision: '', country: '', countryDivision: '', zipCode: '', lat: '', long: '' },
+      firstName: '',
+      lastName: '',
+      email: '',
+      contactPhone: '',
+      estimatedVolumes: '',
+      address: {
+        street: '',
+        number: '',
+        complement: '',
+        city: '',
+        cityDivision: '',
+        country: '',
+        countryDivision: '',
+        zipCode: '',
+        lat: '',
+        long: '',
+      },
     },
   });
 
@@ -88,35 +108,46 @@ export default function CollectionRequest() {
     }
   }, [isUserRole]);
 
-  const cancelRequest = useCallback(async (id: string) => {
-    await toast.promise(
-      async () => {
-        const res = await api.patch(`/package/${id}`, { status: PackageStatus.CANCELLED });
-        if (!isSuccessStatus(res.status)) throw new Error();
-        await fetchRequests();
-      },
-      {
-        loading: 'A cancelar...',
-        success: 'Solicitação cancelada',
-        error: 'Não foi possível cancelar a solicitação',
-      }
-    );
-  }, [fetchRequests]);
+  const cancelRequest = useCallback(
+    async (id: string) => {
+      await toast.promise(
+        async () => {
+          const res = await api.patch(`/package/${id}`, {
+            status: PackageStatus.CANCELLED,
+          });
+          if (!isSuccessStatus(res.status)) throw new Error();
+          await fetchRequests();
+        },
+        {
+          loading: 'A cancelar...',
+          success: 'Solicitação cancelada',
+          error: 'Não foi possível cancelar a solicitação',
+        }
+      );
+    },
+    [fetchRequests]
+  );
 
   useEffect(() => {
     setPageTitle('Solicitação de Recolha');
-    setBreadcrumbs([{ label: 'Solicitação de Recolha', href: '/portal/collection-request' }]);
+    setBreadcrumbs([
+      { label: 'Solicitação de Recolha', href: '/portal/collection-request' },
+    ]);
     fetchRequests();
 
     if (isUserRole) {
       setIsLoadingAddresses(true);
-      api.get<AddressDTO[]>('/me/address')
+      api
+        .get<AddressDTO[]>('/me/address')
         .then(({ data }) => setAddresses(data ?? []))
         .catch(() => toast.error('Não foi possível carregar os endereços'))
         .finally(() => setIsLoadingAddresses(false));
     }
 
-    return () => { setPageTitle(''); setBreadcrumbs([]); };
+    return () => {
+      setPageTitle('');
+      setBreadcrumbs([]);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchRequests, setBreadcrumbs, setPageTitle]);
 
@@ -128,7 +159,8 @@ export default function CollectionRequest() {
         addressId: data.addressId,
         estimatedVolumes: Number(data.estimatedVolumes),
       });
-      if (!isSuccessStatus(response.status) && response.status !== 409) throw new Error();
+      if (!isSuccessStatus(response.status) && response.status !== 409)
+        throw new Error();
       userForm.reset();
       await fetchRequests();
       setUserFormOpen(false);
@@ -148,18 +180,28 @@ export default function CollectionRequest() {
           ...data,
           estimatedVolumes: Number(data.estimatedVolumes),
           address: {
-            street: data.address.street, city: data.address.city, cityDivision: data.address.cityDivision,
-            country: data.address.country, countryDivision: data.address.countryDivision,
+            street: data.address.street,
+            city: data.address.city,
+            cityDivision: data.address.cityDivision,
+            country: data.address.country,
+            countryDivision: data.address.countryDivision,
             zipCode: data.address.zipCode,
-            lat: data.address.lat || '0', long: data.address.long || '0',
-            number: data.address.number, complement: data.address.complement,
+            lat: data.address.lat || '0',
+            long: data.address.long || '0',
+            number: data.address.number,
+            complement: data.address.complement,
           },
         });
-        if (!isSuccessStatus(response.status) && response.status !== 409) throw new Error();
+        if (!isSuccessStatus(response.status) && response.status !== 409)
+          throw new Error();
         adminForm.reset();
         await fetchRequests();
       },
-      { loading: 'A criar solicitação...', success: 'Solicitação de recolha criada com sucesso', error: 'Não foi possível criar a solicitação de recolha' }
+      {
+        loading: 'A criar solicitação...',
+        success: 'Solicitação de recolha criada com sucesso',
+        error: 'Não foi possível criar a solicitação de recolha',
+      }
     );
     setIsSubmitting(false);
   });
@@ -173,16 +215,50 @@ export default function CollectionRequest() {
       );
       if (!res.ok) throw new Error();
       const { results } = await res.json();
-      if (!Array.isArray(results) || results.length === 0) { toast.error('Código postal não encontrado'); return; }
+      if (!Array.isArray(results) || results.length === 0) {
+        toast.error('Código postal não encontrado');
+        return;
+      }
       const { address, position } = results[0];
-      const { streetName, municipality, countrySubdivision, countrySecondarySubdivision, municipalitySubdivision, country } = address;
+      const {
+        streetName,
+        municipality,
+        countrySubdivision,
+        countrySecondarySubdivision,
+        municipalitySubdivision,
+        country,
+      } = address;
       const { setValue, resetField } = adminForm;
-      setValue('address.street', streetName ?? '', { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.cityDivision', firstAddressPart(municipalitySubdivision), { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.city', firstAddressPart(municipality), { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.countryDivision', firstAddressPart(countrySecondarySubdivision ?? countrySubdivision), { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.zipCode', postalCode, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
-      setValue('address.country', country ?? '', { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+      setValue('address.street', streetName ?? '', {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue(
+        'address.cityDivision',
+        firstAddressPart(municipalitySubdivision),
+        { shouldDirty: true, shouldTouch: true, shouldValidate: true }
+      );
+      setValue('address.city', firstAddressPart(municipality), {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue(
+        'address.countryDivision',
+        firstAddressPart(countrySecondarySubdivision ?? countrySubdivision),
+        { shouldDirty: true, shouldTouch: true, shouldValidate: true }
+      );
+      setValue('address.zipCode', postalCode, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue('address.country', country ?? '', {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
       const { lat, lon } = position ?? {};
       setValue('address.lat', lat ? lat.toString() : '');
       setValue('address.long', lon ? lon.toString() : '');
@@ -194,19 +270,24 @@ export default function CollectionRequest() {
 
   const adminErrors = adminForm.formState.errors;
   const adminRegister = adminForm.register;
-  const zipCodeField = adminRegister('address.zipCode', { required: 'Campo obrigatório' });
+  const zipCodeField = adminRegister('address.zipCode', {
+    required: 'Campo obrigatório',
+  });
 
   return (
     <section id="collection-request-page" className="space-y-6">
       <div className="flex justify-end">
         {isUserRole ? (
           isLoadingAddresses ? (
-            <Button variant="secondary" disabled>A carregar...</Button>
+            <Button variant="secondary" disabled>
+              A carregar...
+            </Button>
           ) : hasActiveRequest ? (
             <Alert className="max-w-md ml-auto">
               <AlertTitle>Solicitação em curso</AlertTitle>
               <AlertDescription>
-                Já tem uma solicitação de recolha activa. Aguarde a conclusão ou cancelamento antes de criar uma nova.
+                Já tem uma solicitação de recolha activa. Aguarde a conclusão ou
+                cancelamento antes de criar uma nova.
               </AlertDescription>
             </Alert>
           ) : canRequest ? (
@@ -217,12 +298,21 @@ export default function CollectionRequest() {
               errors={userForm.formState.errors}
               onConfirm={submitUser}
               open={userFormOpen}
-              onOpenChange={(open) => { setUserFormOpen(open); if (!open) userForm.reset(); }}
-              trigger={<Button variant="secondary" disabled={isSubmitting}>Criar Solicitação</Button>}
+              onOpenChange={(open) => {
+                setUserFormOpen(open);
+                if (!open) userForm.reset();
+              }}
+              trigger={
+                <Button variant="secondary" disabled={isSubmitting}>
+                  Criar Solicitação
+                </Button>
+              }
             >
               <div className="grid grid-cols-1 gap-4">
                 <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm space-y-1">
-                  <p className="font-medium text-foreground">{user?.firstName} {user?.lastName}</p>
+                  <p className="font-medium text-foreground">
+                    {user?.firstName} {user?.lastName}
+                  </p>
                   <p className="text-muted-foreground">{user?.email}</p>
                   <p className="text-muted-foreground">{user?.contactPhone}</p>
                 </div>
@@ -233,7 +323,9 @@ export default function CollectionRequest() {
                   render={({ field }) => (
                     <div className="flex flex-col gap-2">
                       {userForm.formState.errors.addressId && (
-                        <p className="text-xs text-destructive">Selecione um endereço</p>
+                        <p className="text-xs text-destructive">
+                          Selecione um endereço
+                        </p>
                       )}
                       {inZoneAddresses.map((addr) => (
                         <label
@@ -256,7 +348,9 @@ export default function CollectionRequest() {
                               {addr.street}, {addr.number}
                               {addr.complement ? ` ${addr.complement}` : ''}
                             </p>
-                            <p className="text-muted-foreground">{addr.zipCode} — {addr.city}</p>
+                            <p className="text-muted-foreground">
+                              {addr.zipCode} — {addr.city}
+                            </p>
                           </div>
                         </label>
                       ))}
@@ -267,8 +361,12 @@ export default function CollectionRequest() {
                   <Input
                     type="number"
                     min={1}
-                    placeholder="Estimativa de volumes*"
-                    className={userForm.formState.errors.estimatedVolumes ? 'border-red-500' : ''}
+                    placeholder="Número de sacos*"
+                    className={
+                      userForm.formState.errors.estimatedVolumes
+                        ? 'border-red-500'
+                        : ''
+                    }
                     {...userForm.register('estimatedVolumes', {
                       required: 'Campo obrigatório',
                       min: { value: 1, message: 'Mínimo 1 volume' },
@@ -288,7 +386,9 @@ export default function CollectionRequest() {
               <AlertTitle>Fora da zona de actuação</AlertTitle>
               <AlertDescription>
                 Não tem nenhum endereço dentro da zona de actuação.{' '}
-                <Link href="/portal/perfil" className="underline font-medium">Adicione um endereço</Link>{' '}
+                <Link href="/portal/perfil" className="underline font-medium">
+                  Adicione um endereço
+                </Link>{' '}
                 na zona de actuação antes de solicitar uma coleta.
               </AlertDescription>
             </Alert>
@@ -300,37 +400,147 @@ export default function CollectionRequest() {
             loading={isSubmitting}
             errors={adminErrors}
             onConfirm={submitAdmin}
-            trigger={<Button variant="secondary" disabled={isSubmitting}>Criar Solicitação</Button>}
+            trigger={
+              <Button variant="secondary" disabled={isSubmitting}>
+                Criar Solicitação
+              </Button>
+            }
           >
             <div className="grid max-h-[70vh] grid-cols-1 gap-4 overflow-y-auto pr-1 md:grid-cols-2">
-              <Input tabIndex={1} placeholder="Nome*" className={adminErrors.firstName ? 'border-red-500' : ''} {...adminRegister('firstName', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={2} placeholder="Apelido*" className={adminErrors.lastName ? 'border-red-500' : ''} {...adminRegister('lastName', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={3} placeholder="Email*" type="email" className={adminErrors.email ? 'border-red-500' : ''} {...adminRegister('email', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={4} placeholder="Contacto*" className={adminErrors.contactPhone ? 'border-red-500' : ''} {...adminRegister('contactPhone', { required: 'Campo obrigatório' })} />
+              <Input
+                tabIndex={1}
+                placeholder="Nome*"
+                className={adminErrors.firstName ? 'border-red-500' : ''}
+                {...adminRegister('firstName', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={2}
+                placeholder="Apelido*"
+                className={adminErrors.lastName ? 'border-red-500' : ''}
+                {...adminRegister('lastName', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={3}
+                placeholder="Email*"
+                type="email"
+                className={adminErrors.email ? 'border-red-500' : ''}
+                {...adminRegister('email', { required: 'Campo obrigatório' })}
+              />
+              <Input
+                tabIndex={4}
+                placeholder="Contacto*"
+                className={adminErrors.contactPhone ? 'border-red-500' : ''}
+                {...adminRegister('contactPhone', {
+                  required: 'Campo obrigatório',
+                })}
+              />
               <Input
                 tabIndex={5}
                 placeholder="Código Postal*"
                 className={adminErrors.address?.zipCode ? 'border-red-500' : ''}
                 {...zipCodeField}
-                onBlur={(event) => { zipCodeField.onBlur(event); void handleBlurPostalCode(event); }}
+                onBlur={(event) => {
+                  zipCodeField.onBlur(event);
+                  void handleBlurPostalCode(event);
+                }}
               />
-              <Input tabIndex={6} placeholder="Morada*" className={adminErrors.address?.street ? 'border-red-500' : ''} {...adminRegister('address.street', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={7} placeholder="Freguesia*" className={adminErrors.address?.cityDivision ? 'border-red-500' : ''} {...adminRegister('address.cityDivision', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={8} placeholder="Concelho*" className={adminErrors.address?.city ? 'border-red-500' : ''} {...adminRegister('address.city', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={9} placeholder="Distrito*" className={adminErrors.address?.countryDivision ? 'border-red-500' : ''} {...adminRegister('address.countryDivision', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={10} placeholder="País*" className={adminErrors.address?.country ? 'border-red-500' : ''} {...adminRegister('address.country', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={11} placeholder="Nº edifício/porta*" className={adminErrors.address?.number ? 'border-red-500' : ''} {...adminRegister('address.number', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={12} placeholder="Complemento Morada" {...adminRegister('address.complement')} />
-              <Input tabIndex={13} placeholder="Latitude*" className={adminErrors.address?.lat ? 'border-red-500' : ''} {...adminRegister('address.lat', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={14} placeholder="Longitude*" className={adminErrors.address?.long ? 'border-red-500' : ''} {...adminRegister('address.long', { required: 'Campo obrigatório' })} />
-              <Input tabIndex={15} type="number" min={1} placeholder="Estimativa de volumes*" className={adminErrors.estimatedVolumes ? 'border-red-500' : ''} {...adminRegister('estimatedVolumes', { required: 'Campo obrigatório', min: { value: 1, message: 'Mínimo 1 volume' } })} />
+              <Input
+                tabIndex={6}
+                placeholder="Morada*"
+                className={adminErrors.address?.street ? 'border-red-500' : ''}
+                {...adminRegister('address.street', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={7}
+                placeholder="Freguesia*"
+                className={
+                  adminErrors.address?.cityDivision ? 'border-red-500' : ''
+                }
+                {...adminRegister('address.cityDivision', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={8}
+                placeholder="Concelho*"
+                className={adminErrors.address?.city ? 'border-red-500' : ''}
+                {...adminRegister('address.city', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={9}
+                placeholder="Distrito*"
+                className={
+                  adminErrors.address?.countryDivision ? 'border-red-500' : ''
+                }
+                {...adminRegister('address.countryDivision', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={10}
+                placeholder="País*"
+                className={adminErrors.address?.country ? 'border-red-500' : ''}
+                {...adminRegister('address.country', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={11}
+                placeholder="Nº edifício/porta*"
+                className={adminErrors.address?.number ? 'border-red-500' : ''}
+                {...adminRegister('address.number', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={12}
+                placeholder="Complemento Morada"
+                {...adminRegister('address.complement')}
+              />
+              <Input
+                tabIndex={13}
+                placeholder="Latitude*"
+                className={adminErrors.address?.lat ? 'border-red-500' : ''}
+                {...adminRegister('address.lat', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={14}
+                placeholder="Longitude*"
+                className={adminErrors.address?.long ? 'border-red-500' : ''}
+                {...adminRegister('address.long', {
+                  required: 'Campo obrigatório',
+                })}
+              />
+              <Input
+                tabIndex={15}
+                type="number"
+                min={1}
+                placeholder="Estimativa de volumes*"
+                className={adminErrors.estimatedVolumes ? 'border-red-500' : ''}
+                {...adminRegister('estimatedVolumes', {
+                  required: 'Campo obrigatório',
+                  min: { value: 1, message: 'Mínimo 1 volume' },
+                })}
+              />
             </div>
           </DialogForm>
         )}
       </div>
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
-        <h2 className="text-lg font-semibold text-secondary">Solicitações de Recolha</h2>
+        <h2 className="text-lg font-semibold text-secondary">
+          Solicitações de Recolha
+        </h2>
         <div className="mt-4 w-full overflow-x-auto">
           <Table>
             <TableHeader>
@@ -349,18 +559,35 @@ export default function CollectionRequest() {
               {requests.length > 0 ? (
                 requests.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell className="font-medium">{request.friendlyCode ?? '-'}</TableCell>
-                    <TableCell>{`${request.user?.firstName ?? '-'} ${request.user?.lastName ?? ''}`.trim()}</TableCell>
+                    <TableCell className="font-medium">
+                      {request.friendlyCode ?? '-'}
+                    </TableCell>
+                    <TableCell>
+                      {`${request.user?.firstName ?? '-'} ${
+                        request.user?.lastName ?? ''
+                      }`.trim()}
+                    </TableCell>
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
                     <TableCell>{request.user?.contactPhone ?? '-'}</TableCell>
-                    <TableCell className="whitespace-normal break-words max-w-[220px] min-w-[160px]">{`${request.address?.street ?? '-'} ${request.address?.number ?? ''}`.trim()}</TableCell>
+                    <TableCell className="whitespace-normal break-words max-w-[220px] min-w-[160px]">
+                      {`${request.address?.street ?? '-'} ${
+                        request.address?.number ?? ''
+                      }`.trim()}
+                    </TableCell>
                     <TableCell>{request.estimatedVolumes ?? '-'}</TableCell>
-                    <TableCell>{request.status}</TableCell>
                     <TableCell>
-                      {(request.status === PackageStatus.CREATED || request.status === PackageStatus.OUT_OF_ZONE) && (
+                      {STATUS_LABEL[request.status] ?? request.status}
+                    </TableCell>
+                    <TableCell>
+                      {(request.status === PackageStatus.CREATED ||
+                        request.status === PackageStatus.OUT_OF_ZONE) && (
                         <ConfirmDialog
                           trigger={
-                            <Button variant="ghost" size="icon" className="size-8">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8"
+                            >
                               <TrashIcon />
                             </Button>
                           }
@@ -372,7 +599,10 @@ export default function CollectionRequest() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
+                  <TableCell
+                    colSpan={8}
+                    className="text-center py-6 text-muted-foreground"
+                  >
                     Nenhum registro encontrado!
                   </TableCell>
                 </TableRow>

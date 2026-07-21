@@ -179,9 +179,9 @@ export default function AddTriage({
             {items.length > 0 ? (
               items.map((item, index) => (
                 <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
-                  <TableCell>{item.quality}</TableCell>
-                  <TableCell>{item.type}</TableCell>
-                  <TableCell>{item.season}</TableCell>
+                  <TableCell>{QUALITY_MAP[item.quality] ?? item.quality}</TableCell>
+                  <TableCell>{TYPE_MAP[item.type] ?? item.type}</TableCell>
+                  <TableCell>{SEASON_MAP[item.season] ?? item.season}</TableCell>
                   <TableCell>
                     {(brands.find((brand) => brand.id === item.brandId)?.name ??
                       item.brandId) ||

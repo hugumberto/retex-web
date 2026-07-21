@@ -2,6 +2,7 @@
 
 import { Brand } from '@/app/types/brand';
 import { PackageDTO, PackageStatus } from '@/app/types/package';
+import { STATUS_LABEL } from '@/lib/package-status';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { QrCodeDTO, TriageResponse } from '@/app/types/qr-code';
 import { Button } from '@/components/ui/button';
@@ -525,7 +526,7 @@ export default function Triage() {
                 Peso total: <strong>{packageWeight.toFixed(2)} kg</strong>
               </span>
               <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
-                {selectedPackage.status}
+                {STATUS_LABEL[selectedPackage.status] ?? selectedPackage.status}
               </span>
             </>
           )}

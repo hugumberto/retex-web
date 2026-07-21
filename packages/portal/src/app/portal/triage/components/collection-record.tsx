@@ -1,5 +1,12 @@
 import { Brand } from '@/app/types/brand';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import {
+  AGE_GROUP_LABEL,
+  QUALITY_LABEL,
+  SEASON_LABEL,
+  SEX_LABEL,
+  TYPE_LABEL,
+} from '@/lib/item-labels';
 import { TriageListItem } from './add-triage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -181,11 +188,11 @@ export default function CollectionRecord({
               {items.length > 0 ? (
                 items.map((item, index) => (
                   <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
-                    <TableCell>{item.quality}</TableCell>
-                    <TableCell>{item.sex}</TableCell>
-                    <TableCell>{item.ageGroup}</TableCell>
-                    <TableCell>{item.type}</TableCell>
-                    <TableCell>{item.season}</TableCell>
+                    <TableCell>{QUALITY_LABEL[item.quality] ?? item.quality}</TableCell>
+                    <TableCell>{SEX_LABEL[item.sex] ?? item.sex}</TableCell>
+                    <TableCell>{AGE_GROUP_LABEL[item.ageGroup] ?? item.ageGroup}</TableCell>
+                    <TableCell>{TYPE_LABEL[item.type] ?? item.type}</TableCell>
+                    <TableCell>{SEASON_LABEL[item.season] ?? item.season}</TableCell>
                     <TableCell>
                       {(brands.find((brand) => brand.id === item.brandId)
                         ?.name ??
