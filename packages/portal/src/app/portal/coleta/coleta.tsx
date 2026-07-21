@@ -1,6 +1,7 @@
 'use client';
 
 import { PackageDTO, PackageStatus } from '@/app/types/package';
+import { PackageCollectionDTO } from '@/app/types/package-collection';
 import { CollectionResponse, QrCodeDTO } from '@/app/types/qr-code';
 import PackageUserData from '../triage/components/package-user-data';
 import { Button } from '@/components/ui/button';
@@ -36,9 +37,8 @@ const STATUS_LABEL: Partial<Record<PackageStatus, string>> = {
 };
 
 const errorMessage = (error: unknown, fallback: string): string => {
-  const message = (
-    error as { response?: { data?: { message?: string } } }
-  )?.response?.data?.message;
+  const message = (error as { response?: { data?: { message?: string } } })
+    ?.response?.data?.message;
   return typeof message === 'string' ? message : fallback;
 };
 
@@ -47,6 +47,9 @@ export default function Coleta() {
 
   const [scanCode, setScanCode] = useState('');
   const [pkg, setPkg] = useState<PackageDTO | null>(null);
+  // Pacotes de uma recolha (quando o código inserido é de uma rota) — para o
+  // utilizador escolher qual pacote recolher.
+  const [routePackages, setRoutePackages] = useState<PackageDTO[]>([]);
   const [boundCodes, setBoundCodes] = useState<QrCodeDTO[]>([]);
   const [isLoadingPackage, setIsLoadingPackage] = useState(false);
   const [qrInput, setQrInput] = useState('');
@@ -78,29 +81,68 @@ export default function Coleta() {
     }
   }, [pkg, canCollect]);
 
+  // Carrega um pacote pelo id/código e prepara a tela de recolha.
+  const loadPackage = useCallback(async (code: string) => {
+    const { data, status } = await api.get<CollectionResponse>(
+      `/collection/${code}`
+    );
+    if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
+    setPkg(data.package);
+    setBoundCodes(data.qrCodes ?? []);
+    setRoutePackages([]);
+    // O foco no input de QR é feito pelo useEffect ao ficar coletável.
+  }, []);
+
   const handleScanBlur = useCallback(async () => {
-    const id = scanCode.trim();
-    if (!id || pkg) return;
+    const code = scanCode.trim();
+    if (!code || pkg) return;
 
     setIsLoadingPackage(true);
     try {
-      const { data, status } = await api.get<CollectionResponse>(
-        `/collection/${id}`
-      );
-      if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
-      setPkg(data.package);
-      setBoundCodes(data.qrCodes ?? []);
+      // 1) Tenta como pacote (código amigável do pacote ou id).
+      await loadPackage(code);
       toast.success('Solicitação carregada');
-      // O foco no input de QR é feito pelo useEffect ao ficar coletável.
-    } catch (error) {
-      console.error('Erro ao carregar solicitação:', error);
-      setPkg(null);
-      setBoundCodes([]);
-      toast.error('Solicitação não encontrada para o código informado');
+    } catch {
+      // 2) Não é um pacote — tenta como recolha (código da rota): lista os
+      //    pacotes da rota para o utilizador escolher qual recolher.
+      try {
+        const { data: route } = await api.get<PackageCollectionDTO>(
+          `/route/${code}`
+        );
+        const pkgs = route.packages ?? [];
+        if (pkgs.length === 0) {
+          setRoutePackages([]);
+          toast.error('Esta recolha não tem pacotes');
+        } else {
+          setRoutePackages(pkgs);
+          toast.success('Recolha carregada — selecione um pacote');
+        }
+      } catch {
+        setPkg(null);
+        setBoundCodes([]);
+        setRoutePackages([]);
+        toast.error('Nenhum pacote ou recolha encontrado para o código');
+      }
     } finally {
       setIsLoadingPackage(false);
     }
-  }, [scanCode, pkg]);
+  }, [scanCode, pkg, loadPackage]);
+
+  // Seleção de um pacote a partir da lista da recolha.
+  const handleSelectRoutePackage = useCallback(
+    async (packageId: string) => {
+      setIsLoadingPackage(true);
+      try {
+        await loadPackage(packageId);
+        toast.success('Solicitação carregada');
+      } catch {
+        toast.error('Não foi possível carregar o pacote selecionado');
+      } finally {
+        setIsLoadingPackage(false);
+      }
+    },
+    [loadPackage]
+  );
 
   const handleBind = useCallback(async () => {
     const code = qrInput.trim();
@@ -177,6 +219,7 @@ export default function Coleta() {
   const handleReset = () => {
     setScanCode('');
     setPkg(null);
+    setRoutePackages([]);
     setBoundCodes([]);
     setQrInput('');
     setShowCancel(false);
@@ -203,7 +246,7 @@ export default function Coleta() {
                 await handleScanBlur();
               }
             }}
-            placeholder="Digite o código e pressione Enter"
+            placeholder="Código do pacote ou da recolha — escaneie ou pressione Enter"
             autoFocus
             disabled={!!pkg || isLoadingPackage}
             className="max-w-md"
@@ -215,8 +258,8 @@ export default function Coleta() {
                   isCollected
                     ? 'bg-blue-100 text-blue-800'
                     : canCollect
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-amber-100 text-amber-800'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-amber-100 text-amber-800'
                 }`}
               >
                 {STATUS_LABEL[pkg.status] ?? pkg.status}
@@ -239,10 +282,58 @@ export default function Coleta() {
         </div>
         {pkg && !canCollect && !isCollected && (
           <p className="mt-3 text-sm text-amber-700">
-            Esta solicitação não está aguardando recolha e não pode ser coletada.
+            Esta solicitação não está aguardando recolha e não pode ser
+            coletada.
           </p>
         )}
       </div>
+
+      {/* Pacotes da recolha (quando o código inserido é de uma rota) */}
+      {!pkg && routePackages.length > 0 && (
+        <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+          <h2 className="mb-4 text-xl font-semibold text-secondary">
+            Pacotes da recolha
+          </h2>
+          <div className="w-full overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Código</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Ação</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {routePackages.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium tracking-wide">
+                      {item.friendlyCode ?? '-'}
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      {`${item.user?.firstName ?? ''} ${
+                        item.user?.lastName ?? ''
+                      }`.trim() || '-'}
+                    </TableCell>
+                    <TableCell>{STATUS_LABEL[item.status] ?? item.status}</TableCell>
+                    <TableCell>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoadingPackage}
+                        onClick={() => handleSelectRoutePackage(item.id)}
+                      >
+                        Selecionar
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      )}
 
       {/* Dados do cliente */}
       {pkg && <PackageUserData user={pkg.user} address={pkg.address} />}
@@ -256,7 +347,8 @@ export default function Coleta() {
             </h2>
             <span className="text-sm text-muted-foreground">
               {boundCodes.length}
-              {pkg.estimatedVolumes ? ` / ${pkg.estimatedVolumes}` : ''} volume(s)
+              {pkg.estimatedVolumes ? ` / ${pkg.estimatedVolumes}` : ''}{' '}
+              volume(s)
             </span>
           </div>
 
