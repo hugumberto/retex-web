@@ -40,6 +40,10 @@ const STATUS_LABEL: Record<UserStatus, string> = {
   [UserStatus.INACTIVE]: 'Inativo',
 };
 
+// Endereço padrão do utilizador (ou o primeiro, como fallback).
+const defaultAddress = (user: UserDTO) =>
+  user.addresses?.find((a) => a.isDefault) ?? user.addresses?.[0];
+
 const ALL = 'ALL';
 
 export default function User() {
@@ -196,6 +200,7 @@ export default function User() {
               <TableHead>Email</TableHead>
               <TableHead>Perfil</TableHead>
               <TableHead>Estado</TableHead>
+              <TableHead>Localidade (padrão)</TableHead>
               <TableHead>Criado em</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
@@ -214,6 +219,22 @@ export default function User() {
                       .join(', ')}
                   </TableCell>
                   <TableCell>{STATUS_LABEL[user.status] ?? user.status}</TableCell>
+                  <TableCell>
+                    {(() => {
+                      const addr = defaultAddress(user);
+                      if (!addr) return '—';
+                      return (
+                        <div className="flex flex-col gap-1">
+                          <span>{addr.city || '—'}</span>
+                          {!addr.isInServiceZone && (
+                            <span className="inline-flex w-fit rounded-full bg-amber-100 px-2 text-xs font-semibold text-amber-800">
+                              Fora da zona
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </TableCell>
                   <TableCell>
                     {user.createdAt
                       ? new Date(user.createdAt).toLocaleDateString('pt-PT')
@@ -252,7 +273,7 @@ export default function User() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="text-center py-6 text-muted-foreground"
                 >
                   Nenhum registro encontrado!
