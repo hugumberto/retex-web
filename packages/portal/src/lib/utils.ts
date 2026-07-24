@@ -19,6 +19,7 @@ import {
   Truck,
   SlidersHorizontal,
   Mail,
+  KeyRound,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -163,6 +164,12 @@ export const NAV_ITEMS: NavEntry[] = [
         href: '/portal/email-log',
         label: 'Registo de Emails',
         icon: Mail,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/reset-password',
+        label: 'Repor Senha',
+        icon: KeyRound,
         roles: [Role.ADMIN],
       },
     ],
