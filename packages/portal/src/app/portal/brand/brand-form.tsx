@@ -85,8 +85,20 @@ export default function BrandForm({
                 isEditing ? 'atualizada' : 'criada'
               } com sucesso!`;
             },
-            error: () =>
-              `Erro ao ${isEditing ? 'atualizar' : 'criar'} a marca.`,
+            error: (err) => {
+              const response = (
+                err as {
+                  response?: { status?: number; data?: { message?: string } };
+                }
+              )?.response;
+              if (response?.status === 409) {
+                return (
+                  response.data?.message ||
+                  'Já existe uma marca com este nome'
+                );
+              }
+              return `Erro ao ${isEditing ? 'atualizar' : 'criar'} a marca.`;
+            },
           }
         );
       } finally {
