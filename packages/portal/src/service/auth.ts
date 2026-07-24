@@ -43,11 +43,17 @@ export async function activateUser(token: string, password: string) {
   }
 }
 
-export async function forgotPassword(email: string) {
-  const { status } = await api.post('/user/forgot-password', { email });
+export async function forgotPassword(
+  email: string
+): Promise<{ ok: boolean; outOfZone: boolean }> {
+  const { status, data } = await api.post<{ ok: boolean; outOfZone?: boolean }>(
+    '/user/forgot-password',
+    { email }
+  );
   if (!isSuccessStatus(status)) {
     throw new Error('Erro ao pedir reposição de senha');
   }
+  return { ok: data?.ok ?? true, outOfZone: data?.outOfZone ?? false };
 }
 
 export async function resetPasswordWithToken(token: string, password: string) {
