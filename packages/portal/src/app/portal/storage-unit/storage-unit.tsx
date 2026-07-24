@@ -218,6 +218,8 @@ export default function StorageUnit() {
               <TableHead>Faixa etária</TableHead>
               <TableHead>Parte</TableHead>
               <TableHead>Estação</TableHead>
+              <TableHead>Peso (kg)</TableHead>
+              <TableHead>Nº de itens</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Ação</TableHead>
             </TableRow>
@@ -234,6 +236,8 @@ export default function StorageUnit() {
                   <TableCell>{AGE_GROUP_MAP[storageUnit.ageGroup]}</TableCell>
                   <TableCell>{TYPE_MAP[storageUnit.type]}</TableCell>
                   <TableCell>{SEASON_MAP[storageUnit.season]}</TableCell>
+                  <TableCell>{Number(storageUnit.weight ?? 0).toFixed(2)}</TableCell>
+                  <TableCell>{storageUnit.itemsCount ?? 0}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -279,7 +283,7 @@ export default function StorageUnit() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={8}
+                  colSpan={10}
                   className="text-center py-6 text-muted-foreground"
                 >
                   Nenhum registro encontrado!

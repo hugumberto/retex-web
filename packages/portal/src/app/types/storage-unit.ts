@@ -34,6 +34,7 @@ export type StorageUnitDTO = {
   season: Season;
   status: Status;
   weight: number;
+  itemsCount?: number;
 };
 
 export type StorageUnitFormData = {
