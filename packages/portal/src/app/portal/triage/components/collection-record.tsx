@@ -188,11 +188,17 @@ export default function CollectionRecord({
               {items.length > 0 ? (
                 items.map((item, index) => (
                   <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
-                    <TableCell>{QUALITY_LABEL[item.quality] ?? item.quality}</TableCell>
+                    <TableCell>
+                      {QUALITY_LABEL[item.quality] ?? item.quality}
+                    </TableCell>
                     <TableCell>{SEX_LABEL[item.sex] ?? item.sex}</TableCell>
-                    <TableCell>{AGE_GROUP_LABEL[item.ageGroup] ?? item.ageGroup}</TableCell>
+                    <TableCell>
+                      {AGE_GROUP_LABEL[item.ageGroup] ?? item.ageGroup}
+                    </TableCell>
                     <TableCell>{TYPE_LABEL[item.type] ?? item.type}</TableCell>
-                    <TableCell>{SEASON_LABEL[item.season] ?? item.season}</TableCell>
+                    <TableCell>
+                      {SEASON_LABEL[item.season] ?? item.season}
+                    </TableCell>
                     <TableCell>
                       {(brands.find((brand) => brand.id === item.brandId)
                         ?.name ??
@@ -334,14 +340,6 @@ export default function CollectionRecord({
             disabled={isAddDisabled || isViewMode}
           >
             Adicionar
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            className="min-w-24"
-            disabled={isViewMode}
-          >
-            Próximo
           </Button>
         </div>
       </div>

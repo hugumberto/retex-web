@@ -75,7 +75,13 @@ export default function Triage() {
       try {
         const { data, status } = await api.get<Brand[]>('/brand');
         if (!isSuccessStatus(status)) throw new Error('Erro ao buscar marcas');
-        setBrands(data);
+        // Marcas por ordem alfabética (case-insensitive, pt-PT).
+        const sorted = [...data].sort((a, b) =>
+          (a.name ?? '').localeCompare(b.name ?? '', 'pt', {
+            sensitivity: 'base',
+          })
+        );
+        setBrands(sorted);
       } catch (error) {
         console.error('Erro ao buscar marcas:', error);
         toast.error('Não foi possível carregar as marcas');
@@ -99,10 +105,9 @@ export default function Triage() {
     (item) => item.qrCodeId === activeQrId
   );
   const processedCount = qrCodes.filter((qr) => qr.processedAt != null).length;
-  // Só os processados e o que está em processamento (ativo); nunca os pendentes.
-  const visibleVolumes = qrCodes.filter(
-    (qr) => qr.processedAt != null || qr.id === activeQrId
-  );
+  // Mostra todos os volumes: processados, o que está em processamento (ativo)
+  // e os pendentes (ainda por processar).
+  const visibleVolumes = qrCodes;
   const activeQr = qrCodes.find((qr) => qr.id === activeQrId) ?? null;
 
   const handleScanCodeBlur = async () => {
@@ -584,7 +589,7 @@ export default function Triage() {
         </div>
       )}
 
-      {/* Volumes (QR codes) — processados + em processamento */}
+      {/* Volumes (QR codes) — processados, em processamento e pendentes */}
       {selectedPackage && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <div className="mb-4 flex items-center justify-between">
@@ -607,11 +612,21 @@ export default function Triage() {
             <TableBody>
               {visibleVolumes.length > 0 ? (
                 visibleVolumes.map((qr) => {
-                  const itemsCount = triageItems.filter(
-                    (item) => item.qrCodeId === qr.id
-                  ).length;
+                  // Soma das quantidades dos itens vinculados a este volume.
+                  const itemsCount = triageItems
+                    .filter((item) => item.qrCodeId === qr.id)
+                    .reduce(
+                      (sum, item) => sum + (Number(item.quantity) || 0),
+                      0
+                    );
                   const processed = qr.processedAt != null;
-                  const rawWeight = processed ? qr.weight : volumeWeight;
+                  const isActive = qr.id === activeQrId;
+                  // O peso em edição (volumeWeight) só se aplica ao volume ativo.
+                  const rawWeight = processed
+                    ? qr.weight
+                    : isActive
+                    ? volumeWeight
+                    : null;
                   const numWeight = Number(rawWeight);
                   const displayWeight =
                     rawWeight != null &&
@@ -619,6 +634,16 @@ export default function Triage() {
                     Number.isFinite(numWeight)
                       ? numWeight.toFixed(2)
                       : '-';
+                  const stateClass = processed
+                    ? 'bg-green-100 text-green-800'
+                    : isActive
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-gray-100 text-gray-700';
+                  const stateLabel = processed
+                    ? 'Processado'
+                    : isActive
+                    ? 'Em processamento'
+                    : 'Pendente';
                   return (
                     <TableRow key={qr.id}>
                       <TableCell className="font-medium">
@@ -628,13 +653,9 @@ export default function Triage() {
                       <TableCell>{itemsCount}</TableCell>
                       <TableCell>
                         <span
-                          className={`inline-flex rounded-full px-2 text-xs font-semibold ${
-                            processed
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
+                          className={`inline-flex rounded-full px-2 text-xs font-semibold ${stateClass}`}
                         >
-                          {processed ? 'Processado' : 'Em processamento'}
+                          {stateLabel}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -646,7 +667,7 @@ export default function Triage() {
                     colSpan={4}
                     className="py-6 text-center text-muted-foreground"
                   >
-                    Nenhum volume em processamento ou processado
+                    Nenhum volume nesta solicitação
                   </TableCell>
                 </TableRow>
               )}
