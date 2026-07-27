@@ -1,6 +1,6 @@
 'use client';
 
-import { QrCodeDTO } from '@/app/types/qr-code';
+import { CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,26 +25,26 @@ type CollectionRequestInfo = {
   id: string;
   friendlyCode?: string;
   status: string;
-  estimatedVolumes?: number;
-  qrCodesGenerated?: number;
+  estimatedBags?: number;
+  bagsGenerated?: number;
 };
 
-type CollectionRequestVolumesResponse = {
+type CollectionRequestBagsResponse = {
   collectionRequest: CollectionRequestInfo;
-  volumes: QrCodeDTO[];
+  bags: CollectionRequestBagDTO[];
 };
 
-export default function Volumes() {
+export default function Bags() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [code, setCode] = useState('');
   const [pkg, setPkg] = useState<CollectionRequestInfo | null>(null);
-  const [volumes, setVolumes] = useState<QrCodeDTO[]>([]);
+  const [bags, setBags] = useState<CollectionRequestBagDTO[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
-    setPageTitle('Volumes do Pacote');
-    setBreadcrumbs([{ label: 'Volumes do Pacote', href: '/portal/volumes' }]);
+    setPageTitle('Sacos da Solicitação');
+    setBreadcrumbs([{ label: 'Sacos da Solicitação', href: '/portal/bags' }]);
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
@@ -56,21 +56,21 @@ export default function Volumes() {
     if (!target) return;
     setIsLoading(true);
     try {
-      const { data, status } = await api.get<CollectionRequestVolumesResponse>(
-        `/qr-code/collection-request/${target}`
+      const { data, status } = await api.get<CollectionRequestBagsResponse>(
+        `/collection-request-bag/collection-request/${target}`
       );
       if (!isSuccessStatus(status)) throw new Error();
       setPkg(data.collectionRequest);
-      setVolumes(data.volumes ?? []);
+      setBags(data.bags ?? []);
     } catch (error) {
       const httpStatus = (error as { response?: { status?: number } })?.response
         ?.status;
       setPkg(null);
-      setVolumes([]);
+      setBags([]);
       toast.error(
         httpStatus === 404
           ? 'Nenhuma solicitação encontrada para o código'
-          : 'Não foi possível carregar os volumes'
+          : 'Não foi possível carregar os sacos'
       );
     } finally {
       setIsLoading(false);
@@ -83,29 +83,29 @@ export default function Volumes() {
     }
   };
 
-  const handleUnassign = async (volume: QrCodeDTO) => {
-    setBusyId(volume.id);
+  const handleUnassign = async (bag: CollectionRequestBagDTO) => {
+    setBusyId(bag.id);
     try {
-      const res = await api.patch(`/qr-code/${volume.id}/unassign`);
+      const res = await api.patch(`/collection-request-bag/${bag.id}/unassign`);
       if (!isSuccessStatus(res.status)) throw new Error();
-      toast.success('Volume desassociado do pacote');
+      toast.success('Saco desassociado da solicitação');
       await refresh();
     } catch {
-      toast.error('Não foi possível desassociar o volume');
+      toast.error('Não foi possível desassociar o saco');
     } finally {
       setBusyId(null);
     }
   };
 
-  const handleDelete = async (volume: QrCodeDTO) => {
-    setBusyId(volume.id);
+  const handleDelete = async (bag: CollectionRequestBagDTO) => {
+    setBusyId(bag.id);
     try {
-      const res = await api.delete(`/qr-code/${volume.id}`);
+      const res = await api.delete(`/collection-request-bag/${bag.id}`);
       if (!isSuccessStatus(res.status)) throw new Error();
-      toast.success('Volume eliminado');
+      toast.success('Saco eliminado');
       await refresh();
     } catch {
-      toast.error('Não foi possível eliminar o volume');
+      toast.error('Não foi possível eliminar o saco');
     } finally {
       setBusyId(null);
     }
@@ -154,11 +154,11 @@ export default function Volumes() {
                 </strong>
               </span>
               <span>
-                Volumes recolhidos: <strong>{pkg.qrCodesGenerated ?? 0}</strong>
+                Sacos recolhidos: <strong>{pkg.bagsGenerated ?? 0}</strong>
               </span>
-              {pkg.estimatedVolumes != null && (
+              {pkg.estimatedBags != null && (
                 <span>
-                  Estimados: <strong>{pkg.estimatedVolumes}</strong>
+                  Estimados: <strong>{pkg.estimatedBags}</strong>
                 </span>
               )}
             </div>
@@ -176,53 +176,53 @@ export default function Volumes() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {volumes.length > 0 ? (
-                  volumes.map((v) => (
-                    <TableRow key={v.id}>
+                {bags.length > 0 ? (
+                  bags.map((b) => (
+                    <TableRow key={b.id}>
                       <TableCell className="font-medium">
-                        {v.friendlyCode}
+                        {b.friendlyCode}
                       </TableCell>
-                      <TableCell>{v.usedAt ? 'Sim' : 'Não'}</TableCell>
-                      <TableCell>{v.processedAt ? 'Sim' : 'Não'}</TableCell>
+                      <TableCell>{b.usedAt ? 'Sim' : 'Não'}</TableCell>
+                      <TableCell>{b.processedAt ? 'Sim' : 'Não'}</TableCell>
                       <TableCell>
-                        {v.weight != null
-                          ? Number(v.weight).toFixed(2)
+                        {b.weight != null
+                          ? Number(b.weight).toFixed(2)
                           : '-'}
                       </TableCell>
                       <TableCell className="space-x-2">
                         <ConfirmDialog
-                          title="Desassociar volume"
-                          description="O volume será desvinculado deste pacote (volta ao pool da rota). Continuar?"
+                          title="Desassociar saco"
+                          description="O saco será desvinculado desta solicitação (volta ao pool da rota). Continuar?"
                           confirmText="Desassociar"
                           trigger={
                             <Button
                               variant="ghost"
                               size="icon"
                               className="size-8"
-                              title="Desassociar do pacote"
-                              disabled={busyId === v.id}
+                              title="Desassociar da solicitação"
+                              disabled={busyId === b.id}
                             >
                               <Link2Off className="size-4" />
                             </Button>
                           }
-                          onConfirm={() => handleUnassign(v)}
+                          onConfirm={() => handleUnassign(b)}
                         />
                         <ConfirmDialog
-                          title="Eliminar volume"
-                          description="O volume será eliminado. Esta ação atualiza o nº de volumes recolhidos do pacote."
+                          title="Eliminar saco"
+                          description="O saco será eliminado. Esta ação atualiza o nº de sacos recolhidos da solicitação."
                           confirmText="Eliminar"
                           trigger={
                             <Button
                               variant="ghost"
                               size="icon"
                               className="size-8 text-red-600 hover:text-red-700"
-                              title="Eliminar volume"
-                              disabled={busyId === v.id}
+                              title="Eliminar saco"
+                              disabled={busyId === b.id}
                             >
                               <TrashIcon className="size-4" />
                             </Button>
                           }
-                          onConfirm={() => handleDelete(v)}
+                          onConfirm={() => handleDelete(b)}
                         />
                       </TableCell>
                     </TableRow>
@@ -233,7 +233,7 @@ export default function Volumes() {
                       colSpan={5}
                       className="py-6 text-center text-muted-foreground"
                     >
-                      Nenhum volume associado a esta solicitação
+                      Nenhum saco associado a esta solicitação
                     </TableCell>
                   </TableRow>
                 )}

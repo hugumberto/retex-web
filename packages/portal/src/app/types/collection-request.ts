@@ -23,7 +23,7 @@ export interface CollectionRequestDTO extends Entity {
   user: UserDTO
   route?: PackageCollectionDTO
   weight?: number
-  estimatedVolumes?: number
+  estimatedBags?: number
   address: Address
   items?: CollectionRequestItemDTO[]
 }
@@ -37,7 +37,7 @@ export interface CollectionRequestItemDTO extends Entity {
   ageGroup: AgeGroup
   brand: Brand
   quantity: number
-  qrCode?: { id: string; friendlyCode?: string } | null
+  bag?: { id: string; friendlyCode?: string } | null
 }
 
 export enum Quality {

@@ -3,7 +3,7 @@
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
 import { STATUS_LABEL } from '@/lib/collection-request-status';
 import { PackageCollectionDTO } from '@/app/types/package-collection';
-import { CollectionResponse, QrCodeDTO } from '@/app/types/qr-code';
+import { CollectionResponse, CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import CollectionRequestUserData from '../triage/components/collection-request-user-data';
 import { Button } from '@/components/ui/button';
 import {
@@ -43,7 +43,7 @@ export default function Coleta() {
   // Pacotes de uma recolha (quando o código inserido é de uma rota) — para o
   // utilizador escolher qual pacote recolher.
   const [routeCollectionRequests, setRouteCollectionRequests] = useState<CollectionRequestDTO[]>([]);
-  const [boundCodes, setBoundCodes] = useState<QrCodeDTO[]>([]);
+  const [boundCodes, setBoundCodes] = useState<CollectionRequestBagDTO[]>([]);
   const [isLoadingCollectionRequest, setIsLoadingCollectionRequest] = useState(false);
   const [qrInput, setQrInput] = useState('');
   const [isBinding, setIsBinding] = useState(false);
@@ -81,7 +81,7 @@ export default function Coleta() {
     );
     if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
     setPkg(data.collectionRequest);
-    setBoundCodes(data.qrCodes ?? []);
+    setBoundCodes(data.bags ?? []);
     setRouteCollectionRequests([]);
     // O foco no input de QR é feito pelo useEffect ao ficar coletável.
   }, []);
@@ -143,15 +143,15 @@ export default function Coleta() {
 
     setIsBinding(true);
     try {
-      const { data, status } = await api.post<QrCodeDTO>(
+      const { data, status } = await api.post<CollectionRequestBagDTO>(
         `/collection/${pkg.id}/bind`,
         { code }
       );
       if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
       setBoundCodes((current) =>
-        current.some((qr) => qr.id === data.id) ? current : [...current, data]
+        current.some((bag) => bag.id === data.id) ? current : [...current, data]
       );
-      toast.success('Volume vinculado');
+      toast.success('Saco vinculado');
     } catch (error) {
       console.error('Erro ao vincular QR code:', error);
       toast.error(errorMessage(error, 'Não foi possível vincular o QR code'));
@@ -331,17 +331,17 @@ export default function Coleta() {
       {/* Dados do cliente */}
       {pkg && <CollectionRequestUserData user={pkg.user} address={pkg.address} />}
 
-      {/* Vínculo de volumes */}
+      {/* Vínculo de sacos */}
       {pkg && (canCollect || isCollected) && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-secondary">
-              Volumes recolhidos
+              Sacos recolhidos
             </h2>
             <span className="text-sm text-muted-foreground">
               {boundCodes.length}
-              {pkg.estimatedVolumes ? ` / ${pkg.estimatedVolumes}` : ''}{' '}
-              volume(s)
+              {pkg.estimatedBags ? ` / ${pkg.estimatedBags}` : ''}{' '}
+              saco(s)
             </span>
           </div>
 
@@ -376,10 +376,10 @@ export default function Coleta() {
             </TableHeader>
             <TableBody>
               {boundCodes.length > 0 ? (
-                boundCodes.map((qr) => (
-                  <TableRow key={qr.id}>
+                boundCodes.map((bag) => (
+                  <TableRow key={bag.id}>
                     <TableCell className="font-medium tracking-wide">
-                      {qr.friendlyCode}
+                      {bag.friendlyCode}
                     </TableCell>
                     <TableCell>
                       <span className="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold text-blue-800">
@@ -394,7 +394,7 @@ export default function Coleta() {
                     colSpan={2}
                     className="py-6 text-center text-muted-foreground"
                   >
-                    Nenhum volume vinculado
+                    Nenhum saco vinculado
                   </TableCell>
                 </TableRow>
               )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { QrCodeDTO } from '@/app/types/qr-code';
+import { CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -26,15 +26,15 @@ import { SearchIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-type RouteCollectionRequestVolumes = {
+type RouteCollectionRequestBags = {
   collectionRequest: {
     id: string;
     friendlyCode?: string | null;
     status: string;
     clientName: string;
-    estimatedVolumes?: number;
+    estimatedBags?: number;
   };
-  qrCodes: QrCodeDTO[];
+  bags: CollectionRequestBagDTO[];
 };
 
 type Props = {
@@ -42,18 +42,18 @@ type Props = {
   routeCode?: string | null;
 };
 
-export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
+export default function RouteBagsDialog({ routeId, routeCode }: Props) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<RouteCollectionRequestVolumes[]>([]);
+  const [data, setData] = useState<RouteCollectionRequestBags[]>([]);
 
   const handleOpenChange = async (next: boolean) => {
     setOpen(next);
     if (next) {
       setIsLoading(true);
       try {
-        const res = await api.get<RouteCollectionRequestVolumes[]>(
-          `/route/${routeId}/collection-request-volumes`
+        const res = await api.get<RouteCollectionRequestBags[]>(
+          `/route/${routeId}/collection-request-bags`
         );
         if (!isSuccessStatus(res.status)) throw new Error();
         setData(res.data ?? []);
@@ -73,7 +73,7 @@ export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
           variant="ghost"
           size="icon"
           className="size-8"
-          title="Ver pacotes e volumes"
+          title="Ver pacotes e sacos"
         >
           <SearchIcon />
         </Button>
@@ -87,7 +87,7 @@ export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
             Pacotes da recolha {routeCode ?? ''}
           </DialogTitle>
           <DialogDescription>
-            Pacotes desta recolha e os volumes (QR codes) vinculados a cada um.
+            Pacotes desta recolha e os sacos (QR codes) vinculados a cada um.
           </DialogDescription>
         </DialogHeader>
 
@@ -122,7 +122,7 @@ export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
                       </strong>
                     </span>
                     <span>
-                      Volumes: <strong>{entry.qrCodes.length}</strong>
+                      Sacos: <strong>{entry.bags.length}</strong>
                     </span>
                   </div>
                 </div>
@@ -131,26 +131,26 @@ export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Código do volume</TableHead>
+                        <TableHead>Código do saco</TableHead>
                         <TableHead>Recolhido</TableHead>
                         <TableHead>Processado</TableHead>
                         <TableHead>Peso (kg)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {entry.qrCodes.length > 0 ? (
-                        entry.qrCodes.map((qr) => (
-                          <TableRow key={qr.id}>
+                      {entry.bags.length > 0 ? (
+                        entry.bags.map((bag) => (
+                          <TableRow key={bag.id}>
                             <TableCell className="font-medium">
-                              {qr.friendlyCode}
+                              {bag.friendlyCode}
                             </TableCell>
-                            <TableCell>{qr.usedAt ? 'Sim' : 'Não'}</TableCell>
+                            <TableCell>{bag.usedAt ? 'Sim' : 'Não'}</TableCell>
                             <TableCell>
-                              {qr.processedAt ? 'Sim' : 'Não'}
+                              {bag.processedAt ? 'Sim' : 'Não'}
                             </TableCell>
                             <TableCell>
-                              {qr.weight != null
-                                ? Number(qr.weight).toFixed(2)
+                              {bag.weight != null
+                                ? Number(bag.weight).toFixed(2)
                                 : '-'}
                             </TableCell>
                           </TableRow>
@@ -161,7 +161,7 @@ export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
                             colSpan={4}
                             className="py-4 text-center text-muted-foreground"
                           >
-                            Sem volumes vinculados
+                            Sem sacos vinculados
                           </TableCell>
                         </TableRow>
                       )}

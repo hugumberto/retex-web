@@ -505,7 +505,7 @@ export default function PackageCollectionForm({
                   <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                     <TableRow>
                       <TableHead className="whitespace-normal">Solicitante</TableHead>
-                      <TableHead>Volumes</TableHead>
+                      <TableHead>Sacos</TableHead>
                       <TableHead>Ação</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -520,7 +520,7 @@ export default function PackageCollectionForm({
                             <br />
                             {addressLabel(pkg)}
                           </TableCell>
-                          <TableCell>{pkg.estimatedVolumes ?? '-'}</TableCell>
+                          <TableCell>{pkg.estimatedBags ?? '-'}</TableCell>
                           <TableCell>
                             <Button
                               type="button"
@@ -556,7 +556,7 @@ export default function PackageCollectionForm({
                     <TableHead className="w-10"></TableHead>
                     <TableHead className="whitespace-normal">Solicitante</TableHead>
                     <TableHead>Cidade</TableHead>
-                    <TableHead>Volumes</TableHead>
+                    <TableHead>Sacos</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -580,7 +580,7 @@ export default function PackageCollectionForm({
                           {addressLabel(item)}
                         </TableCell>
                         <TableCell className="whitespace-normal break-words align-top">{item.address.city}</TableCell>
-                        <TableCell>{item.estimatedVolumes ?? '-'}</TableCell>
+                        <TableCell>{item.estimatedBags ?? '-'}</TableCell>
                       </TableRow>
                     ))
                   ) : (
@@ -614,7 +614,7 @@ export default function PackageCollectionForm({
                       <TableHead>Solicitante</TableHead>
                       <TableHead>Morada</TableHead>
                       <TableHead>Cidade</TableHead>
-                      <TableHead>Volumes</TableHead>
+                      <TableHead>Sacos</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -634,7 +634,7 @@ export default function PackageCollectionForm({
                         <TableCell>{userName(item)}</TableCell>
                         <TableCell>{addressLabel(item)}</TableCell>
                         <TableCell>{item.address.city}</TableCell>
-                        <TableCell>{item.estimatedVolumes ?? '-'}</TableCell>
+                        <TableCell>{item.estimatedBags ?? '-'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

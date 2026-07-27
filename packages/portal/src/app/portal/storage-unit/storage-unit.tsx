@@ -121,7 +121,7 @@ export default function StorageUnit() {
     const ageGroup = escapeHtml(AGE_GROUP_MAP[unit.ageGroup]);
     const type = escapeHtml(TYPE_MAP[unit.type]);
     const season = escapeHtml(SEASON_MAP[unit.season]);
-    const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+    const qrSource = `https://api.qrserver.com/v1/create-bag-code/?size=220x220&data=${encodeURIComponent(
       unit.id
     )}`;
 
@@ -149,7 +149,7 @@ export default function StorageUnit() {
               font-size: 18px;
               font-weight: 700;
             }
-            .qr {
+            .bag {
               width: 220px;
               height: 220px;
               margin: 10px auto 16px;
@@ -172,7 +172,7 @@ export default function StorageUnit() {
           <div class="label">
             <h1 class="title">Etiqueta do Item</h1>
             <p class="code">${friendlyCode}</p>
-            <img class="qr" src="${qrSource}" alt="QR Code ${unitId}" />
+            <img class="bag" src="${qrSource}" alt="QR Code ${unitId}" />
             <p class="text"><strong>Código:</strong> ${friendlyCode}</p>
             <p class="text"><strong>Qualidade:</strong> ${quality}</p>
             <p class="text"><strong>Sexo:</strong> ${sex}</p>

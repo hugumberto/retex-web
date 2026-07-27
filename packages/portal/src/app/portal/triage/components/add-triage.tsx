@@ -50,7 +50,7 @@ const SEASON_MAP: Record<Season, string> = {
 export type TriageListItem = {
   id?: string;
   collectionRequestId: string;
-  qrCodeId?: string;
+  bagId?: string;
   quality: 'GOOD' | 'MEDIUM' | 'BAD';
   type: 'UPPER_PART' | 'UNDER_PART';
   season: 'SUMMER' | 'WINTER';

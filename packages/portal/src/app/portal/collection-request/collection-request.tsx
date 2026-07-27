@@ -34,7 +34,7 @@ interface AdminFormData {
   lastName: string;
   email: string;
   contactPhone: string;
-  estimatedVolumes: string;
+  estimatedBags: string;
   address: {
     street: string;
     number: string;
@@ -51,7 +51,7 @@ interface AdminFormData {
 
 interface UserFormData {
   addressId: string;
-  estimatedVolumes: string;
+  estimatedBags: string;
 }
 
 export default function CollectionRequest() {
@@ -98,7 +98,7 @@ export default function CollectionRequest() {
 
   const [userFormOpen, setUserFormOpen] = useState(false);
   const userForm = useForm<UserFormData>({
-    defaultValues: { addressId: '', estimatedVolumes: '' },
+    defaultValues: { addressId: '', estimatedBags: '' },
   });
   const adminForm = useForm<AdminFormData>({
     defaultValues: {
@@ -106,7 +106,7 @@ export default function CollectionRequest() {
       lastName: '',
       email: '',
       contactPhone: '',
-      estimatedVolumes: '',
+      estimatedBags: '',
       address: {
         street: '',
         number: '',
@@ -182,7 +182,7 @@ export default function CollectionRequest() {
       const response = await api.post('/collection-request', {
         userId: user!.id,
         addressId: data.addressId,
-        estimatedVolumes: Number(data.estimatedVolumes),
+        estimatedBags: Number(data.estimatedBags),
       });
       if (!isSuccessStatus(response.status) && response.status !== 409)
         throw new Error();
@@ -203,7 +203,7 @@ export default function CollectionRequest() {
       async () => {
         const response = await api.post('/collection-request', {
           ...data,
-          estimatedVolumes: Number(data.estimatedVolumes),
+          estimatedBags: Number(data.estimatedBags),
           address: {
             street: data.address.street,
             city: data.address.city,
@@ -388,18 +388,18 @@ export default function CollectionRequest() {
                     min={1}
                     placeholder="Número de sacos*"
                     className={
-                      userForm.formState.errors.estimatedVolumes
+                      userForm.formState.errors.estimatedBags
                         ? 'border-red-500'
                         : ''
                     }
-                    {...userForm.register('estimatedVolumes', {
+                    {...userForm.register('estimatedBags', {
                       required: 'Campo obrigatório',
-                      min: { value: 1, message: 'Mínimo 1 volume' },
+                      min: { value: 1, message: 'Mínimo 1 saco' },
                     })}
                   />
-                  {userForm.formState.errors.estimatedVolumes && (
+                  {userForm.formState.errors.estimatedBags && (
                     <p className="text-xs text-destructive mt-1">
-                      {userForm.formState.errors.estimatedVolumes.message}
+                      {userForm.formState.errors.estimatedBags.message}
                     </p>
                   )}
                 </div>
@@ -550,11 +550,11 @@ export default function CollectionRequest() {
                 tabIndex={15}
                 type="number"
                 min={1}
-                placeholder="Estimativa de volumes*"
-                className={adminErrors.estimatedVolumes ? 'border-red-500' : ''}
-                {...adminRegister('estimatedVolumes', {
+                placeholder="Estimativa de sacos*"
+                className={adminErrors.estimatedBags ? 'border-red-500' : ''}
+                {...adminRegister('estimatedBags', {
                   required: 'Campo obrigatório',
-                  min: { value: 1, message: 'Mínimo 1 volume' },
+                  min: { value: 1, message: 'Mínimo 1 saco' },
                 })}
               />
             </div>
@@ -597,7 +597,7 @@ export default function CollectionRequest() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead className="whitespace-normal">Morada</TableHead>
-                <TableHead>Volumes (est.)</TableHead>
+                <TableHead>Sacos (est.)</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Criado em</TableHead>
                 <TableHead>Ação</TableHead>
@@ -621,7 +621,7 @@ export default function CollectionRequest() {
                         request.address?.number ?? ''
                       }`.trim()}
                     </TableCell>
-                    <TableCell>{request.estimatedVolumes ?? '-'}</TableCell>
+                    <TableCell>{request.estimatedBags ?? '-'}</TableCell>
                     <TableCell>
                       {STATUS_LABEL[request.status] ?? request.status}
                     </TableCell>

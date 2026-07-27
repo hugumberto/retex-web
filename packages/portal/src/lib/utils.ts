@@ -174,8 +174,8 @@ export const NAV_ITEMS: NavEntry[] = [
         roles: [Role.ADMIN],
       },
       {
-        href: '/portal/volumes',
-        label: 'Volumes do Pacote',
+        href: '/portal/bags',
+        label: 'Sacos do Pacote',
         icon: Package,
         roles: [Role.ADMIN],
       },

@@ -1,6 +1,6 @@
 import { CollectionRequestDTO } from './collection-request';
 
-export interface QrCodeDTO {
+export interface CollectionRequestBagDTO {
   id: string;
   token: string;
   friendlyCode: string;
@@ -14,10 +14,10 @@ export interface QrCodeDTO {
 
 export interface CollectionResponse {
   collectionRequest: CollectionRequestDTO;
-  qrCodes: QrCodeDTO[];
+  bags: CollectionRequestBagDTO[];
 }
 
 export interface TriageResponse {
   collectionRequest: CollectionRequestDTO;
-  qrCodes: QrCodeDTO[];
+  bags: CollectionRequestBagDTO[];
 }

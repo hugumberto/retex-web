@@ -66,8 +66,8 @@ export default function RequestDetailsDialog({ request }: Props) {
                 value={STATUS_LABEL[request.status] ?? request.status}
               />
               <Field
-                label="Volumes estimados"
-                value={request.estimatedVolumes}
+                label="Sacos estimados"
+                value={request.estimatedBags}
               />
               <Field label="Peso (kg)" value={request.weight} />
               <Field

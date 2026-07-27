@@ -249,8 +249,8 @@ export default function Dashboard() {
         />
         <KpiCard
           icon={Boxes}
-          label="Volumes Estimados"
-          value={fmt(collectionRequests.totalVolumes)}
+          label="Sacos Estimados"
+          value={fmt(collectionRequests.totalBags)}
         />
         <KpiCard
           icon={Recycle}
