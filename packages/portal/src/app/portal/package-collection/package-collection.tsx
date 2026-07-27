@@ -31,6 +31,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
+import RouteVolumesDialog from './route-volumes-dialog';
 
 // Próximo estado no ciclo da rota. DRAFTING→CREATED tem botão próprio
 // ("Confirmar recolha", que dispara os emails); FINISHED é terminal.
@@ -635,6 +636,10 @@ export default function PackageCollection() {
                   </span>
                 </TableCell>
                 <TableCell className="space-x-2">
+                  <RouteVolumesDialog
+                    routeId={packageCollection.id}
+                    routeCode={packageCollection.friendlyCode}
+                  />
                   <Button
                     variant="ghost"
                     size="icon"
@@ -772,29 +777,33 @@ export default function PackageCollection() {
                       }}
                     />
                   )}
-                  <ConfirmDialog
-                    trigger={
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        disabled={isSubmitting}
-                        className="size-8"
-                      >
-                        <TrashIcon />
-                      </Button>
-                    }
-                    onConfirm={async () => {
-                      await toast.promise(handleDelete(packageCollection.id), {
-                        loading: 'Loading...',
-                        success: () => {
-                          return 'Recolha de Encomendas desativada com sucesso';
-                        },
-                        error: () => {
-                          return 'Erro ao desativar a recolha de encomendas';
-                        },
-                      });
-                    }}
-                  />
+                  {packageCollection.status !==
+                    CollectionStatus.FINISHED && (
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8"
+                        >
+                          <TrashIcon />
+                        </Button>
+                      }
+                      onConfirm={async () => {
+                        await toast.promise(
+                          handleDelete(packageCollection.id),
+                          {
+                            loading: 'Loading...',
+                            success: () =>
+                              'Recolha de Encomendas desativada com sucesso',
+                            error: () =>
+                              'Erro ao desativar a recolha de encomendas',
+                          }
+                        );
+                      }}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))}
