@@ -1,10 +1,10 @@
-import { PackageStatus } from './package';
+import { CollectionRequestStatus } from './collection-request';
 
-export interface PackagesStats {
+export interface CollectionRequestsStats {
   total: number;
   totalWeightKg: number;
   totalVolumes: number;
-  byStatus: { status: PackageStatus; count: number }[];
+  byStatus: { status: CollectionRequestStatus; count: number }[];
   trend: { period: string; weightKg: number; count: number }[];
 }
 
@@ -39,12 +39,12 @@ export interface UsersStats {
 }
 
 export interface OutOfZoneStats {
-  totalPackages: number;
+  totalCollectionRequests: number;
   topCities: { city: string; count: number }[];
 }
 
 export interface DashboardStatsDTO {
-  packages: PackagesStats;
+  collectionRequests: CollectionRequestsStats;
   triage: TriageStats;
   environment: EnvironmentStats;
   users: UsersStats;

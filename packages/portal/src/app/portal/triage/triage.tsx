@@ -1,8 +1,8 @@
 'use client';
 
 import { Brand } from '@/app/types/brand';
-import { PackageDTO, PackageStatus } from '@/app/types/package';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { QrCodeDTO, TriageResponse } from '@/app/types/qr-code';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AddTriage, { buildTriageKey, TriageListItem } from './components/add-triage';
 import CollectionRecord from './components/collection-record';
-import PackageUserData from './components/package-user-data';
+import CollectionRequestUserData from './components/collection-request-user-data';
 
 // Extrai a mensagem de erro do servidor (string ou array do class-validator).
 const finishErrorMessage = (error: unknown): string => {
@@ -41,7 +41,7 @@ export default function Triage() {
   const weightInputRef = useRef<HTMLInputElement>(null);
 
   const [scanCode, setScanCode] = useState('');
-  const [selectedPackage, setSelectedPackage] = useState<PackageDTO | null>(
+  const [selectedCollectionRequest, setSelectedCollectionRequest] = useState<CollectionRequestDTO | null>(
     null
   );
   const [qrCodes, setQrCodes] = useState<QrCodeDTO[]>([]);
@@ -50,7 +50,7 @@ export default function Triage() {
   const [volumeCode, setVolumeCode] = useState('');
   const [volumeWeight, setVolumeWeight] = useState('');
   const [isProcessingVolume, setIsProcessingVolume] = useState(false);
-  const [isLoadingPackage, setIsLoadingPackage] = useState(false);
+  const [isLoadingCollectionRequest, setIsLoadingCollectionRequest] = useState(false);
   const [isSavingProgress, setIsSavingProgress] = useState(false);
   const [isFinishingTriage, setIsFinishingTriage] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -98,7 +98,7 @@ export default function Triage() {
     };
   }, [setBreadcrumbs, setPageTitle]);
 
-  const isViewMode = selectedPackage?.status === PackageStatus.STOCKED;
+  const isViewMode = selectedCollectionRequest?.status === CollectionRequestStatus.STOCKED;
   const allProcessed =
     qrCodes.length > 0 && qrCodes.every((qr) => qr.processedAt != null);
   const activeItems = triageItems.filter(
@@ -112,38 +112,38 @@ export default function Triage() {
 
   const handleScanCodeBlur = async () => {
     const code = scanCode.trim();
-    if (!code || selectedPackage) return;
+    if (!code || selectedCollectionRequest) return;
 
-    setIsLoadingPackage(true);
+    setIsLoadingCollectionRequest(true);
     try {
       const { data, status } = await api.get<TriageResponse>(
         `/triage/${code}`
       );
       if (!isSuccessStatus(status)) throw new Error('Erro ao consultar');
 
-      setSelectedPackage(data.package);
+      setSelectedCollectionRequest(data.collectionRequest);
       setQrCodes(data.qrCodes ?? []);
       setActiveQrId(null);
       setVolumeCode('');
       setVolumeWeight('');
 
-      const mappedItems = (data.package.items ?? []).map((packageItem) => ({
-        id: packageItem.id,
-        packageId: data.package.id,
-        qrCodeId: packageItem.qrCode?.id,
-        quality: packageItem.quality,
-        type: packageItem.type,
-        season: packageItem.season,
-        sex: packageItem.sex,
-        ageGroup: packageItem.ageGroup,
-        brandId: packageItem.brand?.id ?? '',
-        quantity: packageItem.quantity,
+      const mappedItems = (data.collectionRequest.items ?? []).map((collectionRequestItem) => ({
+        id: collectionRequestItem.id,
+        collectionRequestId: data.collectionRequest.id,
+        qrCodeId: collectionRequestItem.qrCode?.id,
+        quality: collectionRequestItem.quality,
+        type: collectionRequestItem.type,
+        season: collectionRequestItem.season,
+        sex: collectionRequestItem.sex,
+        ageGroup: collectionRequestItem.ageGroup,
+        brandId: collectionRequestItem.brand?.id ?? '',
+        quantity: collectionRequestItem.quantity,
       })) as TriageListItem[];
 
-      const mappedStorageUnits = (data.package.items ?? []).reduce<
+      const mappedStorageUnits = (data.collectionRequest.items ?? []).reduce<
         StorageUnitDTO[]
-      >((acc, packageItem) => {
-        const storageUnit = packageItem.storageUnit;
+      >((acc, collectionRequestItem) => {
+        const storageUnit = collectionRequestItem.storageUnit;
         if (!storageUnit?.id) return acc;
         if (acc.some((current) => current.id === storageUnit.id)) return acc;
         acc.push(storageUnit);
@@ -157,7 +157,7 @@ export default function Triage() {
       requestAnimationFrame(() => volumeInputRef.current?.focus());
     } catch (error) {
       console.error('Erro ao consultar triagem:', error);
-      setSelectedPackage(null);
+      setSelectedCollectionRequest(null);
       setQrCodes([]);
       setTriageItems([]);
       setStorageUnits([]);
@@ -166,11 +166,11 @@ export default function Triage() {
       setScanCode('');
       requestAnimationFrame(() => scanCodeInputRef.current?.focus());
     } finally {
-      setIsLoadingPackage(false);
+      setIsLoadingCollectionRequest(false);
     }
   };
 
-  const packageWeight = qrCodes.reduce(
+  const collectionRequestWeight = qrCodes.reduce(
     (sum, qr) => sum + Number(qr.weight ?? 0),
     0
   );
@@ -188,7 +188,7 @@ export default function Triage() {
   // Escaneia/consulta o volume localmente contra os volumes da solicitação.
   const handleVolumeScan = () => {
     const code = volumeCode.trim();
-    if (!code || !selectedPackage) return;
+    if (!code || !selectedCollectionRequest) return;
 
     const qr = qrCodes.find(
       (q) => q.token === code || q.friendlyCode === code
@@ -214,7 +214,7 @@ export default function Triage() {
   };
 
   const handleAddTriageItem = async () => {
-    if (!selectedPackage?.id || !activeQrId) {
+    if (!selectedCollectionRequest?.id || !activeQrId) {
       toast.error('Selecione um volume antes de adicionar o item');
       return;
     }
@@ -233,7 +233,7 @@ export default function Triage() {
     }
 
     const payload = {
-      packageId: selectedPackage.id,
+      collectionRequestId: selectedCollectionRequest.id,
       qrCodeId: activeQrId,
       quality,
       type: clothingType,
@@ -316,8 +316,8 @@ export default function Triage() {
             : qr
         )
       );
-      setSelectedPackage((current) =>
-        current ? { ...current, status: PackageStatus.SCREENING } : current
+      setSelectedCollectionRequest((current) =>
+        current ? { ...current, status: CollectionRequestStatus.SCREENING } : current
       );
       setActiveQrId(null);
       setVolumeWeight('');
@@ -333,7 +333,7 @@ export default function Triage() {
   };
 
   const handleSaveProgress = async () => {
-    if (!selectedPackage?.id) return;
+    if (!selectedCollectionRequest?.id) return;
     setIsSavingProgress(true);
     try {
       // Persiste os vínculos item→unidade de armazenamento já escaneados
@@ -352,12 +352,12 @@ export default function Triage() {
         }
       }
 
-      const { status } = await api.patch(`/package/${selectedPackage.id}`, {
-        status: PackageStatus.SCREENING,
+      const { status } = await api.patch(`/collection-request/${selectedCollectionRequest.id}`, {
+        status: CollectionRequestStatus.SCREENING,
       });
       if (!isSuccessStatus(status)) throw new Error('Erro ao salvar progresso');
-      setSelectedPackage((current) =>
-        current ? { ...current, status: PackageStatus.SCREENING } : current
+      setSelectedCollectionRequest((current) =>
+        current ? { ...current, status: CollectionRequestStatus.SCREENING } : current
       );
       toast.success('Progresso salvo (em triagem)');
     } catch (error) {
@@ -407,7 +407,7 @@ export default function Triage() {
 
   const resetTriageState = () => {
     setScanCode('');
-    setSelectedPackage(null);
+    setSelectedCollectionRequest(null);
     setQrCodes([]);
     setActiveQrId(null);
     setVolumeCode('');
@@ -419,7 +419,7 @@ export default function Triage() {
   };
 
   const handleFinishTriage = async () => {
-    if (!selectedPackage?.id) return;
+    if (!selectedCollectionRequest?.id) return;
     if (!allProcessed) {
       toast.error('Processe todos os volumes antes de finalizar');
       return;
@@ -466,11 +466,11 @@ export default function Triage() {
         throw new Error('Erro ao vincular itens às unidades de armazenamento');
       }
 
-      const { status: packageStatus } = await api.patch(
-        `/package/${selectedPackage.id}`,
-        { status: PackageStatus.STOCKED }
+      const { status: collectionRequestStatus } = await api.patch(
+        `/collection-request/${selectedCollectionRequest.id}`,
+        { status: CollectionRequestStatus.STOCKED }
       );
-      if (!isSuccessStatus(packageStatus)) {
+      if (!isSuccessStatus(collectionRequestStatus)) {
         throw new Error('Erro ao atualizar status do pacote');
       }
 
@@ -486,9 +486,9 @@ export default function Triage() {
   };
 
   const isAddFormInvalid =
-    !selectedPackage ||
+    !selectedCollectionRequest ||
     !activeQrId ||
-    isLoadingPackage ||
+    isLoadingCollectionRequest ||
     isCreatingItem ||
     !brandId ||
     !quantity.trim() ||
@@ -519,34 +519,34 @@ export default function Triage() {
             }}
             placeholder="Código da solicitação ou de um QR"
             autoFocus
-            disabled={!!selectedPackage || isLoadingPackage}
+            disabled={!!selectedCollectionRequest || isLoadingCollectionRequest}
             className="max-w-md"
           />
-          {selectedPackage && (
+          {selectedCollectionRequest && (
             <>
               <span className="inline-flex rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-secondary">
-                {selectedPackage.friendlyCode ?? selectedPackage.id}
+                {selectedCollectionRequest.friendlyCode ?? selectedCollectionRequest.id}
               </span>
               <span className="text-sm text-secondary">
-                Peso total: <strong>{packageWeight.toFixed(2)} kg</strong>
+                Peso total: <strong>{collectionRequestWeight.toFixed(2)} kg</strong>
               </span>
               <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
-                {STATUS_LABEL[selectedPackage.status] ?? selectedPackage.status}
+                {STATUS_LABEL[selectedCollectionRequest.status] ?? selectedCollectionRequest.status}
               </span>
             </>
           )}
         </div>
       </div>
 
-      {selectedPackage && (
-        <PackageUserData
-          user={selectedPackage.user}
-          address={selectedPackage.address}
+      {selectedCollectionRequest && (
+        <CollectionRequestUserData
+          user={selectedCollectionRequest.user}
+          address={selectedCollectionRequest.address}
         />
       )}
 
       {/* Consulta do volume (escaneamento) + peso do volume */}
-      {selectedPackage && !isViewMode && (
+      {selectedCollectionRequest && !isViewMode && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <label className="mb-1 block text-sm font-medium text-secondary">
             Código do volume (QR) *
@@ -590,7 +590,7 @@ export default function Triage() {
       )}
 
       {/* Volumes (QR codes) — processados, em processamento e pendentes */}
-      {selectedPackage && (
+      {selectedCollectionRequest && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-secondary">
@@ -677,10 +677,10 @@ export default function Triage() {
       )}
 
       {/* Itens do volume ativo */}
-      {selectedPackage && activeQrId && !isViewMode && (
+      {selectedCollectionRequest && activeQrId && !isViewMode && (
         <div className="flex flex-col gap-6">
           <CollectionRecord
-            selectedPackageId={selectedPackage.id}
+            selectedCollectionRequestId={selectedCollectionRequest.id}
             isViewMode={isViewMode}
             items={activeItems}
             brands={brands}
@@ -711,7 +711,7 @@ export default function Triage() {
       )}
 
       {/* Unidades de armazenamento */}
-      {selectedPackage && (
+      {selectedCollectionRequest && (
         <AddTriage
           items={triageItems}
           brands={brands}
@@ -731,10 +731,10 @@ export default function Triage() {
       )}
 
       {/* Espaço para a barra flutuante não cobrir o conteúdo */}
-      {selectedPackage && <div className="h-24" />}
+      {selectedCollectionRequest && <div className="h-24" />}
 
       {/* Barra flutuante de ações */}
-      {selectedPackage && (
+      {selectedCollectionRequest && (
         <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-secondary/25 bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
             {activeQrId && !isViewMode && (

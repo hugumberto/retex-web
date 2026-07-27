@@ -112,7 +112,7 @@ function OptionSelector({
 }
 
 type CollectionRecordProps = {
-  selectedPackageId?: string;
+  selectedCollectionRequestId?: string;
   items: TriageListItem[];
   brands: Brand[];
   brandId: string;
@@ -137,7 +137,7 @@ type CollectionRecordProps = {
 };
 
 export default function CollectionRecord({
-  selectedPackageId,
+  selectedCollectionRequestId,
   items,
   brands,
   brandId,
@@ -187,7 +187,7 @@ export default function CollectionRecord({
             <TableBody>
               {items.length > 0 ? (
                 items.map((item, index) => (
-                  <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
+                  <TableRow key={`${item.collectionRequestId}-${item.brandId}-${index}`}>
                     <TableCell>
                       {QUALITY_LABEL[item.quality] ?? item.quality}
                     </TableCell>
@@ -232,7 +232,7 @@ export default function CollectionRecord({
                     colSpan={8}
                     className="h-20 text-center text-secondary/55"
                   >
-                    {selectedPackageId ?? 'Tabela de itens'}
+                    {selectedCollectionRequestId ?? 'Tabela de itens'}
                   </TableCell>
                 </TableRow>
               )}

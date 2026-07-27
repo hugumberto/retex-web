@@ -222,7 +222,7 @@ export default function PackageCollection() {
       data.id
     )}`;
 
-    const rows = data.packages
+    const rows = data.collectionRequests
       .map((pkg) => {
         const requester = escapeHtml(
           `${pkg.user.firstName ?? ''} ${pkg.user.lastName ?? ''}`.trim() || '-'
@@ -242,7 +242,7 @@ export default function PackageCollection() {
       rows ||
       '<tr><td colspan="3" style="text-align:center;color:#6b7280;">Sem itens na rota</td></tr>';
 
-    const itemPages = data.packages
+    const itemPages = data.collectionRequests
       .map((pkg, index) => {
         const itemId = escapeHtml(pkg.id);
         const itemCode = escapeHtml(pkg.friendlyCode ?? '-');
@@ -614,11 +614,11 @@ export default function PackageCollection() {
                       )
                     : '-'}
                 </TableCell>
-                <TableCell>{packageCollection.packagesCount}</TableCell>
+                <TableCell>{packageCollection.collectionRequestsCount}</TableCell>
                 <TableCell>
                   {packageCollection.confirmedCount ?? 0}
                   {' / '}
-                  {packageCollection.packagesCount}
+                  {packageCollection.collectionRequestsCount}
                 </TableCell>
                 <TableCell>
                   <span

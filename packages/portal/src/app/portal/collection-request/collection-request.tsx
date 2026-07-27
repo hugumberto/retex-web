@@ -1,6 +1,6 @@
 'use client';
 
-import { PackageDTO, PackageStatus } from '@/app/types/package';
+import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
 import { AddressDTO, Role } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { TrashIcon } from 'lucide-react';
@@ -19,7 +19,7 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
 import RequestDetailsDialog from './request-details-dialog';
 import { useAppStore } from '@/store';
 import { MapPinOff } from 'lucide-react';
@@ -56,14 +56,14 @@ interface UserFormData {
 
 export default function CollectionRequest() {
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
-  const [requests, setRequests] = useState<PackageDTO[]>([]);
+  const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addresses, setAddresses] = useState<AddressDTO[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
   const isAdmin = user?.roles?.some((r) => r.role === Role.ADMIN) ?? false;
-  const [statusFilter, setStatusFilter] = useState<'ALL' | PackageStatus>(
+  const [statusFilter, setStatusFilter] = useState<'ALL' | CollectionRequestStatus>(
     'ALL'
   );
 
@@ -76,8 +76,8 @@ export default function CollectionRequest() {
         ? requests
         : requests.filter((r) => r.status === statusFilter);
     return [...list].sort((a, b) => {
-      const aCreated = a.status === PackageStatus.CREATED ? 0 : 1;
-      const bCreated = b.status === PackageStatus.CREATED ? 0 : 1;
+      const aCreated = a.status === CollectionRequestStatus.CREATED ? 0 : 1;
+      const bCreated = b.status === CollectionRequestStatus.CREATED ? 0 : 1;
       if (aCreated !== bCreated) return aCreated - bCreated;
       return (
         new Date(a.createdAt ?? 0).getTime() -
@@ -92,8 +92,8 @@ export default function CollectionRequest() {
     isUserRole &&
     requests.some(
       (r) =>
-        r.status !== PackageStatus.CANCELLED &&
-        r.status !== PackageStatus.STOCKED
+        r.status !== CollectionRequestStatus.CANCELLED &&
+        r.status !== CollectionRequestStatus.STOCKED
     );
 
   const [userFormOpen, setUserFormOpen] = useState(false);
@@ -124,8 +124,8 @@ export default function CollectionRequest() {
 
   const fetchRequests = useCallback(async () => {
     try {
-      const endpoint = isUserRole ? '/me/packages' : '/package';
-      const { data, status } = await api.get<PackageDTO[]>(endpoint);
+      const endpoint = isUserRole ? '/me/collection-requests' : '/collection-request';
+      const { data, status } = await api.get<CollectionRequestDTO[]>(endpoint);
       if (!isSuccessStatus(status)) throw new Error();
       setRequests(Array.isArray(data) ? data : []);
     } catch {
@@ -137,8 +137,8 @@ export default function CollectionRequest() {
     async (id: string) => {
       await toast.promise(
         async () => {
-          const res = await api.patch(`/package/${id}`, {
-            status: PackageStatus.CANCELLED,
+          const res = await api.patch(`/collection-request/${id}`, {
+            status: CollectionRequestStatus.CANCELLED,
           });
           if (!isSuccessStatus(res.status)) throw new Error();
           await fetchRequests();
@@ -179,7 +179,7 @@ export default function CollectionRequest() {
   const submitUser = userForm.handleSubmit(async (data) => {
     setIsSubmitting(true);
     try {
-      const response = await api.post('/package', {
+      const response = await api.post('/collection-request', {
         userId: user!.id,
         addressId: data.addressId,
         estimatedVolumes: Number(data.estimatedVolumes),
@@ -201,7 +201,7 @@ export default function CollectionRequest() {
     setIsSubmitting(true);
     await toast.promise(
       async () => {
-        const response = await api.post('/package', {
+        const response = await api.post('/collection-request', {
           ...data,
           estimatedVolumes: Number(data.estimatedVolumes),
           address: {
@@ -576,11 +576,11 @@ export default function CollectionRequest() {
                 className="h-9 rounded-md border border-secondary/40 px-2 text-sm"
                 value={statusFilter}
                 onChange={(e) =>
-                  setStatusFilter(e.target.value as 'ALL' | PackageStatus)
+                  setStatusFilter(e.target.value as 'ALL' | CollectionRequestStatus)
                 }
               >
                 <option value="ALL">Todos</option>
-                {Object.values(PackageStatus).map((s) => (
+                {Object.values(CollectionRequestStatus).map((s) => (
                   <option key={s} value={s}>
                     {STATUS_LABEL[s] ?? s}
                   </option>
@@ -632,8 +632,8 @@ export default function CollectionRequest() {
                     </TableCell>
                     <TableCell className="space-x-2">
                       <RequestDetailsDialog request={request} />
-                      {(request.status === PackageStatus.CREATED ||
-                        request.status === PackageStatus.OUT_OF_ZONE) && (
+                      {(request.status === CollectionRequestStatus.CREATED ||
+                        request.status === CollectionRequestStatus.OUT_OF_ZONE) && (
                         <ConfirmDialog
                           trigger={
                             <Button

@@ -18,16 +18,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PackageStatus } from '@/app/types/package';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { CollectionRequestStatus } from '@/app/types/collection-request';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { SearchIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-type RoutePackageVolumes = {
-  package: {
+type RouteCollectionRequestVolumes = {
+  collectionRequest: {
     id: string;
     friendlyCode?: string | null;
     status: string;
@@ -45,15 +45,15 @@ type Props = {
 export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<RoutePackageVolumes[]>([]);
+  const [data, setData] = useState<RouteCollectionRequestVolumes[]>([]);
 
   const handleOpenChange = async (next: boolean) => {
     setOpen(next);
     if (next) {
       setIsLoading(true);
       try {
-        const res = await api.get<RoutePackageVolumes[]>(
-          `/route/${routeId}/package-volumes`
+        const res = await api.get<RouteCollectionRequestVolumes[]>(
+          `/route/${routeId}/collection-request-volumes`
         );
         if (!isSuccessStatus(res.status)) throw new Error();
         setData(res.data ?? []);
@@ -103,22 +103,22 @@ export default function RouteVolumesDialog({ routeId, routeCode }: Props) {
           <div className="space-y-6">
             {data.map((entry) => (
               <div
-                key={entry.package.id}
+                key={entry.collectionRequest.id}
                 className="rounded-xl border border-secondary/30 p-4"
               >
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <h3 className="font-semibold text-secondary">
-                    {entry.package.friendlyCode ?? entry.package.id}
-                    {entry.package.clientName
-                      ? ` — ${entry.package.clientName}`
+                    {entry.collectionRequest.friendlyCode ?? entry.collectionRequest.id}
+                    {entry.collectionRequest.clientName
+                      ? ` — ${entry.collectionRequest.clientName}`
                       : ''}
                   </h3>
                   <div className="flex flex-wrap gap-3 text-xs text-secondary">
                     <span>
                       Estado:{' '}
                       <strong>
-                        {STATUS_LABEL[entry.package.status as PackageStatus] ??
-                          entry.package.status}
+                        {STATUS_LABEL[entry.collectionRequest.status as CollectionRequestStatus] ??
+                          entry.collectionRequest.status}
                       </strong>
                     </span>
                     <span>

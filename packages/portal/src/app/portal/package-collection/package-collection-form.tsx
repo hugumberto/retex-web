@@ -31,7 +31,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
-import { PackageDTO, PackageStatus } from '../../types/package';
+import { CollectionRequestDTO, CollectionRequestStatus } from '../../types/collection-request';
 import { Role, UserDTO, UserStatus } from '../../types/user';
 import { hasValidCoords, minDistanceKm, readCoords } from './utils';
 
@@ -49,8 +49,8 @@ const NEARBY_THRESHOLD_KM = 2;
 const MAX_SUGGESTIONS = 10;
 
 // Une listas de solicitações removendo duplicados por id (preserva a ordem).
-const mergeById = (...lists: PackageDTO[][]): PackageDTO[] => {
-  const byId = new Map<string, PackageDTO>();
+const mergeById = (...lists: CollectionRequestDTO[][]): CollectionRequestDTO[] => {
+  const byId = new Map<string, CollectionRequestDTO>();
   for (const list of lists) {
     for (const pkg of list) {
       if (!byId.has(pkg.id)) byId.set(pkg.id, pkg);
@@ -79,7 +79,7 @@ export default function PackageCollectionForm({
     defaultValues: {
       driverId: '',
       startDate: undefined,
-      packageIds: [],
+      collectionRequestIds: [],
       status: CollectionStatus.DRAFTING,
       collectionInterval: undefined,
     },
@@ -97,8 +97,8 @@ export default function PackageCollectionForm({
   const [driverOptions, setDriverOptions] = useState<SelectFieldOption[]>([]);
   // Elegíveis (CREATED sem rota) e as já atribuídas à rota (modo edição) são
   // mantidas separadas; a lista exibida é a união determinística das duas.
-  const [eligiblePackages, setEligiblePackages] = useState<PackageDTO[]>([]);
-  const [routePackages, setRoutePackages] = useState<PackageDTO[]>([]);
+  const [eligibleCollectionRequests, setEligibleCollectionRequests] = useState<CollectionRequestDTO[]>([]);
+  const [routeCollectionRequests, setRouteCollectionRequests] = useState<CollectionRequestDTO[]>([]);
   const [isEditing] = useState(!!packageCollectionId);
   const [loadedStatus, setLoadedStatus] = useState<CollectionStatus | null>(
     null
@@ -113,17 +113,17 @@ export default function PackageCollectionForm({
   // Lista exibida: em modo de visualização (rota travada) mostra apenas os
   // pacotes vinculados à rota; caso contrário, os da rota + os elegíveis
   // (CREATED, sem rota).
-  const packages = useMemo(
+  const collectionRequests = useMemo(
     () =>
       isLocked
-        ? routePackages
+        ? routeCollectionRequests
         : mergeById(
-            routePackages,
-            eligiblePackages.filter(
-              (pkg) => pkg.status === PackageStatus.CREATED
+            routeCollectionRequests,
+            eligibleCollectionRequests.filter(
+              (pkg) => pkg.status === CollectionRequestStatus.CREATED
             )
           ),
-    [isLocked, routePackages, eligiblePackages]
+    [isLocked, routeCollectionRequests, eligibleCollectionRequests]
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -133,33 +133,33 @@ export default function PackageCollectionForm({
   const [optimizedOrderIds, setOptimizedOrderIds] = useState<string[]>([]);
   const [isOptimizing, setIsOptimizing] = useState(false);
 
-  const packageIds = watch('packageIds');
+  const collectionRequestIds = watch('collectionRequestIds');
 
-  const packagesById = useMemo(() => {
-    const map = new Map<string, PackageDTO>();
-    packages.forEach((pkg) => map.set(pkg.id, pkg));
+  const collectionRequestsById = useMemo(() => {
+    const map = new Map<string, CollectionRequestDTO>();
+    collectionRequests.forEach((pkg) => map.set(pkg.id, pkg));
     return map;
-  }, [packages]);
+  }, [collectionRequests]);
 
   const eligibleWithCoords = useMemo(
-    () => packages.filter(hasValidCoords),
-    [packages]
+    () => collectionRequests.filter(hasValidCoords),
+    [collectionRequests]
   );
   const eligibleWithoutCoords = useMemo(
-    () => packages.filter((pkg) => !hasValidCoords(pkg)),
-    [packages]
+    () => collectionRequests.filter((pkg) => !hasValidCoords(pkg)),
+    [collectionRequests]
   );
 
   const selectedWithCoords = useMemo(
-    () => eligibleWithCoords.filter((pkg) => packageIds?.includes(pkg.id)),
-    [eligibleWithCoords, packageIds]
+    () => eligibleWithCoords.filter((pkg) => collectionRequestIds?.includes(pkg.id)),
+    [eligibleWithCoords, collectionRequestIds]
   );
 
   // Sugestões: elegíveis não-selecionadas dentro do raio dos pontos escolhidos.
   const suggestedIds = useMemo(() => {
     if (!selectedWithCoords.length) return [];
     const selectedCoords = selectedWithCoords.map(readCoords);
-    const selectedSet = new Set(packageIds ?? []);
+    const selectedSet = new Set(collectionRequestIds ?? []);
     return eligibleWithCoords
       .filter((pkg) => !selectedSet.has(pkg.id))
       .map((pkg) => ({
@@ -170,7 +170,7 @@ export default function PackageCollectionForm({
       .sort((a, b) => a.distance - b.distance)
       .slice(0, MAX_SUGGESTIONS)
       .map((entry) => entry.id);
-  }, [eligibleWithCoords, selectedWithCoords, packageIds]);
+  }, [eligibleWithCoords, selectedWithCoords, collectionRequestIds]);
 
   const fetchDrivers = useCallback(async () => {
     const { data, status } = await api.get<UserDTO[]>(`/user`);
@@ -194,11 +194,11 @@ export default function PackageCollectionForm({
 
   // Lista todas as solicitações elegíveis (CREATED e sem rota), sem filtro de
   // dia/turno.
-  const fetchEligiblePackages = useCallback(async () => {
-    const { data } = await api.get<PaginatedResult<PackageDTO>>(
-      `/package/created`
+  const fetchEligibleCollectionRequests = useCallback(async () => {
+    const { data } = await api.get<PaginatedResult<CollectionRequestDTO>>(
+      `/collection-request/created`
     );
-    setEligiblePackages(data.data);
+    setEligibleCollectionRequests(data.data);
   }, []);
 
   // Carrega os dados da rota em edição (motorista, data, solicitações já
@@ -217,19 +217,19 @@ export default function PackageCollectionForm({
       id: data.id,
       driverId: data.driver?.id ?? '',
       startDate: new Date(data.startDate),
-      packageIds: (data.packages ?? []).map((pkg) => pkg.id),
+      collectionRequestIds: (data.collectionRequests ?? []).map((pkg) => pkg.id),
       status: data.status,
       collectionInterval: data.collectionInterval,
     });
     setLoadedStatus(data.status);
-    // As solicitações da rota não vêm em /package/created (têm route_id).
-    setRoutePackages(data.packages ?? []);
+    // As solicitações da rota não vêm em /collection-request/created (têm route_id).
+    setRouteCollectionRequests(data.collectionRequests ?? []);
   }, [packageCollectionId, reset]);
 
   useEffect(() => {
     if (!isOpen) return;
     fetchDrivers();
-    fetchEligiblePackages();
+    fetchEligibleCollectionRequests();
     if (isEditing && packageCollectionId) {
       loadEditingData();
     }
@@ -238,7 +238,7 @@ export default function PackageCollectionForm({
     isEditing,
     packageCollectionId,
     fetchDrivers,
-    fetchEligiblePackages,
+    fetchEligibleCollectionRequests,
     loadEditingData,
   ]);
 
@@ -247,16 +247,16 @@ export default function PackageCollectionForm({
     setOptimizedOrderIds([]);
   }, []);
 
-  const togglePackage = useCallback(
+  const toggleCollectionRequest = useCallback(
     (id: string) => {
-      const current = packageIds ?? [];
+      const current = collectionRequestIds ?? [];
       const next = current.includes(id)
-        ? current.filter((packageId) => packageId !== id)
+        ? current.filter((collectionRequestId) => collectionRequestId !== id)
         : [...current, id];
-      setValue('packageIds', next);
+      setValue('collectionRequestIds', next);
       invalidateRoute();
     },
-    [packageIds, setValue, invalidateRoute]
+    [collectionRequestIds, setValue, invalidateRoute]
   );
 
   const optimizeRoute = useCallback(async () => {
@@ -345,7 +345,7 @@ export default function PackageCollectionForm({
           : {
               driverId: data.driverId,
               startDate: formattedDate,
-              packageIds: data.packageIds,
+              collectionRequestIds: data.collectionRequestIds,
               status: data.status,
               collectionInterval: data.collectionInterval,
             };
@@ -378,10 +378,10 @@ export default function PackageCollectionForm({
     setIsSubmitting(false);
   };
 
-  const addressLabel = (pkg: PackageDTO) =>
+  const addressLabel = (pkg: CollectionRequestDTO) =>
     `${pkg.address.street} ${pkg.address.number}`.trim() || '-';
 
-  const userName = (pkg: PackageDTO) =>
+  const userName = (pkg: CollectionRequestDTO) =>
     `${pkg.user?.firstName ?? ''} ${pkg.user?.lastName ?? ''}`.trim() || '-';
 
   return (
@@ -471,11 +471,11 @@ export default function PackageCollectionForm({
               </Button>
             </div>
             <CollectionMap
-              packages={eligibleWithCoords}
-              selectedIds={packageIds ?? []}
+              collectionRequests={eligibleWithCoords}
+              selectedIds={collectionRequestIds ?? []}
               suggestedIds={suggestedIds}
               routeGeoJson={routeGeoJson}
-              onToggle={isLocked ? () => undefined : togglePackage}
+              onToggle={isLocked ? () => undefined : toggleCollectionRequest}
             />
             <p className="mt-2 text-xs text-muted-foreground">
               Azul: selecionadas · Laranja: sugeridas (≤ {NEARBY_THRESHOLD_KM}{' '}
@@ -489,7 +489,7 @@ export default function PackageCollectionForm({
               <Title as="h3">Ordem sugerida da rota</Title>
               <ol className="mt-3 list-decimal space-y-1 pl-6 text-sm">
                 {optimizedOrderIds.map((id) => {
-                  const pkg = packagesById.get(id);
+                  const pkg = collectionRequestsById.get(id);
                   return <li key={id}>{pkg ? addressLabel(pkg) : id}</li>;
                 })}
               </ol>
@@ -511,7 +511,7 @@ export default function PackageCollectionForm({
                   </TableHeader>
                   <TableBody>
                     {suggestedIds.map((id) => {
-                      const pkg = packagesById.get(id);
+                      const pkg = collectionRequestsById.get(id);
                       if (!pkg) return null;
                       return (
                         <TableRow key={id}>
@@ -526,7 +526,7 @@ export default function PackageCollectionForm({
                               type="button"
                               variant="outline"
                               size="sm"
-                              onClick={() => togglePackage(id)}
+                              onClick={() => toggleCollectionRequest(id)}
                               disabled={isLocked}
                             >
                               Adicionar
@@ -560,15 +560,15 @@ export default function PackageCollectionForm({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {packages.length > 0 ? (
-                    packages.map((item) => (
+                  {collectionRequests.length > 0 ? (
+                    collectionRequests.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="align-top">
                           <CheckboxForm
                             control={control}
-                            name="packageIds"
-                            checked={packageIds?.includes(item.id)}
-                            onCheckedChange={() => togglePackage(item.id)}
+                            name="collectionRequestIds"
+                            checked={collectionRequestIds?.includes(item.id)}
+                            onCheckedChange={() => toggleCollectionRequest(item.id)}
                             label=""
                             id={item.id}
                             disabled={isLocked}
@@ -623,9 +623,9 @@ export default function PackageCollectionForm({
                         <TableCell>
                           <CheckboxForm
                             control={control}
-                            name="packageIds"
-                            checked={packageIds?.includes(item.id)}
-                            onCheckedChange={() => togglePackage(item.id)}
+                            name="collectionRequestIds"
+                            checked={collectionRequestIds?.includes(item.id)}
+                            onCheckedChange={() => toggleCollectionRequest(item.id)}
                             label=""
                             id={`no-coords-${item.id}`}
                             disabled={isLocked}

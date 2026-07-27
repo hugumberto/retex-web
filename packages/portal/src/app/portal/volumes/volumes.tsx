@@ -12,8 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PackageStatus } from '@/app/types/package';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { CollectionRequestStatus } from '@/app/types/collection-request';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
@@ -21,7 +21,7 @@ import { Link2Off, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-type PackageInfo = {
+type CollectionRequestInfo = {
   id: string;
   friendlyCode?: string;
   status: string;
@@ -29,15 +29,15 @@ type PackageInfo = {
   qrCodesGenerated?: number;
 };
 
-type PackageVolumesResponse = {
-  package: PackageInfo;
+type CollectionRequestVolumesResponse = {
+  collectionRequest: CollectionRequestInfo;
   volumes: QrCodeDTO[];
 };
 
 export default function Volumes() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [code, setCode] = useState('');
-  const [pkg, setPkg] = useState<PackageInfo | null>(null);
+  const [pkg, setPkg] = useState<CollectionRequestInfo | null>(null);
   const [volumes, setVolumes] = useState<QrCodeDTO[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -56,11 +56,11 @@ export default function Volumes() {
     if (!target) return;
     setIsLoading(true);
     try {
-      const { data, status } = await api.get<PackageVolumesResponse>(
-        `/qr-code/package/${target}`
+      const { data, status } = await api.get<CollectionRequestVolumesResponse>(
+        `/qr-code/collection-request/${target}`
       );
       if (!isSuccessStatus(status)) throw new Error();
-      setPkg(data.package);
+      setPkg(data.collectionRequest);
       setVolumes(data.volumes ?? []);
     } catch (error) {
       const httpStatus = (error as { response?: { status?: number } })?.response
@@ -150,7 +150,7 @@ export default function Volumes() {
               <span>
                 Estado:{' '}
                 <strong>
-                  {STATUS_LABEL[pkg.status as PackageStatus] ?? pkg.status}
+                  {STATUS_LABEL[pkg.status as CollectionRequestStatus] ?? pkg.status}
                 </strong>
               </span>
               <span>

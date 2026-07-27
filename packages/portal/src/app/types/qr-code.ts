@@ -1,11 +1,11 @@
-import { PackageDTO } from './package';
+import { CollectionRequestDTO } from './collection-request';
 
 export interface QrCodeDTO {
   id: string;
   token: string;
   friendlyCode: string;
   batchId: string;
-  packageId?: string | null;
+  collectionRequestId?: string | null;
   routeId?: string | null;
   usedAt?: string | null;
   weight?: number | null;
@@ -13,11 +13,11 @@ export interface QrCodeDTO {
 }
 
 export interface CollectionResponse {
-  package: PackageDTO;
+  collectionRequest: CollectionRequestDTO;
   qrCodes: QrCodeDTO[];
 }
 
 export interface TriageResponse {
-  package: PackageDTO;
+  collectionRequest: CollectionRequestDTO;
   qrCodes: QrCodeDTO[];
 }

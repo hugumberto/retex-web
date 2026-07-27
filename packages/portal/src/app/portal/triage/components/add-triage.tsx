@@ -49,7 +49,7 @@ const SEASON_MAP: Record<Season, string> = {
 
 export type TriageListItem = {
   id?: string;
-  packageId: string;
+  collectionRequestId: string;
   qrCodeId?: string;
   quality: 'GOOD' | 'MEDIUM' | 'BAD';
   type: 'UPPER_PART' | 'UNDER_PART';
@@ -176,7 +176,7 @@ export default function AddTriage({
           <TableBody>
             {items.length > 0 ? (
               items.map((item, index) => (
-                <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
+                <TableRow key={`${item.collectionRequestId}-${item.brandId}-${index}`}>
                   <TableCell>
                     {QUALITY_MAP[item.quality] ?? item.quality}
                   </TableCell>

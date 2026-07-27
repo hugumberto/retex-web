@@ -1,15 +1,15 @@
-import { Address } from '@/app/types/package';
+import { Address } from '@/app/types/collection-request';
 import { UserDTO } from '@/app/types/user';
 
-type PackageUserDataProps = {
+type CollectionRequestUserDataProps = {
   user?: UserDTO;
   address?: Address;
 };
 
-export default function PackageUserData({
+export default function CollectionRequestUserData({
   user,
   address,
-}: PackageUserDataProps) {
+}: CollectionRequestUserDataProps) {
   const fullName =
     user && `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
   const fullAddress = address

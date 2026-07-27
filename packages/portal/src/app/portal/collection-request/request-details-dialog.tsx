@@ -1,6 +1,6 @@
 'use client';
 
-import { PackageDTO } from '@/app/types/package';
+import { CollectionRequestDTO } from '@/app/types/collection-request';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,11 +9,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
 import { SearchIcon } from 'lucide-react';
 
 type Props = {
-  request: PackageDTO;
+  request: CollectionRequestDTO;
 };
 
 function Field({ label, value }: { label: string; value?: React.ReactNode }) {

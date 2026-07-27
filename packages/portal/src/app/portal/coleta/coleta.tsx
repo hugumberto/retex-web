@@ -1,10 +1,10 @@
 'use client';
 
-import { PackageDTO, PackageStatus } from '@/app/types/package';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
 import { PackageCollectionDTO } from '@/app/types/package-collection';
 import { CollectionResponse, QrCodeDTO } from '@/app/types/qr-code';
-import PackageUserData from '../triage/components/package-user-data';
+import CollectionRequestUserData from '../triage/components/collection-request-user-data';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -39,12 +39,12 @@ export default function Coleta() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
 
   const [scanCode, setScanCode] = useState('');
-  const [pkg, setPkg] = useState<PackageDTO | null>(null);
+  const [pkg, setPkg] = useState<CollectionRequestDTO | null>(null);
   // Pacotes de uma recolha (quando o código inserido é de uma rota) — para o
   // utilizador escolher qual pacote recolher.
-  const [routePackages, setRoutePackages] = useState<PackageDTO[]>([]);
+  const [routeCollectionRequests, setRouteCollectionRequests] = useState<CollectionRequestDTO[]>([]);
   const [boundCodes, setBoundCodes] = useState<QrCodeDTO[]>([]);
-  const [isLoadingPackage, setIsLoadingPackage] = useState(false);
+  const [isLoadingCollectionRequest, setIsLoadingCollectionRequest] = useState(false);
   const [qrInput, setQrInput] = useState('');
   const [isBinding, setIsBinding] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
@@ -64,8 +64,8 @@ export default function Coleta() {
     };
   }, [setPageTitle, setBreadcrumbs]);
 
-  const canCollect = pkg?.status === PackageStatus.WAITING_FOR_COLLECTION;
-  const isCollected = pkg?.status === PackageStatus.COLLECTED;
+  const canCollect = pkg?.status === CollectionRequestStatus.WAITING_FOR_COLLECTION;
+  const isCollected = pkg?.status === CollectionRequestStatus.COLLECTED;
 
   // Assim que a solicitação fica coletável (input de QR montado), foca-o.
   useEffect(() => {
@@ -75,14 +75,14 @@ export default function Coleta() {
   }, [pkg, canCollect]);
 
   // Carrega um pacote pelo id/código e prepara a tela de recolha.
-  const loadPackage = useCallback(async (code: string) => {
+  const loadCollectionRequest = useCallback(async (code: string) => {
     const { data, status } = await api.get<CollectionResponse>(
       `/collection/${code}`
     );
     if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
-    setPkg(data.package);
+    setPkg(data.collectionRequest);
     setBoundCodes(data.qrCodes ?? []);
-    setRoutePackages([]);
+    setRouteCollectionRequests([]);
     // O foco no input de QR é feito pelo useEffect ao ficar coletável.
   }, []);
 
@@ -90,10 +90,10 @@ export default function Coleta() {
     const code = scanCode.trim();
     if (!code || pkg) return;
 
-    setIsLoadingPackage(true);
+    setIsLoadingCollectionRequest(true);
     try {
       // 1) Tenta como pacote (código amigável do pacote ou id).
-      await loadPackage(code);
+      await loadCollectionRequest(code);
       toast.success('Solicitação carregada');
     } catch {
       // 2) Não é um pacote — tenta como recolha (código da rota): lista os
@@ -102,39 +102,39 @@ export default function Coleta() {
         const { data: route } = await api.get<PackageCollectionDTO>(
           `/route/${code}`
         );
-        const pkgs = route.packages ?? [];
+        const pkgs = route.collectionRequests ?? [];
         if (pkgs.length === 0) {
-          setRoutePackages([]);
+          setRouteCollectionRequests([]);
           toast.error('Esta recolha não tem pacotes');
         } else {
-          setRoutePackages(pkgs);
+          setRouteCollectionRequests(pkgs);
           toast.success('Recolha carregada — selecione um pacote');
         }
       } catch {
         setPkg(null);
         setBoundCodes([]);
-        setRoutePackages([]);
+        setRouteCollectionRequests([]);
         toast.error('Nenhum pacote ou recolha encontrado para o código');
       }
     } finally {
-      setIsLoadingPackage(false);
+      setIsLoadingCollectionRequest(false);
     }
-  }, [scanCode, pkg, loadPackage]);
+  }, [scanCode, pkg, loadCollectionRequest]);
 
   // Seleção de um pacote a partir da lista da recolha.
-  const handleSelectRoutePackage = useCallback(
-    async (packageId: string) => {
-      setIsLoadingPackage(true);
+  const handleSelectRouteCollectionRequest = useCallback(
+    async (collectionRequestId: string) => {
+      setIsLoadingCollectionRequest(true);
       try {
-        await loadPackage(packageId);
+        await loadCollectionRequest(collectionRequestId);
         toast.success('Solicitação carregada');
       } catch {
         toast.error('Não foi possível carregar o pacote selecionado');
       } finally {
-        setIsLoadingPackage(false);
+        setIsLoadingCollectionRequest(false);
       }
     },
-    [loadPackage]
+    [loadCollectionRequest]
   );
 
   const handleBind = useCallback(async () => {
@@ -169,7 +169,7 @@ export default function Coleta() {
 
     setIsFinalizing(true);
     try {
-      const { data, status } = await api.post<PackageDTO>(
+      const { data, status } = await api.post<CollectionRequestDTO>(
         `/collection/${pkg.id}/finalize`
       );
       if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
@@ -192,7 +192,7 @@ export default function Coleta() {
     }
     setIsCancelling(true);
     try {
-      const { data, status } = await api.post<PackageDTO>(
+      const { data, status } = await api.post<CollectionRequestDTO>(
         `/collection/${pkg.id}/cancel`,
         { reason }
       );
@@ -212,7 +212,7 @@ export default function Coleta() {
   const handleReset = () => {
     setScanCode('');
     setPkg(null);
-    setRoutePackages([]);
+    setRouteCollectionRequests([]);
     setBoundCodes([]);
     setQrInput('');
     setShowCancel(false);
@@ -241,7 +241,7 @@ export default function Coleta() {
             }}
             placeholder="Código do pacote ou da recolha — escaneie ou pressione Enter"
             autoFocus
-            disabled={!!pkg || isLoadingPackage}
+            disabled={!!pkg || isLoadingCollectionRequest}
             className="max-w-md"
           />
           {pkg && (
@@ -282,7 +282,7 @@ export default function Coleta() {
       </div>
 
       {/* Pacotes da recolha (quando o código inserido é de uma rota) */}
-      {!pkg && routePackages.length > 0 && (
+      {!pkg && routeCollectionRequests.length > 0 && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <h2 className="mb-4 text-xl font-semibold text-secondary">
             Pacotes da recolha
@@ -298,7 +298,7 @@ export default function Coleta() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {routePackages.map((item) => (
+                {routeCollectionRequests.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium tracking-wide">
                       {item.friendlyCode ?? '-'}
@@ -314,8 +314,8 @@ export default function Coleta() {
                         type="button"
                         variant="secondary"
                         size="sm"
-                        disabled={isLoadingPackage}
-                        onClick={() => handleSelectRoutePackage(item.id)}
+                        disabled={isLoadingCollectionRequest}
+                        onClick={() => handleSelectRouteCollectionRequest(item.id)}
                       >
                         Selecionar
                       </Button>
@@ -329,7 +329,7 @@ export default function Coleta() {
       )}
 
       {/* Dados do cliente */}
-      {pkg && <PackageUserData user={pkg.user} address={pkg.address} />}
+      {pkg && <CollectionRequestUserData user={pkg.user} address={pkg.address} />}
 
       {/* Vínculo de volumes */}
       {pkg && (canCollect || isCollected) && (
