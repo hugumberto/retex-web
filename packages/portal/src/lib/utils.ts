@@ -20,6 +20,7 @@ import {
   SlidersHorizontal,
   Mail,
   KeyRound,
+  Package,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { Role } from '@/app/types/user';
@@ -170,6 +171,12 @@ export const NAV_ITEMS: NavEntry[] = [
         href: '/portal/reset-password',
         label: 'Repor Senha',
         icon: KeyRound,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/volumes',
+        label: 'Volumes do Pacote',
+        icon: Package,
         roles: [Role.ADMIN],
       },
     ],
