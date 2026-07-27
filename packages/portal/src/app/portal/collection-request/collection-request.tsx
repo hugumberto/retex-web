@@ -20,11 +20,12 @@ import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
 import { STATUS_LABEL } from '@/lib/package-status';
+import RequestDetailsDialog from './request-details-dialog';
 import { useAppStore } from '@/store';
 import { MapPinOff } from 'lucide-react';
 import Link from 'next/link';
 import { FocusEvent } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -61,6 +62,30 @@ export default function CollectionRequest() {
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
+  const isAdmin = user?.roles?.some((r) => r.role === Role.ADMIN) ?? false;
+  const [statusFilter, setStatusFilter] = useState<'ALL' | PackageStatus>(
+    'ALL'
+  );
+
+  // Admin: filtra por estado e ordena (CRIADO primeiro; depois mais antigo
+  // primeiro por data de criação). Restantes utilizadores veem a lista natural.
+  const displayedRequests = useMemo(() => {
+    if (!isAdmin) return requests;
+    const list =
+      statusFilter === 'ALL'
+        ? requests
+        : requests.filter((r) => r.status === statusFilter);
+    return [...list].sort((a, b) => {
+      const aCreated = a.status === PackageStatus.CREATED ? 0 : 1;
+      const bCreated = b.status === PackageStatus.CREATED ? 0 : 1;
+      if (aCreated !== bCreated) return aCreated - bCreated;
+      return (
+        new Date(a.createdAt ?? 0).getTime() -
+        new Date(b.createdAt ?? 0).getTime()
+      );
+    });
+  }, [requests, isAdmin, statusFilter]);
+
   const inZoneAddresses = addresses.filter((a) => a.isInServiceZone);
   const canRequest = inZoneAddresses.length > 0;
   const hasActiveRequest =
@@ -538,9 +563,32 @@ export default function CollectionRequest() {
       </div>
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
-        <h2 className="text-lg font-semibold text-secondary">
-          Solicitações de Recolha
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-secondary">
+            Solicitações de Recolha
+          </h2>
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-secondary">
+                Estado:
+              </label>
+              <select
+                className="h-9 rounded-md border border-secondary/40 px-2 text-sm"
+                value={statusFilter}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as 'ALL' | PackageStatus)
+                }
+              >
+                <option value="ALL">Todos</option>
+                {Object.values(PackageStatus).map((s) => (
+                  <option key={s} value={s}>
+                    {STATUS_LABEL[s] ?? s}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         <div className="mt-4 w-full overflow-x-auto">
           <Table>
             <TableHeader>
@@ -548,16 +596,16 @@ export default function CollectionRequest() {
                 <TableHead>Código</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Contacto</TableHead>
                 <TableHead className="whitespace-normal">Morada</TableHead>
                 <TableHead>Volumes (est.)</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Criado em</TableHead>
                 <TableHead>Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {requests.length > 0 ? (
-                requests.map((request) => (
+              {displayedRequests.length > 0 ? (
+                displayedRequests.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
                       {request.friendlyCode ?? '-'}
@@ -568,7 +616,6 @@ export default function CollectionRequest() {
                       }`.trim()}
                     </TableCell>
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
-                    <TableCell>{request.user?.contactPhone ?? '-'}</TableCell>
                     <TableCell className="whitespace-normal break-words max-w-[220px] min-w-[160px]">
                       {`${request.address?.street ?? '-'} ${
                         request.address?.number ?? ''
@@ -578,7 +625,13 @@ export default function CollectionRequest() {
                     <TableCell>
                       {STATUS_LABEL[request.status] ?? request.status}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {request.createdAt
+                        ? new Date(request.createdAt).toLocaleDateString('pt-PT')
+                        : '—'}
+                    </TableCell>
+                    <TableCell className="space-x-2">
+                      <RequestDetailsDialog request={request} />
                       {(request.status === PackageStatus.CREATED ||
                         request.status === PackageStatus.OUT_OF_ZONE) && (
                         <ConfirmDialog
