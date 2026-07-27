@@ -1,6 +1,7 @@
 'use client';
 
 import { PackageDTO, PackageStatus } from '@/app/types/package';
+import { STATUS_LABEL } from '@/lib/package-status';
 import { PackageCollectionDTO } from '@/app/types/package-collection';
 import { CollectionResponse, QrCodeDTO } from '@/app/types/qr-code';
 import PackageUserData from '../triage/components/package-user-data';
@@ -27,14 +28,6 @@ import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-
-const STATUS_LABEL: Partial<Record<PackageStatus, string>> = {
-  [PackageStatus.WAITING_FOR_COLLECTION]: 'Aguardando recolha',
-  [PackageStatus.COLLECTED]: 'Recolhido',
-  [PackageStatus.CREATED]: 'Criado',
-  [PackageStatus.OUT_OF_ZONE]: 'Fora de zona',
-  [PackageStatus.CANCELLED]: 'Cancelado',
-};
 
 const errorMessage = (error: unknown, fallback: string): string => {
   const message = (error as { response?: { data?: { message?: string } } })
