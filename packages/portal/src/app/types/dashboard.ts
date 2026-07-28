@@ -3,7 +3,8 @@ import { CollectionRequestStatus } from './collection-request';
 export interface CollectionRequestsStats {
   total: number;
   totalWeightKg: number;
-  totalBags: number;
+  totalEstimatedBags: number;
+  totalCollectedBags: number;
   byStatus: { status: CollectionRequestStatus; count: number }[];
   trend: { period: string; weightKg: number; count: number }[];
 }

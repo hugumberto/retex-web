@@ -90,7 +90,7 @@ export default function CollectionMap({
 
       const element = marker.getElement();
       element.style.cursor = 'pointer';
-      element.title = `${pkg.address.street} ${pkg.address.number}`;
+      element.title = `${pkg.address?.street ?? ''} ${pkg.address?.number ?? ''}`;
       element.addEventListener('click', () => onToggleRef.current(pkg.id));
 
       markersRef.current.push(marker);
