@@ -379,7 +379,7 @@ export default function PackageCollectionForm({
   };
 
   const addressLabel = (pkg: CollectionRequestDTO) =>
-    `${pkg.address.street} ${pkg.address.number}`.trim() || '-';
+    `${pkg.address?.street ?? ''} ${pkg.address?.number ?? ''}`.trim() || '-';
 
   const userName = (pkg: CollectionRequestDTO) =>
     `${pkg.user?.firstName ?? ''} ${pkg.user?.lastName ?? ''}`.trim() || '-';
@@ -579,7 +579,7 @@ export default function PackageCollectionForm({
                           <br />
                           {addressLabel(item)}
                         </TableCell>
-                        <TableCell className="whitespace-normal break-words align-top">{item.address.city}</TableCell>
+                        <TableCell className="whitespace-normal break-words align-top">{item.address?.city ?? '-'}</TableCell>
                         <TableCell>{item.estimatedBags ?? '-'}</TableCell>
                       </TableRow>
                     ))
@@ -633,7 +633,7 @@ export default function PackageCollectionForm({
                         </TableCell>
                         <TableCell>{userName(item)}</TableCell>
                         <TableCell>{addressLabel(item)}</TableCell>
-                        <TableCell>{item.address.city}</TableCell>
+                        <TableCell>{item.address?.city ?? '-'}</TableCell>
                         <TableCell>{item.estimatedBags ?? '-'}</TableCell>
                       </TableRow>
                     ))}
