@@ -228,8 +228,8 @@ export default function PackageCollection() {
           `${pkg.user.firstName ?? ''} ${pkg.user.lastName ?? ''}`.trim() || '-'
         );
         const address = escapeHtml(
-          `${pkg.address.street ?? ''}, ${pkg.address.number ?? ''} ${
-            pkg.address.city ?? ''
+          `${pkg.address?.street ?? ''}, ${pkg.address?.number ?? ''} ${
+            pkg.address?.city ?? ''
           }`.trim() || '-'
         );
         const code = escapeHtml(pkg.friendlyCode ?? '-');
@@ -252,9 +252,9 @@ export default function PackageCollection() {
         const requesterEmail = escapeHtml(pkg.user.email ?? '-');
         const requesterPhone = escapeHtml(pkg.user.contactPhone ?? '-');
         const fullAddress = escapeHtml(
-          `${pkg.address.street ?? ''}, ${pkg.address.number ?? ''}${
-            pkg.address.complement ? `, ${pkg.address.complement}` : ''
-          }, ${pkg.address.zipCode ?? ''} ${pkg.address.city ?? ''}`
+          `${pkg.address?.street ?? ''}, ${pkg.address?.number ?? ''}${
+            pkg.address?.complement ? `, ${pkg.address?.complement}` : ''
+          }, ${pkg.address?.zipCode ?? ''} ${pkg.address?.city ?? ''}`
             .replace(/\s+,/g, ',')
             .trim() || '-'
         );

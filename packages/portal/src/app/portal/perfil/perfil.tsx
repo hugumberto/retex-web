@@ -127,7 +127,9 @@ export default function Perfil() {
           {
             loading: 'A eliminar...',
             success: 'Endereço eliminado',
-            error: 'Erro ao eliminar endereço',
+            error: (err) =>
+              (err as AxiosError<{ message?: string }>)?.response?.data
+                ?.message ?? 'Erro ao eliminar endereço',
           }
         );
       } finally {
