@@ -49,8 +49,8 @@ const SEASON_MAP: Record<Season, string> = {
 
 export type TriageListItem = {
   id?: string;
-  packageId: string;
-  qrCodeId?: string;
+  collectionRequestId: string;
+  bagId?: string;
   quality: 'GOOD' | 'MEDIUM' | 'BAD';
   type: 'UPPER_PART' | 'UNDER_PART';
   season: 'SUMMER' | 'WINTER';
@@ -115,11 +115,7 @@ export default function AddTriage({
 
   const hasInvalidItemCombination = items.some(
     (item) =>
-      !item.quality ||
-      !item.sex ||
-      !item.ageGroup ||
-      !item.type ||
-      !item.season
+      !item.quality || !item.sex || !item.ageGroup || !item.type || !item.season
   );
 
   const allStorageKeysInItems = validStorageUnits.every((storageUnit) =>
@@ -168,6 +164,8 @@ export default function AddTriage({
           <TableHeader>
             <TableRow>
               <TableHead>Qualidade</TableHead>
+              <TableHead>Sexo</TableHead>
+              <TableHead>Faixa etária</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Estação</TableHead>
               <TableHead>Marca</TableHead>
@@ -178,10 +176,18 @@ export default function AddTriage({
           <TableBody>
             {items.length > 0 ? (
               items.map((item, index) => (
-                <TableRow key={`${item.packageId}-${item.brandId}-${index}`}>
-                  <TableCell>{QUALITY_MAP[item.quality] ?? item.quality}</TableCell>
+                <TableRow key={`${item.collectionRequestId}-${item.brandId}-${index}`}>
+                  <TableCell>
+                    {QUALITY_MAP[item.quality] ?? item.quality}
+                  </TableCell>
+                  <TableCell>{SEX_MAP[item.sex] ?? item.sex}</TableCell>
+                  <TableCell>
+                    {AGE_GROUP_MAP[item.ageGroup] ?? item.ageGroup}
+                  </TableCell>
                   <TableCell>{TYPE_MAP[item.type] ?? item.type}</TableCell>
-                  <TableCell>{SEASON_MAP[item.season] ?? item.season}</TableCell>
+                  <TableCell>
+                    {SEASON_MAP[item.season] ?? item.season}
+                  </TableCell>
                   <TableCell>
                     {(brands.find((brand) => brand.id === item.brandId)?.name ??
                       item.brandId) ||
@@ -211,7 +217,7 @@ export default function AddTriage({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={8}
                   className="h-20 text-center text-secondary/55"
                 >
                   Tabela de itens
@@ -235,7 +241,7 @@ export default function AddTriage({
                 await handleStorageCodeEnter();
               }
             }}
-            placeholder="Digite o código e pressione Enter"
+            placeholder="Escaneie o QR ou digite o código"
             disabled={isLoadingStorageUnit || isViewMode}
           />
         </div>

@@ -1,6 +1,6 @@
 // Rótulos PT-PT dos atributos de itens (qualidade, sexo, faixa etária, tipo,
 // estação), apresentados ao utilizador nas tabelas de triagem/armazém.
-// Keyed por string para ser agnóstico ao enum de origem (package.ts vs
+// Keyed por string para ser agnóstico ao enum de origem (collectionRequest.ts vs
 // storage-unit.ts partilham os mesmos valores).
 
 export const QUALITY_LABEL: Record<string, string> = {

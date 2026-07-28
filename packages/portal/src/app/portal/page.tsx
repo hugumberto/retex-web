@@ -1,6 +1,6 @@
 'use client';
 
-import { PackageDTO } from '@/app/types/package';
+import { CollectionRequestDTO } from '@/app/types/collection-request';
 import { Role } from '@/app/types/user';
 import {
   Table,
@@ -11,14 +11,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
-import { STATUS_CLASS, STATUS_LABEL } from '@/lib/package-status';
+import { STATUS_CLASS, STATUS_LABEL } from '@/lib/collection-request-status';
 import { useAppStore } from '@/store';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function Index() {
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
-  const [requests, setRequests] = useState<PackageDTO[]>([]);
+  const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
   const [loading, setLoading] = useState(false);
 
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
@@ -26,7 +26,7 @@ export default function Index() {
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get<PackageDTO[]>('/me/packages');
+      const { data } = await api.get<CollectionRequestDTO[]>('/me/collection-requests');
       setRequests(Array.isArray(data) ? data : []);
     } catch {
       toast.error('Não foi possível carregar as solicitações');

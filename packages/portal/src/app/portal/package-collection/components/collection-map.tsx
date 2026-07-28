@@ -5,12 +5,12 @@ import '@tomtom-international/web-sdk-maps/dist/maps.css';
 import type { FeatureCollection } from 'geojson';
 import { useEffect, useRef } from 'react';
 
-import { PackageDTO } from '@/app/types/package';
+import { CollectionRequestDTO } from '@/app/types/collection-request';
 import { readCoords } from '../utils';
 
 interface CollectionMapProps {
   // Apenas elegíveis com coordenada válida.
-  packages: PackageDTO[];
+  collectionRequests: CollectionRequestDTO[];
   selectedIds: string[];
   suggestedIds?: string[];
   // Geometria da rota otimizada (FeatureCollection do TomTom services).
@@ -28,7 +28,7 @@ const COLORS = {
 const DEFAULT_CENTER: [number, number] = [-9.1393, 38.7223];
 
 export default function CollectionMap({
-  packages,
+  collectionRequests,
   selectedIds,
   suggestedIds = [],
   routeGeoJson,
@@ -76,7 +76,7 @@ export default function CollectionMap({
     const bounds = new tt.LngLatBounds();
     let plotted = 0;
 
-    packages.forEach((pkg) => {
+    collectionRequests.forEach((pkg) => {
       const { lat, long } = readCoords(pkg);
       const color = selected.has(pkg.id)
         ? COLORS.selected
@@ -101,7 +101,7 @@ export default function CollectionMap({
     if (plotted > 0) {
       map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
     }
-  }, [packages, selectedIds, suggestedIds]);
+  }, [collectionRequests, selectedIds, suggestedIds]);
 
   // Desenha/atualiza a polyline da rota otimizada.
   useEffect(() => {

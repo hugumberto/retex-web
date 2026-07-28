@@ -1,12 +1,12 @@
 import { Entity } from "./helper";
-import { PackageDTO } from "./package";
+import { CollectionRequestDTO } from "./collection-request";
 import { UserDTO } from "./user";
 
     export interface PackageCollectionFormData {
     id?: string;
     driverId: string;
     startDate: Date;
-    packageIds: string[];
+    collectionRequestIds: string[];
     status: CollectionStatus;
     collectionInterval: CollectionInterval;
   }
@@ -16,7 +16,7 @@ import { UserDTO } from "./user";
   friendlyCode?: string
   collectionInterval?: CollectionInterval
   driver: UserDTO
-  packages: PackageDTO[]
+  collectionRequests: CollectionRequestDTO[]
   startDate: Date
   endDate?: Date
 }
@@ -26,8 +26,8 @@ export enum CollectionInterval {
   AFTERNOON = '13:00 - 17:00',
   EVENING = '17:00 - 21:00',
 }
- export interface PackageCollectionTableDTO extends Exclude<PackageCollectionDTO, 'packages'> {
-  packagesCount: number
+ export interface PackageCollectionTableDTO extends Exclude<PackageCollectionDTO, 'collectionRequests'> {
+  collectionRequestsCount: number
   confirmedCount: number
 }
 

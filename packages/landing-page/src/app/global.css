@@ -1293,6 +1293,12 @@ a.nav-cta-btn:hover {
 
 .landing-section.blog > h2 {
   margin-bottom: 28px;
+  text-align: center;
+}
+
+/* Títulos de secção centrados: "Como funciona?" e "O Nosso Blog". */
+#como-funciona > h2 {
+  text-align: center;
 }
 
 .blog-featured {

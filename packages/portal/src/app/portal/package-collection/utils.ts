@@ -1,4 +1,4 @@
-import { PackageDTO } from '@/app/types/package';
+import { CollectionRequestDTO } from '@/app/types/collection-request';
 
 export interface LatLong {
   lat: number;
@@ -6,12 +6,12 @@ export interface LatLong {
 }
 
 // Colunas decimais chegam da API como string — sempre coagir para número.
-export const readCoords = (pkg: PackageDTO): LatLong => ({
+export const readCoords = (pkg: CollectionRequestDTO): LatLong => ({
   lat: Number(pkg.address?.lat),
   long: Number(pkg.address?.long),
 });
 
-export const hasValidCoords = (pkg: PackageDTO): boolean => {
+export const hasValidCoords = (pkg: CollectionRequestDTO): boolean => {
   const { lat, long } = readCoords(pkg);
   return (
     Number.isFinite(lat) &&

@@ -108,8 +108,8 @@ export default function Parametros() {
             errors={errors}
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Percentual extra de QR codes gerados sobre os volumes informados ao
-            iniciar a rota (ex.: 10% → 3 volumes geram 4 códigos).
+            Percentual extra de QR codes gerados sobre os sacos informados ao
+            iniciar a rota (ex.: 10% → 3 sacos geram 4 códigos).
           </p>
         </div>
         <Button type="submit" variant="secondary" disabled={isSubmitting}>

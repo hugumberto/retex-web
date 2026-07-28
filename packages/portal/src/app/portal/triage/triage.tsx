@@ -1,10 +1,10 @@
 'use client';
 
 import { Brand } from '@/app/types/brand';
-import { PackageDTO, PackageStatus } from '@/app/types/package';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
-import { QrCodeDTO, TriageResponse } from '@/app/types/qr-code';
+import { CollectionRequestBagDTO, TriageResponse } from '@/app/types/collection-request-bag';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AddTriage, { buildTriageKey, TriageListItem } from './components/add-triage';
 import CollectionRecord from './components/collection-record';
-import PackageUserData from './components/package-user-data';
+import CollectionRequestUserData from './components/collection-request-user-data';
 
 // Extrai a mensagem de erro do servidor (string ou array do class-validator).
 const finishErrorMessage = (error: unknown): string => {
@@ -37,20 +37,20 @@ const finishErrorMessage = (error: unknown): string => {
 export default function Triage() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const scanCodeInputRef = useRef<HTMLInputElement>(null);
-  const volumeInputRef = useRef<HTMLInputElement>(null);
+  const bagInputRef = useRef<HTMLInputElement>(null);
   const weightInputRef = useRef<HTMLInputElement>(null);
 
   const [scanCode, setScanCode] = useState('');
-  const [selectedPackage, setSelectedPackage] = useState<PackageDTO | null>(
+  const [selectedCollectionRequest, setSelectedCollectionRequest] = useState<CollectionRequestDTO | null>(
     null
   );
-  const [qrCodes, setQrCodes] = useState<QrCodeDTO[]>([]);
-  const [activeQrId, setActiveQrId] = useState<string | null>(null);
-  // Consulta/escaneamento do volume + peso do volume ativo (um por vez).
-  const [volumeCode, setVolumeCode] = useState('');
-  const [volumeWeight, setVolumeWeight] = useState('');
-  const [isProcessingVolume, setIsProcessingVolume] = useState(false);
-  const [isLoadingPackage, setIsLoadingPackage] = useState(false);
+  const [bags, setBags] = useState<CollectionRequestBagDTO[]>([]);
+  const [activeBagId, setActiveBagId] = useState<string | null>(null);
+  // Consulta/escaneamento do saco + peso do saco ativo (um por vez).
+  const [bagCode, setBagCode] = useState('');
+  const [bagWeight, setBagWeight] = useState('');
+  const [isProcessingBag, setIsProcessingBag] = useState(false);
+  const [isLoadingCollectionRequest, setIsLoadingCollectionRequest] = useState(false);
   const [isSavingProgress, setIsSavingProgress] = useState(false);
   const [isFinishingTriage, setIsFinishingTriage] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -75,7 +75,13 @@ export default function Triage() {
       try {
         const { data, status } = await api.get<Brand[]>('/brand');
         if (!isSuccessStatus(status)) throw new Error('Erro ao buscar marcas');
-        setBrands(data);
+        // Marcas por ordem alfabética (case-insensitive, pt-PT).
+        const sorted = [...data].sort((a, b) =>
+          (a.name ?? '').localeCompare(b.name ?? '', 'pt', {
+            sensitivity: 'base',
+          })
+        );
+        setBrands(sorted);
       } catch (error) {
         console.error('Erro ao buscar marcas:', error);
         toast.error('Não foi possível carregar as marcas');
@@ -92,53 +98,52 @@ export default function Triage() {
     };
   }, [setBreadcrumbs, setPageTitle]);
 
-  const isViewMode = selectedPackage?.status === PackageStatus.STOCKED;
+  const isViewMode = selectedCollectionRequest?.status === CollectionRequestStatus.STOCKED;
   const allProcessed =
-    qrCodes.length > 0 && qrCodes.every((qr) => qr.processedAt != null);
+    bags.length > 0 && bags.every((bag) => bag.processedAt != null);
   const activeItems = triageItems.filter(
-    (item) => item.qrCodeId === activeQrId
+    (item) => item.bagId === activeBagId
   );
-  const processedCount = qrCodes.filter((qr) => qr.processedAt != null).length;
-  // Só os processados e o que está em processamento (ativo); nunca os pendentes.
-  const visibleVolumes = qrCodes.filter(
-    (qr) => qr.processedAt != null || qr.id === activeQrId
-  );
-  const activeQr = qrCodes.find((qr) => qr.id === activeQrId) ?? null;
+  const processedCount = bags.filter((bag) => bag.processedAt != null).length;
+  // Mostra todos os sacos: processados, o que está em processamento (ativo)
+  // e os pendentes (ainda por processar).
+  const visibleBags = bags;
+  const activeBag = bags.find((bag) => bag.id === activeBagId) ?? null;
 
   const handleScanCodeBlur = async () => {
     const code = scanCode.trim();
-    if (!code || selectedPackage) return;
+    if (!code || selectedCollectionRequest) return;
 
-    setIsLoadingPackage(true);
+    setIsLoadingCollectionRequest(true);
     try {
       const { data, status } = await api.get<TriageResponse>(
         `/triage/${code}`
       );
       if (!isSuccessStatus(status)) throw new Error('Erro ao consultar');
 
-      setSelectedPackage(data.package);
-      setQrCodes(data.qrCodes ?? []);
-      setActiveQrId(null);
-      setVolumeCode('');
-      setVolumeWeight('');
+      setSelectedCollectionRequest(data.collectionRequest);
+      setBags(data.bags ?? []);
+      setActiveBagId(null);
+      setBagCode('');
+      setBagWeight('');
 
-      const mappedItems = (data.package.items ?? []).map((packageItem) => ({
-        id: packageItem.id,
-        packageId: data.package.id,
-        qrCodeId: packageItem.qrCode?.id,
-        quality: packageItem.quality,
-        type: packageItem.type,
-        season: packageItem.season,
-        sex: packageItem.sex,
-        ageGroup: packageItem.ageGroup,
-        brandId: packageItem.brand?.id ?? '',
-        quantity: packageItem.quantity,
+      const mappedItems = (data.collectionRequest.items ?? []).map((collectionRequestItem) => ({
+        id: collectionRequestItem.id,
+        collectionRequestId: data.collectionRequest.id,
+        bagId: collectionRequestItem.bag?.id,
+        quality: collectionRequestItem.quality,
+        type: collectionRequestItem.type,
+        season: collectionRequestItem.season,
+        sex: collectionRequestItem.sex,
+        ageGroup: collectionRequestItem.ageGroup,
+        brandId: collectionRequestItem.brand?.id ?? '',
+        quantity: collectionRequestItem.quantity,
       })) as TriageListItem[];
 
-      const mappedStorageUnits = (data.package.items ?? []).reduce<
+      const mappedStorageUnits = (data.collectionRequest.items ?? []).reduce<
         StorageUnitDTO[]
-      >((acc, packageItem) => {
-        const storageUnit = packageItem.storageUnit;
+      >((acc, collectionRequestItem) => {
+        const storageUnit = collectionRequestItem.storageUnit;
         if (!storageUnit?.id) return acc;
         if (acc.some((current) => current.id === storageUnit.id)) return acc;
         acc.push(storageUnit);
@@ -148,12 +153,12 @@ export default function Triage() {
       setTriageItems(mappedItems);
       setStorageUnits(mappedStorageUnits);
       toast.success('Solicitação carregada com sucesso');
-      // Foco vai para o campo de código do volume.
-      requestAnimationFrame(() => volumeInputRef.current?.focus());
+      // Foco vai para o campo de código do saco.
+      requestAnimationFrame(() => bagInputRef.current?.focus());
     } catch (error) {
       console.error('Erro ao consultar triagem:', error);
-      setSelectedPackage(null);
-      setQrCodes([]);
+      setSelectedCollectionRequest(null);
+      setBags([]);
       setTriageItems([]);
       setStorageUnits([]);
       toast.error('Nenhuma solicitação encontrada para o código informado');
@@ -161,12 +166,12 @@ export default function Triage() {
       setScanCode('');
       requestAnimationFrame(() => scanCodeInputRef.current?.focus());
     } finally {
-      setIsLoadingPackage(false);
+      setIsLoadingCollectionRequest(false);
     }
   };
 
-  const packageWeight = qrCodes.reduce(
-    (sum, qr) => sum + Number(qr.weight ?? 0),
+  const collectionRequestWeight = bags.reduce(
+    (sum, bag) => sum + Number(bag.weight ?? 0),
     0
   );
 
@@ -180,37 +185,37 @@ export default function Triage() {
     setAgeGroup(undefined);
   };
 
-  // Escaneia/consulta o volume localmente contra os volumes da solicitação.
-  const handleVolumeScan = () => {
-    const code = volumeCode.trim();
-    if (!code || !selectedPackage) return;
+  // Escaneia/consulta o saco localmente contra os sacos da solicitação.
+  const handleBagScan = () => {
+    const code = bagCode.trim();
+    if (!code || !selectedCollectionRequest) return;
 
-    const qr = qrCodes.find(
+    const bag = bags.find(
       (q) => q.token === code || q.friendlyCode === code
     );
-    if (!qr) {
-      toast.error('Volume não pertence a esta solicitação');
-      setVolumeCode('');
-      requestAnimationFrame(() => volumeInputRef.current?.focus());
+    if (!bag) {
+      toast.error('Saco não pertence a esta solicitação');
+      setBagCode('');
+      requestAnimationFrame(() => bagInputRef.current?.focus());
       return;
     }
-    if (qr.processedAt != null) {
-      toast.error('Volume já processado');
-      setVolumeCode('');
-      requestAnimationFrame(() => volumeInputRef.current?.focus());
+    if (bag.processedAt != null) {
+      toast.error('Saco já processado');
+      setBagCode('');
+      requestAnimationFrame(() => bagInputRef.current?.focus());
       return;
     }
 
-    setActiveQrId(qr.id);
-    setVolumeWeight('');
+    setActiveBagId(bag.id);
+    setBagWeight('');
     clearItemForm();
-    setVolumeCode('');
+    setBagCode('');
     requestAnimationFrame(() => weightInputRef.current?.focus());
   };
 
   const handleAddTriageItem = async () => {
-    if (!selectedPackage?.id || !activeQrId) {
-      toast.error('Selecione um volume antes de adicionar o item');
+    if (!selectedCollectionRequest?.id || !activeBagId) {
+      toast.error('Selecione um saco antes de adicionar o item');
       return;
     }
     if (!brandId) {
@@ -228,8 +233,8 @@ export default function Triage() {
     }
 
     const payload = {
-      packageId: selectedPackage.id,
-      qrCodeId: activeQrId,
+      collectionRequestId: selectedCollectionRequest.id,
+      bagId: activeBagId,
       quality,
       type: clothingType,
       season,
@@ -252,7 +257,7 @@ export default function Triage() {
         { ...payload, id: data?.id } as TriageListItem,
       ]);
       clearItemForm();
-      toast.success('Item adicionado ao volume');
+      toast.success('Item adicionado ao saco');
     } catch (error) {
       console.error('Erro ao criar item:', error);
       toast.error('Não foi possível adicionar o item');
@@ -280,55 +285,55 @@ export default function Triage() {
     }
   };
 
-  const handleProcessVolume = async () => {
-    if (!activeQrId) return;
-    const parsedWeight = Number(volumeWeight);
+  const handleProcessBag = async () => {
+    if (!activeBagId) return;
+    const parsedWeight = Number(bagWeight);
     if (
-      !volumeWeight.trim() ||
+      !bagWeight.trim() ||
       Number.isNaN(parsedWeight) ||
       parsedWeight < 0
     ) {
-      toast.error('Informe um peso válido para o volume');
+      toast.error('Informe um peso válido para o saco');
       return;
     }
 
-    setIsProcessingVolume(true);
+    setIsProcessingBag(true);
     try {
-      const { status } = await api.post(`/triage/qr/${activeQrId}/process`, {
+      const { status } = await api.post(`/triage/bag/${activeBagId}/process`, {
         weight: parsedWeight,
       });
-      if (!isSuccessStatus(status)) throw new Error('Erro ao processar volume');
+      if (!isSuccessStatus(status)) throw new Error('Erro ao processar saco');
 
-      // Atualiza o volume + o peso do pacote localmente (evita novo GET).
-      setQrCodes((current) =>
-        current.map((qr) =>
-          qr.id === activeQrId
+      // Atualiza o saco + o peso do pacote localmente (evita novo GET).
+      setBags((current) =>
+        current.map((bag) =>
+          bag.id === activeBagId
             ? {
-                ...qr,
+                ...bag,
                 weight: parsedWeight,
                 processedAt: new Date().toISOString(),
               }
-            : qr
+            : bag
         )
       );
-      setSelectedPackage((current) =>
-        current ? { ...current, status: PackageStatus.SCREENING } : current
+      setSelectedCollectionRequest((current) =>
+        current ? { ...current, status: CollectionRequestStatus.SCREENING } : current
       );
-      setActiveQrId(null);
-      setVolumeWeight('');
+      setActiveBagId(null);
+      setBagWeight('');
       clearItemForm();
-      toast.success('Volume processado');
-      requestAnimationFrame(() => volumeInputRef.current?.focus());
+      toast.success('Saco processado');
+      requestAnimationFrame(() => bagInputRef.current?.focus());
     } catch (error) {
-      console.error('Erro ao processar volume:', error);
-      toast.error('Não foi possível processar o volume');
+      console.error('Erro ao processar saco:', error);
+      toast.error('Não foi possível processar o saco');
     } finally {
-      setIsProcessingVolume(false);
+      setIsProcessingBag(false);
     }
   };
 
   const handleSaveProgress = async () => {
-    if (!selectedPackage?.id) return;
+    if (!selectedCollectionRequest?.id) return;
     setIsSavingProgress(true);
     try {
       // Persiste os vínculos item→unidade de armazenamento já escaneados
@@ -347,12 +352,12 @@ export default function Triage() {
         }
       }
 
-      const { status } = await api.patch(`/package/${selectedPackage.id}`, {
-        status: PackageStatus.SCREENING,
+      const { status } = await api.patch(`/collection-request/${selectedCollectionRequest.id}`, {
+        status: CollectionRequestStatus.SCREENING,
       });
       if (!isSuccessStatus(status)) throw new Error('Erro ao salvar progresso');
-      setSelectedPackage((current) =>
-        current ? { ...current, status: PackageStatus.SCREENING } : current
+      setSelectedCollectionRequest((current) =>
+        current ? { ...current, status: CollectionRequestStatus.SCREENING } : current
       );
       toast.success('Progresso salvo (em triagem)');
     } catch (error) {
@@ -402,11 +407,11 @@ export default function Triage() {
 
   const resetTriageState = () => {
     setScanCode('');
-    setSelectedPackage(null);
-    setQrCodes([]);
-    setActiveQrId(null);
-    setVolumeCode('');
-    setVolumeWeight('');
+    setSelectedCollectionRequest(null);
+    setBags([]);
+    setActiveBagId(null);
+    setBagCode('');
+    setBagWeight('');
     clearItemForm();
     setTriageItems([]);
     setStorageCode('');
@@ -414,9 +419,9 @@ export default function Triage() {
   };
 
   const handleFinishTriage = async () => {
-    if (!selectedPackage?.id) return;
+    if (!selectedCollectionRequest?.id) return;
     if (!allProcessed) {
-      toast.error('Processe todos os volumes antes de finalizar');
+      toast.error('Processe todos os sacos antes de finalizar');
       return;
     }
     if (triageItems.length === 0) {
@@ -461,11 +466,11 @@ export default function Triage() {
         throw new Error('Erro ao vincular itens às unidades de armazenamento');
       }
 
-      const { status: packageStatus } = await api.patch(
-        `/package/${selectedPackage.id}`,
-        { status: PackageStatus.STOCKED }
+      const { status: collectionRequestStatus } = await api.patch(
+        `/collection-request/${selectedCollectionRequest.id}`,
+        { status: CollectionRequestStatus.STOCKED }
       );
-      if (!isSuccessStatus(packageStatus)) {
+      if (!isSuccessStatus(collectionRequestStatus)) {
         throw new Error('Erro ao atualizar status do pacote');
       }
 
@@ -481,9 +486,9 @@ export default function Triage() {
   };
 
   const isAddFormInvalid =
-    !selectedPackage ||
-    !activeQrId ||
-    isLoadingPackage ||
+    !selectedCollectionRequest ||
+    !activeBagId ||
+    isLoadingCollectionRequest ||
     isCreatingItem ||
     !brandId ||
     !quantity.trim() ||
@@ -498,7 +503,7 @@ export default function Triage() {
       {/* Consulta */}
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <label className="mb-1 block text-sm font-medium text-secondary">
-          Código (solicitação ou volume) *
+          Código (solicitação ou saco) *
         </label>
         <div className="flex flex-wrap items-center gap-3">
           <Input
@@ -514,60 +519,60 @@ export default function Triage() {
             }}
             placeholder="Código da solicitação ou de um QR"
             autoFocus
-            disabled={!!selectedPackage || isLoadingPackage}
+            disabled={!!selectedCollectionRequest || isLoadingCollectionRequest}
             className="max-w-md"
           />
-          {selectedPackage && (
+          {selectedCollectionRequest && (
             <>
               <span className="inline-flex rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-secondary">
-                {selectedPackage.friendlyCode ?? selectedPackage.id}
+                {selectedCollectionRequest.friendlyCode ?? selectedCollectionRequest.id}
               </span>
               <span className="text-sm text-secondary">
-                Peso total: <strong>{packageWeight.toFixed(2)} kg</strong>
+                Peso total: <strong>{collectionRequestWeight.toFixed(2)} kg</strong>
               </span>
               <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
-                {STATUS_LABEL[selectedPackage.status] ?? selectedPackage.status}
+                {STATUS_LABEL[selectedCollectionRequest.status] ?? selectedCollectionRequest.status}
               </span>
             </>
           )}
         </div>
       </div>
 
-      {selectedPackage && (
-        <PackageUserData
-          user={selectedPackage.user}
-          address={selectedPackage.address}
+      {selectedCollectionRequest && (
+        <CollectionRequestUserData
+          user={selectedCollectionRequest.user}
+          address={selectedCollectionRequest.address}
         />
       )}
 
-      {/* Consulta do volume (escaneamento) + peso do volume */}
-      {selectedPackage && !isViewMode && (
+      {/* Consulta do saco (escaneamento) + peso do saco */}
+      {selectedCollectionRequest && !isViewMode && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <label className="mb-1 block text-sm font-medium text-secondary">
-            Código do volume (QR) *
+            Código do saco (QR) *
           </label>
           <Input
-            ref={volumeInputRef}
-            value={volumeCode}
-            onChange={(e) => setVolumeCode(e.target.value)}
-            onBlur={handleVolumeScan}
+            ref={bagInputRef}
+            value={bagCode}
+            onChange={(e) => setBagCode(e.target.value)}
+            onBlur={handleBagScan}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                handleVolumeScan();
+                handleBagScan();
               }
             }}
-            placeholder="Escaneie ou digite o código do volume e pressione Enter"
-            disabled={!!activeQrId}
+            placeholder="Escaneie ou digite o código do saco e pressione Enter"
+            disabled={!!activeBagId}
             className="max-w-md"
           />
 
-          {activeQrId && (
+          {activeBagId && (
             <div className="mt-4">
               <label className="mb-1 block text-sm font-medium text-secondary">
-                Peso do volume{' '}
+                Peso do saco{' '}
                 <strong className="text-secondary">
-                  {activeQr?.friendlyCode}
+                  {activeBag?.friendlyCode}
                 </strong>{' '}
                 (kg) *
               </label>
@@ -575,8 +580,8 @@ export default function Triage() {
                 ref={weightInputRef}
                 type="number"
                 min={0}
-                value={volumeWeight}
-                onChange={(e) => setVolumeWeight(e.target.value)}
+                value={bagWeight}
+                onChange={(e) => setBagWeight(e.target.value)}
                 className="max-w-xs"
               />
             </div>
@@ -584,15 +589,15 @@ export default function Triage() {
         </div>
       )}
 
-      {/* Volumes (QR codes) — processados + em processamento */}
-      {selectedPackage && (
+      {/* Sacos (QR codes) — processados, em processamento e pendentes */}
+      {selectedCollectionRequest && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-secondary">
-              Volumes (QR codes)
+              Sacos (QR codes)
             </h2>
             <span className="text-sm font-medium text-secondary">
-              Processados: {processedCount} / {qrCodes.length} volumes
+              Processados: {processedCount} / {bags.length} sacos
             </span>
           </div>
           <Table>
@@ -605,13 +610,23 @@ export default function Triage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {visibleVolumes.length > 0 ? (
-                visibleVolumes.map((qr) => {
-                  const itemsCount = triageItems.filter(
-                    (item) => item.qrCodeId === qr.id
-                  ).length;
-                  const processed = qr.processedAt != null;
-                  const rawWeight = processed ? qr.weight : volumeWeight;
+              {visibleBags.length > 0 ? (
+                visibleBags.map((bag) => {
+                  // Soma das quantidades dos itens vinculados a este saco.
+                  const itemsCount = triageItems
+                    .filter((item) => item.bagId === bag.id)
+                    .reduce(
+                      (sum, item) => sum + (Number(item.quantity) || 0),
+                      0
+                    );
+                  const processed = bag.processedAt != null;
+                  const isActive = bag.id === activeBagId;
+                  // O peso em edição (bagWeight) só se aplica ao saco ativo.
+                  const rawWeight = processed
+                    ? bag.weight
+                    : isActive
+                    ? bagWeight
+                    : null;
                   const numWeight = Number(rawWeight);
                   const displayWeight =
                     rawWeight != null &&
@@ -619,22 +634,28 @@ export default function Triage() {
                     Number.isFinite(numWeight)
                       ? numWeight.toFixed(2)
                       : '-';
+                  const stateClass = processed
+                    ? 'bg-green-100 text-green-800'
+                    : isActive
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-gray-100 text-gray-700';
+                  const stateLabel = processed
+                    ? 'Processado'
+                    : isActive
+                    ? 'Em processamento'
+                    : 'Pendente';
                   return (
-                    <TableRow key={qr.id}>
+                    <TableRow key={bag.id}>
                       <TableCell className="font-medium">
-                        {qr.friendlyCode}
+                        {bag.friendlyCode}
                       </TableCell>
                       <TableCell>{displayWeight}</TableCell>
                       <TableCell>{itemsCount}</TableCell>
                       <TableCell>
                         <span
-                          className={`inline-flex rounded-full px-2 text-xs font-semibold ${
-                            processed
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
+                          className={`inline-flex rounded-full px-2 text-xs font-semibold ${stateClass}`}
                         >
-                          {processed ? 'Processado' : 'Em processamento'}
+                          {stateLabel}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -646,7 +667,7 @@ export default function Triage() {
                     colSpan={4}
                     className="py-6 text-center text-muted-foreground"
                   >
-                    Nenhum volume em processamento ou processado
+                    Nenhum saco nesta solicitação
                   </TableCell>
                 </TableRow>
               )}
@@ -655,11 +676,11 @@ export default function Triage() {
         </div>
       )}
 
-      {/* Itens do volume ativo */}
-      {selectedPackage && activeQrId && !isViewMode && (
+      {/* Itens do saco ativo */}
+      {selectedCollectionRequest && activeBagId && !isViewMode && (
         <div className="flex flex-col gap-6">
           <CollectionRecord
-            selectedPackageId={selectedPackage.id}
+            selectedCollectionRequestId={selectedCollectionRequest.id}
             isViewMode={isViewMode}
             items={activeItems}
             brands={brands}
@@ -690,7 +711,7 @@ export default function Triage() {
       )}
 
       {/* Unidades de armazenamento */}
-      {selectedPackage && (
+      {selectedCollectionRequest && (
         <AddTriage
           items={triageItems}
           brands={brands}
@@ -710,20 +731,20 @@ export default function Triage() {
       )}
 
       {/* Espaço para a barra flutuante não cobrir o conteúdo */}
-      {selectedPackage && <div className="h-24" />}
+      {selectedCollectionRequest && <div className="h-24" />}
 
       {/* Barra flutuante de ações */}
-      {selectedPackage && (
+      {selectedCollectionRequest && (
         <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-secondary/25 bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
-            {activeQrId && !isViewMode && (
+            {activeBagId && !isViewMode && (
               <Button
                 type="button"
                 variant="secondary"
-                onClick={handleProcessVolume}
-                disabled={isProcessingVolume || !volumeWeight.trim()}
+                onClick={handleProcessBag}
+                disabled={isProcessingBag || !bagWeight.trim()}
               >
-                Guardar volume
+                Guardar saco
               </Button>
             )}
             <Button

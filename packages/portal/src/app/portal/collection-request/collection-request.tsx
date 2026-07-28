@@ -1,6 +1,6 @@
 'use client';
 
-import { PackageDTO, PackageStatus } from '@/app/types/package';
+import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
 import { AddressDTO, Role } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { TrashIcon } from 'lucide-react';
@@ -19,12 +19,13 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
-import { STATUS_LABEL } from '@/lib/package-status';
+import { STATUS_LABEL } from '@/lib/collection-request-status';
+import RequestDetailsDialog from './request-details-dialog';
 import { useAppStore } from '@/store';
 import { MapPinOff } from 'lucide-react';
 import Link from 'next/link';
 import { FocusEvent } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -33,7 +34,7 @@ interface AdminFormData {
   lastName: string;
   email: string;
   contactPhone: string;
-  estimatedVolumes: string;
+  estimatedBags: string;
   address: {
     street: string;
     number: string;
@@ -50,30 +51,54 @@ interface AdminFormData {
 
 interface UserFormData {
   addressId: string;
-  estimatedVolumes: string;
+  estimatedBags: string;
 }
 
 export default function CollectionRequest() {
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
-  const [requests, setRequests] = useState<PackageDTO[]>([]);
+  const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addresses, setAddresses] = useState<AddressDTO[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
+  const isAdmin = user?.roles?.some((r) => r.role === Role.ADMIN) ?? false;
+  const [statusFilter, setStatusFilter] = useState<'ALL' | CollectionRequestStatus>(
+    'ALL'
+  );
+
+  // Admin: filtra por estado e ordena (CRIADO primeiro; depois mais antigo
+  // primeiro por data de criação). Restantes utilizadores veem a lista natural.
+  const displayedRequests = useMemo(() => {
+    if (!isAdmin) return requests;
+    const list =
+      statusFilter === 'ALL'
+        ? requests
+        : requests.filter((r) => r.status === statusFilter);
+    return [...list].sort((a, b) => {
+      const aCreated = a.status === CollectionRequestStatus.CREATED ? 0 : 1;
+      const bCreated = b.status === CollectionRequestStatus.CREATED ? 0 : 1;
+      if (aCreated !== bCreated) return aCreated - bCreated;
+      return (
+        new Date(a.createdAt ?? 0).getTime() -
+        new Date(b.createdAt ?? 0).getTime()
+      );
+    });
+  }, [requests, isAdmin, statusFilter]);
+
   const inZoneAddresses = addresses.filter((a) => a.isInServiceZone);
   const canRequest = inZoneAddresses.length > 0;
   const hasActiveRequest =
     isUserRole &&
     requests.some(
       (r) =>
-        r.status !== PackageStatus.CANCELLED &&
-        r.status !== PackageStatus.STOCKED
+        r.status !== CollectionRequestStatus.CANCELLED &&
+        r.status !== CollectionRequestStatus.STOCKED
     );
 
   const [userFormOpen, setUserFormOpen] = useState(false);
   const userForm = useForm<UserFormData>({
-    defaultValues: { addressId: '', estimatedVolumes: '' },
+    defaultValues: { addressId: '', estimatedBags: '' },
   });
   const adminForm = useForm<AdminFormData>({
     defaultValues: {
@@ -81,7 +106,7 @@ export default function CollectionRequest() {
       lastName: '',
       email: '',
       contactPhone: '',
-      estimatedVolumes: '',
+      estimatedBags: '',
       address: {
         street: '',
         number: '',
@@ -99,8 +124,8 @@ export default function CollectionRequest() {
 
   const fetchRequests = useCallback(async () => {
     try {
-      const endpoint = isUserRole ? '/me/packages' : '/package';
-      const { data, status } = await api.get<PackageDTO[]>(endpoint);
+      const endpoint = isUserRole ? '/me/collection-requests' : '/collection-request';
+      const { data, status } = await api.get<CollectionRequestDTO[]>(endpoint);
       if (!isSuccessStatus(status)) throw new Error();
       setRequests(Array.isArray(data) ? data : []);
     } catch {
@@ -112,8 +137,8 @@ export default function CollectionRequest() {
     async (id: string) => {
       await toast.promise(
         async () => {
-          const res = await api.patch(`/package/${id}`, {
-            status: PackageStatus.CANCELLED,
+          const res = await api.patch(`/collection-request/${id}`, {
+            status: CollectionRequestStatus.CANCELLED,
           });
           if (!isSuccessStatus(res.status)) throw new Error();
           await fetchRequests();
@@ -154,10 +179,10 @@ export default function CollectionRequest() {
   const submitUser = userForm.handleSubmit(async (data) => {
     setIsSubmitting(true);
     try {
-      const response = await api.post('/package', {
+      const response = await api.post('/collection-request', {
         userId: user!.id,
         addressId: data.addressId,
-        estimatedVolumes: Number(data.estimatedVolumes),
+        estimatedBags: Number(data.estimatedBags),
       });
       if (!isSuccessStatus(response.status) && response.status !== 409)
         throw new Error();
@@ -176,9 +201,9 @@ export default function CollectionRequest() {
     setIsSubmitting(true);
     await toast.promise(
       async () => {
-        const response = await api.post('/package', {
+        const response = await api.post('/collection-request', {
           ...data,
-          estimatedVolumes: Number(data.estimatedVolumes),
+          estimatedBags: Number(data.estimatedBags),
           address: {
             street: data.address.street,
             city: data.address.city,
@@ -363,18 +388,18 @@ export default function CollectionRequest() {
                     min={1}
                     placeholder="Número de sacos*"
                     className={
-                      userForm.formState.errors.estimatedVolumes
+                      userForm.formState.errors.estimatedBags
                         ? 'border-red-500'
                         : ''
                     }
-                    {...userForm.register('estimatedVolumes', {
+                    {...userForm.register('estimatedBags', {
                       required: 'Campo obrigatório',
-                      min: { value: 1, message: 'Mínimo 1 volume' },
+                      min: { value: 1, message: 'Mínimo 1 saco' },
                     })}
                   />
-                  {userForm.formState.errors.estimatedVolumes && (
+                  {userForm.formState.errors.estimatedBags && (
                     <p className="text-xs text-destructive mt-1">
-                      {userForm.formState.errors.estimatedVolumes.message}
+                      {userForm.formState.errors.estimatedBags.message}
                     </p>
                   )}
                 </div>
@@ -525,11 +550,11 @@ export default function CollectionRequest() {
                 tabIndex={15}
                 type="number"
                 min={1}
-                placeholder="Estimativa de volumes*"
-                className={adminErrors.estimatedVolumes ? 'border-red-500' : ''}
-                {...adminRegister('estimatedVolumes', {
+                placeholder="Estimativa de sacos*"
+                className={adminErrors.estimatedBags ? 'border-red-500' : ''}
+                {...adminRegister('estimatedBags', {
                   required: 'Campo obrigatório',
-                  min: { value: 1, message: 'Mínimo 1 volume' },
+                  min: { value: 1, message: 'Mínimo 1 saco' },
                 })}
               />
             </div>
@@ -538,9 +563,32 @@ export default function CollectionRequest() {
       </div>
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
-        <h2 className="text-lg font-semibold text-secondary">
-          Solicitações de Recolha
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-secondary">
+            Solicitações de Recolha
+          </h2>
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-secondary">
+                Estado:
+              </label>
+              <select
+                className="h-9 rounded-md border border-secondary/40 px-2 text-sm"
+                value={statusFilter}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as 'ALL' | CollectionRequestStatus)
+                }
+              >
+                <option value="ALL">Todos</option>
+                {Object.values(CollectionRequestStatus).map((s) => (
+                  <option key={s} value={s}>
+                    {STATUS_LABEL[s] ?? s}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         <div className="mt-4 w-full overflow-x-auto">
           <Table>
             <TableHeader>
@@ -548,16 +596,16 @@ export default function CollectionRequest() {
                 <TableHead>Código</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Contacto</TableHead>
                 <TableHead className="whitespace-normal">Morada</TableHead>
-                <TableHead>Volumes (est.)</TableHead>
+                <TableHead>Sacos (est.)</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Criado em</TableHead>
                 <TableHead>Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {requests.length > 0 ? (
-                requests.map((request) => (
+              {displayedRequests.length > 0 ? (
+                displayedRequests.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
                       {request.friendlyCode ?? '-'}
@@ -568,19 +616,24 @@ export default function CollectionRequest() {
                       }`.trim()}
                     </TableCell>
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
-                    <TableCell>{request.user?.contactPhone ?? '-'}</TableCell>
                     <TableCell className="whitespace-normal break-words max-w-[220px] min-w-[160px]">
                       {`${request.address?.street ?? '-'} ${
                         request.address?.number ?? ''
                       }`.trim()}
                     </TableCell>
-                    <TableCell>{request.estimatedVolumes ?? '-'}</TableCell>
+                    <TableCell>{request.estimatedBags ?? '-'}</TableCell>
                     <TableCell>
                       {STATUS_LABEL[request.status] ?? request.status}
                     </TableCell>
-                    <TableCell>
-                      {(request.status === PackageStatus.CREATED ||
-                        request.status === PackageStatus.OUT_OF_ZONE) && (
+                    <TableCell className="whitespace-nowrap">
+                      {request.createdAt
+                        ? new Date(request.createdAt).toLocaleDateString('pt-PT')
+                        : '—'}
+                    </TableCell>
+                    <TableCell className="space-x-2">
+                      <RequestDetailsDialog request={request} />
+                      {(request.status === CollectionRequestStatus.CREATED ||
+                        request.status === CollectionRequestStatus.OUT_OF_ZONE) && (
                         <ConfirmDialog
                           trigger={
                             <Button

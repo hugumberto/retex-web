@@ -26,11 +26,12 @@ import {
   QrCodeIcon,
   TrashIcon,
 } from 'lucide-react';
-import { QrCodeDTO } from '@/app/types/qr-code';
+import { CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
+import RouteBagsDialog from './route-bags-dialog';
 
 // Próximo estado no ciclo da rota. DRAFTING→CREATED tem botão próprio
 // ("Confirmar recolha", que dispara os emails); FINISHED é terminal.
@@ -132,8 +133,8 @@ export default function PackageCollection() {
   };
 
   const handlePrintQrCodes = async (id: string) => {
-    const { data, status } = await api.get<QrCodeDTO[]>(
-      `/route/${id}/qr-codes`
+    const { data, status } = await api.get<CollectionRequestBagDTO[]>(
+      `/route/${id}/bags`
     );
     if (status !== 200) {
       throw new Error('Erro ao buscar os QR codes da rota');
@@ -149,10 +150,10 @@ export default function PackageCollection() {
 
     // A impressora usa etiquetas de 40x60mm (retrato): um QR code por página/etiqueta.
     const labels = data
-      .map((qr) => {
-        const code = escapeHtml(qr.friendlyCode);
-        const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=${encodeURIComponent(
-          qr.token
+      .map((bag) => {
+        const code = escapeHtml(bag.friendlyCode);
+        const qrSource = `https://api.qrserver.com/v1/create-bag-code/?size=300x300&margin=0&data=${encodeURIComponent(
+          bag.token
         )}`;
         return `<div class="label"><img src="${qrSource}" alt="QR ${code}" /><div class="code">${code}</div></div>`;
       })
@@ -217,11 +218,11 @@ export default function PackageCollection() {
     const routeDate = new Date(data.startDate).toLocaleDateString('pt-PT');
     const safeDate = escapeHtml(routeDate);
     const logoSource = `${window.location.origin}/assets/logo.png`;
-    const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+    const qrSource = `https://api.qrserver.com/v1/create-bag-code/?size=220x220&data=${encodeURIComponent(
       data.id
     )}`;
 
-    const rows = data.packages
+    const rows = data.collectionRequests
       .map((pkg) => {
         const requester = escapeHtml(
           `${pkg.user.firstName ?? ''} ${pkg.user.lastName ?? ''}`.trim() || '-'
@@ -241,7 +242,7 @@ export default function PackageCollection() {
       rows ||
       '<tr><td colspan="3" style="text-align:center;color:#6b7280;">Sem itens na rota</td></tr>';
 
-    const itemPages = data.packages
+    const itemPages = data.collectionRequests
       .map((pkg, index) => {
         const itemId = escapeHtml(pkg.id);
         const itemCode = escapeHtml(pkg.friendlyCode ?? '-');
@@ -257,7 +258,7 @@ export default function PackageCollection() {
             .replace(/\s+,/g, ',')
             .trim() || '-'
         );
-        const itemQrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+        const itemQrSource = `https://api.qrserver.com/v1/create-bag-code/?size=220x220&data=${encodeURIComponent(
           pkg.id
         )}`;
 
@@ -271,7 +272,7 @@ export default function PackageCollection() {
                 <p><strong>Data:</strong> ${safeDate}</p>
                 <p><strong>Página:</strong> ${index + 2}</p>
               </div>
-              <img class="qr" src="${itemQrSource}" alt="QR Item ${itemId}" />
+              <img class="bag" src="${itemQrSource}" alt="QR Item ${itemId}" />
             </header>
 
             <section class="content">
@@ -310,7 +311,7 @@ export default function PackageCollection() {
                       <p><strong>Cliente:</strong> ${requesterName}</p>
                       <p><strong>Endereço:</strong> ${fullAddress}</p>
                     </div>
-                    <img class="receipt-qr" src="${itemQrSource}" alt="QR Recibo ${itemId}" />
+                    <img class="receipt-bag" src="${itemQrSource}" alt="QR Recibo ${itemId}" />
                   </div>
                   <div class="receipt-signatures">
                     <div>
@@ -366,7 +367,7 @@ export default function PackageCollection() {
               margin: 4px 0;
               font-size: 15px;
             }
-            .qr {
+            .bag {
               width: 220px;
               height: 220px;
               object-fit: contain;
@@ -481,7 +482,7 @@ export default function PackageCollection() {
               margin: 5px 0;
               font-size: 13px;
             }
-            .receipt-qr {
+            .receipt-bag {
               width: 120px;
               height: 120px;
               object-fit: contain;
@@ -546,7 +547,7 @@ export default function PackageCollection() {
                   <p><strong>Motorista:</strong> ${driverName}</p>
                 </div>
               </div>
-              <img class="qr" src="${qrSource}" alt="QR ${routeId}" />
+              <img class="bag" src="${qrSource}" alt="QR ${routeId}" />
             </header>
             <section class="content">
               <h2 class="table-title">Peças da Rota</h2>
@@ -613,11 +614,11 @@ export default function PackageCollection() {
                       )
                     : '-'}
                 </TableCell>
-                <TableCell>{packageCollection.packagesCount}</TableCell>
+                <TableCell>{packageCollection.collectionRequestsCount}</TableCell>
                 <TableCell>
                   {packageCollection.confirmedCount ?? 0}
                   {' / '}
-                  {packageCollection.packagesCount}
+                  {packageCollection.collectionRequestsCount}
                 </TableCell>
                 <TableCell>
                   <span
@@ -635,6 +636,10 @@ export default function PackageCollection() {
                   </span>
                 </TableCell>
                 <TableCell className="space-x-2">
+                  <RouteBagsDialog
+                    routeId={packageCollection.id}
+                    routeCode={packageCollection.friendlyCode}
+                  />
                   <Button
                     variant="ghost"
                     size="icon"
@@ -772,29 +777,33 @@ export default function PackageCollection() {
                       }}
                     />
                   )}
-                  <ConfirmDialog
-                    trigger={
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        disabled={isSubmitting}
-                        className="size-8"
-                      >
-                        <TrashIcon />
-                      </Button>
-                    }
-                    onConfirm={async () => {
-                      await toast.promise(handleDelete(packageCollection.id), {
-                        loading: 'Loading...',
-                        success: () => {
-                          return 'Recolha de Encomendas desativada com sucesso';
-                        },
-                        error: () => {
-                          return 'Erro ao desativar a recolha de encomendas';
-                        },
-                      });
-                    }}
-                  />
+                  {packageCollection.status !==
+                    CollectionStatus.FINISHED && (
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8"
+                        >
+                          <TrashIcon />
+                        </Button>
+                      }
+                      onConfirm={async () => {
+                        await toast.promise(
+                          handleDelete(packageCollection.id),
+                          {
+                            loading: 'Loading...',
+                            success: () =>
+                              'Recolha de Encomendas desativada com sucesso',
+                            error: () =>
+                              'Erro ao desativar a recolha de encomendas',
+                          }
+                        );
+                      }}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))}

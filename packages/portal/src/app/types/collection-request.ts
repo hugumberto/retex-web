@@ -17,18 +17,18 @@ export interface Address {
   long: number;
 } 
 
-export interface PackageDTO extends Entity {
-  status: PackageStatus
+export interface CollectionRequestDTO extends Entity {
+  status: CollectionRequestStatus
   friendlyCode?: string
   user: UserDTO
   route?: PackageCollectionDTO
   weight?: number
-  estimatedVolumes?: number
+  estimatedBags?: number
   address: Address
-  items?: PackageItemDTO[]
+  items?: CollectionRequestItemDTO[]
 }
-export interface PackageItemDTO extends Entity {
-  package: PackageDTO
+export interface CollectionRequestItemDTO extends Entity {
+  collectionRequest: CollectionRequestDTO
   quality: Quality
   type: Type
   storageUnit: StorageUnitDTO
@@ -37,7 +37,7 @@ export interface PackageItemDTO extends Entity {
   ageGroup: AgeGroup
   brand: Brand
   quantity: number
-  qrCode?: { id: string; friendlyCode?: string } | null
+  bag?: { id: string; friendlyCode?: string } | null
 }
 
 export enum Quality {
@@ -66,7 +66,7 @@ export enum AgeGroup {
   CHILD = "CHILD",
 }
 
-export enum PackageStatus {
+export enum CollectionRequestStatus {
   CREATED = 'CREATED',
   CONFIRMED = 'CONFIRMED',
   OUT_OF_ZONE = 'OUT_OF_ZONE',

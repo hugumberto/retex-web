@@ -39,8 +39,8 @@ function ConfirmContent() {
       try {
         await api.post(
           isReject
-            ? '/package/reject-collection'
-            : '/package/confirm-collection',
+            ? '/collection-request/reject-collection'
+            : '/collection-request/confirm-collection',
           { token }
         );
         if (!cancelled) setState('success');

@@ -1,7 +1,7 @@
 'use client';
 
 import { DashboardStatsDTO } from '@/app/types/dashboard';
-import { PackageStatus, Quality, Season, Type } from '@/app/types/package';
+import { CollectionRequestStatus, Quality, Season, Type } from '@/app/types/collection-request';
 import {
   Card,
   CardContent,
@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
-import { STATUS_COLOR, STATUS_LABEL } from '@/lib/package-status';
+import { STATUS_COLOR, STATUS_LABEL } from '@/lib/collection-request-status';
 import { useAppStore } from '@/store';
 import {
   Boxes,
@@ -197,12 +197,12 @@ export default function Dashboard() {
     );
   }
 
-  const { packages, triage, environment, users, outOfZone } = stats;
+  const { collectionRequests, triage, environment, users, outOfZone } = stats;
 
-  const statusData = packages.byStatus.map((row) => ({
+  const statusData = collectionRequests.byStatus.map((row) => ({
     label: STATUS_LABEL[row.status] ?? row.status,
     count: row.count,
-    color: STATUS_COLOR[row.status as PackageStatus] ?? '#64748b',
+    color: STATUS_COLOR[row.status as CollectionRequestStatus] ?? '#64748b',
   }));
 
   const qualityData = triage.byQuality.map((row) => ({
@@ -225,7 +225,7 @@ export default function Dashboard() {
     .slice(0, 8)
     .map((row) => ({ label: row.brand, value: row.quantity }));
 
-  const trendData = packages.trend.map((row) => ({
+  const trendData = collectionRequests.trend.map((row) => ({
     label: row.period,
     weight: row.weightKg,
   }));
@@ -241,16 +241,16 @@ export default function Dashboard() {
 
       {/* KPIs principais */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard icon={Package} label="Total de Pacotes" value={fmt(packages.total)} />
+        <KpiCard icon={Package} label="Total de Pacotes" value={fmt(collectionRequests.total)} />
         <KpiCard
           icon={Scale}
           label="Peso Total (kg)"
-          value={fmt(packages.totalWeightKg)}
+          value={fmt(collectionRequests.totalWeightKg)}
         />
         <KpiCard
           icon={Boxes}
-          label="Volumes Estimados"
-          value={fmt(packages.totalVolumes)}
+          label="Sacos Estimados"
+          value={fmt(collectionRequests.totalBags)}
         />
         <KpiCard
           icon={Recycle}
@@ -267,7 +267,7 @@ export default function Dashboard() {
         <KpiCard
           icon={MapPinOff}
           label="Pacotes Fora de Zona"
-          value={fmt(outOfZone.totalPackages)}
+          value={fmt(outOfZone.totalCollectionRequests)}
         />
       </div>
 

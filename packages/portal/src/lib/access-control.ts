@@ -18,6 +18,8 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal/zona', roles: [Role.ADMIN] },
   { path: '/portal/parametros', roles: [Role.ADMIN] },
   { path: '/portal/email-log', roles: [Role.ADMIN] },
+  { path: '/portal/reset-password', roles: [Role.ADMIN] },
+  { path: '/portal/bags', roles: [Role.ADMIN] },
   { path: '/portal/faq', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/blog', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/blog-categories', roles: [Role.ADMIN, Role.OPS] },

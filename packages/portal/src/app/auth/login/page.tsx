@@ -63,10 +63,21 @@ export default function LoginPage() {
 
   async function onResetPasswordSubmit(data: ResetPasswordFormData) {
     try {
-      await forgotPassword(data.email);
+      const { outOfZone } = await forgotPassword(data.email);
+      reset();
+      setIsResetModalOpen(false);
+      if (outOfZone) {
+        toast.info(
+          'O seu endereço está fora da nossa zona de atuação. Assim que passarmos a atuar na sua zona, receberá um email para definir a sua palavra-passe.',
+          { duration: 8000 }
+        );
+      } else {
+        toast.success(
+          'Se este email estiver registado, enviámos um link para repor a palavra-passe.'
+        );
+      }
     } catch {
       // Anti-enumeração: não revelamos falhas (ex.: email inexistente).
-    } finally {
       reset();
       setIsResetModalOpen(false);
       toast.success(

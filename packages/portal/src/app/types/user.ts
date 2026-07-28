@@ -24,6 +24,7 @@ export interface UserDTO extends Entity {
   contactPhone: string;
   status: UserStatus;
   roles: RoleResponse[];
+  addresses?: AddressDTO[];
 }
 export interface RoleResponse extends Entity {
   role: Role;
