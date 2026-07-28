@@ -154,7 +154,7 @@ export default function AddTriage({
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-secondary">
-          Adicionar - Triagem
+          Itens da Triagem
         </h2>
         <X className="size-5 text-secondary" />
       </div>
@@ -176,7 +176,9 @@ export default function AddTriage({
           <TableBody>
             {items.length > 0 ? (
               items.map((item, index) => (
-                <TableRow key={`${item.collectionRequestId}-${item.brandId}-${index}`}>
+                <TableRow
+                  key={`${item.collectionRequestId}-${item.brandId}-${index}`}
+                >
                   <TableCell>
                     {QUALITY_MAP[item.quality] ?? item.quality}
                   </TableCell>

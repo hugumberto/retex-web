@@ -39,6 +39,7 @@ import {
   UserRound,
   X,
 } from 'lucide-react';
+import { PantsIcon } from '@/components/icons/pants-icon';
 import React from 'react';
 
 type TriageOption = {
@@ -60,7 +61,7 @@ const seasonOptions: TriageOption[] = [
 
 const clothingTypeOptions: TriageOption[] = [
   { value: 'UPPER_PART', label: 'Parte de cima', icon: Shirt },
-  { value: 'UNDER_PART', label: 'Parte de baixo', icon: Shirt },
+  { value: 'UNDER_PART', label: 'Parte de baixo', icon: PantsIcon },
 ];
 
 const sexOptions: TriageOption[] = [
@@ -187,7 +188,9 @@ export default function CollectionRecord({
             <TableBody>
               {items.length > 0 ? (
                 items.map((item, index) => (
-                  <TableRow key={`${item.collectionRequestId}-${item.brandId}-${index}`}>
+                  <TableRow
+                    key={`${item.collectionRequestId}-${item.brandId}-${index}`}
+                  >
                     <TableCell>
                       {QUALITY_LABEL[item.quality] ?? item.quality}
                     </TableCell>
@@ -232,7 +235,7 @@ export default function CollectionRecord({
                     colSpan={8}
                     className="h-20 text-center text-secondary/55"
                   >
-                    {selectedCollectionRequestId ?? 'Tabela de itens'}
+                    {'Tabela de itens'}
                   </TableCell>
                 </TableRow>
               )}
