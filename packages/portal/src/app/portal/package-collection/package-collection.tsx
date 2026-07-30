@@ -69,7 +69,9 @@ export default function PackageCollection() {
 
   useEffect(() => {
     setPageTitle(t('pageTitle'));
-    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/package-collection' }]);
+    setBreadcrumbs([
+      { label: t('pageTitle'), href: '/portal/package-collection' },
+    ]);
     fetchData();
     return () => {
       setPageTitle('');
@@ -107,10 +109,7 @@ export default function PackageCollection() {
     }
   };
 
-  const handleAdvanceStatus = async (
-    id: string,
-    next: CollectionStatus
-  ) => {
+  const handleAdvanceStatus = async (id: string, next: CollectionStatus) => {
     setIsSubmitting(true);
     try {
       const res = await api.put(`/route/${id}`, { status: next });
@@ -307,8 +306,12 @@ export default function PackageCollection() {
                 <div class="detail-card">
                   <h3>${t('requesterData')}</h3>
                   <p><strong>${t('nameWithColon')}</strong> ${requesterName}</p>
-                  <p><strong>${t('emailWithColon')}</strong> ${requesterEmail}</p>
-                  <p><strong>${t('phoneWithColon')}</strong> ${requesterPhone}</p>
+                  <p><strong>${t(
+                    'emailWithColon'
+                  )}</strong> ${requesterEmail}</p>
+                  <p><strong>${t(
+                    'phoneWithColon'
+                  )}</strong> ${requesterPhone}</p>
                 </div>
                 <div class="detail-card">
                   <h3>${t('pickupAddress')}</h3>
@@ -333,9 +336,15 @@ export default function PackageCollection() {
                       <p><strong>${t('itemCode')}</strong> ${itemCode}</p>
                       <p><strong>${t('routeCode')}</strong> ${routeCode}</p>
                       <p><strong>${t('dateWithColon')}</strong> ${safeDate}</p>
-                      <p><strong>${t('driverWithColon')}</strong> ${driverName}</p>
-                      <p><strong>${t('customerWithColon')}</strong> ${requesterName}</p>
-                      <p><strong>${t('addressWithColon')}</strong> ${fullAddress}</p>
+                      <p><strong>${t(
+                        'driverWithColon'
+                      )}</strong> ${driverName}</p>
+                      <p><strong>${t(
+                        'customerWithColon'
+                      )}</strong> ${requesterName}</p>
+                      <p><strong>${t(
+                        'addressWithColon'
+                      )}</strong> ${fullAddress}</p>
                     </div>
                     <img class="receipt-bag" src="${itemQrSource}" alt="QR Recibo ${itemId}" />
                   </div>
@@ -581,7 +590,7 @@ export default function PackageCollection() {
                 <thead>
                   <tr>
                     <th>${tCommon('code')}</th>
-                    <th>{t('requester')}</th>
+                    <th>${t('requester')}</th>
                     <th>${tCommon('address')}</th>
                   </tr>
                 </thead>
@@ -659,7 +668,9 @@ export default function PackageCollection() {
                       )
                     : '-'}
                 </TableCell>
-                <TableCell>{packageCollection.collectionRequestsCount}</TableCell>
+                <TableCell>
+                  {packageCollection.collectionRequestsCount}
+                </TableCell>
                 <TableCell>
                   {packageCollection.confirmedCount ?? 0}
                   {' / '}
@@ -703,10 +714,8 @@ export default function PackageCollection() {
                   >
                     <PrinterIcon />
                   </Button>
-                  {(packageCollection.status ===
-                    CollectionStatus.IN_TRANSIT ||
-                    packageCollection.status ===
-                      CollectionStatus.FINISHED) && (
+                  {(packageCollection.status === CollectionStatus.IN_TRANSIT ||
+                    packageCollection.status === CollectionStatus.FINISHED) && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -718,8 +727,7 @@ export default function PackageCollection() {
                             loading: t('preparingQr'),
                             success: () => t('qrPrintReady'),
                             error: (e) =>
-                              (e as Error)?.message ||
-                              t('qrPrintError'),
+                              (e as Error)?.message || t('qrPrintError'),
                           }
                         );
                       }}
@@ -728,8 +736,7 @@ export default function PackageCollection() {
                       <QrCodeIcon />
                     </Button>
                   )}
-                  {packageCollection.status ===
-                    CollectionStatus.FINISHED && (
+                  {packageCollection.status === CollectionStatus.FINISHED && (
                     <ConfirmDialog
                       title={t('surveyTitle')}
                       description={t('surveyDescription')}
@@ -750,8 +757,7 @@ export default function PackageCollection() {
                           handleDispatchSurvey(packageCollection.id),
                           {
                             loading: t('sendingSurvey'),
-                            success: () =>
-                              t('surveySuccess'),
+                            success: () => t('surveySuccess'),
                             error: () => t('surveyError'),
                           }
                         );
@@ -780,8 +786,7 @@ export default function PackageCollection() {
                           handleSetCreated(packageCollection.id),
                           {
                             loading: 'Loading...',
-                            success: () =>
-                              t('confirmSuccess'),
+                            success: () => t('confirmSuccess'),
                             error: () => t('confirmError'),
                           }
                         );
@@ -813,17 +818,14 @@ export default function PackageCollection() {
                           {
                             loading: 'Loading...',
                             success: () =>
-                              `Estado atualizado para ${
-                                tStatus(next) ?? next
-                              }`,
+                              `Estado atualizado para ${tStatus(next) ?? next}`,
                             error: () => t('statusUpdateError'),
                           }
                         );
                       }}
                     />
                   )}
-                  {packageCollection.status !==
-                    CollectionStatus.FINISHED && (
+                  {packageCollection.status !== CollectionStatus.FINISHED && (
                     <ConfirmDialog
                       trigger={
                         <Button
@@ -840,10 +842,8 @@ export default function PackageCollection() {
                           handleDelete(packageCollection.id),
                           {
                             loading: 'Loading...',
-                            success: () =>
-                              t('deactivateSuccess'),
-                            error: () =>
-                              t('deactivateError'),
+                            success: () => t('deactivateSuccess'),
+                            error: () => t('deactivateError'),
                           }
                         );
                       }}
@@ -858,9 +858,7 @@ export default function PackageCollection() {
                   colSpan={7}
                   className="text-center text-sm text-gray-500"
                 >
-                  {
-                    t('empty')
-                  }
+                  {t('empty')}
                 </TableCell>
               </TableRow>
             )}
