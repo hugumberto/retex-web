@@ -94,7 +94,7 @@ export default function StorageUnit() {
     const ageGroup = escapeHtml(tAgeGroup(unit.ageGroup));
     const type = escapeHtml(tItemType(unit.type));
     const season = escapeHtml(tSeason(unit.season));
-    const qrSource = `https://api.qrserver.com/v1/create-bag-code/?size=220x220&data=${encodeURIComponent(
+    const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
       unit.id
     )}`;
 

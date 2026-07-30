@@ -155,7 +155,7 @@ export default function PackageCollection() {
     const labels = data
       .map((bag) => {
         const code = escapeHtml(bag.friendlyCode);
-        const qrSource = `https://api.qrserver.com/v1/create-bag-code/?size=300x300&margin=0&data=${encodeURIComponent(
+        const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=${encodeURIComponent(
           bag.token
         )}`;
         return `<div class="label"><img src="${qrSource}" alt="QR ${code}" /><div class="code">${code}</div></div>`;
@@ -221,7 +221,7 @@ export default function PackageCollection() {
     const routeDate = new Date(data.startDate).toLocaleDateString('pt-PT');
     const safeDate = escapeHtml(routeDate);
     const logoSource = `${window.location.origin}/assets/logo.png`;
-    const qrSource = `https://api.qrserver.com/v1/create-bag-code/?size=220x220&data=${encodeURIComponent(
+    const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
       data.id
     )}`;
 
@@ -263,7 +263,7 @@ export default function PackageCollection() {
             .replace(/\s+,/g, ',')
             .trim() || '-'
         );
-        const itemQrSource = `https://api.qrserver.com/v1/create-bag-code/?size=220x220&data=${encodeURIComponent(
+        const itemQrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
           pkg.id
         )}`;
 
