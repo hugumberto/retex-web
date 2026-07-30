@@ -27,13 +27,15 @@ import { Role } from '@/app/types/user';
 
 export type NavLeaf = {
   href: string;
-  label: string;
+  /** Chave de tradução no namespace `nav`. */
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
   roles: Role[];
 };
 
 export type NavGroup = {
-  label: string;
+  /** Chave de tradução no namespace `nav`. */
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
   roles: Role[];
   children: NavLeaf[];
@@ -54,128 +56,128 @@ export function cn(...inputs: ClassValue[]) {
 export const NAV_ITEMS: NavEntry[] = [
   {
     href: '/portal',
-    label: 'INÍCIO',
+    labelKey: 'nav.home',
     icon: LayoutDashboard,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
   },
   {
     href: '/portal/dashboard',
-    label: 'DASHBOARD',
+    labelKey: 'nav.dashboard',
     icon: BarChart3,
     roles: [Role.ADMIN],
   },
   {
     href: '/portal/triage',
-    label: 'TRIAGEM',
+    labelKey: 'nav.triage',
     icon: RefreshCw,
     roles: [Role.ADMIN, Role.OPS],
   },
   {
     href: '/portal/collection-request',
-    label: 'SOLICITAR RECOLHA',
+    labelKey: 'nav.collectionRequest',
     icon: HandHelping,
     roles: [Role.ADMIN, Role.OPS, Role.USER],
   },
   {
-    label: 'LOGÍSTICA',
+    labelKey: 'nav.logistics',
     icon: Truck,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
     children: [
       {
         href: '/portal/package-collection',
-        label: 'GERIR RECOLHA',
+        labelKey: 'nav.managePickup',
         icon: ClipboardList,
         roles: [Role.ADMIN, Role.OPS, Role.DRIVER],
       },
       {
         href: '/portal/storage-unit',
-        label: 'ARMAZENAMENTO',
+        labelKey: 'nav.storage',
         icon: Boxes,
         roles: [Role.ADMIN, Role.OPS],
       },
       {
         href: '/portal/coleta',
-        label: 'RECOLHA',
+        labelKey: 'nav.pickup',
         icon: PackageCheck,
         roles: [Role.ADMIN, Role.DRIVER],
       },
     ],
   },
   {
-    label: 'LANDING PAGE',
+    labelKey: 'nav.landingPage',
     icon: Globe,
     roles: [Role.ADMIN, Role.OPS],
     children: [
       {
         href: '/portal/blog',
-        label: 'Blog',
+        labelKey: 'nav.blog',
         icon: NewspaperIcon,
         roles: [Role.ADMIN, Role.OPS],
       },
       {
         href: '/portal/blog-categories',
-        label: 'Categorias',
+        labelKey: 'nav.categories',
         icon: Tags,
         roles: [Role.ADMIN, Role.OPS],
       },
       {
         href: '/portal/faq',
-        label: 'FAQ',
+        labelKey: 'nav.faq',
         icon: HelpCircle,
         roles: [Role.ADMIN, Role.OPS],
       },
     ],
   },
   {
-    label: 'CONFIGURAÇÕES',
+    labelKey: 'nav.settings',
     icon: Settings,
     roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
     children: [
       {
         href: '/portal/perfil',
-        label: 'Conta',
+        labelKey: 'nav.account',
         icon: CircleUser,
         roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER],
       },
       {
         href: '/portal/brand',
-        label: 'MARCA',
+        labelKey: 'nav.brand',
         icon: Tag,
         roles: [Role.ADMIN, Role.OPS],
       },
       {
         href: '/portal/user',
-        label: 'Utilizadores',
+        labelKey: 'nav.users',
         icon: UserIcon,
         roles: [Role.ADMIN],
       },
       {
         href: '/portal/zona',
-        label: 'Zonas',
+        labelKey: 'nav.zones',
         icon: MapPin,
         roles: [Role.ADMIN],
       },
       {
         href: '/portal/parametros',
-        label: 'Parâmetros',
+        labelKey: 'nav.parameters',
         icon: SlidersHorizontal,
         roles: [Role.ADMIN],
       },
       {
         href: '/portal/email-log',
-        label: 'Registo de Emails',
+        labelKey: 'nav.emailLog',
         icon: Mail,
         roles: [Role.ADMIN],
       },
       {
         href: '/portal/reset-password',
-        label: 'Repor Senha',
+        labelKey: 'nav.resetPassword',
         icon: KeyRound,
         roles: [Role.ADMIN],
       },
       {
         href: '/portal/bags',
-        label: 'Sacos do Pacote',
+        labelKey: 'nav.packageBags',
         icon: Package,
         roles: [Role.ADMIN],
       },

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { AddressDTO } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { DialogForm } from '@/components/form/dialog-form';
@@ -26,6 +27,8 @@ interface PasswordFormData {
 }
 
 export default function Perfil() {
+  const t = useTranslations('profile');
+  const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs, user, setUser } = useAppStore();
   const [addresses, setAddresses] = useState<AddressDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,13 +48,13 @@ export default function Perfil() {
       if (!isSuccessStatus(status)) throw new Error();
       setAddresses(data);
     } catch {
-      toast.error('Não foi possível carregar os endereços');
+      toast.error(t('addressesLoadError'));
     }
   }, []);
 
   useEffect(() => {
-    setPageTitle('Perfil');
-    setBreadcrumbs([{ label: 'Perfil', href: '/portal/perfil' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/perfil' }]);
     fetchAddresses();
     return () => {
       setPageTitle('');
@@ -66,10 +69,10 @@ export default function Perfil() {
       if (!isSuccessStatus(res.status)) throw new Error();
       if (user) setUser({ ...user, contactPhone: data.contactPhone });
       setContactOpen(false);
-      toast.success('Contacto actualizado');
+      toast.success(t('contactUpdated'));
     } catch (err) {
       const message = (err as AxiosError<{ message: string }>)?.response?.data?.message
-        ?? 'Não foi possível actualizar o contacto';
+        ?? t('contactUpdateError');
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -78,7 +81,7 @@ export default function Perfil() {
 
   const submitPassword = passwordForm.handleSubmit(async (data) => {
     if (data.newPassword !== data.confirmPassword) {
-      passwordForm.setError('confirmPassword', { message: 'As palavras-passe não coincidem' });
+      passwordForm.setError('confirmPassword', { message: t('passwordsDoNotMatch') });
       return;
     }
     setIsSubmitting(true);
@@ -87,10 +90,10 @@ export default function Perfil() {
       if (!isSuccessStatus(res.status) && res.status !== 204) throw new Error();
       passwordForm.reset();
       setPasswordOpen(false);
-      toast.success('Palavra-passe alterada com sucesso');
+      toast.success(t('passwordChanged'));
     } catch (err) {
       const message = (err as AxiosError<{ message: string }>)?.response?.data?.message
-        ?? 'Não foi possível alterar a palavra-passe';
+        ?? t('passwordChangeError');
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -104,9 +107,9 @@ export default function Perfil() {
         const res = await api.patch(`/me/address/${id}/default`);
         if (!isSuccessStatus(res.status)) throw new Error();
         await fetchAddresses();
-        toast.success('Endereço padrão actualizado');
+        toast.success(t('defaultAddressUpdated'));
       } catch {
-        toast.error('Erro ao definir endereço padrão');
+        toast.error(t('defaultAddressError'));
       } finally {
         setIsSubmitting(false);
       }
@@ -125,11 +128,11 @@ export default function Perfil() {
             await fetchAddresses();
           })(),
           {
-            loading: 'A eliminar...',
-            success: 'Endereço eliminado',
+            loading: tCommon('deleting'),
+            success: t('addressDeleted'),
             error: (err) =>
               (err as AxiosError<{ message?: string }>)?.response?.data
-                ?.message ?? 'Erro ao eliminar endereço',
+                ?.message ?? t('addressDeleteError'),
           }
         );
       } finally {
@@ -143,7 +146,7 @@ export default function Perfil() {
     <section id="perfil-page" className="flex flex-col gap-6">
       {/* User info card */}
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
-        <h2 className="text-lg font-semibold text-secondary mb-4">Dados Pessoais</h2>
+        <h2 className="text-lg font-semibold text-secondary mb-4">{t('personalData')}</h2>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
             <p className="font-medium text-foreground">
@@ -157,8 +160,8 @@ export default function Perfil() {
           </div>
           <div className="flex gap-2">
             <DialogForm<ContactFormData>
-              title="Editar Contacto"
-              confirmText="Guardar"
+              title={t('editContact')}
+              confirmText={tCommon('save')}
               loading={isSubmitting}
               errors={contactForm.formState.errors}
               onConfirm={submitContact}
@@ -167,18 +170,18 @@ export default function Perfil() {
                 setContactOpen(open);
                 if (!open) contactForm.reset({ contactPhone: user?.contactPhone ?? '' });
               }}
-              trigger={<Button variant="outline" size="sm">Editar Contacto</Button>}
+              trigger={<Button variant="outline" size="sm">{t('editContact')}</Button>}
             >
               <Input
-                placeholder="Contacto telefónico*"
+                placeholder={t('phonePlaceholder')}
                 className={contactForm.formState.errors.contactPhone ? 'border-red-500' : ''}
-                {...contactForm.register('contactPhone', { required: 'Campo obrigatório' })}
+                {...contactForm.register('contactPhone', { required: tCommon('requiredField') })}
               />
             </DialogForm>
 
             <DialogForm<PasswordFormData>
-              title="Alterar Palavra-passe"
-              confirmText="Alterar"
+              title={t('changePassword')}
+              confirmText={t('changeConfirm')}
               loading={isSubmitting}
               errors={passwordForm.formState.errors}
               onConfirm={submitPassword}
@@ -187,14 +190,14 @@ export default function Perfil() {
                 setPasswordOpen(open);
                 if (!open) passwordForm.reset();
               }}
-              trigger={<Button variant="outline" size="sm">Alterar Palavra-passe</Button>}
+              trigger={<Button variant="outline" size="sm">{t('changePassword')}</Button>}
             >
               <div className="flex flex-col gap-3">
                 <Input
                   type="password"
-                  placeholder="Palavra-passe actual*"
+                  placeholder={t('currentPasswordPlaceholder')}
                   className={passwordForm.formState.errors.currentPassword ? 'border-red-500' : ''}
-                  {...passwordForm.register('currentPassword', { required: 'Campo obrigatório' })}
+                  {...passwordForm.register('currentPassword', { required: tCommon('requiredField') })}
                 />
                 {passwordForm.formState.errors.currentPassword && (
                   <p className="text-xs text-destructive">
@@ -203,11 +206,11 @@ export default function Perfil() {
                 )}
                 <Input
                   type="password"
-                  placeholder="Nova palavra-passe*"
+                  placeholder={t('newPasswordPlaceholder')}
                   className={passwordForm.formState.errors.newPassword ? 'border-red-500' : ''}
                   {...passwordForm.register('newPassword', {
-                    required: 'Campo obrigatório',
-                    minLength: { value: 6, message: 'Mínimo 6 caracteres' },
+                    required: tCommon('requiredField'),
+                    minLength: { value: 6, message: t('passwordMinLength') },
                   })}
                 />
                 {passwordForm.formState.errors.newPassword && (
@@ -217,9 +220,9 @@ export default function Perfil() {
                 )}
                 <Input
                   type="password"
-                  placeholder="Confirmar palavra-passe*"
+                  placeholder={t('confirmPasswordPlaceholder')}
                   className={passwordForm.formState.errors.confirmPassword ? 'border-red-500' : ''}
-                  {...passwordForm.register('confirmPassword', { required: 'Campo obrigatório' })}
+                  {...passwordForm.register('confirmPassword', { required: tCommon('requiredField') })}
                 />
                 {passwordForm.formState.errors.confirmPassword && (
                   <p className="text-xs text-destructive">
@@ -239,7 +242,7 @@ export default function Perfil() {
 
       {addresses.length === 0 ? (
         <p className="text-center text-muted-foreground py-12">
-          Não tens endereços guardados.
+          {t('noAddresses')}
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -250,7 +253,7 @@ export default function Perfil() {
             >
               {addr.isDefault && (
                 <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs text-white">
-                  <Star className="size-3" /> Padrão
+                  <Star className="size-3" /> {t('default')}
                 </span>
               )}
 
@@ -270,8 +273,8 @@ export default function Perfil() {
 
               <div className={`flex items-center gap-1.5 text-xs font-medium ${addr.isInServiceZone ? 'text-emerald-600' : 'text-slate-400'}`}>
                 {addr.isInServiceZone
-                  ? <><CheckCircle2 className="size-3.5" /> Zona de actuação</>
-                  : <><XCircle className="size-3.5" /> Fora da zona de actuação</>
+                  ? <><CheckCircle2 className="size-3.5" /> {t('inServiceZone')}</>
+                  : <><XCircle className="size-3.5" /> {t('outOfServiceZone')}</>
                 }
               </div>
 
@@ -284,7 +287,7 @@ export default function Perfil() {
                     onClick={() => handleSetDefault(addr.id)}
                     className="text-xs"
                   >
-                    Definir padrão
+                    {t('setDefault')}
                   </Button>
                 )}
                 <ConfirmDialog

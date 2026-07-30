@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import * as React from 'react';
 import { format, isBefore, startOfDay } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
@@ -28,6 +29,7 @@ export function DatePicker({
   placeholder,
   disabled,
 }: DatePickerProps) {
+  const t = useTranslations('common');
   const [date, setDate] = React.useState<Date | undefined>(selected);
 
   React.useEffect(() => {
@@ -55,7 +57,7 @@ export function DatePicker({
           {date ? (
             format(date, 'dd-MM-yyyy')
           ) : (
-            <span>{placeholder || 'Pick a date'}</span>
+            <span>{placeholder || t('pickDate')}</span>
           )}
         </Button>
       </PopoverTrigger>

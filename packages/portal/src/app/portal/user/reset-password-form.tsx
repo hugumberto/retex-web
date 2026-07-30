@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Role, UserDTO } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { DialogForm } from '@/components/form/dialog-form';
@@ -24,13 +25,23 @@ type ResetPasswordFormProps = {
   user: UserDTO;
 };
 
-const triggerButton = (
-  <Button variant="ghost" size="icon" className="size-8" title="Repor senha">
-    <KeyRound className="size-4" />
-  </Button>
-);
+function TriggerButton() {
+  const t = useTranslations('users');
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="size-8"
+      title={t('resetPasswordTooltip')}
+    >
+      <KeyRound className="size-4" />
+    </Button>
+  );
+}
 
 export default function ResetPasswordForm({ user }: ResetPasswordFormProps) {
+  const t = useTranslations('users');
   const { user: currentUser } = useAppStore();
   const isAdmin = getUserRoles(currentUser).includes(Role.ADMIN);
 
@@ -39,21 +50,21 @@ export default function ResetPasswordForm({ user }: ResetPasswordFormProps) {
   if (isAdmin) {
     const handleSend = async () => {
       try {
-        toast.loading('A enviar email de ativação...', { id: 'send-activation' });
+        toast.loading(t('sendingActivation'), { id: 'send-activation' });
         await sendActivationEmail(user.email);
-        toast.success('Email de ativação enviado', { id: 'send-activation' });
+        toast.success(t('sendActivationSuccess'), { id: 'send-activation' });
       } catch (error) {
-        toast.error('Não foi possível enviar o email', { id: 'send-activation' });
+        toast.error(t('sendActivationError'), { id: 'send-activation' });
         console.error('Erro ao enviar email de ativação:', error);
       }
     };
 
     return (
       <ConfirmDialog
-        trigger={triggerButton}
-        title="Enviar email de ativação"
+        trigger={<TriggerButton />}
+        title={t('sendActivationTitle')}
         description={`Vai ser enviado um email para ${user.firstName} ${user.lastName} definir uma nova senha. A conta fica inativa até concluir a ativação.`}
-        confirmText="Enviar"
+        confirmText={t('sendConfirm')}
         onConfirm={handleSend}
       />
     );
@@ -64,6 +75,8 @@ export default function ResetPasswordForm({ user }: ResetPasswordFormProps) {
 }
 
 function ManualResetForm({ user }: ResetPasswordFormProps) {
+  const t = useTranslations('users');
+  const tValidation = useTranslations('validation');
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -79,7 +92,7 @@ function ManualResetForm({ user }: ResetPasswordFormProps) {
 
   const onSubmit = async (formData: ResetPasswordFormData) => {
     try {
-      toast.loading('Resetando senha...', { id: 'reset-password' });
+      toast.loading(t('resettingPassword'), { id: 'reset-password' });
 
       const { status } = await api.put('/user/reset-password', {
         email: user.email,
@@ -87,17 +100,17 @@ function ManualResetForm({ user }: ResetPasswordFormProps) {
       });
 
       if (!isSuccessStatus(status)) {
-        throw new Error('Erro ao resetar senha do usuário');
+        throw new Error(t('resetPasswordError'));
       }
 
-      toast.success('Senha resetada com sucesso', { id: 'reset-password' });
+      toast.success(t('resetPasswordSuccess'), { id: 'reset-password' });
       reset({
         email: user.email,
         password: '',
       });
       setIsOpen(false);
     } catch (error) {
-      toast.error('Não foi possível resetar a senha', { id: 'reset-password' });
+      toast.error(t('resetPasswordError'), { id: 'reset-password' });
       console.error('Erro ao resetar senha do usuário:', error);
     }
   };
@@ -106,13 +119,15 @@ function ManualResetForm({ user }: ResetPasswordFormProps) {
     <DialogForm<ResetPasswordFormData>
       open={isOpen}
       onOpenChange={setIsOpen}
-      title="Resetar Senha"
-      description={`Defina uma nova senha para ${user.firstName} ${user.lastName}.`}
-      confirmText="Resetar"
+      title={t('resetPasswordTitle')}
+      description={t('resetPasswordDescription', {
+        name: `${user.firstName} ${user.lastName}`,
+      })}
+      confirmText={t('resetConfirm')}
       loading={isSubmitting}
       onConfirm={handleSubmit(onSubmit)}
       errors={errors}
-      trigger={triggerButton}
+      trigger={<TriggerButton />}
     >
       <div className="space-y-4">
         <div>
@@ -124,22 +139,22 @@ function ManualResetForm({ user }: ResetPasswordFormProps) {
 
         <div>
           <label className="block text-sm font-medium text-secondary">
-            Nova senha
+            {t('newPassword')}
           </label>
           <Input
             type="password"
-            placeholder="Informe a nova senha"
+            placeholder={t('newPasswordPlaceholder')}
             className={`mt-1 ${errors.password ? 'border-red-500' : ''}`}
             {...register('password', {
-              required: 'A nova senha é obrigatória',
+              required: tValidation('passwordRequired'),
               minLength: {
                 value: 8,
-                message: 'A senha deve ter pelo menos 8 caracteres',
+                message: tValidation('passwordMinLength'),
               },
               pattern: {
                 value: /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/,
                 message:
-                  'A senha deve conter ao menos 1 letra maiúscula, 1 número e 1 caractere especial',
+                  tValidation('passwordPattern'),
               },
             })}
           />

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import {
   CollectionInterval,
   CollectionStatus,
@@ -35,13 +36,21 @@ import { CollectionRequestDTO, CollectionRequestStatus } from '../../types/colle
 import { Role, UserDTO, UserStatus } from '../../types/user';
 import { hasValidCoords, minDistanceKm, readCoords } from './utils';
 
+// O placeholder do mapa é um componente próprio para poder usar o hook de
+// traduções (o `loading` do dynamic corre fora do componente pai).
+function MapLoading() {
+  const t = useTranslations('packageCollection');
+
+  return (
+    <div className="flex h-[420px] w-full items-center justify-center rounded-lg border border-secondary/25 text-muted-foreground">
+      {t('loadingMap')}
+    </div>
+  );
+}
+
 const CollectionMap = dynamic(() => import('./components/collection-map'), {
   ssr: false,
-  loading: () => (
-    <div className="flex h-[420px] w-full items-center justify-center rounded-lg border border-secondary/25 text-muted-foreground">
-      A carregar mapa...
-    </div>
-  ),
+  loading: () => <MapLoading />,
 });
 
 // Solicitações a até este raio (km) de um ponto selecionado são sugeridas.
@@ -68,6 +77,8 @@ export default function PackageCollectionForm({
   packageCollectionId,
   onSave,
 }: PackageCollectionFormProps) {
+  const t = useTranslations('packageCollection');
+  const tCommon = useTranslations('common');
   const {
     control,
     handleSubmit,
@@ -261,13 +272,13 @@ export default function PackageCollectionForm({
 
   const optimizeRoute = useCallback(async () => {
     if (selectedWithCoords.length < 2) {
-      toast.error('Selecione ao menos 2 solicitações com localização');
+      toast.error(t('optimizeMinimum'));
       return;
     }
 
     const apiKey = process.env.NEXT_PUBLIC_TOMTOM_API_KEY;
     if (!apiKey) {
-      toast.error('Configuração do mapa indisponível');
+      toast.error(t('mapUnavailable'));
       return;
     }
 
@@ -316,10 +327,10 @@ export default function PackageCollectionForm({
         setOptimizedOrderIds(selectedWithCoords.map((pkg) => pkg.id));
       }
 
-      toast.success('Rota otimizada calculada');
+      toast.success(t('optimizeSuccess'));
     } catch (error) {
       console.error('Erro ao calcular rota:', error);
-      toast.error('Não foi possível calcular a rota otimizada');
+      toast.error(t('optimizeError'));
     } finally {
       setIsOptimizing(false);
     }
@@ -386,8 +397,8 @@ export default function PackageCollectionForm({
 
   return (
     <DialogForm
-      triggerText="Criar"
-      title="Recolha de Encomendas"
+      triggerText={tCommon('create')}
+      title={t('formTitle')}
       onConfirm={handleSubmit(submit)}
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
@@ -400,7 +411,7 @@ export default function PackageCollectionForm({
           </Button>
         ) : (
           <Button variant="secondary" className="ml-auto block">
-            Criar
+            {tCommon('create')}
           </Button>
         )
       }
@@ -408,10 +419,10 @@ export default function PackageCollectionForm({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <div className="md:col-span-2">
           <SelectForm
-            label="Motorista"
+            label={t('driver')}
             name="driverId"
             control={control}
-            rules={{ required: 'O motorista é obrigatório' }}
+            rules={{ required: t('driverRequired') }}
             options={driverOptions}
             errors={errors}
             disabled={isLocked}
@@ -420,10 +431,10 @@ export default function PackageCollectionForm({
 
         <div>
           <DatePickerForm
-            label="Data da Recolha"
+            label={t('pickupDate')}
             name="startDate"
             control={control}
-            rules={{ required: 'A data é obrigatória' }}
+            rules={{ required: t('dateRequired') }}
             errors={errors}
             disabled={isLocked}
           />
@@ -431,10 +442,10 @@ export default function PackageCollectionForm({
 
         <div>
           <SelectForm
-            label="Intervalo da Recolha"
+            label={t('pickupInterval')}
             name="collectionInterval"
             control={control}
-            rules={{ required: 'O intervalo é obrigatório' }}
+            rules={{ required: t('intervalRequired') }}
             options={intervalOptions}
             errors={errors}
             disabled={isLocked}
@@ -444,8 +455,7 @@ export default function PackageCollectionForm({
         {isLocked && (
           <div className="md:col-span-4">
             <p className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
-              Rota confirmada — motorista, solicitações e data ficam bloqueados.
-              Apenas o estado pode avançar.
+              {t('lockedRouteWarning')}
             </p>
           </div>
         )}
@@ -458,7 +468,7 @@ export default function PackageCollectionForm({
           {/* Mapa das solicitações elegíveis */}
           <div className="pt-6">
             <div className="mb-3 flex items-center justify-between">
-              <Title as="h3">Mapa das solicitações</Title>
+              <Title as="h3">{t('requestsMap')}</Title>
               <Button
                 type="button"
                 variant="secondary"
@@ -467,7 +477,7 @@ export default function PackageCollectionForm({
                   isOptimizing || selectedWithCoords.length < 2 || isLocked
                 }
               >
-                {isOptimizing ? 'A otimizar...' : 'Otimizar rota'}
+                {isOptimizing ? t('optimizing') : t('optimizeRoute')}
               </Button>
             </div>
             <CollectionMap
@@ -486,7 +496,7 @@ export default function PackageCollectionForm({
           {/* Ordem sugerida da rota */}
           {optimizedOrderIds.length > 0 && (
             <div className="pt-6">
-              <Title as="h3">Ordem sugerida da rota</Title>
+              <Title as="h3">{t('suggestedOrder')}</Title>
               <ol className="mt-3 list-decimal space-y-1 pl-6 text-sm">
                 {optimizedOrderIds.map((id) => {
                   const pkg = collectionRequestsById.get(id);
@@ -499,14 +509,14 @@ export default function PackageCollectionForm({
           {/* Sugeridas perto da rota (abaixo do mapa) */}
           {suggestedIds.length > 0 && (
             <div className="pt-6">
-              <Title as="h3">Sugeridas perto da rota</Title>
+              <Title as="h3">{t('suggestedNearRoute')}</Title>
               <div className="mt-4 w-full">
                 <Table containerClassName="max-h-[18vh]">
                   <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                     <TableRow>
-                      <TableHead className="whitespace-normal">Solicitante</TableHead>
-                      <TableHead>Sacos</TableHead>
-                      <TableHead>Ação</TableHead>
+                      <TableHead className="whitespace-normal">{t('requester')}</TableHead>
+                      <TableHead>{tCommon('bags')}</TableHead>
+                      <TableHead>{tCommon('action')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -548,15 +558,15 @@ export default function PackageCollectionForm({
         <div className="min-w-0">
           {/* Seleção de solicitações elegíveis */}
           <div className="pt-6">
-            <Title as="h3">Seleção de Recolhas</Title>
+            <Title as="h3">{t('requestSelection')}</Title>
             <div className="mt-4 w-full">
               <Table containerClassName="max-h-[50vh]">
                 <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                   <TableRow>
                     <TableHead className="w-10"></TableHead>
-                    <TableHead className="whitespace-normal">Solicitante</TableHead>
-                    <TableHead>Cidade</TableHead>
-                    <TableHead>Sacos</TableHead>
+                    <TableHead className="whitespace-normal">{t('requester')}</TableHead>
+                    <TableHead>{tCommon('city')}</TableHead>
+                    <TableHead>{tCommon('bags')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -589,7 +599,7 @@ export default function PackageCollectionForm({
                         colSpan={5}
                         className="text-center py-6 text-muted-foreground"
                       >
-                        Nenhuma solicitação elegível!
+                        {t('noEligibleRequests')}
                       </TableCell>
                     </TableRow>
                   )}
@@ -601,20 +611,19 @@ export default function PackageCollectionForm({
           {/* Solicitações sem localização (não aparecem no mapa) */}
           {eligibleWithoutCoords.length > 0 && (
             <div className="pt-6">
-              <Title as="h3">Sem localização</Title>
+              <Title as="h3">{t('noLocation')}</Title>
               <p className="mt-1 text-xs text-muted-foreground">
-                Sem coordenadas válidas — não aparecem no mapa, mas podem ser
-                selecionadas.
+                {t('noValidCoordinates')}
               </p>
               <div className="mt-3 w-full">
                 <Table containerClassName="max-h-[32vh]">
                   <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                     <TableRow>
                       <TableHead></TableHead>
-                      <TableHead>Solicitante</TableHead>
-                      <TableHead>Morada</TableHead>
-                      <TableHead>Cidade</TableHead>
-                      <TableHead>Sacos</TableHead>
+                      <TableHead>{t('requester')}</TableHead>
+                      <TableHead>{tCommon('address')}</TableHead>
+                      <TableHead>{tCommon('city')}</TableHead>
+                      <TableHead>{tCommon('bags')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

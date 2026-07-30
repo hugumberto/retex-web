@@ -1,5 +1,6 @@
 'use client';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import {
   Breadcrumb,
@@ -10,6 +11,7 @@ import {
 } from '../ui/breadcrumb';
 
 export const Breadcrumbs = () => {
+  const t = useTranslations('common');
   const { breadcrumbs } = useAppStore();
 
   return (
@@ -17,7 +19,7 @@ export const Breadcrumbs = () => {
       <BreadcrumbList>
         {breadcrumbs.length > 0 && (
           <BreadcrumbItem>
-            <BreadcrumbLink href="/portal">Home</BreadcrumbLink>
+            <BreadcrumbLink href="/portal">{t('home')}</BreadcrumbLink>
           </BreadcrumbItem>
         )}
         {breadcrumbs.map((seg, idx) => {

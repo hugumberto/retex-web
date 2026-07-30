@@ -1,9 +1,9 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import {
   PackageCollectionDTO,
   CollectionStatus,
-  COLLECTION_STATUS_LABEL,
   PackageCollectionTableDTO,
 } from '@/app/types/package-collection';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
@@ -50,6 +50,9 @@ const escapeHtml = (value: string) =>
     .replace(/'/g, '&#39;');
 
 export default function PackageCollection() {
+  const t = useTranslations('packageCollection');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionStatus');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,8 +68,8 @@ export default function PackageCollection() {
   };
 
   useEffect(() => {
-    setPageTitle('Gerir Recolha');
-    setBreadcrumbs([{ label: 'Gerir Recolha', href: '/portal/package-collection' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/package-collection' }]);
     fetchData();
     return () => {
       setPageTitle('');
@@ -137,15 +140,15 @@ export default function PackageCollection() {
       `/route/${id}/bags`
     );
     if (status !== 200) {
-      throw new Error('Erro ao buscar os QR codes da rota');
+      throw new Error(t('qrFetchError'));
     }
     if (!data.length) {
-      throw new Error('Nenhum QR code gerado para esta rota');
+      throw new Error(t('noQrCodes'));
     }
 
     const printWindow = window.open('', '_blank', 'width=1024,height=900');
     if (!printWindow) {
-      throw new Error('Permita pop-ups para imprimir');
+      throw new Error(t('popupBlocked'));
     }
 
     // A impressora usa etiquetas de 40x60mm (retrato): um QR code por página/etiqueta.
@@ -162,7 +165,7 @@ export default function PackageCollection() {
     printWindow.document.write(`
       <html>
         <head>
-          <title>QR Codes da Rota</title>
+          <title>${t('qrCodesTitle')}</title>
           <style>
             @page { size: 40mm 60mm; margin: 0; }
             html, body { margin:0; padding:0; font-family: Arial, sans-serif; color:#013364; }
@@ -201,12 +204,12 @@ export default function PackageCollection() {
       `/route/${id}`
     );
     if (status !== 200) {
-      throw new Error('Erro ao buscar dados da rota para impressão');
+      throw new Error(t('printFetchError'));
     }
 
     const printWindow = window.open('', '_blank', 'width=1024,height=900');
     if (!printWindow) {
-      throw new Error('Permita pop-ups para imprimir');
+      throw new Error(t('popupBlocked'));
     }
 
     const routeId = escapeHtml(data.id);
@@ -240,7 +243,9 @@ export default function PackageCollection() {
 
     const tableRows =
       rows ||
-      '<tr><td colspan="3" style="text-align:center;color:#6b7280;">Sem itens na rota</td></tr>';
+      `<tr><td colspan="3" style="text-align:center;color:#6b7280;">${t(
+        'noRouteItems'
+      )}</td></tr>`;
 
     const itemPages = data.collectionRequests
       .map((pkg, index) => {
@@ -267,55 +272,55 @@ export default function PackageCollection() {
             <header class="item-header">
               <img class="logo small" src="${logoSource}" alt="Retex" />
               <div class="meta">
-                <p><strong>Rota:</strong> ${routeCode}</p>
-                <p><strong>Item:</strong> ${itemCode}</p>
-                <p><strong>Data:</strong> ${safeDate}</p>
-                <p><strong>Página:</strong> ${index + 2}</p>
+                <p><strong>${t('routeWithColon')}</strong> ${routeCode}</p>
+                <p><strong>${t('itemWithColon')}</strong> ${itemCode}</p>
+                <p><strong>${t('dateWithColon')}</strong> ${safeDate}</p>
+                <p><strong>${t('page')}</strong> ${index + 2}</p>
               </div>
               <img class="bag" src="${itemQrSource}" alt="QR Item ${itemId}" />
             </header>
 
             <section class="content">
-              <h2 class="table-title">Detalhes do Item</h2>
+              <h2 class="table-title">${t('itemDetails')}</h2>
               <div class="detail-grid">
                 <div class="detail-card">
-                  <h3>Dados do Requerente</h3>
-                  <p><strong>Nome:</strong> ${requesterName}</p>
-                  <p><strong>Email:</strong> ${requesterEmail}</p>
-                  <p><strong>Telefone:</strong> ${requesterPhone}</p>
+                  <h3>${t('requesterData')}</h3>
+                  <p><strong>${t('nameWithColon')}</strong> ${requesterName}</p>
+                  <p><strong>${t('emailWithColon')}</strong> ${requesterEmail}</p>
+                  <p><strong>${t('phoneWithColon')}</strong> ${requesterPhone}</p>
                 </div>
                 <div class="detail-card">
-                  <h3>Endereço de Recolha</h3>
+                  <h3>${t('pickupAddress')}</h3>
                   <p>${fullAddress}</p>
                 </div>
               </div>
 
               <div class="outside-signature">
-                <span>Assinatura do Cliente</span>
+                <span>${t('customerSignature')}</span>
                 <div class="signature-line"></div>
               </div>
 
               <div class="receipt-block">
                 <div class="cut-line">
-                  <span>Linha de Corte</span>
+                  <span>${t('cutLine')}</span>
                 </div>
 
                 <section class="receipt">
-                  <div class="receipt-header">RECIBO DO CLIENTE</div>
+                  <div class="receipt-header">${t('customerReceipt')}</div>
                   <div class="receipt-content">
                     <div class="receipt-body">
-                      <p><strong>Código do Item:</strong> ${itemCode}</p>
-                      <p><strong>Rota:</strong> ${routeCode}</p>
-                      <p><strong>Data:</strong> ${safeDate}</p>
-                      <p><strong>Motorista:</strong> ${driverName}</p>
-                      <p><strong>Cliente:</strong> ${requesterName}</p>
-                      <p><strong>Endereço:</strong> ${fullAddress}</p>
+                      <p><strong>${t('itemCode')}</strong> ${itemCode}</p>
+                      <p><strong>${t('routeCode')}</strong> ${routeCode}</p>
+                      <p><strong>${t('dateWithColon')}</strong> ${safeDate}</p>
+                      <p><strong>${t('driverWithColon')}</strong> ${driverName}</p>
+                      <p><strong>${t('customerWithColon')}</strong> ${requesterName}</p>
+                      <p><strong>${t('addressWithColon')}</strong> ${fullAddress}</p>
                     </div>
                     <img class="receipt-bag" src="${itemQrSource}" alt="QR Recibo ${itemId}" />
                   </div>
                   <div class="receipt-signatures">
                     <div>
-                      <span>Assinatura do Motorista</span>
+                      <span>${t('driverSignature')}</span>
                       <div class="signature-line"></div>
                     </div>
                   </div>
@@ -542,21 +547,21 @@ export default function PackageCollection() {
               <div>
                 <img class="logo" src="${logoSource}" alt="Retex" />
                 <div class="meta">
-                  <p><strong>Código da Rota:</strong> ${routeCode}</p>
-                  <p><strong>Data:</strong> ${safeDate}</p>
-                  <p><strong>Motorista:</strong> ${driverName}</p>
+                  <p><strong>${t('routeCode')}</strong> ${routeCode}</p>
+                  <p><strong>${t('dateWithColon')}</strong> ${safeDate}</p>
+                  <p><strong>${t('driverWithColon')}</strong> ${driverName}</p>
                 </div>
               </div>
               <img class="bag" src="${qrSource}" alt="QR ${routeId}" />
             </header>
             <section class="content">
-              <h2 class="table-title">Peças da Rota</h2>
+              <h2 class="table-title">${t('routeItems')}</h2>
               <table>
                 <thead>
                   <tr>
-                    <th>Código</th>
-                    <th>Requerente</th>
-                    <th>Endereço</th>
+                    <th>${tCommon('code')}</th>
+                    <th>{t('requester')}</th>
+                    <th>${tCommon('address')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -589,13 +594,13 @@ export default function PackageCollection() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Motorista</TableHead>
-              <TableHead>Data de Recolha</TableHead>
-              <TableHead>Qtd. Encomendas</TableHead>
-              <TableHead>Confirmações</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Ação</TableHead>
+              <TableHead>{tCommon('code')}</TableHead>
+              <TableHead>{t('driver')}</TableHead>
+              <TableHead>{t('pickupDate')}</TableHead>
+              <TableHead>{t('requestCount')}</TableHead>
+              <TableHead>{t('confirmations')}</TableHead>
+              <TableHead>{tCommon('status')}</TableHead>
+              <TableHead>{tCommon('action')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -631,7 +636,7 @@ export default function PackageCollection() {
                         : 'bg-green-100 text-green-800'
                     }`}
                   >
-                    {COLLECTION_STATUS_LABEL[packageCollection.status] ??
+                    {tStatus(packageCollection.status) ??
                       packageCollection.status}
                   </span>
                 </TableCell>
@@ -648,13 +653,13 @@ export default function PackageCollection() {
                       await toast.promise(
                         handlePrintRoute(packageCollection.id),
                         {
-                          loading: 'A preparar impressão...',
-                          success: () => 'Impressão pronta',
-                          error: () => 'Erro ao preparar impressão da rota',
+                          loading: t('preparingPrint'),
+                          success: () => t('printReady'),
+                          error: () => t('printError'),
                         }
                       );
                     }}
-                    title="Imprimir rota"
+                    title={t('printRouteTooltip')}
                   >
                     <PrinterIcon />
                   </Button>
@@ -670,15 +675,15 @@ export default function PackageCollection() {
                         await toast.promise(
                           handlePrintQrCodes(packageCollection.id),
                           {
-                            loading: 'A preparar QR codes...',
-                            success: () => 'Impressão de QR codes pronta',
+                            loading: t('preparingQr'),
+                            success: () => t('qrPrintReady'),
                             error: (e) =>
                               (e as Error)?.message ||
-                              'Erro ao imprimir QR codes',
+                              t('qrPrintError'),
                           }
                         );
                       }}
-                      title="Imprimir QR codes da rota"
+                      title={t('printQrTooltip')}
                     >
                       <QrCodeIcon />
                     </Button>
@@ -686,16 +691,16 @@ export default function PackageCollection() {
                   {packageCollection.status ===
                     CollectionStatus.FINISHED && (
                     <ConfirmDialog
-                      title="Disparar questionário"
-                      description="Enviar o questionário de satisfação a todos os clientes desta recolha?"
-                      confirmText="Disparar"
+                      title={t('surveyTitle')}
+                      description={t('surveyDescription')}
+                      confirmText={t('surveyConfirm')}
                       trigger={
                         <Button
                           variant="ghost"
                           size="icon"
                           disabled={isSubmitting}
                           className="size-8 text-secondary hover:text-secondary/80"
-                          title="Disparar questionário de satisfação"
+                          title={t('surveyTooltip')}
                         >
                           <MailIcon />
                         </Button>
@@ -704,10 +709,10 @@ export default function PackageCollection() {
                         await toast.promise(
                           handleDispatchSurvey(packageCollection.id),
                           {
-                            loading: 'A enviar questionário...',
+                            loading: t('sendingSurvey'),
                             success: () =>
-                              'Questionário enviado aos clientes',
-                            error: () => 'Erro ao enviar o questionário',
+                              t('surveySuccess'),
+                            error: () => t('surveyError'),
                           }
                         );
                       }}
@@ -725,7 +730,7 @@ export default function PackageCollection() {
                           size="icon"
                           disabled={isSubmitting}
                           className="size-8 text-green-600 hover:text-green-700"
-                          title="Confirmar recolha (estado Created)"
+                          title={t('confirmTooltip')}
                         >
                           <CheckCircle2Icon />
                         </Button>
@@ -736,8 +741,8 @@ export default function PackageCollection() {
                           {
                             loading: 'Loading...',
                             success: () =>
-                              'Recolha confirmada e emails enviados aos clientes',
-                            error: () => 'Erro ao confirmar a recolha',
+                              t('confirmSuccess'),
+                            error: () => t('confirmError'),
                           }
                         );
                       }}
@@ -751,11 +756,11 @@ export default function PackageCollection() {
                           size="icon"
                           disabled={isSubmitting}
                           className="size-8 text-blue-600 hover:text-blue-700"
-                          title={`Avançar para ${
-                            COLLECTION_STATUS_LABEL[
+                          title={t('advanceTo', {
+                            status: tStatus(
                               NEXT_STATUS[packageCollection.status]!
-                            ]
-                          }`}
+                            ),
+                          })}
                         >
                           <ChevronsRightIcon />
                         </Button>
@@ -769,9 +774,9 @@ export default function PackageCollection() {
                             loading: 'Loading...',
                             success: () =>
                               `Estado atualizado para ${
-                                COLLECTION_STATUS_LABEL[next] ?? next
+                                tStatus(next) ?? next
                               }`,
-                            error: () => 'Erro ao atualizar o estado',
+                            error: () => t('statusUpdateError'),
                           }
                         );
                       }}
@@ -796,9 +801,9 @@ export default function PackageCollection() {
                           {
                             loading: 'Loading...',
                             success: () =>
-                              'Recolha de Encomendas desativada com sucesso',
+                              t('deactivateSuccess'),
                             error: () =>
-                              'Erro ao desativar a recolha de encomendas',
+                              t('deactivateError'),
                           }
                         );
                       }}
@@ -814,7 +819,7 @@ export default function PackageCollection() {
                   className="text-center text-sm text-gray-500"
                 >
                   {
-                    ' Nenhuma recolha de encomendas encontrada. Clique em "Criar Nova Recolha de Encomendas" para adicionar uma.'
+                    t('empty')
                   }
                 </TableCell>
               </TableRow>

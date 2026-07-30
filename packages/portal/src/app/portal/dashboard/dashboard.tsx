@@ -1,7 +1,8 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { DashboardStatsDTO } from '@/app/types/dashboard';
-import { CollectionRequestStatus, Quality, Season, Type } from '@/app/types/collection-request';
+import { CollectionRequestStatus, Quality } from '@/app/types/collection-request';
 import {
   Card,
   CardContent,
@@ -19,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
-import { STATUS_COLOR, STATUS_LABEL } from '@/lib/collection-request-status';
+import { STATUS_COLOR } from '@/lib/collection-request-status';
 import { useAppStore } from '@/store';
 import {
   Boxes,
@@ -48,26 +49,10 @@ import {
 } from 'recharts';
 import { toast } from 'sonner';
 
-const QUALITY_LABEL: Record<string, string> = {
-  [Quality.GOOD]: 'Boa',
-  [Quality.MEDIUM]: 'Média',
-  [Quality.BAD]: 'Má',
-};
-
 const QUALITY_COLOR: Record<string, string> = {
   [Quality.GOOD]: '#10b981',
   [Quality.MEDIUM]: '#f59e0b',
   [Quality.BAD]: '#dc2626',
-};
-
-const SEASON_LABEL: Record<string, string> = {
-  [Season.SUMMER]: 'Verão',
-  [Season.WINTER]: 'Inverno',
-};
-
-const TYPE_LABEL: Record<string, string> = {
-  [Type.UPPER_PART]: 'Parte de cima',
-  [Type.UNDER_PART]: 'Parte de baixo',
 };
 
 const numberFmt = new Intl.NumberFormat('pt-PT');
@@ -113,6 +98,8 @@ function ChartCard({
   isEmpty: boolean;
   children: React.ReactNode;
 }) {
+  const t = useTranslations('dashboard');
+
   return (
     <Card>
       <CardHeader>
@@ -122,7 +109,7 @@ function ChartCard({
       <CardContent>
         {isEmpty ? (
           <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
-            Sem dados
+            {t('noData')}
           </div>
         ) : (
           children
@@ -150,6 +137,12 @@ function DashboardSkeleton() {
 }
 
 export default function Dashboard() {
+  const t = useTranslations('dashboard');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionRequestStatus');
+  const tQuality = useTranslations('enums.quality');
+  const tSeason = useTranslations('enums.season');
+  const tItemType = useTranslations('enums.itemType');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [stats, setStats] = useState<DashboardStatsDTO | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,14 +156,14 @@ export default function Dashboard() {
       setStats(data);
     } catch {
       setError(true);
-      toast.error('Não foi possível carregar o dashboard');
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    setPageTitle('Dashboard');
+    setPageTitle(t('pageTitle'));
     setBreadcrumbs([]);
     fetchStats();
     return () => {
@@ -185,13 +178,13 @@ export default function Dashboard() {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-3 text-center">
         <p className="text-sm text-muted-foreground">
-          Não foi possível carregar os indicadores.
+          {t('indicatorsError')}
         </p>
         <button
           onClick={fetchStats}
           className="rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white"
         >
-          Tentar novamente
+          {t('retry')}
         </button>
       </div>
     );
@@ -200,24 +193,24 @@ export default function Dashboard() {
   const { collectionRequests, triage, environment, users, outOfZone } = stats;
 
   const statusData = collectionRequests.byStatus.map((row) => ({
-    label: STATUS_LABEL[row.status] ?? row.status,
+    label: tStatus(row.status),
     count: row.count,
     color: STATUS_COLOR[row.status as CollectionRequestStatus] ?? '#64748b',
   }));
 
   const qualityData = triage.byQuality.map((row) => ({
-    label: QUALITY_LABEL[row.key] ?? row.key,
+    label: tQuality(row.key),
     value: row.quantity,
     color: QUALITY_COLOR[row.key] ?? '#64748b',
   }));
 
   const seasonData = triage.bySeason.map((row) => ({
-    label: SEASON_LABEL[row.key] ?? row.key,
+    label: tSeason(row.key),
     value: row.quantity,
   }));
 
   const typeData = triage.byType.map((row) => ({
-    label: TYPE_LABEL[row.key] ?? row.key,
+    label: tItemType(row.key),
     value: row.quantity,
   }));
 
@@ -233,42 +226,42 @@ export default function Dashboard() {
   return (
     <section className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
+        <h1 className="text-xl font-semibold text-foreground">{t('pageTitle')}</h1>
         <p className="text-sm text-muted-foreground">
-          Visão geral de recolhas, triagem, impacto e utilizadores.
+          {t('subtitle')}
         </p>
       </div>
 
       {/* KPIs principais */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard icon={Package} label="Total de Pacotes" value={fmt(collectionRequests.total)} />
+        <KpiCard icon={Package} label={t('totalRequests')} value={fmt(collectionRequests.total)} />
         <KpiCard
           icon={Scale}
-          label="Peso Total (kg)"
+          label={t('totalWeight')}
           value={fmt(collectionRequests.totalWeightKg)}
         />
         <KpiCard
           icon={Boxes}
-          label="Sacos (estimados / recolhidos)"
+          label={t('bagsEstimatedCollected')}
           value={`${fmt(collectionRequests.totalEstimatedBags)} / ${fmt(
             collectionRequests.totalCollectedBags
           )}`}
         />
         <KpiCard
           icon={Recycle}
-          label="Total de Peças Triadas"
+          label={t('totalTriagedItems')}
           value={fmt(triage.totalItems)}
         />
-        <KpiCard icon={Users} label="Utilizadores" value={fmt(users.total)} />
+        <KpiCard icon={Users} label={t('users')} value={fmt(users.total)} />
         <KpiCard
           icon={UserCheck}
-          label="Utilizadores Ativos"
+          label={t('activeUsers')}
           value={fmt(users.active)}
           hint={`${fmt(users.statusActive)} contas ativas`}
         />
         <KpiCard
           icon={MapPinOff}
-          label="Pacotes Fora de Zona"
+          label={t('outOfZoneRequests')}
           value={fmt(outOfZone.totalCollectionRequests)}
         />
       </div>
@@ -276,37 +269,36 @@ export default function Dashboard() {
       {/* Impacto ambiental */}
       <div>
         <h2 className="mb-3 text-lg font-semibold text-secondary">
-          Impacto Ambiental
+          {t('environmentalImpact')}
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <KpiCard
             icon={Recycle}
-            label="Desviado de Aterro (kg)"
+            label={t('divertedFromLandfill')}
             value={fmt(environment.landfillDivertedKg)}
           />
           <KpiCard
             icon={Leaf}
-            label="CO₂ Evitado (kg)"
+            label={t('co2Avoided')}
             value={fmt(environment.co2AvoidedKg)}
             hint={`${environment.factors.co2KgPerKg} kg CO₂/kg`}
           />
           <KpiCard
             icon={Droplets}
-            label="Água Poupada (L)"
+            label={t('waterSaved')}
             value={fmt(environment.waterSavedLiters)}
             hint={`${fmt(environment.factors.waterLitersPerKg)} L/kg`}
           />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Estimativas a partir do peso desviado, usando fatores de conversão
-          configuráveis.
+          {t('impactHelp')}
         </p>
       </div>
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <ChartCard
-          title="Pacotes por Status"
+          title={t('requestsByStatus')}
           isEmpty={statusData.length === 0}
         >
           <ResponsiveContainer width="100%" height={260}>
@@ -331,8 +323,8 @@ export default function Dashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Tendência de Peso Recolhido"
-          description="Últimos 12 meses (kg)"
+          title={t('weightTrend')}
+          description={t('lastTwelveMonths')}
           isEmpty={trendData.length === 0}
         >
           <ResponsiveContainer width="100%" height={260}>
@@ -352,8 +344,8 @@ export default function Dashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Qualidade das peças"
-          description="Quantidade por qualidade"
+          title={t('itemQuality')}
+          description={t('quantityPerQuality')}
           isEmpty={qualityData.length === 0}
         >
           <ResponsiveContainer width="100%" height={260}>
@@ -376,8 +368,8 @@ export default function Dashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Top Marcas"
-          description="Quantidade de itens por marca"
+          title={t('topBrands')}
+          description={t('itemsPerBrand')}
           isEmpty={brandData.length === 0}
         >
           <ResponsiveContainer width="100%" height={260}>
@@ -396,7 +388,7 @@ export default function Dashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Peças por estação"
+          title={t('itemsPerSeason')}
           isEmpty={seasonData.length === 0}
         >
           <ResponsiveContainer width="100%" height={260}>
@@ -409,7 +401,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Tipo de peça" isEmpty={typeData.length === 0}>
+        <ChartCard title={t('itemType')} isEmpty={typeData.length === 0}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={typeData} margin={{ left: -16 }}>
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
@@ -424,22 +416,22 @@ export default function Dashboard() {
       {/* Cidades fora da zona */}
       <Card>
         <CardHeader>
-          <CardTitle>Cidades Fora da Zona de Atuação</CardTitle>
+          <CardTitle>{t('citiesOutOfZone')}</CardTitle>
           <CardDescription>
-            Procura por cidades ainda não abrangidas (potencial procura).
+            {t('citiesOutOfZoneHelp')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {outOfZone.topCities.length === 0 ? (
             <div className="py-6 text-center text-sm text-muted-foreground">
-              Sem dados
+              {t('noData')}
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Cidade</TableHead>
-                  <TableHead className="text-right">Pedidos</TableHead>
+                  <TableHead>{tCommon('city')}</TableHead>
+                  <TableHead className="text-right">{t('requests')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "home": {
+      "title": "RETEX | Solutions Durables pour la Collecte et la Réutilisation des Textiles",
+      "description": "Transformez votre impact environnemental avec RETEX. Collectez, réutilisez et contribuez à un avenir plus durable. Commencez dès maintenant.",
+      "keywords": "déchets textiles, vêtements usagés, économie circulaire, marketplace durable, tri automatique des vêtements, réutilisation textile, recyclage des textiles, RETEX, impact environnemental",
+      "ogTitle": "RETEX - Mode Durable et Circulaire",
+      "ogDescription": "Transformez l'avenir de la mode avec RETEX. Réutilisez, recyclez et réduisez l'impact environnemental.",
+      "ogImageAlt": "RETEX - Économie Circulaire pour la Mode"
+    },
+    "faq": {
+      "title": "FAQ | RETEX",
+      "description": "Questions fréquentes sur RETEX et instructions pour la collecte des textiles."
+    },
+    "blog": {
+      "title": "Blog | RETEX",
+      "description": "Actualités, articles et nouveautés de RETEX."
+    },
+    "register": {
+      "title": "Créer un compte | RETEX",
+      "description": "Créez votre compte RETEX et commencez à contribuer à un avenir plus durable."
+    },
+    "post": {
+      "notFound": "Article introuvable | RETEX"
+    }
+  },
+  "nav": {
+    "howItWorks": "Comment ça marche",
+    "services": "Services",
+    "blog": "Blog",
+    "faq": "FAQ",
+    "cta": "Inscription/Connexion",
+    "menuAria": "Menu",
+    "logoAlt": "RETEX"
+  },
+  "languageSwitcher": {
+    "label": "Langue"
+  },
+  "hero": {
+    "tagline": "Nous relions les familles, les entreprises et les municipalités autour d'une mission : prolonger le cycle de vie des vêtements usagés pour un avenir plus durable."
+  },
+  "howItWorks": {
+    "title": "Comment ça marche ?",
+    "steps": {
+      "register": {
+        "title": "Inscrivez-vous",
+        "description": "Renseignez les informations nécessaires pour finaliser votre inscription."
+      },
+      "schedule": {
+        "title": "Planifiez votre collecte",
+        "description": "Indiquez-nous le lieu le plus pratique pour vous"
+      },
+      "rest": {
+        "title": "On s'occupe du reste",
+        "description": "Attendez qu'un de nos transporteurs vous contacte."
+      }
+    }
+  },
+  "services": {
+    "companies": {
+      "title": "Entreprises et Municipalités",
+      "body": "Notre solution permet aux municipalités et aux entreprises de renforcer la gestion durable des textiles grâce à un système de collecte sélective et d'économie circulaire. Les municipalités bénéficient d'un meilleur détournement des déchets textiles de l'enfouissement, de taux de recyclage améliorés et d'un accès aux données d'impact environnemental via des tableaux de bord numériques. Les entreprises, quant à elles, peuvent obtenir des Crédits de Circularité liés à la collecte et à la valorisation des textiles, soutenant la compensation des émissions et un reporting ESG plus transparent et mesurable.",
+      "cta": "Nous contacter",
+      "imageAlt": "Textiles et symbole du recyclage"
+    },
+    "individuals": {
+      "title": "Particuliers",
+      "body": "Vous avez des vêtements que vous ne portez plus ? Donnez-leur une nouvelle utilité. Grâce à son service de collecte sélective de textiles, RETEX oriente les pièces en bon état vers la réutilisation, contribuant à réduire les déchets et à promouvoir l'économie circulaire.",
+      "cta": "Planifier une collecte",
+      "imageAlt": "Couture et réutilisation textile"
+    }
+  },
+  "about": {
+    "title": "Qui sommes-nous ?",
+    "body1": "Voici RETEX, une <strong>plateforme qui révolutionne notre façon de gérer les déchets textiles</strong>. Nous rendons la réutilisation des textiles plus simple, plus pratique et plus efficace, grâce à un modèle de collecte innovant et à un engagement réel envers l'économie circulaire.",
+    "body2": "Nous connectons consommateurs, entreprises et municipalités pour donner une nouvelle vie aux textiles, réduire le gaspillage et générer un impact environnemental et social positif.",
+    "cta": "En savoir plus",
+    "logoAlt": "RETEX"
+  },
+  "values": {
+    "kicker": "Découvrez-en plus sur",
+    "title": "Nos valeurs",
+    "items": {
+      "collection": {
+        "title": "Collecte Durable",
+        "text": "Au Portugal, il y en a plus de 200 mille tonnes. Le problème grandit, mais nous avons une solution."
+      },
+      "waste": {
+        "title": "Réduction des Déchets Textiles",
+        "text": "Nous donnons une nouvelle vie à chaque pièce, évitant que des tonnes finissent en décharge."
+      },
+      "impact": {
+        "title": "Impact Social et Environnemental",
+        "text": "Nous soutenons des causes sociales et des pratiques durables pour réduire l'empreinte écologique."
+      },
+      "circular": {
+        "title": "Économie Circulaire",
+        "text": "Nous transformons les déchets en ressources, en encourageant une consommation plus responsable."
+      }
+    }
+  },
+  "quote": {
+    "body": "Recycler, c'est reconnaître que tout a de la valeur et mérite une seconde vie.",
+    "author": "- Jane Goodall"
+  },
+  "upcycling": {
+    "banner": "CETTE PIÈCE A ÉTÉ RÉINVENTÉE À PARTIR DE MATÉRIAUX RÉUTILISÉS",
+    "kicker": "UPCYCLING TEXTILE",
+    "title": "Donner une nouvelle vie à la matière",
+    "body": "Chez RETEX, l'upcycling est la façon la plus créative de prolonger la vie des textiles. Au lieu de partir à la poubelle, les chutes de production, les stocks excédentaires et les anciens uniformes sont transformés en nouveaux produits à plus forte valeur — accessoires, articles pour la maison et cadeaux d'entreprise.",
+    "made": "Made in Portugal",
+    "sustainable": "Durable"
+  },
+  "partners": {
+    "title": "RETEX a le privilège de collaborer avec :",
+    "previous": "PRÉCÉDENT",
+    "next": "SUIVANT"
+  },
+  "contact": {
+    "title": "Formulaire",
+    "leadStrong": "Des questions ? Nous sommes là pour vous aider !",
+    "lead": "Remplissez le formulaire et contactez-nous.",
+    "fields": {
+      "name": "Nom",
+      "phone": "Téléphone portable",
+      "email": "E-mail",
+      "subject": "Objet",
+      "message": "Message"
+    },
+    "submit": "Envoyer",
+    "submitting": "Envoi en cours…",
+    "success": "Formulaire envoyé avec succès !",
+    "error": "Erreur lors de l'envoi du formulaire."
+  },
+  "validation": {
+    "required": "Champ obligatoire",
+    "invalidEmail": "E-mail invalide"
+  },
+  "register": {
+    "title": "Créer un compte",
+    "fields": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone portable",
+      "zipCode": "Code postal",
+      "zipCodePlaceholder": "0000-000",
+      "street": "Adresse",
+      "number": "Numéro",
+      "complement": "Complément d'adresse",
+      "city": "Localité",
+      "cityDivision": "Commune",
+      "gender": "Sexe",
+      "dateOfBirth": "Date de naissance"
+    },
+    "gender": {
+      "male": "Masculin",
+      "female": "Féminin",
+      "preferNotToSay": "Je préfère ne pas répondre"
+    },
+    "submit": "Créer un compte",
+    "submitting": "Inscription en cours…",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "login": "Connexion",
+    "socialAria": "Se connecter avec un compte social",
+    "feedback": {
+      "duplicateEmail": "Cet e-mail est déjà enregistré. Essayez de vous connecter.",
+      "successInZone": "Inscription réussie ! Nous vous avons envoyé un e-mail pour définir votre mot de passe et activer votre compte. Vérifiez votre boîte de réception.",
+      "successOutOfZone": "Inscription réussie ! Votre adresse se situe hors de notre zone de service — nous vous préviendrons par e-mail dès qu'elle sera couverte.",
+      "error": "Erreur lors de l'inscription. Veuillez réessayer."
+    }
+  },
+  "blog": {
+    "kicker": "Actualités",
+    "sectionTitle": "Notre Blog",
+    "seeAll": "Voir tout",
+    "indexTitle": "Blog",
+    "indexSubtitle": "Retrouvez ici des actualités et des idées sur la mode circulaire",
+    "empty": "Il n'y a pas encore d'articles publiés.",
+    "defaultCategory": "Blog",
+    "recentTitle": "Derniers articles",
+    "paginationAria": "Pagination du blog",
+    "previous": "← Précédent",
+    "next": "Suivant →",
+    "pageInfo": "Page {current} sur {total}"
+  },
+  "footer": {
+    "tagline": "wear. care. share. repeat.",
+    "nav": {
+      "howItWorks": "COMMENT ÇA MARCHE",
+      "faq": "FAQ",
+      "blog": "BLOG",
+      "about": "À PROPOS"
+    },
+    "contactTitle": "Contactez-nous pour en savoir plus",
+    "privacyPolicy": "Politique de Confidentialité",
+    "cookiePolicy": "Politique de Cookies",
+    "complaintsBook": "Livre de Réclamations en ligne"
+  }
+}

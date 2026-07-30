@@ -1,34 +1,39 @@
 'use client';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 export default function NavCtaLink() {
-  const [href, setHref] = useState('/register');
-  const [hasSession, setHasSession] = useState(false);
+  const t = useTranslations('nav');
+  const [portalHref, setPortalHref] = useState('');
 
   useEffect(() => {
     const session = document.cookie
       .split(';')
       .some((c) => c.trim().startsWith('retex_session=1'));
-    setHasSession(session);
-    if (session) {
-      const base = process.env.NEXT_PUBLIC_PORTAL_URL?.trim() ?? '';
-      if (base) {
-        setHref(`${base}/portal`);
-      }
-    }
+    if (!session) return;
+    const base = process.env.NEXT_PUBLIC_PORTAL_URL?.trim() ?? '';
+    if (base) setPortalHref(`${base}/portal`);
   }, []);
 
-  // Login (sessão ativa + portal) abre numa nova aba; registo abre na mesma aba.
-  const isLogin = hasSession && href !== '/register';
+  // Login (sessão ativa + portal) abre numa nova aba; o registo é uma rota
+  // interna e usa o Link do next-intl para manter o idioma activo.
+  if (portalHref) {
+    return (
+      <a
+        href={portalHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="nav-cta-btn"
+      >
+        {t('cta')}
+      </a>
+    );
+  }
 
   return (
-    <a
-      href={href}
-      target={isLogin ? '_blank' : undefined}
-      rel={isLogin ? 'noopener noreferrer' : undefined}
-      className="nav-cta-btn"
-    >
-      Registo/Login
-    </a>
+    <Link href="/register" className="nav-cta-btn">
+      {t('cta')}
+    </Link>
   );
 }

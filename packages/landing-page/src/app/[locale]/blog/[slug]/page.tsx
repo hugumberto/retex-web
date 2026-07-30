@@ -1,5 +1,7 @@
 import { Header } from '@/components/landing/Header';
 import LandingFooter from '@/components/landing/LandingFooter';
+import { Link } from '@/i18n/navigation';
+import { localeHtmlLang, type Locale } from '@/i18n/routing';
 import {
   apiUrl,
   BlogPost,
@@ -9,7 +11,7 @@ import {
   stripHtml,
 } from '@/lib/blog';
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import sanitizeHtml from 'sanitize-html';
 
@@ -65,11 +67,14 @@ async function getRecent(excludeSlug: string): Promise<BlogPost[]> {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = await getPost(slug);
-  if (!post) return { title: 'Post não encontrado | RETEX' };
+  if (!post) {
+    const t = await getTranslations({ locale, namespace: 'metadata.post' });
+    return { title: t('notFound') };
+  }
 
   const description = stripHtml(post.body).slice(0, 160);
   return {
@@ -87,12 +92,14 @@ export async function generateMetadata({
 export default async function BlogPostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = await getPost(slug);
   if (!post) notFound();
 
+  const t = await getTranslations({ locale, namespace: 'blog' });
+  const dateLocale = localeHtmlLang[locale as Locale] ?? 'pt-PT';
   const recent = await getRecent(slug);
 
   return (
@@ -112,7 +119,7 @@ export default async function BlogPostPage({
                 className="blog-article-date"
                 dateTime={isoDate(post.publishDate)}
               >
-                {formatDateLong(post.publishDate)}
+                {formatDateLong(post.publishDate, dateLocale)}
               </time>
             )}
           </header>
@@ -132,7 +139,7 @@ export default async function BlogPostPage({
 
             {recent.length > 0 && (
               <aside className="blog-article-aside">
-                <h2 className="blog-aside-title">Últimos artigos</h2>
+                <h2 className="blog-aside-title">{t('recentTitle')}</h2>
                 <div className="blog-aside-list">
                   {recent.map((p) => (
                     <Link
@@ -156,7 +163,7 @@ export default async function BlogPostPage({
                           className="blog-date"
                           dateTime={isoDate(p.publishDate)}
                         >
-                          {formatDateLong(p.publishDate)}
+                          {formatDateLong(p.publishDate, dateLocale)}
                         </time>
                       </div>
                     </Link>

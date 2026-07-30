@@ -1,5 +1,6 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { renderWithIntl } from '../../test-utils/intl';
 import ContactForm from './ContactForm';
 
 describe('ContactForm', () => {
@@ -12,7 +13,7 @@ describe('ContactForm', () => {
   });
 
   it('mostra erros obrigatorios ao tentar enviar vazio', async () => {
-    render(<ContactForm />);
+    renderWithIntl(<ContactForm />);
 
     fireEvent.click(screen.getByRole('button', { name: /submeter/i }));
 
@@ -21,7 +22,7 @@ describe('ContactForm', () => {
   });
 
   it('remove o erro obrigatorio do nome quando o campo e preenchido', async () => {
-    render(<ContactForm />);
+    renderWithIntl(<ContactForm />);
 
     const nomeInput = screen.getByRole('textbox', { name: /nome/i });
 
@@ -46,7 +47,7 @@ describe('ContactForm', () => {
       status: 200,
     });
 
-    render(<ContactForm />);
+    renderWithIntl(<ContactForm />);
 
     fireEvent.change(screen.getByRole('textbox', { name: /nome/i }), {
       target: { value: 'Ana Silva' },

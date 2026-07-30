@@ -14,12 +14,15 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import { TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import BrandForm from './brand-form';
 
 export default function BrandCrud() {
+  const t = useTranslations('brand');
+  const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const PAGE_SIZE = 10;
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -43,7 +46,7 @@ export default function BrandCrud() {
       setBrands(data);
     } catch (error) {
       console.error('Erro ao buscar marcas:', error);
-      toast.error('Não foi possível carregar as marcas');
+      toast.error(t('loadError'));
     }
   }, []);
 
@@ -69,24 +72,24 @@ export default function BrandCrud() {
   const handleDeleteWithToast = useCallback(
     async (id: string) => {
       await toast.promise(handleDeleteBrand(id), {
-        loading: 'Carregando...',
-        success: () => 'Marca eliminada com sucesso',
-        error: () => 'Erro ao eliminar a marca',
+        loading: tCommon('loading'),
+        success: () => t('deleteSuccess'),
+        error: () => t('deleteError'),
       });
     },
     [handleDeleteBrand]
   );
 
   useEffect(() => {
-    setPageTitle('Marca');
-    setBreadcrumbs([{ label: 'Marca', href: '/portal/brand' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/brand' }]);
     fetchBrands();
 
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [fetchBrands, setBreadcrumbs, setPageTitle]);
+  }, [fetchBrands, setBreadcrumbs, setPageTitle, t]);
 
   const handleSave = useCallback(async () => {
     await fetchBrands();
@@ -106,9 +109,9 @@ export default function BrandCrud() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Manual</TableHead>
-              <TableHead>Ação</TableHead>
+              <TableHead>{tCommon('name')}</TableHead>
+              <TableHead>{t('manual')}</TableHead>
+              <TableHead>{tCommon('action')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -116,7 +119,7 @@ export default function BrandCrud() {
               paginatedBrands.map((brand) => (
                 <TableRow key={brand.id}>
                   <TableCell>{brand.name}</TableCell>
-                  <TableCell>{brand.manual ? 'Sim' : 'Não'}</TableCell>
+                  <TableCell>{brand.manual ? tCommon('yes') : tCommon('no')}</TableCell>
                   <TableCell className="space-x-2">
                     <BrandForm
                       brandId={brand.id}
@@ -145,7 +148,7 @@ export default function BrandCrud() {
                   colSpan={3}
                   className="text-center py-6 text-muted-foreground"
                 >
-                  Nenhum registro encontrado!
+                  {tCommon('noRecords')}
                 </TableCell>
               </TableRow>
             )}
@@ -154,7 +157,7 @@ export default function BrandCrud() {
 
         <div className="mt-4 flex items-center justify-between gap-3">
           <span className="text-sm text-muted-foreground">
-            Página {currentPage} de {totalPages}
+            {tCommon('pageInfo', { current: currentPage, total: totalPages })}
           </span>
 
           <div className="flex items-center gap-2">
@@ -164,7 +167,7 @@ export default function BrandCrud() {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
             >
-              Anterior
+              {tCommon('previous')}
             </Button>
             <Button
               variant="outline"
@@ -174,7 +177,7 @@ export default function BrandCrud() {
               }
               disabled={currentPage === totalPages}
             >
-              Próximo
+              {tCommon('next')}
             </Button>
           </div>
         </div>

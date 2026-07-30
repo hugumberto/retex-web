@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "home": {
+      "title": "RETEX | Sustainable Solutions for Textile Collection and Reuse",
+      "description": "Transform your environmental impact with RETEX. Collect, reuse and contribute to a more sustainable future. Start now.",
+      "keywords": "textile waste, used clothing, circular economy, sustainable marketplace, automated clothing sorting, textile reuse, textile recycling, RETEX, environmental impact",
+      "ogTitle": "RETEX - Sustainable and Circular Fashion",
+      "ogDescription": "Transform the future of fashion with RETEX. Reuse, recycle and reduce environmental impact.",
+      "ogImageAlt": "RETEX - Circular Economy for Fashion"
+    },
+    "faq": {
+      "title": "FAQ | RETEX",
+      "description": "Frequently asked questions about RETEX and instructions for textile collection."
+    },
+    "blog": {
+      "title": "Blog | RETEX",
+      "description": "News, articles and updates from RETEX."
+    },
+    "register": {
+      "title": "Create account | RETEX",
+      "description": "Create your RETEX account and start contributing to a more sustainable future."
+    },
+    "post": {
+      "notFound": "Article not found | RETEX"
+    }
+  },
+  "nav": {
+    "howItWorks": "How it works",
+    "services": "Services",
+    "blog": "Blog",
+    "faq": "FAQs",
+    "cta": "Sign up/Log in",
+    "menuAria": "Menu",
+    "logoAlt": "RETEX"
+  },
+  "languageSwitcher": {
+    "label": "Language"
+  },
+  "hero": {
+    "tagline": "We connect families, businesses and municipalities in one mission: extending the life cycle of used clothing for a more sustainable future."
+  },
+  "howItWorks": {
+    "title": "How does it work?",
+    "steps": {
+      "register": {
+        "title": "Sign up",
+        "description": "Fill in the information needed to complete your registration."
+      },
+      "schedule": {
+        "title": "Book your collection",
+        "description": "Tell us the most convenient location for you"
+      },
+      "rest": {
+        "title": "We take it from here",
+        "description": "Wait for one of our carriers to get in touch."
+      }
+    }
+  },
+  "services": {
+    "companies": {
+      "title": "Businesses and Municipalities",
+      "body": "Our solution allows municipalities and businesses to strengthen sustainable textile management through a system of separate collection and circular economy. Municipalities benefit from diverting more textile waste from landfill, improved recycling rates and access to environmental impact data through digital dashboards. Businesses, in turn, can earn Circularity Credits linked to textile collection and recovery, supporting emissions offsetting and more transparent, measurable ESG reporting.",
+      "cta": "Get in touch",
+      "imageAlt": "Textiles and recycling symbol"
+    },
+    "individuals": {
+      "title": "Individuals",
+      "body": "Do you have clothes you no longer wear? Give them a new purpose. Through its separate textile collection service, RETEX channels garments in good condition towards reuse, helping to reduce waste and promote the circular economy.",
+      "cta": "Book a collection",
+      "imageAlt": "Sewing and textile reuse"
+    }
+  },
+  "about": {
+    "title": "Who are we?",
+    "body1": "We are RETEX, a <strong>platform that is revolutionising the way we deal with textile waste</strong>. We make textile reuse simpler, more convenient and more efficient through an innovative collection model and a genuine commitment to the circular economy.",
+    "body2": "We connect consumers, businesses and municipalities to give textiles a new life, reduce waste and generate positive environmental and social impact.",
+    "cta": "Learn more",
+    "logoAlt": "RETEX"
+  },
+  "values": {
+    "kicker": "Discover more about",
+    "title": "Our values",
+    "items": {
+      "collection": {
+        "title": "Sustainable Collection",
+        "text": "In Portugal there are more than 200 thousand tonnes. The problem is growing, but we have a solution."
+      },
+      "waste": {
+        "title": "Reducing Textile Waste",
+        "text": "We give every garment a new life, keeping tonnes of textiles out of landfill."
+      },
+      "impact": {
+        "title": "Social and Environmental Impact",
+        "text": "We support social causes and sustainable practices to reduce our ecological footprint."
+      },
+      "circular": {
+        "title": "Circular Economy",
+        "text": "We turn waste into resources, promoting more conscious consumption."
+      }
+    }
+  },
+  "quote": {
+    "body": "Recycling is recognising that everything has value and deserves a second life.",
+    "author": "- Jane Goodall"
+  },
+  "upcycling": {
+    "banner": "THIS PIECE WAS REINVENTED FROM REUSED MATERIALS",
+    "kicker": "TEXTILE UPCYCLING",
+    "title": "Giving materials a new life",
+    "body": "At RETEX, upcycling is the most creative way to extend the life of textiles. Instead of going to waste, production offcuts, surplus stock and old uniforms are transformed into new, higher-value products — accessories, homeware and corporate gifts.",
+    "made": "Made in Portugal",
+    "sustainable": "Sustainable"
+  },
+  "partners": {
+    "title": "RETEX is privileged to work with:",
+    "previous": "PREVIOUS",
+    "next": "NEXT"
+  },
+  "contact": {
+    "title": "Contact form",
+    "leadStrong": "Have questions? We're here to help!",
+    "lead": "Fill in the form and get in touch with us.",
+    "fields": {
+      "name": "Name",
+      "phone": "Mobile phone",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message"
+    },
+    "submit": "Submit",
+    "submitting": "Sending…",
+    "success": "Form submitted successfully!",
+    "error": "Error submitting the form."
+  },
+  "validation": {
+    "required": "Required field",
+    "invalidEmail": "Invalid email"
+  },
+  "register": {
+    "title": "Create account",
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Mobile phone",
+      "zipCode": "Postcode",
+      "zipCodePlaceholder": "0000-000",
+      "street": "Address",
+      "number": "Number",
+      "complement": "Additional info",
+      "city": "Town/City",
+      "cityDivision": "Parish",
+      "gender": "Gender",
+      "dateOfBirth": "Date of birth"
+    },
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "preferNotToSay": "Prefer not to say"
+    },
+    "submit": "Create account",
+    "submitting": "Registering…",
+    "alreadyHaveAccount": "Already have an account?",
+    "login": "Log in",
+    "socialAria": "Sign in with a social account",
+    "feedback": {
+      "duplicateEmail": "This email is already registered. Please try logging in.",
+      "successInZone": "Registration complete! We've sent you an email to set your password and activate your account. Please check your inbox.",
+      "successOutOfZone": "Registration complete! Your address is outside our service area — we'll notify you by email as soon as it becomes available.",
+      "error": "Error completing registration. Please try again."
+    }
+  },
+  "blog": {
+    "kicker": "News",
+    "sectionTitle": "Our Blog",
+    "seeAll": "See all",
+    "indexTitle": "Blog",
+    "indexSubtitle": "Find news and ideas about circular fashion here",
+    "empty": "There are no published articles yet.",
+    "defaultCategory": "Blog",
+    "recentTitle": "Latest articles",
+    "paginationAria": "Blog pagination",
+    "previous": "← Previous",
+    "next": "Next →",
+    "pageInfo": "Page {current} of {total}"
+  },
+  "footer": {
+    "tagline": "wear. care. share. repeat.",
+    "nav": {
+      "howItWorks": "HOW IT WORKS",
+      "faq": "FAQS",
+      "blog": "BLOG",
+      "about": "ABOUT US"
+    },
+    "contactTitle": "Contact us to find out more",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "complaintsBook": "Online Complaints Book"
+  }
+}

@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  EmailLogDTO,
-  EmailLogStatus,
-  EMAIL_STATUS_LABEL,
-  EMAIL_TYPE_LABEL,
-} from '@/app/types/email-log';
+import { EmailLogDTO, EmailLogStatus } from '@/app/types/email-log';
 import { PaginatedResult } from '@/app/types/helper';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,15 +14,32 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { useAppStore } from '@/store';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const PAGE_SIZE = 20;
 
-const formatDateTime = (value: string) =>
-  new Date(value).toLocaleString('pt-PT');
+// Os tipos correspondem aos templates do backend; a ordem define o dropdown.
+const EMAIL_TYPES = [
+  'account-activation',
+  'out-of-service-zone',
+  'password-reset',
+  'package-confirmation',
+  'collection-confirmation',
+  'collection-cancelled',
+  'contact-form',
+  'survey',
+] as const;
 
 export default function EmailLog() {
+  const t = useTranslations('emailLog');
+  const tCommon = useTranslations('common');
+  const tType = useTranslations('enums.emailType');
+  const tStatus = useTranslations('enums.emailStatus');
+  const locale = useLocale();
+  const formatDateTime = (value: string) =>
+    new Date(value).toLocaleString(locale);
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [logs, setLogs] = useState<EmailLogDTO[]>([]);
   const [total, setTotal] = useState(0);
@@ -73,17 +85,17 @@ export default function EmailLog() {
         setTotal(data.meta.total);
         setPage(data.meta.page);
       } catch {
-        toast.error('Não foi possível carregar o registo de emails');
+        toast.error(t('loadError'));
       } finally {
         setIsLoading(false);
       }
     },
-    [type, recipient, from, to]
+    [type, recipient, from, to, t]
   );
 
   useEffect(() => {
-    setPageTitle('Registo de Emails');
-    setBreadcrumbs([{ label: 'Registo de Emails', href: '/portal/email-log' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/email-log' }]);
     fetchLogs(1);
     return () => {
       setPageTitle('');
@@ -108,32 +120,36 @@ export default function EmailLog() {
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-secondary">Tipo</label>
+            <label className="text-xs font-medium text-secondary">
+              {tCommon('type')}
+            </label>
             <select
               className="h-9 rounded-md border border-secondary/40 px-2 text-sm"
               value={type}
               onChange={(e) => setType(e.target.value)}
             >
-              <option value="">Todos</option>
-              {Object.entries(EMAIL_TYPE_LABEL).map(([value, label]) => (
+              <option value="">{tCommon('all')}</option>
+              {EMAIL_TYPES.map((value) => (
                 <option key={value} value={value}>
-                  {label}
+                  {tType(value)}
                 </option>
               ))}
             </select>
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-secondary">
-              Destinatário
+              {t('recipient')}
             </label>
             <Input
-              placeholder="email@exemplo.pt"
+              placeholder={t('recipientPlaceholder')}
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-secondary">De</label>
+            <label className="text-xs font-medium text-secondary">
+              {tCommon('from')}
+            </label>
             <Input
               type="date"
               value={from}
@@ -141,7 +157,9 @@ export default function EmailLog() {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-secondary">Até</label>
+            <label className="text-xs font-medium text-secondary">
+              {tCommon('to')}
+            </label>
             <Input
               type="date"
               value={to}
@@ -154,14 +172,14 @@ export default function EmailLog() {
               onClick={applyFilters}
               disabled={isLoading}
             >
-              Filtrar
+              {tCommon('filter')}
             </Button>
             <Button
               variant="ghost"
               onClick={clearFilters}
               disabled={isLoading}
             >
-              Limpar
+              {tCommon('clear')}
             </Button>
           </div>
         </div>
@@ -172,10 +190,10 @@ export default function EmailLog() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Destinatário</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Data</TableHead>
+                <TableHead>{tCommon('type')}</TableHead>
+                <TableHead>{t('recipient')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
+                <TableHead>{tCommon('date')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -183,7 +201,7 @@ export default function EmailLog() {
                 logs.map((log) => (
                   <TableRow key={log.id}>
                     <TableCell className="font-medium">
-                      {EMAIL_TYPE_LABEL[log.type] ?? log.type}
+                      {tType(log.type)}
                     </TableCell>
                     <TableCell className="whitespace-normal break-words max-w-[220px]">
                       {log.recipient}
@@ -197,7 +215,7 @@ export default function EmailLog() {
                         }`}
                         title={log.error ?? undefined}
                       >
-                        {EMAIL_STATUS_LABEL[log.status] ?? log.status}
+                        {tStatus(log.status)}
                       </span>
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
@@ -211,7 +229,7 @@ export default function EmailLog() {
                     colSpan={4}
                     className="text-center py-6 text-muted-foreground"
                   >
-                    {isLoading ? 'A carregar...' : 'Nenhum email registado'}
+                    {isLoading ? tCommon('loading') : t('empty')}
                   </TableCell>
                 </TableRow>
               )}
@@ -221,7 +239,7 @@ export default function EmailLog() {
 
         <div className="mt-4 flex items-center justify-between text-sm text-secondary">
           <span>
-            {total} registo{total === 1 ? '' : 's'}
+            {t('recordCount', { count: total })}
           </span>
           <div className="flex items-center gap-2">
             <Button
@@ -230,7 +248,7 @@ export default function EmailLog() {
               disabled={page <= 1 || isLoading}
               onClick={() => fetchLogs(page - 1)}
             >
-              Anterior
+              {tCommon('previous')}
             </Button>
             <span>
               {page} / {totalPages}
@@ -241,7 +259,7 @@ export default function EmailLog() {
               disabled={page >= totalPages || isLoading}
               onClick={() => fetchLogs(page + 1)}
             >
-              Seguinte
+              {tCommon('next')}
             </Button>
           </div>
         </div>

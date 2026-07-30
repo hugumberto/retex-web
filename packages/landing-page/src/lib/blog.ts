@@ -52,17 +52,19 @@ export function formatDate(iso?: string): string {
   return `${dd}.${mm}.${yy}`;
 }
 
-const MONTHS_PT = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
-];
-
-/** Formata uma data ISO como "13 de Maio de 2025". */
-export function formatDateLong(iso?: string): string {
+/**
+ * Formata uma data ISO por extenso no idioma pedido
+ * ("13 de maio de 2025", "13 May 2025", ...).
+ */
+export function formatDateLong(iso?: string, locale = 'pt-PT'): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return `${d.getDate()} de ${MONTHS_PT[d.getMonth()]} de ${d.getFullYear()}`;
+  return new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(d);
 }
 
 /** Devolve yyyy-mm-dd para o atributo dateTime de <time>. */

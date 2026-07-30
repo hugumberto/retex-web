@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  BLOG_POST_HIGHLIGHT_LABELS,
   BlogPostFormData,
   BlogPostHighlight,
   BlogPostStatus,
@@ -16,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -38,6 +38,9 @@ const slugify = (input: string): string =>
     .replace(/^-+|-+$/g, '');
 
 export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
+  const t = useTranslations('blog');
+  const tCommon = useTranslations('common');
+  const tHighlight = useTranslations('enums.blogHighlight');
   const router = useRouter();
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const isEditing = !!blogPostId;
@@ -68,10 +71,10 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
   }, [initialData, reset]);
 
   useEffect(() => {
-    const label = isEditing ? 'Editar Post' : 'Criar Post';
+    const label = isEditing ? t('editPost') : t('createPost');
     setPageTitle(label);
     setBreadcrumbs([
-      { label: 'Blog', href: '/portal/blog' },
+      { label: t('pageTitle'), href: '/portal/blog' },
       { label, href: '#' },
     ]);
     return () => {
@@ -108,9 +111,9 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
           router.push('/portal/blog');
         })(),
         {
-          loading: 'Carregando...',
-          success: `Post ${isEditing ? 'atualizado' : 'criado'} com sucesso!`,
-          error: `Erro ao ${isEditing ? 'atualizar' : 'criar'} o post.`,
+          loading: tCommon('loading'),
+          success: isEditing ? t('updateSuccess') : t('createSuccess'),
+          error: isEditing ? t('updateError') : t('createError'),
         }
       );
       setIsSubmitting(false);
@@ -123,36 +126,36 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <InputForm
-            label="Título"
+            label={tCommon('title')}
             name="title"
             control={control}
-            rules={{ required: 'O título é obrigatório' }}
+            rules={{ required: tCommon('requiredField') }}
             errors={errors}
           />
         </div>
         <div>
           <InputForm
-            label="Slug"
+            label={tCommon('slug')}
             name="slug"
             control={control}
-            rules={{ required: 'O slug é obrigatório' }}
+            rules={{ required: tCommon('requiredField') }}
             errors={errors}
           />
         </div>
         <div>
           <ImageUploadForm
-            label="Hero Image"
+            label={t('heroImage')}
             name="hero"
             control={control}
-            rules={{ required: 'A imagem hero é obrigatória' }}
+            rules={{ required: tCommon('requiredField') }}
           />
         </div>
         <div>
-          <KeywordsForm label="Keywords" name="tags" control={control} />
+          <KeywordsForm label={t('keywords')} name="tags" control={control} />
         </div>
         <div className="md:col-span-2">
           <CategoryPickerForm
-            label="Categorias"
+            label={t('categories')}
             name="categoryIds"
             control={control}
             errors={errors}
@@ -160,7 +163,7 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
         </div>
         <div>
           <SelectForm
-            label="Estado"
+            label={tCommon('status')}
             name="status"
             control={control}
             options={[BlogPostStatus.DRAFT, BlogPostStatus.PUBLISHED]}
@@ -169,7 +172,7 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
         </div>
         <div>
           <SelectForm
-            label="Highlight"
+            label={t('highlight')}
             name="highlight"
             control={control}
             options={[
@@ -177,7 +180,7 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
               BlogPostHighlight.FEATURED,
               BlogPostHighlight.HIGHLIGHTED,
             ].map((value) => ({
-              label: BLOG_POST_HIGHLIGHT_LABELS[value],
+              label: tHighlight(String(value)),
               value,
             }))}
             errors={errors}
@@ -200,7 +203,11 @@ export default function BlogForm({ blogPostId, initialData }: BlogFormProps) {
           Cancelar
         </Button>
         <Button type="submit" variant="secondary" disabled={isSubmitting}>
-          {isSubmitting ? 'Processando...' : isEditing ? 'Atualizar' : 'Criar'}
+          {isSubmitting
+            ? tCommon('processing')
+            : isEditing
+            ? tCommon('update')
+            : tCommon('create')}
         </Button>
       </div>
     </form>

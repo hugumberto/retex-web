@@ -14,12 +14,15 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import BlogCategoryForm from './blog-category-form';
 
 export default function BlogCategories() {
+  const t = useTranslations('blogCategories');
+  const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,22 +33,22 @@ export default function BlogCategories() {
       if (!isSuccessStatus(status)) throw new Error();
       setCategories(Array.isArray(data) ? data : []);
     } catch {
-      toast.error('Não foi possível carregar as categorias');
+      toast.error(t('loadError'));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    setPageTitle('Categorias do Blog');
+    setPageTitle(t('pageTitle'));
     setBreadcrumbs([
-      { label: 'Blog', href: '/portal/blog' },
-      { label: 'Categorias', href: '/portal/blog-categories' },
+      { label: t('blogBreadcrumb'), href: '/portal/blog' },
+      { label: t('categoriesBreadcrumb'), href: '/portal/blog-categories' },
     ]);
     fetchCategories();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [fetchCategories, setBreadcrumbs, setPageTitle]);
+  }, [fetchCategories, setBreadcrumbs, setPageTitle, t]);
 
   const handleDelete = useCallback(
     async (id: string) => {
@@ -57,14 +60,14 @@ export default function BlogCategories() {
           await fetchCategories();
         })(),
         {
-          loading: 'A eliminar...',
-          success: 'Categoria eliminada',
-          error: 'Erro ao eliminar categoria',
+          loading: tCommon('deleting'),
+          success: t('deleteSuccess'),
+          error: t('deleteError'),
         }
       );
       setIsSubmitting(false);
     },
-    [fetchCategories]
+    [fetchCategories, t, tCommon]
   );
 
   return (
@@ -75,16 +78,16 @@ export default function BlogCategories() {
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <h2 className="text-lg font-semibold text-secondary mb-4">
-          Categorias do Blog
+          {t('pageTitle')}
         </h2>
         <div className="w-full overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Título</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Ação</TableHead>
+                <TableHead>{tCommon('title')}</TableHead>
+                <TableHead>{tCommon('slug')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -104,8 +107,8 @@ export default function BlogCategories() {
                         }`}
                       >
                         {cat.status === BlogCategoryStatus.ACTIVE
-                          ? 'Activo'
-                          : 'Inactivo'}
+                          ? tCommon('active')
+                          : tCommon('inactive')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -142,7 +145,7 @@ export default function BlogCategories() {
                     colSpan={4}
                     className="text-center py-6 text-muted-foreground"
                   >
-                    Nenhuma categoria criada.
+                    {t('empty')}
                   </TableCell>
                 </TableRow>
               )}

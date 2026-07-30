@@ -1,7 +1,10 @@
 import { Header } from '@/components/landing/Header';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 export default function LandingHero() {
+  const t = useTranslations('hero');
+
   return (
     <section className="landing-hero">
       <Header />
@@ -21,12 +24,7 @@ export default function LandingHero() {
           <span>share.</span>
           <span>repeat.</span>
         </h1>
-        <p>
-          Ligamos Famílias, Empresas e Municípios numa missão:
-          <br />
-          prolongar o ciclo de vida da roupa usada, contribuindo para um futuro
-          mais sustentável.
-        </p>
+        <p>{t('tagline')}</p>
       </div>
     </section>
   );

@@ -1,12 +1,6 @@
+import { useTranslations } from 'next-intl';
 import { Brand } from '@/app/types/brand';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
-import {
-  AGE_GROUP_LABEL,
-  QUALITY_LABEL,
-  SEASON_LABEL,
-  SEX_LABEL,
-  TYPE_LABEL,
-} from '@/lib/item-labels';
 import { TriageListItem } from './add-triage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,32 +41,6 @@ type TriageOption = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 };
-
-const qualityOptions: TriageOption[] = [
-  { value: 'GOOD', label: 'Boa', icon: Smile },
-  { value: 'MEDIUM', label: 'Regular', icon: Meh },
-  { value: 'BAD', label: 'Má', icon: Frown },
-];
-
-const seasonOptions: TriageOption[] = [
-  { value: 'SUMMER', label: 'Verão', icon: Sun },
-  { value: 'WINTER', label: 'Inverno', icon: Snowflake },
-];
-
-const clothingTypeOptions: TriageOption[] = [
-  { value: 'UPPER_PART', label: 'Parte de cima', icon: Shirt },
-  { value: 'UNDER_PART', label: 'Parte de baixo', icon: PantsIcon },
-];
-
-const sexOptions: TriageOption[] = [
-  { value: 'MALE', label: 'Homem', icon: User },
-  { value: 'FEMALE', label: 'Mulher', icon: UserRound },
-];
-
-const ageGroupOptions: TriageOption[] = [
-  { value: 'ADULT', label: 'Adulto', icon: User },
-  { value: 'CHILD', label: 'Infantil', icon: Baby },
-];
 
 function OptionSelector({
   options,
@@ -161,11 +129,42 @@ export default function CollectionRecord({
   isAddDisabled,
   isViewMode,
 }: CollectionRecordProps) {
+  const t = useTranslations('triage');
+  const tCommon = useTranslations('common');
+  const tQuality = useTranslations('enums.quality');
+  const tSex = useTranslations('enums.sex');
+  const tAgeGroup = useTranslations('enums.ageGroup');
+  const tItemType = useTranslations('enums.itemType');
+  const tSeason = useTranslations('enums.season');
+
+  // Opções construídas dentro do componente para seguirem o idioma activo.
+  const qualityOptions: TriageOption[] = [
+    { value: 'GOOD', label: tQuality('GOOD'), icon: Smile },
+    { value: 'MEDIUM', label: tQuality('MEDIUM'), icon: Meh },
+    { value: 'BAD', label: tQuality('BAD'), icon: Frown },
+  ];
+  const seasonOptions: TriageOption[] = [
+    { value: 'SUMMER', label: tSeason('SUMMER'), icon: Sun },
+    { value: 'WINTER', label: tSeason('WINTER'), icon: Snowflake },
+  ];
+  const clothingTypeOptions: TriageOption[] = [
+    { value: 'UPPER_PART', label: tItemType('UPPER_PART'), icon: Shirt },
+    { value: 'UNDER_PART', label: tItemType('UNDER_PART'), icon: PantsIcon },
+  ];
+  const sexOptions: TriageOption[] = [
+    { value: 'MALE', label: tSex('MALE'), icon: User },
+    { value: 'FEMALE', label: tSex('FEMALE'), icon: UserRound },
+  ];
+  const ageGroupOptions: TriageOption[] = [
+    { value: 'ADULT', label: tAgeGroup('ADULT'), icon: User },
+    { value: 'CHILD', label: tAgeGroup('CHILD'), icon: Baby },
+  ];
+
   return (
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-secondary">
-          Registo de Triagem
+          {t('recordSection')}
         </h2>
         <X className="size-5 text-secondary" />
       </div>
@@ -175,14 +174,14 @@ export default function CollectionRecord({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Qualidade</TableHead>
-                <TableHead>Sexo</TableHead>
-                <TableHead>Faixa etária</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Estação</TableHead>
-                <TableHead>Marca</TableHead>
-                <TableHead>Quantidade</TableHead>
-                <TableHead>Ação</TableHead>
+                <TableHead>{tCommon('quality')}</TableHead>
+                <TableHead>{tCommon('sex')}</TableHead>
+                <TableHead>{tCommon('ageGroup')}</TableHead>
+                <TableHead>{tCommon('type')}</TableHead>
+                <TableHead>{tCommon('season')}</TableHead>
+                <TableHead>{tCommon('brand')}</TableHead>
+                <TableHead>{tCommon('quantity')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -192,15 +191,15 @@ export default function CollectionRecord({
                     key={`${item.collectionRequestId}-${item.brandId}-${index}`}
                   >
                     <TableCell>
-                      {QUALITY_LABEL[item.quality] ?? item.quality}
+                      {tQuality(item.quality)}
                     </TableCell>
-                    <TableCell>{SEX_LABEL[item.sex] ?? item.sex}</TableCell>
+                    <TableCell>{tSex(item.sex)}</TableCell>
                     <TableCell>
-                      {AGE_GROUP_LABEL[item.ageGroup] ?? item.ageGroup}
+                      {tAgeGroup(item.ageGroup)}
                     </TableCell>
-                    <TableCell>{TYPE_LABEL[item.type] ?? item.type}</TableCell>
+                    <TableCell>{tItemType(item.type)}</TableCell>
                     <TableCell>
-                      {SEASON_LABEL[item.season] ?? item.season}
+                      {tSeason(item.season)}
                     </TableCell>
                     <TableCell>
                       {(brands.find((brand) => brand.id === item.brandId)
@@ -211,8 +210,8 @@ export default function CollectionRecord({
                     <TableCell>{item.quantity}</TableCell>
                     <TableCell>
                       <ConfirmDialog
-                        title="Remover item?"
-                        description="Tem certeza que deseja remover este item da triagem?"
+                        title={t('removeItemTitle')}
+                        description={t('removeItemDescription')}
                         trigger={
                           <Button
                             type="button"
@@ -235,7 +234,7 @@ export default function CollectionRecord({
                     colSpan={8}
                     className="h-20 text-center text-secondary/55"
                   >
-                    {'Tabela de itens'}
+                    {t('itemsTableCaption')}
                   </TableCell>
                 </TableRow>
               )}
@@ -246,11 +245,11 @@ export default function CollectionRecord({
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-secondary">
-              Marca *
+              {t('brandLabel')}
             </label>
             <Select value={brandId} onValueChange={onBrandChange}>
               <SelectTrigger className="w-full" disabled={isViewMode}>
-                <SelectValue placeholder="Selecionar marca" />
+                <SelectValue placeholder={t('brandPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {brands.map((item) => (
@@ -264,7 +263,7 @@ export default function CollectionRecord({
 
           <div>
             <label className="mb-1 block text-sm font-medium text-secondary">
-              Quantidade *
+              {t('quantityLabel')}
             </label>
             <Input
               type="number"
@@ -277,7 +276,7 @@ export default function CollectionRecord({
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-secondary">Qualidade *</p>
+          <p className="mb-2 text-sm font-medium text-secondary">{t('qualityLabel')}</p>
           <OptionSelector
             options={qualityOptions}
             selected={quality}
@@ -289,7 +288,7 @@ export default function CollectionRecord({
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-secondary">Estação *</p>
+          <p className="mb-2 text-sm font-medium text-secondary">{t('seasonLabel')}</p>
           <OptionSelector
             options={seasonOptions}
             selected={season}
@@ -300,7 +299,7 @@ export default function CollectionRecord({
 
         <div>
           <p className="mb-2 text-sm font-medium text-secondary">
-            Tipo de Roupa *
+            {t('clothingTypeLabel')}
           </p>
           <OptionSelector
             options={clothingTypeOptions}
@@ -313,7 +312,7 @@ export default function CollectionRecord({
         </div>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-secondary">Sexo *</p>
+          <p className="mb-2 text-sm font-medium text-secondary">{t('sexLabel')}</p>
           <OptionSelector
             options={sexOptions}
             selected={sex}
@@ -324,7 +323,7 @@ export default function CollectionRecord({
 
         <div>
           <p className="mb-2 text-sm font-medium text-secondary">
-            Faixa etária *
+            {t('ageGroupLabel')}
           </p>
           <OptionSelector
             options={ageGroupOptions}

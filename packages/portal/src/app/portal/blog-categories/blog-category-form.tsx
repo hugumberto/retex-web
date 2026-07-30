@@ -6,6 +6,7 @@ import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -22,6 +23,8 @@ interface Props {
 }
 
 export default function BlogCategoryForm({ onSave, category, trigger }: Props) {
+  const t = useTranslations('blogCategories');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEdit = !!category;
 
@@ -64,23 +67,21 @@ export default function BlogCategoryForm({ onSave, category, trigger }: Props) {
             onSave();
           })(),
           {
-            loading: isEdit ? 'A guardar...' : 'A criar...',
-            success: isEdit ? 'Categoria actualizada!' : 'Categoria criada!',
-            error: isEdit
-              ? 'Erro ao actualizar categoria.'
-              : 'Erro ao criar categoria.',
+            loading: isEdit ? tCommon('saving') : tCommon('creating'),
+            success: isEdit ? t('updateSuccess') : t('createSuccess'),
+            error: isEdit ? t('updateError') : t('createError'),
           }
         );
       } finally {
         setIsSubmitting(false);
       }
     },
-    [isEdit, category, onSave]
+    [isEdit, category, onSave, t, tCommon]
   );
 
   return (
     <DialogForm
-      title={isEdit ? 'Editar Categoria' : 'Nova Categoria'}
+      title={isEdit ? t('formEditTitle') : t('formCreateTitle')}
       onConfirm={form.handleSubmit(handleSubmit)}
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
@@ -88,28 +89,28 @@ export default function BlogCategoryForm({ onSave, category, trigger }: Props) {
       trigger={
         trigger ?? (
           <Button variant="secondary" className="ml-auto block">
-            Adicionar categoria
+            {t('addButton')}
           </Button>
         )
       }
     >
       <div className="grid grid-cols-1 gap-4">
         <InputForm
-          label="Título"
+          label={tCommon('title')}
           name="title"
           control={control}
-          rules={{ required: 'Campo obrigatório' }}
+          rules={{ required: tCommon('requiredField') }}
           errors={errors}
-          placeholder="ex: Moda circular"
+          placeholder={t('titlePlaceholder')}
         />
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">Estado</label>
+          <label className="text-sm font-medium">{tCommon('status')}</label>
           <select
             className="rounded-md border border-input bg-background px-3 py-2 text-sm"
             {...register('status')}
           >
-            <option value={BlogCategoryStatus.ACTIVE}>Activo</option>
-            <option value={BlogCategoryStatus.INACTIVE}>Inactivo</option>
+            <option value={BlogCategoryStatus.ACTIVE}>{tCommon('active')}</option>
+            <option value={BlogCategoryStatus.INACTIVE}>{tCommon('inactive')}</option>
           </select>
         </div>
       </div>

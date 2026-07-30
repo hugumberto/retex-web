@@ -1,18 +1,7 @@
 import { CollectionRequestStatus } from '@/app/types/collection-request';
 
-export const STATUS_LABEL: Record<CollectionRequestStatus, string> = {
-  [CollectionRequestStatus.CREATED]: 'Criado',
-  [CollectionRequestStatus.CONFIRMED]: 'Confirmado',
-  [CollectionRequestStatus.OUT_OF_ZONE]: 'Fora da Zona',
-  [CollectionRequestStatus.WAITING_FOR_COLLECTION]: 'Aguarda Recolha',
-  [CollectionRequestStatus.COLLECTED]: 'Recolhido',
-  [CollectionRequestStatus.IN_TRANSIT]: 'Em Trânsito',
-  [CollectionRequestStatus.IN_HOUSE]: 'Em Armazém',
-  [CollectionRequestStatus.CANCELLED]: 'Cancelado',
-  [CollectionRequestStatus.SCREENING]: 'Em Triagem',
-  [CollectionRequestStatus.STOCKED]: 'Concluído',
-};
-
+// As etiquetas de texto vivem no i18n (`enums.collectionRequestStatus.*`);
+// aqui ficam apenas as cores, que não dependem do idioma.
 export const STATUS_CLASS: Record<CollectionRequestStatus, string> = {
   [CollectionRequestStatus.CREATED]: 'bg-blue-100 text-blue-700',
   [CollectionRequestStatus.CONFIRMED]: 'bg-green-100 text-green-700',

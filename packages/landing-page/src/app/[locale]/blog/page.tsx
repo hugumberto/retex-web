@@ -1,5 +1,6 @@
 import { Header } from '@/components/landing/Header';
 import LandingFooter from '@/components/landing/LandingFooter';
+import { Link } from '@/i18n/navigation';
 import {
   apiUrl,
   BlogPost,
@@ -8,12 +9,19 @@ import {
   isoDate,
   PaginatedResult,
 } from '@/lib/blog';
-import Link from 'next/link';
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
-export const metadata = {
-  title: 'Blog | RETEX',
-  description: 'Novidades, artigos e atualizações da RETEX.',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata.blog' });
+
+  return { title: t('title'), description: t('description') };
+}
 
 const LIMIT = 12;
 
@@ -34,11 +42,15 @@ async function getPosts(page: number): Promise<PaginatedResult<BlogPost>> {
 }
 
 export default async function BlogIndexPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
+  const { locale } = await params;
   const { page } = await searchParams;
+  const t = await getTranslations({ locale, namespace: 'blog' });
   const current = Math.max(1, Number(page) || 1);
   const { data: posts, meta } = await getPosts(current);
   const totalPages = Math.max(1, meta.totalPages);
@@ -49,12 +61,12 @@ export default async function BlogIndexPage({
       <div className="flex-1 mt-[4rem]">
         <section className="landing-section blog-index">
           <header className="blog-index-head">
-            <h1>Blog</h1>
-            <p>Encontra aqui novidades e ideias sobre moda circular</p>
+            <h1>{t('indexTitle')}</h1>
+            <p>{t('indexSubtitle')}</p>
           </header>
 
           {posts.length === 0 ? (
-            <p className="blog-empty">Ainda não há artigos publicados.</p>
+            <p className="blog-empty">{t('empty')}</p>
           ) : (
             <div className="blog-index-grid">
               {posts.map((post) => (
@@ -74,7 +86,9 @@ export default async function BlogIndexPage({
                     )}
                   </div>
                   <div className="blog-copy">
-                    <small>{post.categories?.[0]?.title ?? 'Blog'}</small>
+                    <small>
+                      {post.categories?.[0]?.title ?? t('defaultCategory')}
+                    </small>
                     <h3>{post.title}</h3>
                     <p>{excerpt(post.body, 130)}</p>
                     <div className="blog-meta-row">
@@ -92,29 +106,31 @@ export default async function BlogIndexPage({
           )}
 
           {totalPages > 1 && (
-            <nav className="blog-pagination" aria-label="Paginação do blog">
+            <nav className="blog-pagination" aria-label={t('paginationAria')}>
               {current > 1 ? (
                 <Link
                   href={`/blog?page=${current - 1}`}
                   className="blog-page-btn"
                 >
-                  ← Anterior
+                  {t('previous')}
                 </Link>
               ) : (
-                <span className="blog-page-btn is-disabled">← Anterior</span>
+                <span className="blog-page-btn is-disabled">
+                  {t('previous')}
+                </span>
               )}
               <span className="blog-page-info">
-                Página {current} de {totalPages}
+                {t('pageInfo', { current, total: totalPages })}
               </span>
               {current < totalPages ? (
                 <Link
                   href={`/blog?page=${current + 1}`}
                   className="blog-page-btn"
                 >
-                  Seguinte →
+                  {t('next')}
                 </Link>
               ) : (
-                <span className="blog-page-btn is-disabled">Seguinte →</span>
+                <span className="blog-page-btn is-disabled">{t('next')}</span>
               )}
             </nav>
           )}

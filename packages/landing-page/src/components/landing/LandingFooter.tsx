@@ -1,8 +1,11 @@
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import Link from 'next/link';
 import Script from 'next/script';
 
 export default function LandingFooter() {
+  const t = useTranslations('footer');
+
   return (
     <footer className="landing-footer">
       <div className="footer-top">
@@ -14,18 +17,18 @@ export default function LandingFooter() {
             height={53}
             className="footer-logo"
           />
-          <p className="footer-tagline">wear. care. share. repeat.</p>
+          <p className="footer-tagline">{t('tagline')}</p>
         </div>
 
         <nav className="footer-col--nav">
-          <Link href="/#como-funciona">COMO FUNCIONA</Link>
-          <Link href="/faq">FAQ&apos;S</Link>
-          <Link href="/#blog">BLOG</Link>
-          <Link href="/#sobre-nos">SOBRE NÓS</Link>
+          <Link href="/#como-funciona">{t('nav.howItWorks')}</Link>
+          <Link href="/faq">{t('nav.faq')}</Link>
+          <Link href="/#blog">{t('nav.blog')}</Link>
+          <Link href="/#sobre-nos">{t('nav.about')}</Link>
         </nav>
 
         <div className="footer-col--contact">
-          <h3>Contacta-nos para saber mais</h3>
+          <h3>{t('contactTitle')}</h3>
           <a href="mailto:geral@retex.pt">geral@retex.pt</a>
         </div>
       </div>
@@ -104,7 +107,7 @@ export default function LandingFooter() {
           rel="noreferrer"
           className="iubenda-nostyle iubenda-noiframe iubenda-embed"
         >
-          Política de Privacidade
+          {t('privacyPolicy')}
         </a>
         {' | '}
         <a
@@ -113,10 +116,10 @@ export default function LandingFooter() {
           rel="noreferrer"
           className="iubenda-nostyle iubenda-noiframe iubenda-embed"
         >
-          Política de Cookies
+          {t('cookiePolicy')}
         </a>
         {' | '}
-        Livro de Reclamações Online
+        {t('complaintsBook')}
       </p>
 
       <Script

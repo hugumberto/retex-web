@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { activateUser } from '@/service/auth';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
@@ -16,20 +17,22 @@ type ActivateFormData = {
   confirmPassword: string;
 };
 
-function errorMessageForStatus(status?: number): string {
+function errorKeyForStatus(status?: number): string {
   switch (status) {
     case 404:
-      return 'Link de ativação inválido ou já utilizado.';
+      return 'errorInvalidLink';
     case 409:
-      return 'Esta conta já foi ativada. Faça login.';
+      return 'errorAlreadyActive';
     case 400:
-      return 'O link expirou ou o endereço está fora da zona de atuação.';
+      return 'errorExpiredOrOutOfZone';
     default:
-      return 'Não foi possível ativar a conta. Tente novamente.';
+      return 'errorGeneric';
   }
 }
 
 function ActivateForm() {
+  const t = useTranslations('auth.activate');
+  const tValidation = useTranslations('validation');
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -49,11 +52,11 @@ function ActivateForm() {
     setIsSubmitting(true);
     try {
       await activateUser(token, data.password);
-      toast.success('Conta ativada com sucesso! Já pode entrar.');
+      toast.success(t('success'));
       router.push('/auth/login');
     } catch (err) {
       const status = (err as { response?: { status?: number } })?.response?.status;
-      toast.error(errorMessageForStatus(status));
+      toast.error(t(errorKeyForStatus(status)));
     } finally {
       setIsSubmitting(false);
     }
@@ -62,12 +65,12 @@ function ActivateForm() {
   if (!token) {
     return (
       <div className="w-full max-w-sm space-y-4 rounded-xl border bg-white p-6 shadow-md text-center">
-        <Title>Link inválido</Title>
+        <Title>{t('invalidLinkTitle')}</Title>
         <p className="text-sm text-muted-foreground">
-          O link de ativação não é válido. Verifique o email que recebeu ou contacte o suporte.
+          {t('invalidLinkDescription')}
         </p>
         <Button asChild variant="secondary" className="w-full">
-          <Link href="/auth/login">Ir para o login</Link>
+          <Link href="/auth/login">{t('goToLogin')}</Link>
         </Button>
       </div>
     );
@@ -89,29 +92,26 @@ function ActivateForm() {
           priority
         />
       </div>
-      <Title>Ativar conta</Title>
-      <p className="text-sm text-muted-foreground">
-        Defina a sua palavra-passe para ativar a conta e aceder ao portal.
-      </p>
+      <Title>{t('title')}</Title>
+      <p className="text-sm text-muted-foreground">{t('description')}</p>
 
       <div>
         <label className="block text-sm font-medium text-secondary">
-          Nova senha
+          {t('newPassword')}
         </label>
         <Input
           type="password"
-          placeholder="Nova senha"
+          placeholder={t('newPassword')}
           className={`mt-1 ${errors.password ? 'border-red-500' : ''}`}
           {...register('password', {
-            required: 'A senha é obrigatória',
+            required: tValidation('passwordRequired'),
             minLength: {
               value: 8,
-              message: 'A senha deve ter pelo menos 8 caracteres',
+              message: tValidation('passwordMinLength'),
             },
             pattern: {
               value: /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/,
-              message:
-                'A senha deve conter ao menos 1 letra maiúscula, 1 número e 1 caractere especial',
+              message: tValidation('passwordPattern'),
             },
           })}
         />
@@ -122,16 +122,16 @@ function ActivateForm() {
 
       <div>
         <label className="block text-sm font-medium text-secondary">
-          Confirmar senha
+          {t('confirmPassword')}
         </label>
         <Input
           type="password"
-          placeholder="Repita a senha"
+          placeholder={t('repeatPassword')}
           className={`mt-1 ${errors.confirmPassword ? 'border-red-500' : ''}`}
           {...register('confirmPassword', {
-            required: 'Confirme a senha',
+            required: tValidation('confirmPasswordRequired'),
             validate: (value) =>
-              value === watch('password') || 'As senhas não coincidem',
+              value === watch('password') || tValidation('passwordsDoNotMatch'),
           })}
         />
         {errors.confirmPassword?.message && (
@@ -147,7 +147,7 @@ function ActivateForm() {
         className="w-full"
         disabled={isSubmitting}
       >
-        {isSubmitting ? 'A ativar...' : 'Ativar conta'}
+        {isSubmitting ? t('submitting') : t('submit')}
       </Button>
     </form>
   );

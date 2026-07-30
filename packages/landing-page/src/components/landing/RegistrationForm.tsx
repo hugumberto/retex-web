@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { firstAddressPart } from '../../utils/address';
@@ -29,6 +30,9 @@ const portalLoginHref = (() => {
 })();
 
 export default function RegistrationForm() {
+  const t = useTranslations('register');
+  const tValidation = useTranslations('validation');
+  const locale = useLocale();
   const {
     register,
     handleSubmit,
@@ -99,12 +103,18 @@ export default function RegistrationForm() {
         `${process.env.NEXT_PUBLIC_API_URL}user/register`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept-Language': locale,
+          },
           body: JSON.stringify({
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
             contactPhone: data.contactPhone,
+            // Idioma em que o utilizador se registou: é o que a API usa para
+            // lhe enviar emails daqui em diante.
+            language: locale,
             gender: data.gender || undefined,
             dateOfBirth: data.dateOfBirth || undefined,
             address: {
@@ -124,7 +134,7 @@ export default function RegistrationForm() {
       );
       if (res.status === 409) {
         setMessageTone('error');
-        setMessage('Este email já está registado. Tente fazer login.');
+        setMessage(t('feedback.duplicateEmail'));
         return;
       }
       if (!res.ok) throw new Error();
@@ -132,19 +142,19 @@ export default function RegistrationForm() {
       setMessageTone('success');
       setMessage(
         body?.inServiceZone
-          ? 'Registo realizado! Enviámos um email para definir a sua password e ativar a conta. Verifique a sua caixa de entrada.'
-          : 'Registo realizado! O seu endereço está fora da zona de atuação — iremos notificá-lo por email assim que estiver disponível.'
+          ? t('feedback.successInZone')
+          : t('feedback.successOutOfZone')
       );
       reset();
     } catch {
       setMessageTone('error');
-      setMessage('Erro ao realizar o registo. Tente novamente.');
+      setMessage(t('feedback.error'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const req = { required: 'Campo obrigatório' as const };
+  const req = { required: tValidation('required') };
 
   return (
     <form
@@ -152,7 +162,7 @@ export default function RegistrationForm() {
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
-      <h2 className="register-card-title">Criar conta</h2>
+      <h2 className="register-card-title">{t('title')}</h2>
 
       {message ? (
         <p
@@ -169,7 +179,8 @@ export default function RegistrationForm() {
       <div className="form-row">
         <label>
           <span className="form-label">
-            Nome<span className="form-req">*</span>
+            {t('fields.firstName')}
+            <span className="form-req">*</span>
           </span>
           <input
             type="text"
@@ -183,7 +194,8 @@ export default function RegistrationForm() {
         </label>
         <label>
           <span className="form-label">
-            Apelido<span className="form-req">*</span>
+            {t('fields.lastName')}
+            <span className="form-req">*</span>
           </span>
           <input
             type="text"
@@ -199,7 +211,8 @@ export default function RegistrationForm() {
 
       <label>
         <span className="form-label">
-          Email<span className="form-req">*</span>
+          {t('fields.email')}
+          <span className="form-req">*</span>
         </span>
         <input
           type="email"
@@ -209,7 +222,7 @@ export default function RegistrationForm() {
             ...req,
             pattern: {
               value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-              message: 'Email inválido',
+              message: tValidation('invalidEmail'),
             },
           })}
         />
@@ -221,7 +234,8 @@ export default function RegistrationForm() {
       <div className="form-row">
         <label>
           <span className="form-label">
-            Telemóvel<span className="form-req">*</span>
+            {t('fields.phone')}
+            <span className="form-req">*</span>
           </span>
           <input
             type="tel"
@@ -237,11 +251,12 @@ export default function RegistrationForm() {
         </label>
         <label>
           <span className="form-label">
-            Código postal<span className="form-req">*</span>
+            {t('fields.zipCode')}
+            <span className="form-req">*</span>
           </span>
           <input
             type="text"
-            placeholder="0000-000"
+            placeholder={t('fields.zipCodePlaceholder')}
             autoComplete="postal-code"
             className={errors.zipCode ? 'field-error' : undefined}
             {...register('zipCode', req)}
@@ -255,7 +270,8 @@ export default function RegistrationForm() {
 
       <label>
         <span className="form-label">
-          Morada<span className="form-req">*</span>
+          {t('fields.street')}
+          <span className="form-req">*</span>
         </span>
         <input
           type="text"
@@ -271,7 +287,8 @@ export default function RegistrationForm() {
       <div className="form-row">
         <label>
           <span className="form-label">
-            Nº de Porta<span className="form-req">*</span>
+            {t('fields.number')}
+            <span className="form-req">*</span>
           </span>
           <input
             type="text"
@@ -284,14 +301,15 @@ export default function RegistrationForm() {
           ) : null}
         </label>
         <label>
-          <span className="form-label">Complemento</span>
+          <span className="form-label">{t('fields.complement')}</span>
           <input type="text" {...register('complement')} />
         </label>
       </div>
       <div className="form-row">
         <label>
           <span className="form-label">
-            Localidade<span className="form-req">*</span>
+            {t('fields.city')}
+            <span className="form-req">*</span>
           </span>
           <input
             type="text"
@@ -301,21 +319,27 @@ export default function RegistrationForm() {
         </label>
         <label>
           <span className="form-label">
-            Freguesia<span className="form-req">*</span>
+            {t('fields.cityDivision')}
+            <span className="form-req">*</span>
           </span>
           <input type="text" {...register('cityDivision')} />
         </label>
       </div>
       <div>
         <span className="form-label">
-          Sexo<span className="form-req">*</span>
+          {t('fields.gender')}
+          <span className="form-req">*</span>
         </span>
-        <div className="radio-group" role="radiogroup" aria-label="Sexo">
+        <div
+          className="radio-group"
+          role="radiogroup"
+          aria-label={t('fields.gender')}
+        >
           {(
             [
-              { value: 'MALE', label: 'Masculino' },
-              { value: 'FEMALE', label: 'Feminino' },
-              { value: 'PREFER_NOT_TO_SAY', label: 'Prefiro não dizer' },
+              { value: 'MALE', label: t('gender.male') },
+              { value: 'FEMALE', label: t('gender.female') },
+              { value: 'PREFER_NOT_TO_SAY', label: t('gender.preferNotToSay') },
             ] as const
           ).map(({ value, label }) => (
             <label key={value} className="radio-option">
@@ -331,7 +355,8 @@ export default function RegistrationForm() {
 
       <label>
         <span className="form-label">
-          Data de Nascimento<span className="form-req">*</span>
+          {t('fields.dateOfBirth')}
+          <span className="form-req">*</span>
         </span>
         <input
           type="date"
@@ -349,17 +374,17 @@ export default function RegistrationForm() {
       <input type="hidden" {...register('long')} />
 
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'A registar…' : 'Criar conta'}
+        {isSubmitting ? t('submitting') : t('submit')}
       </button>
 
       <p className="register-login-link">
-        Já tens conta?{' '}
+        {t('alreadyHaveAccount')}{' '}
         <a href={portalLoginHref} target="_blank" rel="noopener noreferrer">
-          Login
+          {t('login')}
         </a>
       </p>
 
-      <div className="register-social-row" aria-label="Entrar com conta social">
+      <div className="register-social-row" aria-label={t('socialAria')}>
         <span
           className="register-social-icon"
           aria-label="Facebook"

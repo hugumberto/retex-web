@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { useTranslations } from 'next-intl';
 import * as React from 'react';
 import { FieldErrors, FieldValues } from 'react-hook-form';
 
@@ -35,10 +36,10 @@ interface DialogFormProps<T extends FieldValues> {
 export function DialogForm<T extends FieldValues>({
   open,
   onOpenChange,
-  title = 'Confirmar ação',
+  title,
   description,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
   trigger,
@@ -47,8 +48,13 @@ export function DialogForm<T extends FieldValues>({
   errors,
   contentClassName,
 }: DialogFormProps<T>) {
+  const t = useTranslations('common.dialogForm');
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = open !== undefined;
+
+  const resolvedTitle = title ?? t('title');
+  const resolvedConfirmText = confirmText ?? t('confirm');
+  const resolvedCancelText = cancelText ?? t('cancel');
   const actualOpen = isControlled ? open : internalOpen;
 
   const handleOpenChange = (next: boolean) => {
@@ -75,7 +81,7 @@ export function DialogForm<T extends FieldValues>({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent aria-describedby={undefined} className={contentClassName}>
         <DialogHeader>
-          <DialogTitle className="text-secondary">{title}</DialogTitle>
+          <DialogTitle className="text-secondary">{resolvedTitle}</DialogTitle>
           {description && (
             <DialogDescription aria-describedby={undefined}>
               {description}
@@ -97,11 +103,11 @@ export function DialogForm<T extends FieldValues>({
                 onClick={handleCancel}
                 disabled={loading}
               >
-                {cancelText}
+                {resolvedCancelText}
               </Button>
             </DialogClose>
             <Button type="submit" disabled={loading} variant={'secondary'}>
-              {loading ? 'Processando...' : confirmText}
+              {loading ? t('processing') : resolvedConfirmText}
             </Button>
           </DialogFooter>
         </form>

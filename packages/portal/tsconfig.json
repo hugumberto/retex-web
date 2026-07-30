@@ -43,6 +43,7 @@
     "src/**/*.jsx",
     "src/**/*.ts",
     "src/**/*.tsx",
+    "src/**/*.json",
     ".next/types/**/*.ts"
   ],
   "exclude": [

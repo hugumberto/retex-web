@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { PencilIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -22,6 +23,8 @@ export default function BrandForm({
   initialData,
   onSave,
 }: BrandFormProps) {
+  const t = useTranslations('brand');
+  const tCommon = useTranslations('common');
   const isEditing = useMemo(() => !!brandId, [brandId]);
   const [, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,14 +79,12 @@ export default function BrandForm({
             }
           })(),
           {
-            loading: 'Carregando...',
+            loading: tCommon('loading'),
             success: () => {
               onSave();
               setIsOpen(false);
               reset({ name: '', manual: false });
-              return `Marca ${
-                isEditing ? 'atualizada' : 'criada'
-              } com sucesso!`;
+              return isEditing ? t('updateSuccess') : t('createSuccess');
             },
             error: (err) => {
               const response = (
@@ -93,11 +94,10 @@ export default function BrandForm({
               )?.response;
               if (response?.status === 409) {
                 return (
-                  response.data?.message ||
-                  'Já existe uma marca com este nome'
+                  response.data?.message || t('duplicateName')
                 );
               }
-              return `Erro ao ${isEditing ? 'atualizar' : 'criar'} a marca.`;
+              return isEditing ? t('updateError') : t('createError');
             },
           }
         );
@@ -105,12 +105,12 @@ export default function BrandForm({
         setIsSubmitting(false);
       }
     },
-    [brandId, isEditing, onSave, reset]
+    [brandId, isEditing, onSave, reset, t, tCommon]
   );
 
   return (
     <DialogForm
-      title={isEditing ? 'Atualizar Marca' : 'Cadastro de Marca'}
+      title={isEditing ? t('formEditTitle') : t('formCreateTitle')}
       onConfirm={form.handleSubmit(handleSubmit)}
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
@@ -122,19 +122,19 @@ export default function BrandForm({
           </Button>
         ) : (
           <Button variant="secondary" className="ml-auto block">
-            Criar
+            {tCommon('create')}
           </Button>
         )
       }
     >
       <div className="grid grid-cols-1 gap-6">
         <InputForm
-          label="Nome"
+          label={tCommon('name')}
           name="name"
           control={control}
-          rules={{ required: 'O nome é obrigatório' }}
+          rules={{ required: tCommon('nameRequired') }}
           errors={errors}
-          placeholder="Nome da marca"
+          placeholder={t('namePlaceholder')}
         />
       </div>
     </DialogForm>

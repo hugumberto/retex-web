@@ -6,6 +6,7 @@ import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -23,6 +24,8 @@ interface Props {
 }
 
 export default function FaqCategoryForm({ onSave, category, trigger }: Props) {
+  const t = useTranslations('faq');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEdit = !!category;
 
@@ -62,9 +65,9 @@ export default function FaqCategoryForm({ onSave, category, trigger }: Props) {
             onSave();
           })(),
           {
-            loading: isEdit ? 'A guardar...' : 'A criar...',
-            success: isEdit ? 'Categoria actualizada!' : 'Categoria criada!',
-            error: isEdit ? 'Erro ao actualizar categoria.' : 'Erro ao criar categoria.',
+            loading: isEdit ? tCommon('saving') : tCommon('creating'),
+            success: isEdit ? t('categoryUpdated') : t('categoryCreated'),
+            error: isEdit ? t('categoryUpdateError') : t('categoryCreateError'),
           }
         );
       } finally {
@@ -76,7 +79,7 @@ export default function FaqCategoryForm({ onSave, category, trigger }: Props) {
 
   return (
     <DialogForm
-      title={isEdit ? 'Editar Categoria' : 'Nova Categoria FAQ'}
+      title={isEdit ? t('categoryEditTitle') : t('categoryCreateTitle')}
       onConfirm={form.handleSubmit(handleSubmit)}
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
@@ -84,39 +87,41 @@ export default function FaqCategoryForm({ onSave, category, trigger }: Props) {
       trigger={
         trigger ?? (
           <Button variant="secondary" className="ml-auto block">
-            Adicionar categoria
+            {t('addCategoryButton')}
           </Button>
         )
       }
     >
       <div className="grid grid-cols-1 gap-4">
         <InputForm
-          label="Título"
+          label={tCommon('title')}
           name="title"
           control={control}
-          rules={{ required: 'Campo obrigatório' }}
+          rules={{ required: tCommon('requiredField') }}
           errors={errors}
-          placeholder="ex: Perguntas frequentes"
+          placeholder={t('categoryTitlePlaceholder')}
         />
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">Descrição</label>
+          <label className="text-sm font-medium">{tCommon('description')}</label>
           <textarea
             className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            placeholder="Breve descrição da categoria"
-            {...register('description', { required: 'Campo obrigatório' })}
+            placeholder={t('categoryDescriptionPlaceholder')}
+            {...register('description', {
+              required: tCommon('requiredField'),
+            })}
           />
           {errors.description && (
             <p className="text-xs text-destructive">{errors.description.message}</p>
           )}
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">Estado</label>
+          <label className="text-sm font-medium">{tCommon('status')}</label>
           <select
             className="rounded-md border border-input bg-background px-3 py-2 text-sm"
             {...register('status')}
           >
-            <option value={FaqStatus.ACTIVE}>Activo</option>
-            <option value={FaqStatus.INACTIVE}>Inactivo</option>
+            <option value={FaqStatus.ACTIVE}>{tCommon('active')}</option>
+            <option value={FaqStatus.INACTIVE}>{tCommon('inactive')}</option>
           </select>
         </div>
       </div>

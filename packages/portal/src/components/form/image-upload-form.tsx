@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import * as React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,7 @@ function ImageUploadInput({
   id,
   className,
 }: ImageUploadInputProps) {
+  const t = useTranslations('imageUpload');
   const [localError, setLocalError] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -48,9 +50,7 @@ function ImageUploadInput({
 
     if (file.size > maxSize) {
       setLocalError(
-        `Imagem excede o tamanho máximo de ${(maxSize / (1024 * 1024)).toFixed(
-          1
-        )}MB`
+        t('tooLarge', { size: (maxSize / (1024 * 1024)).toFixed(1) })
       );
       // reset selection
       e.target.value = '';
@@ -61,7 +61,7 @@ function ImageUploadInput({
       const dataUrl = await readFileAsDataURL(file);
       onChange(dataUrl);
     } catch {
-      setLocalError('Falha ao ler arquivo da imagem');
+      setLocalError(t('readError'));
     }
   };
 
@@ -84,7 +84,7 @@ function ImageUploadInput({
         />
         {value && (
           <Button type="button" data-style="ghost" onClick={handleClear}>
-            Remover
+            {t('remove')}
           </Button>
         )}
       </div>
@@ -94,7 +94,7 @@ function ImageUploadInput({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
-            alt="Pré-visualização"
+            alt={t('previewAlt')}
             className="h-28 w-28 rounded-md border object-cover"
           />
         </div>

@@ -1,12 +1,14 @@
+import { useTranslations } from 'next-intl';
+
 export default function LandingUpcycling() {
+  const t = useTranslations('upcycling');
+
   return (
     <section
       className="upcycling-strip mb-12"
       aria-labelledby="upcycling-heading"
     >
-      <p className="upcycling-banner">
-        ESTA PEÇA FOI REINVENTADA COM MATERIAIS REUTILIZADOS
-      </p>
+      <p className="upcycling-banner">{t('banner')}</p>
       <div className="upcycling-rule">
         <span className="upcycling-scissors" aria-hidden>
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
@@ -35,24 +37,18 @@ export default function LandingUpcycling() {
       </div>
       <div className="upcycling-inner">
         <div>
-          <p className="upcycling-kicker">UPCYCLING TÊXTIL</p>
-          <h3 id="upcycling-heading">Dar uma nova vida ao material</h3>
-          <p>
-            Na RETEX, o upcycling é a forma mais criativa de prolongar a vida
-            dos têxteis. Em vez de irem para o lixo, resíduos de produção, stock
-            excedente e uniformes antigos são transformados em novos produtos
-            com mais valor — acessórios, peças para o lar e brindes
-            corporativos.
-          </p>
+          <p className="upcycling-kicker">{t('kicker')}</p>
+          <h3 id="upcycling-heading">{t('title')}</h3>
+          <p>{t('body')}</p>
           <small>RETEX</small>
-          <small className="upcycling-made">Made in Portugal</small>
+          <small className="upcycling-made">{t('made')}</small>
         </div>
         <div className="upcycling-stat">
           <div className="upcycling-stat-numbers">
             <span className="upcycling-hundred">100</span>
             <span className="upcycling-percent">%</span>
           </div>
-          <span className="upcycling-sust">Sustentável</span>
+          <span className="upcycling-sust">{t('sustainable')}</span>
           <div className="care-icons" aria-hidden>
             <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
               <rect

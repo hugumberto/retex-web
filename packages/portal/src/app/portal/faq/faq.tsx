@@ -14,6 +14,7 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -22,6 +23,8 @@ import FaqItemForm from './faq-item-form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function Faq() {
+  const t = useTranslations('faq');
+  const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [categories, setCategories] = useState<FaqCategoryDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,16 +36,16 @@ export default function Faq() {
       if (!isSuccessStatus(status)) throw new Error();
       setCategories(Array.isArray(data) ? data : []);
     } catch {
-      toast.error('Não foi possível carregar as categorias FAQ');
+      toast.error(t('loadError'));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    setPageTitle('FAQ');
-    setBreadcrumbs([{ label: 'FAQ', href: '/portal/faq' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/faq' }]);
     fetchCategories();
     return () => { setPageTitle(''); setBreadcrumbs([]); };
-  }, [fetchCategories, setBreadcrumbs, setPageTitle]);
+  }, [fetchCategories, setBreadcrumbs, setPageTitle, t]);
 
   const handleDeleteCategory = useCallback(
     async (id: string) => {
@@ -53,11 +56,15 @@ export default function Faq() {
           if (!isSuccessStatus(res.status) && res.status !== 204) throw new Error();
           await fetchCategories();
         })(),
-        { loading: 'A eliminar...', success: 'Categoria eliminada', error: 'Erro ao eliminar categoria' }
+        {
+          loading: tCommon('deleting'),
+          success: t('categoryDeleted'),
+          error: t('categoryDeleteError'),
+        }
       );
       setIsSubmitting(false);
     },
-    [fetchCategories]
+    [fetchCategories, t, tCommon]
   );
 
   const handleDeleteItem = useCallback(
@@ -73,11 +80,15 @@ export default function Faq() {
             prev ? { ...prev, items: prev.items.filter((i) => i.id !== itemId) } : null
           );
         })(),
-        { loading: 'A eliminar...', success: 'Item eliminado', error: 'Erro ao eliminar item' }
+        {
+          loading: tCommon('deleting'),
+          success: t('itemDeleted'),
+          error: t('itemDeleteError'),
+        }
       );
       setIsSubmitting(false);
     },
-    [fetchCategories]
+    [fetchCategories, t, tCommon]
   );
 
   const handleSaveCategory = useCallback(async () => {
@@ -112,15 +123,17 @@ export default function Faq() {
       </div>
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
-        <h2 className="text-lg font-semibold text-secondary mb-4">Categorias FAQ</h2>
+        <h2 className="text-lg font-semibold text-secondary mb-4">
+          {t('categoriesTitle')}
+        </h2>
         <div className="w-full overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Título</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Itens</TableHead>
-                <TableHead>Ação</TableHead>
+                <TableHead>{tCommon('title')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
+                <TableHead>{t('items')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -134,7 +147,9 @@ export default function Faq() {
                           ? 'bg-emerald-100 text-emerald-700'
                           : 'bg-slate-100 text-slate-500'
                       }`}>
-                        {cat.status === FaqStatus.ACTIVE ? 'Activo' : 'Inactivo'}
+                        {cat.status === FaqStatus.ACTIVE
+                          ? tCommon('active')
+                          : tCommon('inactive')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -144,7 +159,7 @@ export default function Faq() {
                         className="text-xs"
                         onClick={() => openItemsDialog(cat)}
                       >
-                        {cat.items?.length ?? 0} item(s)
+                        {t('itemCount', { count: cat.items?.length ?? 0 })}
                       </Button>
                     </TableCell>
                     <TableCell>
@@ -173,7 +188,7 @@ export default function Faq() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                    Nenhuma categoria criada.
+                    {t('emptyCategories')}
                   </TableCell>
                 </TableRow>
               )}
@@ -186,7 +201,9 @@ export default function Faq() {
       <Dialog open={!!itemsCategory} onOpenChange={(open) => { if (!open) setItemsCategory(null); }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{itemsCategory?.title} — Itens</DialogTitle>
+            <DialogTitle>
+              {t('itemsDialogTitle', { category: itemsCategory?.title ?? '' })}
+            </DialogTitle>
           </DialogHeader>
           <div className="flex justify-end mb-2">
             {itemsCategory && (
@@ -199,9 +216,9 @@ export default function Faq() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Pergunta</TableHead>
-                <TableHead>Resposta</TableHead>
-                <TableHead>Ação</TableHead>
+                <TableHead>{t('question')}</TableHead>
+                <TableHead>{t('answer')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -239,7 +256,7 @@ export default function Faq() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
-                    Nenhum item adicionado.
+                    {t('emptyItems')}
                   </TableCell>
                 </TableRow>
               )}

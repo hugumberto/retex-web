@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +20,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { CollectionRequestStatus } from '@/app/types/collection-request';
-import { STATUS_LABEL } from '@/lib/collection-request-status';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { SearchIcon } from 'lucide-react';
@@ -43,6 +43,9 @@ type Props = {
 };
 
 export default function RouteBagsDialog({ routeId, routeCode }: Props) {
+  const t = useTranslations('packageCollection');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionRequestStatus');
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<RouteCollectionRequestBags[]>([]);
@@ -58,7 +61,7 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
         if (!isSuccessStatus(res.status)) throw new Error();
         setData(res.data ?? []);
       } catch {
-        toast.error('Não foi possível carregar os pacotes da recolha');
+        toast.error(t('bagsLoadError'));
         setData([]);
       } finally {
         setIsLoading(false);
@@ -73,7 +76,7 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
           variant="ghost"
           size="icon"
           className="size-8"
-          title="Ver pacotes e sacos"
+          title={t('viewBagsTooltip')}
         >
           <SearchIcon />
         </Button>
@@ -87,17 +90,17 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
             Pacotes da recolha {routeCode ?? ''}
           </DialogTitle>
           <DialogDescription>
-            Pacotes desta recolha e os sacos (QR codes) vinculados a cada um.
+            {t('bagsDialogDescription')}
           </DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
-            A carregar...
+            {tCommon('loading')}
           </p>
         ) : data.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
-            Nenhum pacote nesta recolha
+            {t('noRequestsInRoute')}
           </p>
         ) : (
           <div className="space-y-6">
@@ -117,7 +120,7 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
                     <span>
                       Estado:{' '}
                       <strong>
-                        {STATUS_LABEL[entry.collectionRequest.status as CollectionRequestStatus] ??
+                        {tStatus(entry.collectionRequest.status as CollectionRequestStatus) ??
                           entry.collectionRequest.status}
                       </strong>
                     </span>
@@ -131,10 +134,10 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Código do saco</TableHead>
-                        <TableHead>Recolhido</TableHead>
-                        <TableHead>Processado</TableHead>
-                        <TableHead>Peso (kg)</TableHead>
+                        <TableHead>{t('bagCode')}</TableHead>
+                        <TableHead>{tCommon('collected')}</TableHead>
+                        <TableHead>{tCommon('processed')}</TableHead>
+                        <TableHead>{tCommon('weightKg')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -144,9 +147,9 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
                             <TableCell className="font-medium">
                               {bag.friendlyCode}
                             </TableCell>
-                            <TableCell>{bag.usedAt ? 'Sim' : 'Não'}</TableCell>
+                            <TableCell>{bag.usedAt ? tCommon('yes') : tCommon('no')}</TableCell>
                             <TableCell>
-                              {bag.processedAt ? 'Sim' : 'Não'}
+                              {bag.processedAt ? tCommon('yes') : tCommon('no')}
                             </TableCell>
                             <TableCell>
                               {bag.weight != null
@@ -161,7 +164,7 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
                             colSpan={4}
                             className="py-4 text-center text-muted-foreground"
                           >
-                            Sem sacos vinculados
+                            {t('noBagsBound')}
                           </TableCell>
                         </TableRow>
                       )}

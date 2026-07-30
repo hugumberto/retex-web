@@ -4,12 +4,15 @@ import { BlogPostDTO, BlogPostFormData } from '@/app/types/blog';
 import { PaginatedResult } from '@/app/types/helper';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import BlogForm from '../blog-form';
 
 export default function EditBlogPage() {
+  const t = useTranslations('blog');
+  const tCommon = useTranslations('common');
   const params = useParams<{ id: string }>();
   const [initialData, setInitialData] = useState<BlogPostFormData | undefined>();
   const [loading, setLoading] = useState(true);
@@ -22,7 +25,7 @@ export default function EditBlogPage() {
       if (!isSuccessStatus(status)) throw new Error();
       const post = data.data.find((p) => p.id === params.id);
       if (!post) {
-        toast.error('Post não encontrado');
+        toast.error(t('notFound'));
         return;
       }
       setInitialData({
@@ -37,18 +40,18 @@ export default function EditBlogPage() {
         categoryIds: post.categories?.map((category) => category.id) ?? [],
       });
     } catch {
-      toast.error('Não foi possível carregar o post');
+      toast.error(t('loadOneError'));
     } finally {
       setLoading(false);
     }
-  }, [params.id]);
+  }, [params.id, t]);
 
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
 
   if (loading) {
-    return <p className="p-6 text-muted-foreground">Carregando...</p>;
+    return <p className="p-6 text-muted-foreground">{tCommon('loading')}</p>;
   }
 
   return <BlogForm blogPostId={params.id} initialData={initialData} />;

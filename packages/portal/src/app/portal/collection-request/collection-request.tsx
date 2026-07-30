@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
 import { AddressDTO, Role } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
@@ -19,7 +20,6 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
-import { STATUS_LABEL } from '@/lib/collection-request-status';
 import RequestDetailsDialog from './request-details-dialog';
 import { useAppStore } from '@/store';
 import { MapPinOff } from 'lucide-react';
@@ -55,6 +55,9 @@ interface UserFormData {
 }
 
 export default function CollectionRequest() {
+  const t = useTranslations('collectionRequest');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionRequestStatus');
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
   const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,7 +132,7 @@ export default function CollectionRequest() {
       if (!isSuccessStatus(status)) throw new Error();
       setRequests(Array.isArray(data) ? data : []);
     } catch {
-      toast.error('Não foi possível carregar as solicitações de recolha');
+      toast.error(t('loadError'));
     }
   }, [isUserRole]);
 
@@ -144,9 +147,9 @@ export default function CollectionRequest() {
           await fetchRequests();
         },
         {
-          loading: 'A cancelar...',
-          success: 'Solicitação cancelada',
-          error: 'Não foi possível cancelar a solicitação',
+          loading: t('cancelling'),
+          success: t('cancelSuccess'),
+          error: t('cancelError'),
         }
       );
     },
@@ -154,9 +157,9 @@ export default function CollectionRequest() {
   );
 
   useEffect(() => {
-    setPageTitle('Solicitação de Recolha');
+    setPageTitle(t('pageTitle'));
     setBreadcrumbs([
-      { label: 'Solicitação de Recolha', href: '/portal/collection-request' },
+      { label: t('pageTitle'), href: '/portal/collection-request' },
     ]);
     fetchRequests();
 
@@ -165,7 +168,7 @@ export default function CollectionRequest() {
       api
         .get<AddressDTO[]>('/me/address')
         .then(({ data }) => setAddresses(data ?? []))
-        .catch(() => toast.error('Não foi possível carregar os endereços'))
+        .catch(() => toast.error(t('addressesLoadError')))
         .finally(() => setIsLoadingAddresses(false));
     }
 
@@ -189,9 +192,9 @@ export default function CollectionRequest() {
       userForm.reset();
       await fetchRequests();
       setUserFormOpen(false);
-      toast.success('Solicitação de recolha criada com sucesso');
+      toast.success(t('createSuccess'));
     } catch {
-      toast.error('Não foi possível criar a solicitação de recolha');
+      toast.error(t('createError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -223,9 +226,9 @@ export default function CollectionRequest() {
         await fetchRequests();
       },
       {
-        loading: 'A criar solicitação...',
-        success: 'Solicitação de recolha criada com sucesso',
-        error: 'Não foi possível criar a solicitação de recolha',
+        loading: t('creating'),
+        success: t('createSuccess'),
+        error: t('createError'),
       }
     );
     setIsSubmitting(false);
@@ -241,7 +244,7 @@ export default function CollectionRequest() {
       if (!res.ok) throw new Error();
       const { results } = await res.json();
       if (!Array.isArray(results) || results.length === 0) {
-        toast.error('Código postal não encontrado');
+        toast.error(t('zipNotFound'));
         return;
       }
       const { address, position } = results[0];
@@ -289,14 +292,14 @@ export default function CollectionRequest() {
       setValue('address.long', lon ? lon.toString() : '');
       resetField('address.number', { defaultValue: '' });
     } catch {
-      toast.error('Não foi possível buscar o endereço pelo código postal');
+      toast.error(t('zipLookupError'));
     }
   };
 
   const adminErrors = adminForm.formState.errors;
   const adminRegister = adminForm.register;
   const zipCodeField = adminRegister('address.zipCode', {
-    required: 'Campo obrigatório',
+    required: tCommon('requiredField'),
   });
 
   return (
@@ -305,20 +308,19 @@ export default function CollectionRequest() {
         {isUserRole ? (
           isLoadingAddresses ? (
             <Button variant="secondary" disabled>
-              A carregar...
+              {tCommon('loading')}
             </Button>
           ) : hasActiveRequest ? (
             <Alert className="max-w-md ml-auto">
-              <AlertTitle>Solicitação em curso</AlertTitle>
+              <AlertTitle>{t('activeRequest')}</AlertTitle>
               <AlertDescription>
-                Já tem uma solicitação de recolha activa. Aguarde a conclusão ou
-                cancelamento antes de criar uma nova.
+                {t('activeRequestWarning')}
               </AlertDescription>
             </Alert>
           ) : canRequest ? (
             <DialogForm<UserFormData>
-              title="Nova Solicitação de Recolha"
-              confirmText="Criar Solicitação"
+              title={t('formTitle')}
+              confirmText={t('createConfirm')}
               loading={isSubmitting}
               errors={userForm.formState.errors}
               onConfirm={submitUser}
@@ -329,7 +331,7 @@ export default function CollectionRequest() {
               }}
               trigger={
                 <Button variant="secondary" disabled={isSubmitting}>
-                  Criar Solicitação
+                  {t('createConfirm')}
                 </Button>
               }
             >
@@ -344,12 +346,12 @@ export default function CollectionRequest() {
                 <Controller
                   name="addressId"
                   control={userForm.control}
-                  rules={{ required: 'Selecione um endereço' }}
+                  rules={{ required: t('selectAddress') }}
                   render={({ field }) => (
                     <div className="flex flex-col gap-2">
                       {userForm.formState.errors.addressId && (
                         <p className="text-xs text-destructive">
-                          Selecione um endereço
+                          {t('selectAddress')}
                         </p>
                       )}
                       {inZoneAddresses.map((addr) => (
@@ -386,15 +388,15 @@ export default function CollectionRequest() {
                   <Input
                     type="number"
                     min={1}
-                    placeholder="Número de sacos*"
+                    placeholder={t('bagCountPlaceholder')}
                     className={
                       userForm.formState.errors.estimatedBags
                         ? 'border-red-500'
                         : ''
                     }
                     {...userForm.register('estimatedBags', {
-                      required: 'Campo obrigatório',
-                      min: { value: 1, message: 'Mínimo 1 saco' },
+                      required: tCommon('requiredField'),
+                      min: { value: 1, message: t('minOneBag') },
                     })}
                   />
                   {userForm.formState.errors.estimatedBags && (
@@ -408,11 +410,11 @@ export default function CollectionRequest() {
           ) : (
             <Alert variant="destructive" className="max-w-md ml-auto">
               <MapPinOff className="size-4" />
-              <AlertTitle>Fora da zona de actuação</AlertTitle>
+              <AlertTitle>{t('outOfServiceZone')}</AlertTitle>
               <AlertDescription>
                 Não tem nenhum endereço dentro da zona de actuação.{' '}
                 <Link href="/portal/perfil" className="underline font-medium">
-                  Adicione um endereço
+                  {t('addAddress')}
                 </Link>{' '}
                 na zona de actuação antes de solicitar uma coleta.
               </AlertDescription>
@@ -420,52 +422,52 @@ export default function CollectionRequest() {
           )
         ) : (
           <DialogForm<AdminFormData>
-            title="Nova Solicitação de Recolha"
-            confirmText="Criar Solicitação"
+            title={t('formTitle')}
+            confirmText={t('createConfirm')}
             loading={isSubmitting}
             errors={adminErrors}
             onConfirm={submitAdmin}
             trigger={
               <Button variant="secondary" disabled={isSubmitting}>
-                Criar Solicitação
+                {t('createConfirm')}
               </Button>
             }
           >
             <div className="grid max-h-[70vh] grid-cols-1 gap-4 overflow-y-auto pr-1 md:grid-cols-2">
               <Input
                 tabIndex={1}
-                placeholder="Nome*"
+                placeholder={t('firstNamePlaceholder')}
                 className={adminErrors.firstName ? 'border-red-500' : ''}
                 {...adminRegister('firstName', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={2}
-                placeholder="Apelido*"
+                placeholder={t('lastNamePlaceholder')}
                 className={adminErrors.lastName ? 'border-red-500' : ''}
                 {...adminRegister('lastName', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={3}
-                placeholder="Email*"
+                placeholder={t('emailPlaceholder')}
                 type="email"
                 className={adminErrors.email ? 'border-red-500' : ''}
-                {...adminRegister('email', { required: 'Campo obrigatório' })}
+                {...adminRegister('email', { required: tCommon('requiredField') })}
               />
               <Input
                 tabIndex={4}
-                placeholder="Contacto*"
+                placeholder={t('phonePlaceholder')}
                 className={adminErrors.contactPhone ? 'border-red-500' : ''}
                 {...adminRegister('contactPhone', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={5}
-                placeholder="Código Postal*"
+                placeholder={t('zipPlaceholder')}
                 className={adminErrors.address?.zipCode ? 'border-red-500' : ''}
                 {...zipCodeField}
                 onBlur={(event) => {
@@ -475,86 +477,86 @@ export default function CollectionRequest() {
               />
               <Input
                 tabIndex={6}
-                placeholder="Morada*"
+                placeholder={t('streetPlaceholder')}
                 className={adminErrors.address?.street ? 'border-red-500' : ''}
                 {...adminRegister('address.street', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={7}
-                placeholder="Freguesia*"
+                placeholder={t('cityDivisionPlaceholder')}
                 className={
                   adminErrors.address?.cityDivision ? 'border-red-500' : ''
                 }
                 {...adminRegister('address.cityDivision', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={8}
-                placeholder="Concelho*"
+                placeholder={t('cityPlaceholder')}
                 className={adminErrors.address?.city ? 'border-red-500' : ''}
                 {...adminRegister('address.city', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={9}
-                placeholder="Distrito*"
+                placeholder={t('countryDivisionPlaceholder')}
                 className={
                   adminErrors.address?.countryDivision ? 'border-red-500' : ''
                 }
                 {...adminRegister('address.countryDivision', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={10}
-                placeholder="País*"
+                placeholder={t('countryPlaceholder')}
                 className={adminErrors.address?.country ? 'border-red-500' : ''}
                 {...adminRegister('address.country', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={11}
-                placeholder="Nº edifício/porta*"
+                placeholder={t('numberPlaceholder')}
                 className={adminErrors.address?.number ? 'border-red-500' : ''}
                 {...adminRegister('address.number', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={12}
-                placeholder="Complemento Morada"
+                placeholder={t('complementPlaceholder')}
                 {...adminRegister('address.complement')}
               />
               <Input
                 tabIndex={13}
-                placeholder="Latitude*"
+                placeholder={t('latPlaceholder')}
                 className={adminErrors.address?.lat ? 'border-red-500' : ''}
                 {...adminRegister('address.lat', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={14}
-                placeholder="Longitude*"
+                placeholder={t('longPlaceholder')}
                 className={adminErrors.address?.long ? 'border-red-500' : ''}
                 {...adminRegister('address.long', {
-                  required: 'Campo obrigatório',
+                  required: tCommon('requiredField'),
                 })}
               />
               <Input
                 tabIndex={15}
                 type="number"
                 min={1}
-                placeholder="Estimativa de sacos*"
+                placeholder={t('estimatedBagsPlaceholder')}
                 className={adminErrors.estimatedBags ? 'border-red-500' : ''}
                 {...adminRegister('estimatedBags', {
-                  required: 'Campo obrigatório',
-                  min: { value: 1, message: 'Mínimo 1 saco' },
+                  required: tCommon('requiredField'),
+                  min: { value: 1, message: t('minOneBag') },
                 })}
               />
             </div>
@@ -565,7 +567,7 @@ export default function CollectionRequest() {
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-secondary">
-            Solicitações de Recolha
+            {t('listTitle')}
           </h2>
           {isAdmin && (
             <div className="flex items-center gap-2">
@@ -579,10 +581,10 @@ export default function CollectionRequest() {
                   setStatusFilter(e.target.value as 'ALL' | CollectionRequestStatus)
                 }
               >
-                <option value="ALL">Todos</option>
+                <option value="ALL">{tCommon('all')}</option>
                 {Object.values(CollectionRequestStatus).map((s) => (
                   <option key={s} value={s}>
-                    {STATUS_LABEL[s] ?? s}
+                    {tStatus(s)}
                   </option>
                 ))}
               </select>
@@ -593,14 +595,14 @@ export default function CollectionRequest() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead className="whitespace-normal">Morada</TableHead>
-                <TableHead>Sacos (est.)</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Criado em</TableHead>
-                <TableHead>Ação</TableHead>
+                <TableHead>{tCommon('code')}</TableHead>
+                <TableHead>{tCommon('name')}</TableHead>
+                <TableHead>{tCommon('email')}</TableHead>
+                <TableHead className="whitespace-normal">{tCommon('address')}</TableHead>
+                <TableHead>{t('estimatedBagsColumn')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
+                <TableHead>{tCommon('createdAt')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -623,7 +625,7 @@ export default function CollectionRequest() {
                     </TableCell>
                     <TableCell>{request.estimatedBags ?? '-'}</TableCell>
                     <TableCell>
-                      {STATUS_LABEL[request.status] ?? request.status}
+                      {tStatus(request.status)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {request.createdAt
@@ -656,7 +658,7 @@ export default function CollectionRequest() {
                     colSpan={8}
                     className="text-center py-6 text-muted-foreground"
                   >
-                    Nenhum registro encontrado!
+                    {tCommon('noRecords')}
                   </TableCell>
                 </TableRow>
               )}

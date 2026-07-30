@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { InputForm } from '@/components/form/input-form';
 import Title from '@/components/custom/title';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
@@ -23,6 +24,8 @@ type ResetPasswordFormData = {
 };
 
 export default function LoginPage() {
+  const t = useTranslations('auth.login');
+  const tValidation = useTranslations('validation');
   const router = useRouter();
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const isDev = process.env.NODE_ENV !== 'production';
@@ -54,9 +57,7 @@ export default function LoginPage() {
     } catch (err) {
       const status = isAxiosError(err) ? err.response?.status : undefined;
       toast.error(
-        status === 401
-          ? 'Email ou senha inválidos'
-          : 'Não foi possível entrar. Tente novamente mais tarde.'
+        status === 401 ? t('invalidCredentials') : t('genericError')
       );
     }
   }
@@ -67,22 +68,15 @@ export default function LoginPage() {
       reset();
       setIsResetModalOpen(false);
       if (outOfZone) {
-        toast.info(
-          'O seu endereço está fora da nossa zona de atuação. Assim que passarmos a atuar na sua zona, receberá um email para definir a sua palavra-passe.',
-          { duration: 8000 }
-        );
+        toast.info(t('outOfZone'), { duration: 8000 });
       } else {
-        toast.success(
-          'Se este email estiver registado, enviámos um link para repor a palavra-passe.'
-        );
+        toast.success(t('resetSent'));
       }
     } catch {
       // Anti-enumeração: não revelamos falhas (ex.: email inexistente).
       reset();
       setIsResetModalOpen(false);
-      toast.success(
-        'Se este email estiver registado, enviámos um link para repor a palavra-passe.'
-      );
+      toast.success(t('resetSent'));
     }
   }
 
@@ -101,25 +95,25 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <Title>Login</Title>
+          <Title>{t('title')}</Title>
 
           <InputForm
             name="email"
             control={control}
-            label="Email"
+            label={t('email')}
             type="email"
-            placeholder="Email"
-            rules={{ required: 'Email é obrigatório' }}
+            placeholder={t('email')}
+            rules={{ required: tValidation('emailRequired') }}
             errors={errors}
           />
 
           <InputForm
             name="password"
             control={control}
-            label="Password"
+            label={t('password')}
             type="password"
-            placeholder="Password"
-            rules={{ required: 'Senha é obrigatória' }}
+            placeholder={t('password')}
+            rules={{ required: tValidation('passwordRequired') }}
             errors={errors}
           />
 
@@ -130,7 +124,7 @@ export default function LoginPage() {
               className="h-auto p-0 text-sm"
               onClick={() => setIsResetModalOpen(true)}
             >
-              Esqueci a senha
+              {t('forgotPassword')}
             </Button>
           </div>
 
@@ -140,7 +134,7 @@ export default function LoginPage() {
             className="w-full"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'A entrar...' : 'Entrar'}
+            {isSubmitting ? t('submitting') : t('submit')}
           </Button>
         </form>
       </div>
@@ -148,9 +142,9 @@ export default function LoginPage() {
       <DialogForm<ResetPasswordFormData>
         open={isResetModalOpen}
         onOpenChange={setIsResetModalOpen}
-        title="Repor palavra-passe"
-        description="Indique o seu email. Se estiver registado, enviámos um link para repor a palavra-passe."
-        confirmText="Enviar link"
+        title={t('resetTitle')}
+        description={t('resetDescription')}
+        confirmText={t('resetConfirm')}
         loading={isResetSubmitting}
         errors={resetErrors}
         onConfirm={handleResetSubmit(onResetPasswordSubmit)}
@@ -158,17 +152,17 @@ export default function LoginPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-secondary">
-              Email
+              {t('email')}
             </label>
             <Input
               type="email"
-              placeholder="Informe seu email"
+              placeholder={t('emailPlaceholder')}
               className={`mt-1 ${resetErrors.email ? 'border-red-500' : ''}`}
               {...register('email', {
-                required: 'Email é obrigatório',
+                required: tValidation('emailRequired'),
                 pattern: {
                   value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                  message: 'Formato de email inválido',
+                  message: tValidation('emailInvalid'),
                 },
               })}
             />
