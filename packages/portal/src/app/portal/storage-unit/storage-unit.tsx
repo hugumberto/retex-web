@@ -154,9 +154,28 @@ export default function StorageUnit() {
             <p class="text"><strong>${t('seasonWithColon')}</strong> ${season}</p>
           </div>
           <script>
-            window.onload = function () {
-              window.print();
-            };
+            (function () {
+              // Os QR codes vêm de um serviço externo: se imprimirmos no
+              // onload a caixa de impressão pode abrir antes de eles chegarem.
+              var pending = [].slice.call(document.images).filter(function (img) {
+                return !img.complete;
+              });
+              if (!pending.length) return window.print();
+
+              var left = pending.length;
+              var go = function () {
+                if (left > 0 && --left === 0) window.print();
+              };
+              pending.forEach(function (img) {
+                img.addEventListener('load', go);
+                img.addEventListener('error', go);
+              });
+
+              // Rede lenta ou imagem em falta: imprime na mesma ao fim de 5s.
+              setTimeout(function () {
+                if (left > 0) { left = 0; window.print(); }
+              }, 5000);
+            })();
           </script>
         </body>
       </html>
