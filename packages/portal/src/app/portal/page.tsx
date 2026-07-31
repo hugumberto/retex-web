@@ -11,12 +11,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
-import { STATUS_CLASS, STATUS_LABEL } from '@/lib/collection-request-status';
+import { STATUS_CLASS } from '@/lib/collection-request-status';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function Index() {
+  const t = useTranslations('portalHome');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionRequestStatus');
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
   const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
   const [loading, setLoading] = useState(false);
@@ -29,11 +33,11 @@ export default function Index() {
       const { data } = await api.get<CollectionRequestDTO[]>('/me/collection-requests');
       setRequests(Array.isArray(data) ? data : []);
     } catch {
-      toast.error('Não foi possível carregar as solicitações');
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     setPageTitle('');
@@ -46,25 +50,31 @@ export default function Index() {
     <section className="flex flex-col gap-6">
       <div>
         <h1 className="text-xl font-semibold text-foreground">
-          Olá{user?.firstName ? `, ${user.firstName}` : ''}!
+          {user?.firstName
+            ? t('greetingWithName', { name: user.firstName })
+            : t('greeting')}
         </h1>
-        <p className="text-sm text-muted-foreground">Bem-vindo ao portal Retex.</p>
+        <p className="text-sm text-muted-foreground">{t('welcome')}</p>
       </div>
 
       {isUserRole && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
-          <h2 className="text-lg font-semibold text-secondary mb-4">As minhas solicitações</h2>
+          <h2 className="text-lg font-semibold text-secondary mb-4">
+            {t('myRequests')}
+          </h2>
 
           {loading ? (
-            <p className="text-sm text-muted-foreground py-6 text-center">A carregar...</p>
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              {tCommon('loading')}
+            </p>
           ) : (
             <div className="w-full overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Morada</TableHead>
-                    <TableHead>Cidade</TableHead>
-                    <TableHead>Estado</TableHead>
+                    <TableHead>{tCommon('address')}</TableHead>
+                    <TableHead>{tCommon('city')}</TableHead>
+                    <TableHead>{tCommon('status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -79,7 +89,7 @@ export default function Index() {
                         <TableCell>{req.address?.city ?? '—'}</TableCell>
                         <TableCell>
                           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_CLASS[req.status] ?? 'bg-muted text-muted-foreground'}`}>
-                            {STATUS_LABEL[req.status] ?? req.status}
+                            {tStatus(req.status)}
                           </span>
                         </TableCell>
                       </TableRow>
@@ -87,7 +97,7 @@ export default function Index() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-6 text-muted-foreground">
-                        Não tens solicitações de recolha.
+                        {t('empty')}
                       </TableCell>
                     </TableRow>
                   )}

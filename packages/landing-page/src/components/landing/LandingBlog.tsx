@@ -1,5 +1,6 @@
 'use client';
 
+import { Link } from '@/i18n/navigation';
 import {
   apiUrl,
   BlogPost,
@@ -8,10 +9,12 @@ import {
   isoDate,
   PaginatedResult,
 } from '@/lib/blog';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 function BlogSidePost({ post }: { post: BlogPost }) {
+  const t = useTranslations('blog');
+
   return (
     <Link href={`/blog/${post.slug}`} className="blog-row">
       <div className="blog-thumb">
@@ -22,7 +25,7 @@ function BlogSidePost({ post }: { post: BlogPost }) {
         )}
       </div>
       <div className="blog-copy">
-        <small>{post.categories?.[0]?.title ?? 'Blog'}</small>
+        <small>{post.categories?.[0]?.title ?? t('defaultCategory')}</small>
         <h3>{post.title}</h3>
         <p>{excerpt(post.body, 110)}</p>
         <div className="blog-meta-row">
@@ -36,6 +39,7 @@ function BlogSidePost({ post }: { post: BlogPost }) {
 }
 
 export default function LandingBlog() {
+  const t = useTranslations('blog');
   const [posts, setPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
@@ -54,8 +58,8 @@ export default function LandingBlog() {
 
   return (
     <section id="blog" className="landing-section blog">
-      <p className="blog-kicker">Novidades</p>
-      <h2>O Nosso Blog</h2>
+      <p className="blog-kicker">{t('kicker')}</p>
+      <h2>{t('sectionTitle')}</h2>
       <div className="blog-grid">
         <Link href={`/blog/${featured.slug}`} className="blog-featured">
           <div className="blog-featured-visual">
@@ -66,7 +70,9 @@ export default function LandingBlog() {
             )}
           </div>
           <div className="blog-copy blog-copy--featured">
-            <small>{featured.categories?.[0]?.title ?? 'Blog'}</small>
+            <small>
+              {featured.categories?.[0]?.title ?? t('defaultCategory')}
+            </small>
             <h3>{featured.title}</h3>
             <p>{excerpt(featured.body)}</p>
             <div className="blog-meta-row">
@@ -89,7 +95,7 @@ export default function LandingBlog() {
       </div>
       <div className="blog-see-all-row">
         <Link href="/blog" className="blog-see-all">
-          Ver todos
+          {t('seeAll')}
         </Link>
       </div>
     </section>

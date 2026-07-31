@@ -8,8 +8,16 @@ import LandingQuote from '@/components/landing/LandingQuote';
 import LandingServices from '@/components/landing/LandingServices';
 import LandingUpcycling from '@/components/landing/LandingUpcycling';
 import LandingValues from '@/components/landing/LandingValues';
+import { setRequestLocale } from 'next-intl/server';
 
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <main className="landing-shell">
       <LandingHero />

@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "home": {
+      "title": "RETEX | Soluções Sustentáveis para a Recolha e Reutilização de Têxteis",
+      "description": "Transforma o teu impacto ambiental com a RETEX. Recolhe, reutiliza e contribui para um futuro mais sustentável. Começa agora.",
+      "keywords": "desperdício têxtil, roupa usada, economia circular, marketplace sustentável, triagem automática de roupa, reutilização têxtil, reciclagem de têxteis, RETEX, impacto ambiental",
+      "ogTitle": "RETEX - Moda Sustentável e Circular",
+      "ogDescription": "Transforme o futuro da moda com a RETEX. Reutilize, recicle e reduza o impacto ambiental.",
+      "ogImageAlt": "RETEX - Economia Circular para a Moda"
+    },
+    "faq": {
+      "title": "FAQ | RETEX",
+      "description": "Perguntas frequentes sobre a RETEX e instruções para recolha de têxteis."
+    },
+    "blog": {
+      "title": "Blog | RETEX",
+      "description": "Novidades, artigos e atualizações da RETEX."
+    },
+    "register": {
+      "title": "Criar conta | RETEX",
+      "description": "Cria a tua conta RETEX e começa a contribuir para um futuro mais sustentável."
+    },
+    "post": {
+      "notFound": "Artigo não encontrado | RETEX"
+    }
+  },
+  "nav": {
+    "howItWorks": "Como funciona",
+    "services": "Serviços",
+    "blog": "Blog",
+    "faq": "FAQ's",
+    "cta": "Registo/Login",
+    "menuAria": "Menu",
+    "logoAlt": "RETEX"
+  },
+  "languageSwitcher": {
+    "label": "Idioma"
+  },
+  "hero": {
+    "tagline": "Ligamos Famílias, Empresas e Municípios numa missão: prolongar o ciclo de vida da roupa usada, contribuindo para um futuro mais sustentável."
+  },
+  "howItWorks": {
+    "title": "Como funciona?",
+    "steps": {
+      "register": {
+        "title": "Faz o teu registo",
+        "description": "Preenche a informação necessária para ficares registado."
+      },
+      "schedule": {
+        "title": "Agenda a tua recolha",
+        "description": "Menciona o local mais indicado para ti"
+      },
+      "rest": {
+        "title": "Agora é connosco",
+        "description": "Aguardar o contacto de um dos nossos transportadores."
+      }
+    }
+  },
+  "services": {
+    "companies": {
+      "title": "Empresas e Municípios",
+      "body": "A nossa solução permite a municípios e empresas reforçarem a gestão sustentável dos têxteis através de um sistema de recolha seletiva e economia circular. Os municípios beneficiam de maior desvio de resíduos têxteis de aterro, melhoria das taxas de reciclagem e acesso a dados de impacto ambiental através de dashboards digitais. As empresas, por sua vez, podem obter Créditos de Circularidade associados à recolha e valorização de têxteis, apoiando a compensação de emissões e o reporte de indicadores ESG de forma mais transparente e mensurável.",
+      "cta": "Entrar em contacto",
+      "imageAlt": "Têxteis e símbolo de reciclagem"
+    },
+    "individuals": {
+      "title": "Particulares",
+      "body": "Tem roupa que já não usa? Dê-lhe um novo propósito. Através do serviço de recolha seletiva de têxteis, a RETEX encaminha peças em bom estado para reutilização, contribuindo para a redução de resíduos e para a promoção da economia circular.",
+      "cta": "Agendar recolha",
+      "imageAlt": "Costura e reutilização têxtil"
+    }
+  },
+  "about": {
+    "title": "Quem somos?",
+    "body1": "Apresentamos a RETEX, uma <strong>plataforma que revoluciona a forma como lidamos com o desperdício têxtil</strong>. Tornamos a reutilização de têxtil mais simples, conveniente e eficiente, através de um modelo de recolha inovador e um compromisso real com a economia circular.",
+    "body2": "Conectamos consumidores, empresas e municípios para dar nova vida aos têxteis, reduzir o desperdício e gerar impacto ambiental e social positivo.",
+    "cta": "Saber mais",
+    "logoAlt": "RETEX"
+  },
+  "values": {
+    "kicker": "Descobre mais sobre",
+    "title": "Os nossos valores",
+    "items": {
+      "collection": {
+        "title": "Recolha Sustentável",
+        "text": "Em Portugal, são mais de 200 mil. O problema cresce, mas temos solução."
+      },
+      "waste": {
+        "title": "Redução do Desperdício Têxtil",
+        "text": "Damos nova vida a cada peça, evitando que toneladas acabem em aterros."
+      },
+      "impact": {
+        "title": "Impacto Social e Ambiental",
+        "text": "Apoiamos causas sociais e práticas sustentáveis para reduzir a pegada ecológica."
+      },
+      "circular": {
+        "title": "Economia Circular",
+        "text": "Transformamos resíduos em recursos, promovendo um consumo mais consciente."
+      }
+    }
+  },
+  "quote": {
+    "body": "Reciclar é reconhecer que tudo tem valor e merece uma segunda vida.",
+    "author": "- Jane Goodall"
+  },
+  "upcycling": {
+    "banner": "ESTA PEÇA FOI REINVENTADA COM MATERIAIS REUTILIZADOS",
+    "kicker": "UPCYCLING TÊXTIL",
+    "title": "Dar uma nova vida ao material",
+    "body": "Na RETEX, o upcycling é a forma mais criativa de prolongar a vida dos têxteis. Em vez de irem para o lixo, resíduos de produção, stock excedente e uniformes antigos são transformados em novos produtos com mais valor — acessórios, peças para o lar e brindes corporativos.",
+    "made": "Made in Portugal",
+    "sustainable": "Sustentável"
+  },
+  "partners": {
+    "title": "a RETEX tem o privilégio de colaborar com:",
+    "previous": "ANTERIOR",
+    "next": "PRÓXIMO"
+  },
+  "contact": {
+    "title": "Formulário",
+    "leadStrong": "Tem dúvidas? Estamos aqui para ajudar!",
+    "lead": "Preencha o formulário e entre em contacto connosco.",
+    "fields": {
+      "name": "Nome",
+      "phone": "Telemóvel",
+      "email": "Email",
+      "subject": "Título",
+      "message": "Mensagem"
+    },
+    "submit": "Submeter",
+    "submitting": "A enviar…",
+    "success": "Formulário enviado com sucesso!",
+    "error": "Erro ao enviar o formulário."
+  },
+  "validation": {
+    "required": "Campo obrigatório",
+    "invalidEmail": "Email inválido"
+  },
+  "register": {
+    "title": "Criar conta",
+    "fields": {
+      "firstName": "Nome",
+      "lastName": "Apelido",
+      "email": "Email",
+      "phone": "Telemóvel",
+      "zipCode": "Código postal",
+      "zipCodePlaceholder": "0000-000",
+      "street": "Morada",
+      "number": "Nº de Porta",
+      "complement": "Complemento",
+      "city": "Localidade",
+      "cityDivision": "Freguesia",
+      "gender": "Sexo",
+      "dateOfBirth": "Data de Nascimento"
+    },
+    "gender": {
+      "male": "Masculino",
+      "female": "Feminino",
+      "preferNotToSay": "Prefiro não dizer"
+    },
+    "submit": "Criar conta",
+    "submitting": "A registar…",
+    "alreadyHaveAccount": "Já tens conta?",
+    "login": "Login",
+    "socialAria": "Entrar com conta social",
+    "feedback": {
+      "duplicateEmail": "Este email já está registado. Tente fazer login.",
+      "successInZone": "Registo realizado! Enviámos um email para definir a sua password e ativar a conta. Verifique a sua caixa de entrada.",
+      "successOutOfZone": "Registo realizado! O seu endereço está fora da zona de atuação — iremos notificá-lo por email assim que estiver disponível.",
+      "error": "Erro ao realizar o registo. Tente novamente."
+    }
+  },
+  "blog": {
+    "kicker": "Novidades",
+    "sectionTitle": "O Nosso Blog",
+    "seeAll": "Ver todos",
+    "indexTitle": "Blog",
+    "indexSubtitle": "Encontra aqui novidades e ideias sobre moda circular",
+    "empty": "Ainda não há artigos publicados.",
+    "defaultCategory": "Blog",
+    "recentTitle": "Últimos artigos",
+    "paginationAria": "Paginação do blog",
+    "previous": "← Anterior",
+    "next": "Seguinte →",
+    "pageInfo": "Página {current} de {total}"
+  },
+  "footer": {
+    "tagline": "wear. care. share. repeat.",
+    "nav": {
+      "howItWorks": "COMO FUNCIONA",
+      "faq": "FAQ'S",
+      "blog": "BLOG",
+      "about": "SOBRE NÓS"
+    },
+    "contactTitle": "Contacta-nos para saber mais",
+    "privacyPolicy": "Política de Privacidade",
+    "cookiePolicy": "Política de Cookies",
+    "complaintsBook": "Livro de Reclamações Online"
+  }
+}

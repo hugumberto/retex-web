@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { BlogCategory } from '@/app/types/blog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,8 @@ export function CategoryPickerForm<T extends FieldValues>({
   errors,
   className,
 }: CategoryPickerFormProps<T>) {
+  const t = useTranslations('blog');
+  const tCommon = useTranslations('common');
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [creating, setCreating] = useState(false);
@@ -65,7 +68,7 @@ export function CategoryPickerForm<T extends FieldValues>({
       onChange([...selected, data.id]);
       setNewTitle('');
     } catch {
-      toast.error('Não foi possível criar a categoria');
+      toast.error(t('categoryCreateError'));
     } finally {
       setCreating(false);
     }
@@ -92,7 +95,7 @@ export function CategoryPickerForm<T extends FieldValues>({
               <div className="flex flex-wrap gap-2">
                 {categories.length === 0 && (
                   <span className="text-sm text-muted-foreground">
-                    Sem categorias. Crie a primeira abaixo.
+                    {t('noCategories')}
                   </span>
                 )}
                 {categories.map((category) => {
@@ -125,7 +128,7 @@ export function CategoryPickerForm<T extends FieldValues>({
                       createCategory(field.onChange, selected);
                     }
                   }}
-                  placeholder="Nova categoria..."
+                  placeholder={t('newCategoryPlaceholder')}
                   className="flex-1"
                 />
                 <Button
@@ -134,7 +137,7 @@ export function CategoryPickerForm<T extends FieldValues>({
                   disabled={!newTitle.trim() || creating}
                   onClick={() => createCategory(field.onChange, selected)}
                 >
-                  Adicionar
+                  {tCommon('add')}
                 </Button>
               </div>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,18 +29,6 @@ import { Role, UserDTO, UserStatus } from '../../types/user';
 import UserForm from './user-form';
 import ResetPasswordForm from './reset-password-form';
 
-const ROLE_LABEL: Record<Role, string> = {
-  [Role.USER]: 'Utilizador',
-  [Role.DRIVER]: 'Motorista',
-  [Role.OPS]: 'Operação',
-  [Role.ADMIN]: 'Admin',
-};
-
-const STATUS_LABEL: Record<UserStatus, string> = {
-  [UserStatus.ACTIVE]: 'Ativo',
-  [UserStatus.INACTIVE]: 'Inativo',
-};
-
 // Endereço padrão do utilizador (ou o primeiro, como fallback).
 const defaultAddress = (user: UserDTO) =>
   user.addresses?.find((a) => a.isDefault) ?? user.addresses?.[0];
@@ -47,6 +36,10 @@ const defaultAddress = (user: UserDTO) =>
 const ALL = 'ALL';
 
 export default function User() {
+  const t = useTranslations('users');
+  const tRole = useTranslations('enums.role');
+  const tStatus = useTranslations('enums.userStatus');
+  const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [users, setUsers] = useState<UserDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,25 +75,25 @@ export default function User() {
     try {
       const { data, status } = await api.get<UserDTO[]>('/user');
       if (!isSuccessStatus(status)) {
-        throw new Error('Erro ao buscar utilizadores');
+        throw new Error(t('fetchError'));
       }
       setUsers(data);
     } catch (error) {
       console.error('Erro ao buscar utilizadores:', error);
-      toast.error('Não foi possível carregar os utilizadores');
+      toast.error(t('loadError'));
     }
   }, []);
 
   useEffect(() => {
-    setPageTitle('Utilizador');
-    setBreadcrumbs([{ label: 'Utilizador', href: '/portal/user' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/user' }]);
     fetchData();
 
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [fetchData, setBreadcrumbs, setPageTitle]);
+  }, [fetchData, setBreadcrumbs, setPageTitle, t]);
 
   const handleDeleteUser = useCallback(
     async (user: UserDTO) => {
@@ -115,7 +108,7 @@ export default function User() {
           status: 'INACTIVE',
         });
         if (!isSuccessStatus(res.status)) {
-          throw new Error('Erro ao eliminar utilizador');
+          throw new Error(t('deleteError'));
         }
         await fetchData();
       } catch (error) {
@@ -132,8 +125,8 @@ export default function User() {
     async (user: UserDTO) => {
       await toast.promise(handleDeleteUser(user), {
         loading: 'Carregando...',
-        success: () => 'Utilizador eliminado com sucesso',
-        error: () => 'Erro ao eliminar o utilizador',
+        success: () => t('deleteSuccess'),
+        error: () => t('deleteError'),
       });
     },
     [handleDeleteUser]
@@ -144,7 +137,7 @@ export default function User() {
       <div className="w-full flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Input
-            placeholder="Pesquisar por email"
+            placeholder={t('searchByEmail')}
             value={emailQuery}
             onChange={(e) => setEmailQuery(e.target.value)}
             className="w-full sm:w-64"
@@ -154,13 +147,13 @@ export default function User() {
             onValueChange={(value) => setRoleFilter(value as Role | typeof ALL)}
           >
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Perfil" />
+              <SelectValue placeholder={tCommon('role')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL}>Todos os perfis</SelectItem>
+              <SelectItem value={ALL}>{t('allRoles')}</SelectItem>
               {Object.values(Role).map((role) => (
                 <SelectItem key={role} value={role}>
-                  {ROLE_LABEL[role]}
+                  {tRole(role)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -172,13 +165,13 @@ export default function User() {
             }
           >
             <SelectTrigger className="w-full sm:w-44">
-              <SelectValue placeholder="Estado" />
+              <SelectValue placeholder={tCommon('status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL}>Todos os status</SelectItem>
+              <SelectItem value={ALL}>{t('allStatuses')}</SelectItem>
               {Object.values(UserStatus).map((status) => (
                 <SelectItem key={status} value={status}>
-                  {STATUS_LABEL[status]}
+                  {tStatus(status)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -196,13 +189,13 @@ export default function User() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Perfil</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Localidade (padrão)</TableHead>
-              <TableHead>Criado em</TableHead>
-              <TableHead>Ações</TableHead>
+              <TableHead>{tCommon('name')}</TableHead>
+              <TableHead>{tCommon('email')}</TableHead>
+              <TableHead>{tCommon('role')}</TableHead>
+              <TableHead>{tCommon('status')}</TableHead>
+              <TableHead>{t('defaultCity')}</TableHead>
+              <TableHead>{tCommon('createdAt')}</TableHead>
+              <TableHead>{tCommon('actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -214,11 +207,9 @@ export default function User() {
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    {user.roles
-                      .map((role) => ROLE_LABEL[role.role] ?? role.role)
-                      .join(', ')}
+                    {user.roles.map((role) => tRole(role.role)).join(', ')}
                   </TableCell>
-                  <TableCell>{STATUS_LABEL[user.status] ?? user.status}</TableCell>
+                  <TableCell>{tStatus(user.status)}</TableCell>
                   <TableCell>
                     {(() => {
                       const addr = defaultAddress(user);
@@ -228,7 +219,7 @@ export default function User() {
                           <span>{addr.city || '—'}</span>
                           {!addr.isInServiceZone && (
                             <span className="inline-flex w-fit rounded-full bg-amber-100 px-2 text-xs font-semibold text-amber-800">
-                              Fora da zona
+                              {t('outOfZone')}
                             </span>
                           )}
                         </div>
@@ -276,7 +267,7 @@ export default function User() {
                   colSpan={7}
                   className="text-center py-6 text-muted-foreground"
                 >
-                  Nenhum registro encontrado!
+                  {tCommon('noRecords')}
                 </TableCell>
               </TableRow>
             )}

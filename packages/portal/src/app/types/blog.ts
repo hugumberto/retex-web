@@ -31,11 +31,6 @@ export enum BlogPostHighlight {
   HIGHLIGHTED = 2,
 }
 
-export const BLOG_POST_HIGHLIGHT_LABELS: Record<BlogPostHighlight, string> = {
-  [BlogPostHighlight.NONE]: 'Nenhum',
-  [BlogPostHighlight.FEATURED]: 'Em destaque',
-  [BlogPostHighlight.HIGHLIGHTED]: 'Destacado',
-};
 export enum BlogPostStatus {
   DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',

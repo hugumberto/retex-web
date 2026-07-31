@@ -3,6 +3,7 @@
 import { Bell, ChevronDown, Info, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -28,6 +29,7 @@ import { cn, isNavGroup, NAV_ITEMS, NavGroup, NavLeaf } from '@/lib/utils';
 import { Role } from '@/app/types/user';
 import { useAppStore } from '@/store';
 import { Label } from '../ui/label';
+import { LanguageSwitcher } from './language-switcher';
 import Title from './title';
 
 const isPathActive = (pathname: string | null, href: string): boolean => {
@@ -51,6 +53,7 @@ const leafButtonClasses = (active: boolean) =>
   );
 
 function NavLeafItem({ item, active }: { item: NavLeaf; active: boolean }) {
+  const t = useTranslations();
   const Icon = item.icon;
   return (
     <SidebarMenuItem>
@@ -61,7 +64,7 @@ function NavLeafItem({ item, active }: { item: NavLeaf; active: boolean }) {
       >
         <Link href={item.href}>
           <Icon className={cn('size-5')} />
-          <Label className="text-[13px]">{item.label}</Label>
+          <Label className="text-[13px]">{t(item.labelKey)}</Label>
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -77,6 +80,7 @@ function NavGroupItem({
   userRoles: Role[];
   pathname: string | null;
 }) {
+  const t = useTranslations();
   const children = group.children.filter((child) =>
     child.roles.some((role) => userRoles.includes(role))
   );
@@ -102,7 +106,7 @@ function NavGroupItem({
       >
         <Icon className={cn('size-5')} />
         <Label className="text-[13px] flex-1 text-left cursor-pointer">
-          {group.label}
+          {t(group.labelKey)}
         </Label>
         <ChevronDown
           className={cn('size-4 transition-transform', open && 'rotate-180')}
@@ -123,7 +127,7 @@ function NavGroupItem({
                 >
                   <Link href={child.href}>
                     <ChildIcon className={cn('size-4')} />
-                    <span className="text-[13px]">{child.label}</span>
+                    <span className="text-[13px]">{t(child.labelKey)}</span>
                   </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
@@ -136,6 +140,7 @@ function NavGroupItem({
 }
 
 export function AppSidebar() {
+  const t = useTranslations('common');
   const pathname = usePathname();
   const { user } = useAppStore();
   const userRoles = getUserRoles(user);
@@ -163,12 +168,14 @@ export function AppSidebar() {
 
       <SidebarContent className="px-3">
         <SidebarGroup>
-          <SidebarGroupLabel className="sr-only">Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="sr-only">
+            {t('navigation')}
+          </SidebarGroupLabel>
           <SidebarMenu>
             {visibleNavItems.map((entry) =>
               isNavGroup(entry) ? (
                 <NavGroupItem
-                  key={entry.label}
+                  key={entry.labelKey}
                   group={entry}
                   userRoles={userRoles}
                   pathname={pathname}
@@ -190,7 +197,7 @@ export function AppSidebar() {
           <span className="inline-flex size-6 items-center justify-center rounded-full border">
             <Info className="size-3.5" />
           </span>
-          <span className="font-medium">Info</span>
+          <span className="font-medium">{t('info')}</span>
         </div>
 
         <div className="mt-6 flex items-center gap-3">
@@ -201,11 +208,11 @@ export function AppSidebar() {
             }}
           />
           <div className="text-sm font-semibold min-w-0 truncate flex-1 text-secondary">
-            {user ? `${user.firstName} ${user.lastName}` : 'Utilizador'}
+            {user ? `${user.firstName} ${user.lastName}` : t('user')}
           </div>
           <button
             onClick={() => useAppStore.getState().logout()}
-            title="Terminar sessão"
+            title={t('logout')}
             className="shrink-0 text-secondary hover:text-destructive transition-colors"
           >
             <LogOut className="size-4" />
@@ -219,15 +226,17 @@ export function AppSidebar() {
 }
 
 export function RetexTopBar() {
+  const t = useTranslations('common');
   const { pageTitle } = useAppStore();
 
   return (
     <header className="sticky top-0 z-40 bg-white">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <SidebarTrigger className="-ml-1 md:hidden" />
-        <Title>{pageTitle || 'Home'}</Title>
+        <Title>{pageTitle || t('home')}</Title>
 
         <div className="ml-auto flex items-center gap-5">
+          <LanguageSwitcher />
           <Bell className="size-5" />
           <div
             className="size-10 rounded-full"

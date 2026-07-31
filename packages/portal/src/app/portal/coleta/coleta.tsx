@@ -1,7 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
-import { STATUS_LABEL } from '@/lib/collection-request-status';
 import { PackageCollectionDTO } from '@/app/types/package-collection';
 import { CollectionResponse, CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import CollectionRequestUserData from '../triage/components/collection-request-user-data';
@@ -36,6 +36,9 @@ const errorMessage = (error: unknown, fallback: string): string => {
 };
 
 export default function Coleta() {
+  const t = useTranslations('pickup');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionRequestStatus');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
 
   const [scanCode, setScanCode] = useState('');
@@ -56,13 +59,13 @@ export default function Coleta() {
   const qrRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setPageTitle('Recolha');
-    setBreadcrumbs([{ label: 'Recolha', href: '/portal/coleta' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/coleta' }]);
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setPageTitle, setBreadcrumbs]);
+  }, [setPageTitle, setBreadcrumbs, t]);
 
   const canCollect = pkg?.status === CollectionRequestStatus.WAITING_FOR_COLLECTION;
   const isCollected = pkg?.status === CollectionRequestStatus.COLLECTED;
@@ -94,7 +97,7 @@ export default function Coleta() {
     try {
       // 1) Tenta como pacote (código amigável do pacote ou id).
       await loadCollectionRequest(code);
-      toast.success('Solicitação carregada');
+      toast.success(t('requestLoaded'));
     } catch {
       // 2) Não é um pacote — tenta como recolha (código da rota): lista os
       //    pacotes da rota para o utilizador escolher qual recolher.
@@ -105,16 +108,16 @@ export default function Coleta() {
         const pkgs = route.collectionRequests ?? [];
         if (pkgs.length === 0) {
           setRouteCollectionRequests([]);
-          toast.error('Esta recolha não tem pacotes');
+          toast.error(t('routeHasNoRequests'));
         } else {
           setRouteCollectionRequests(pkgs);
-          toast.success('Recolha carregada — selecione um pacote');
+          toast.success(t('routeLoaded'));
         }
       } catch {
         setPkg(null);
         setBoundCodes([]);
         setRouteCollectionRequests([]);
-        toast.error('Nenhum pacote ou recolha encontrado para o código');
+        toast.error(t('notFoundForCode'));
       }
     } finally {
       setIsLoadingCollectionRequest(false);
@@ -127,9 +130,9 @@ export default function Coleta() {
       setIsLoadingCollectionRequest(true);
       try {
         await loadCollectionRequest(collectionRequestId);
-        toast.success('Solicitação carregada');
+        toast.success(t('requestLoaded'));
       } catch {
-        toast.error('Não foi possível carregar o pacote selecionado');
+        toast.error(t('loadSelectedError'));
       } finally {
         setIsLoadingCollectionRequest(false);
       }
@@ -151,10 +154,10 @@ export default function Coleta() {
       setBoundCodes((current) =>
         current.some((bag) => bag.id === data.id) ? current : [...current, data]
       );
-      toast.success('Saco vinculado');
+      toast.success(t('bagBound'));
     } catch (error) {
       console.error('Erro ao vincular QR code:', error);
-      toast.error(errorMessage(error, 'Não foi possível vincular o QR code'));
+      toast.error(errorMessage(error, t('bindQrError')));
     } finally {
       // Em qualquer caso (leitura correta ou incorreta): limpa o campo e mantém
       // o foco. O foco é feito após o re-render (input reabilitado).
@@ -174,10 +177,10 @@ export default function Coleta() {
       );
       if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
       setPkg(data);
-      toast.success('Coleta finalizada com sucesso');
+      toast.success(t('finishSuccess'));
     } catch (error) {
       console.error('Erro ao finalizar coleta:', error);
-      toast.error(errorMessage(error, 'Não foi possível finalizar a coleta'));
+      toast.error(errorMessage(error, t('finishError')));
     } finally {
       setIsFinalizing(false);
     }
@@ -187,7 +190,7 @@ export default function Coleta() {
     if (!pkg) return;
     const reason = cancelReason.trim();
     if (!reason) {
-      toast.error('Informe o motivo do cancelamento');
+      toast.error(t('cancelReasonRequired'));
       return;
     }
     setIsCancelling(true);
@@ -200,10 +203,10 @@ export default function Coleta() {
       setPkg(data);
       setShowCancel(false);
       setCancelReason('');
-      toast.success('Recolha cancelada. O cliente foi notificado por email.');
+      toast.success(t('cancelSuccess'));
     } catch (error) {
       console.error('Erro ao cancelar recolha:', error);
-      toast.error(errorMessage(error, 'Não foi possível cancelar a recolha'));
+      toast.error(errorMessage(error, t('cancelError')));
     } finally {
       setIsCancelling(false);
     }
@@ -225,7 +228,7 @@ export default function Coleta() {
       {/* Código da solicitação */}
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <label className="mb-1 block text-sm font-medium text-secondary">
-          Código da Solicitação *
+          {t('requestCodeLabel')}
         </label>
         <div className="flex flex-wrap items-center gap-3">
           <Input
@@ -239,7 +242,7 @@ export default function Coleta() {
                 await handleScanBlur();
               }
             }}
-            placeholder="Código do pacote ou da recolha — escaneie ou pressione Enter"
+            placeholder={t('requestCodePlaceholder')}
             autoFocus
             disabled={!!pkg || isLoadingCollectionRequest}
             className="max-w-md"
@@ -255,7 +258,7 @@ export default function Coleta() {
                     : 'bg-amber-100 text-amber-800'
                 }`}
               >
-                {STATUS_LABEL[pkg.status] ?? pkg.status}
+                {tStatus(pkg.status)}
               </span>
               {canCollect && (
                 <Button
@@ -264,19 +267,18 @@ export default function Coleta() {
                   className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
                   onClick={() => setShowCancel(true)}
                 >
-                  Cancelar recolha
+                  {t('cancelPickup')}
                 </Button>
               )}
               <Button type="button" variant="outline" onClick={handleReset}>
-                Nova coleta
+                {t('newPickup')}
               </Button>
             </>
           )}
         </div>
         {pkg && !canCollect && !isCollected && (
           <p className="mt-3 text-sm text-amber-700">
-            Esta solicitação não está aguardando recolha e não pode ser
-            coletada.
+            {t('notAwaitingPickup')}
           </p>
         )}
       </div>
@@ -285,16 +287,16 @@ export default function Coleta() {
       {!pkg && routeCollectionRequests.length > 0 && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <h2 className="mb-4 text-xl font-semibold text-secondary">
-            Pacotes da recolha
+            {t('routeRequests')}
           </h2>
           <div className="w-full overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Ação</TableHead>
+                  <TableHead>{tCommon('code')}</TableHead>
+                  <TableHead>{tCommon('customer')}</TableHead>
+                  <TableHead>{tCommon('status')}</TableHead>
+                  <TableHead>{tCommon('action')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -308,7 +310,7 @@ export default function Coleta() {
                         item.user?.lastName ?? ''
                       }`.trim() || '-'}
                     </TableCell>
-                    <TableCell>{STATUS_LABEL[item.status] ?? item.status}</TableCell>
+                    <TableCell>{tStatus(item.status)}</TableCell>
                     <TableCell>
                       <Button
                         type="button"
@@ -336,7 +338,7 @@ export default function Coleta() {
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-secondary">
-              Sacos recolhidos
+              {t('collectedBags')}
             </h2>
             <span className="text-sm text-muted-foreground">
               {boundCodes.length}
@@ -348,7 +350,7 @@ export default function Coleta() {
           {canCollect && (
             <div className="mb-5">
               <label className="mb-1 block text-sm font-medium text-secondary">
-                Vincular QR (token ou código amigável)
+                {t('bindQrLabel')}
               </label>
               <Input
                 ref={qrRef}
@@ -360,7 +362,7 @@ export default function Coleta() {
                     await handleBind();
                   }
                 }}
-                placeholder="Escaneie ou digite e pressione Enter"
+                placeholder={t('bindQrPlaceholder')}
                 disabled={isBinding}
                 className="max-w-md"
               />
@@ -370,8 +372,8 @@ export default function Coleta() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>{tCommon('code')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -394,7 +396,7 @@ export default function Coleta() {
                     colSpan={2}
                     className="py-6 text-center text-muted-foreground"
                   >
-                    Nenhum saco vinculado
+                    {t('noBagsBound')}
                   </TableCell>
                 </TableRow>
               )}
@@ -409,7 +411,7 @@ export default function Coleta() {
                 onClick={handleFinalize}
                 disabled={isFinalizing || boundCodes.length === 0}
               >
-                Finalizar coleta
+                {t('finish')}
               </Button>
             </div>
           )}
@@ -421,11 +423,10 @@ export default function Coleta() {
         <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle className="text-secondary">
-              Cancelar recolha
+              {t('cancelPickup')}
             </DialogTitle>
             <DialogDescription>
-              Informe o motivo do cancelamento. O cliente receberá um email com
-              esta mensagem.
+              {t('cancelReasonHelp')}
             </DialogDescription>
           </DialogHeader>
           <textarea
@@ -433,7 +434,7 @@ export default function Coleta() {
             onChange={(e) => setCancelReason(e.target.value)}
             rows={4}
             maxLength={1000}
-            placeholder="Motivo do cancelamento"
+            placeholder={t('cancelReasonPlaceholder')}
             className="w-full rounded-md border border-secondary/25 p-3 text-sm outline-none focus:border-secondary/50"
           />
           <DialogFooter className="mt-2 flex justify-end gap-2">
@@ -452,7 +453,7 @@ export default function Coleta() {
               onClick={handleCancel}
               disabled={isCancelling || !cancelReason.trim()}
             >
-              Confirmar cancelamento
+              {t('confirmCancel')}
             </Button>
           </DialogFooter>
         </DialogContent>

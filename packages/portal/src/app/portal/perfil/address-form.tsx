@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { DialogForm } from '@/components/form/dialog-form';
 import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,8 @@ const defaultValues: AddressFormData = {
 type Props = { onSave: () => void };
 
 export default function AddressForm({ onSave }: Props) {
+  const t = useTranslations('profile');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { control, handleSubmit, setValue, reset, formState: { errors } } =
     useForm<AddressFormData>({ defaultValues });
@@ -68,7 +71,7 @@ export default function AddressForm({ onSave }: Props) {
 
         const { results } = await res.json();
         if (!Array.isArray(results) || results.length === 0) {
-          toast.error('Código postal não encontrado');
+          toast.error(t('zipNotFound'));
           return;
         }
 
@@ -84,7 +87,7 @@ export default function AddressForm({ onSave }: Props) {
         setValue('lat', position?.lat ? String(position.lat) : '');
         setValue('long', position?.lon ? String(position.lon) : '');
       } catch {
-        toast.error('Não foi possível buscar o endereço pelo código postal');
+        toast.error(t('zipLookupError'));
       }
     },
     [setValue]
@@ -102,9 +105,9 @@ export default function AddressForm({ onSave }: Props) {
             reset(defaultValues);
           })(),
           {
-            loading: 'A guardar...',
-            success: 'Endereço adicionado com sucesso',
-            error: 'Erro ao adicionar endereço',
+            loading: tCommon('saving'),
+            success: t('addressAdded'),
+            error: t('addressAddError'),
           }
         );
       } finally {
@@ -116,15 +119,15 @@ export default function AddressForm({ onSave }: Props) {
 
   return (
     <DialogForm<AddressFormData>
-      title="Novo Endereço"
-      confirmText="Guardar"
+      title={t('newAddressTitle')}
+      confirmText={tCommon('save')}
       loading={isSubmitting}
       errors={errors}
       onConfirm={handleSubmit(onSubmit)}
       onOpenChange={handleOpenChange}
       trigger={
         <Button variant="secondary" className="flex items-center gap-2">
-          <PlusIcon className="size-4" /> Adicionar endereço
+          <PlusIcon className="size-4" /> {t('addAddress')}
         </Button>
       }
     >
@@ -132,10 +135,10 @@ export default function AddressForm({ onSave }: Props) {
         <Controller
           name="zipCode"
           control={control}
-          rules={{ required: 'Código postal obrigatório' }}
+          rules={{ required: tCommon('requiredField') }}
           render={({ field }) => (
             <div>
-              <Label htmlFor="zipCode">Código Postal</Label>
+              <Label htmlFor="zipCode">{t('zipCode')}</Label>
               <input
                 {...field}
                 id="zipCode"
@@ -150,52 +153,52 @@ export default function AddressForm({ onSave }: Props) {
         />
 
         <InputForm
-          label="Morada"
+          label={tCommon('address')}
           name="street"
           control={control}
-          rules={{ required: 'Morada obrigatória' }}
+          rules={{ required: tCommon('requiredField') }}
           errors={errors}
-          placeholder="Rua / Avenida"
+          placeholder={t('streetPlaceholder')}
         />
 
         <div className="grid grid-cols-2 gap-3">
           <InputForm
-            label="Nº de Porta"
+            label={t('number')}
             name="number"
             control={control}
-            rules={{ required: 'Número obrigatório' }}
+            rules={{ required: tCommon('requiredField') }}
             errors={errors}
             placeholder="12"
           />
           <InputForm
-            label="Complemento"
+            label={t('complement')}
             name="complement"
             control={control}
             errors={errors}
-            placeholder="Andar, apartamento..."
+            placeholder={t('complementPlaceholder')}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <InputForm
-            label="Cidade"
+            label={tCommon('city')}
             name="city"
             control={control}
-            rules={{ required: 'Cidade obrigatória' }}
+            rules={{ required: tCommon('requiredField') }}
             errors={errors}
             placeholder="Lisboa"
           />
           <InputForm
-            label="Freguesia"
+            label={t('cityDivision')}
             name="cityDivision"
             control={control}
             errors={errors}
-            placeholder="Parque das Nações"
+            placeholder={t('cityDivisionPlaceholder')}
           />
         </div>
 
         <InputForm
-          label="Distrito"
+          label={t('countryDivision')}
           name="countryDivision"
           control={control}
           errors={errors}
@@ -213,7 +216,7 @@ export default function AddressForm({ onSave }: Props) {
                 onCheckedChange={field.onChange}
               />
               <Label htmlFor="isDefault" className="cursor-pointer">
-                Definir como endereço padrão
+                {t('setAsDefault')}
               </Label>
             </div>
           )}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -40,10 +41,12 @@ type KeywordsInputProps = {
 function KeywordsInput({
   value,
   onChange,
-  placeholder = 'Add keywords and press Enter...',
+  placeholder,
   className,
 }: KeywordsInputProps) {
+  const t = useTranslations('common');
   const [input, setInput] = React.useState('');
+  const resolvedPlaceholder = placeholder ?? t('keywordsPlaceholder');
 
   const addKeyword = (keyword: string) => {
     const trimmed = keyword.trim();
@@ -101,7 +104,7 @@ function KeywordsInput({
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         className="border-none focus-visible:ring-0 focus-visible:ring-offset-0 flex-1 min-w-[120px]"
       />
     </div>

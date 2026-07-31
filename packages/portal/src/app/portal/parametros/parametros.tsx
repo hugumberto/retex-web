@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { SystemParameterDTO } from '@/app/types/system-parameter';
 import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,8 @@ interface ParametrosFormData {
 }
 
 export default function Parametros() {
+  const t = useTranslations('parameters');
+  const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,14 +48,14 @@ export default function Parametros() {
   }, [reset]);
 
   useEffect(() => {
-    setPageTitle('Parâmetros Gerais');
-    setBreadcrumbs([{ label: 'Parâmetros Gerais', href: '/portal/parametros' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/parametros' }]);
     fetchParameters();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setPageTitle, setBreadcrumbs, fetchParameters]);
+  }, [setPageTitle, setBreadcrumbs, fetchParameters, t]);
 
   const handleSave = useCallback(async (data: ParametrosFormData) => {
     setIsSubmitting(true);
@@ -64,10 +67,10 @@ export default function Parametros() {
         qrCodeThresholdPercentage: Number(data.qrCodeThresholdPercentage),
       });
       if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
-      toast.success('Parâmetros atualizados');
+      toast.success(t('saveSuccess'));
     } catch (error) {
       console.error('Erro ao salvar parâmetros:', error);
-      toast.error('Não foi possível salvar os parâmetros');
+      toast.error(t('saveError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -78,42 +81,40 @@ export default function Parametros() {
       <form onSubmit={handleSubmit(handleSave)} className="space-y-6">
         <div>
           <InputForm
-            label="Prazo de confirmação da recolha (dias antes)"
+            label={t('confirmationDeadlineLabel')}
             name="collectionConfirmationDeadlineDays"
             type="number"
             control={control}
             rules={{
-              required: 'Informe o número de dias',
-              min: { value: 0, message: 'Mínimo de 0' },
-              max: { value: 30, message: 'Máximo de 30' },
+              required: t('daysRequired'),
+              min: { value: 0, message: t('minZero') },
+              max: { value: 30, message: t('maxThirty') },
             }}
             errors={errors}
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Até quantos dias antes da recolha o cliente pode confirmar. Sem
-            confirmação até o prazo, a solicitação sai da rota.
+            {t('confirmationDeadlineHelp')}
           </p>
         </div>
         <div>
           <InputForm
-            label="Threshold de QR codes (%)"
+            label={t('qrThresholdLabel')}
             name="qrCodeThresholdPercentage"
             type="number"
             control={control}
             rules={{
-              required: 'Informe o percentual',
-              min: { value: 0, message: 'Mínimo de 0' },
-              max: { value: 100, message: 'Máximo de 100' },
+              required: t('percentageRequired'),
+              min: { value: 0, message: t('minZero') },
+              max: { value: 100, message: t('maxHundred') },
             }}
             errors={errors}
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Percentual extra de QR codes gerados sobre os sacos informados ao
-            iniciar a rota (ex.: 10% → 3 sacos geram 4 códigos).
+            {t('qrThresholdHelp')}
           </p>
         </div>
         <Button type="submit" variant="secondary" disabled={isSubmitting}>
-          {isSubmitting ? 'A guardar...' : 'Guardar'}
+          {isSubmitting ? tCommon('saving') : tCommon('save')}
         </Button>
       </form>
     </section>

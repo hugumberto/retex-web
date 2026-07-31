@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -42,12 +43,14 @@ export function SelectForm<T extends FieldValues>({
   label,
   id,
   options,
-  placeholder = 'Selecionar',
+  placeholder,
   rules,
   errors,
   className,
   disabled,
 }: SelectFieldProps<T>) {
+  const tCommon = useTranslations('common');
+  const resolvedPlaceholder = placeholder ?? tCommon('select');
   const error = errors?.[name];
   return (
     <div>
@@ -70,7 +73,7 @@ export function SelectForm<T extends FieldValues>({
                   error ? 'border-red-500' : 'border-secondary'
                 } rounded-md shadow-sm ${className || ''}`}
               >
-                <SelectValue placeholder={placeholder} />
+                <SelectValue placeholder={resolvedPlaceholder} />
               </SelectTrigger>
               <SelectContent>
                 {(Array.isArray(options) ? options : []).map((option) =>

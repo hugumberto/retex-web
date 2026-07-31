@@ -1,8 +1,8 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Brand } from '@/app/types/brand';
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
-import { STATUS_LABEL } from '@/lib/collection-request-status';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { CollectionRequestBagDTO, TriageResponse } from '@/app/types/collection-request-bag';
 import { Button } from '@/components/ui/button';
@@ -25,16 +25,20 @@ import CollectionRecord from './components/collection-record';
 import CollectionRequestUserData from './components/collection-request-user-data';
 
 // Extrai a mensagem de erro do servidor (string ou array do class-validator).
-const finishErrorMessage = (error: unknown): string => {
+// O fallback é passado já traduzido por quem chama.
+const finishErrorMessage = (error: unknown, fallback: string): string => {
   const message = (
     error as { response?: { data?: { message?: string | string[] } } }
   )?.response?.data?.message;
   if (Array.isArray(message)) return message.join('; ');
   if (typeof message === 'string') return message;
-  return 'Não foi possível finalizar a triagem';
+  return fallback;
 };
 
 export default function Triage() {
+  const t = useTranslations('triage');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionRequestStatus');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const scanCodeInputRef = useRef<HTMLInputElement>(null);
   const bagInputRef = useRef<HTMLInputElement>(null);
@@ -74,7 +78,7 @@ export default function Triage() {
     const fetchBrands = async () => {
       try {
         const { data, status } = await api.get<Brand[]>('/brand');
-        if (!isSuccessStatus(status)) throw new Error('Erro ao buscar marcas');
+        if (!isSuccessStatus(status)) throw new Error(t('brandsLoadError'));
         // Marcas por ordem alfabética (case-insensitive, pt-PT).
         const sorted = [...data].sort((a, b) =>
           (a.name ?? '').localeCompare(b.name ?? '', 'pt', {
@@ -88,15 +92,15 @@ export default function Triage() {
       }
     };
 
-    setPageTitle('Triagem');
-    setBreadcrumbs([{ label: 'Triagem', href: '/portal/triage' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/triage' }]);
     fetchBrands();
 
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setBreadcrumbs, setPageTitle]);
+  }, [setBreadcrumbs, setPageTitle, t]);
 
   const isViewMode = selectedCollectionRequest?.status === CollectionRequestStatus.STOCKED;
   const allProcessed =
@@ -119,7 +123,7 @@ export default function Triage() {
       const { data, status } = await api.get<TriageResponse>(
         `/triage/${code}`
       );
-      if (!isSuccessStatus(status)) throw new Error('Erro ao consultar');
+      if (!isSuccessStatus(status)) throw new Error(t('lookupError'));
 
       setSelectedCollectionRequest(data.collectionRequest);
       setBags(data.bags ?? []);
@@ -152,7 +156,7 @@ export default function Triage() {
 
       setTriageItems(mappedItems);
       setStorageUnits(mappedStorageUnits);
-      toast.success('Solicitação carregada com sucesso');
+      toast.success(t('requestLoaded'));
       // Foco vai para o campo de código do saco.
       requestAnimationFrame(() => bagInputRef.current?.focus());
     } catch (error) {
@@ -161,7 +165,7 @@ export default function Triage() {
       setBags([]);
       setTriageItems([]);
       setStorageUnits([]);
-      toast.error('Nenhuma solicitação encontrada para o código informado');
+      toast.error(t('requestNotFound'));
       // Não encontrou: limpa e mantém o foco no campo da solicitação.
       setScanCode('');
       requestAnimationFrame(() => scanCodeInputRef.current?.focus());
@@ -194,13 +198,13 @@ export default function Triage() {
       (q) => q.token === code || q.friendlyCode === code
     );
     if (!bag) {
-      toast.error('Saco não pertence a esta solicitação');
+      toast.error(t('bagNotInRequest'));
       setBagCode('');
       requestAnimationFrame(() => bagInputRef.current?.focus());
       return;
     }
     if (bag.processedAt != null) {
-      toast.error('Saco já processado');
+      toast.error(t('bagAlreadyProcessed'));
       setBagCode('');
       requestAnimationFrame(() => bagInputRef.current?.focus());
       return;
@@ -215,20 +219,20 @@ export default function Triage() {
 
   const handleAddTriageItem = async () => {
     if (!selectedCollectionRequest?.id || !activeBagId) {
-      toast.error('Selecione um saco antes de adicionar o item');
+      toast.error(t('selectBagFirst'));
       return;
     }
     if (!brandId) {
-      toast.error('Selecione uma marca');
+      toast.error(t('selectBrand'));
       return;
     }
     if (!quality || !season || !clothingType || !sex || !ageGroup) {
-      toast.error('Selecione qualidade, estação, tipo, sexo e faixa etária');
+      toast.error(t('selectAttributes'));
       return;
     }
     const parsedQuantity = Number(quantity);
     if (!quantity.trim() || Number.isNaN(parsedQuantity) || parsedQuantity < 1) {
-      toast.error('Informe uma quantidade válida');
+      toast.error(t('invalidQuantity'));
       return;
     }
 
@@ -250,14 +254,14 @@ export default function Triage() {
         '/items',
         payload
       );
-      if (!isSuccessStatus(status)) throw new Error('Erro ao criar item');
+      if (!isSuccessStatus(status)) throw new Error(t('itemCreateError'));
 
       setTriageItems((current) => [
         ...current,
         { ...payload, id: data?.id } as TriageListItem,
       ]);
       clearItemForm();
-      toast.success('Item adicionado ao saco');
+      toast.success(t('itemAdded'));
     } catch (error) {
       console.error('Erro ao criar item:', error);
       toast.error('Não foi possível adicionar o item');
@@ -268,18 +272,18 @@ export default function Triage() {
 
   const handleDeleteTriageItem = async (item: TriageListItem) => {
     if (!item.id) {
-      toast.error('Este item não possui identificador para remoção');
+      toast.error(t('itemMissingId'));
       return;
     }
     setDeletingItemId(item.id);
     try {
       const { status } = await api.delete(`/items/${item.id}`);
-      if (!isSuccessStatus(status)) throw new Error('Erro ao remover item');
+      if (!isSuccessStatus(status)) throw new Error(t('itemRemoveError'));
       setTriageItems((current) => current.filter((it) => it.id !== item.id));
-      toast.success('Item removido com sucesso');
+      toast.success(t('itemRemoved'));
     } catch (error) {
       console.error('Erro ao remover item:', error);
-      toast.error('Não foi possível remover o item');
+      toast.error(t('itemRemoveError'));
     } finally {
       setDeletingItemId(null);
     }
@@ -293,7 +297,7 @@ export default function Triage() {
       Number.isNaN(parsedWeight) ||
       parsedWeight < 0
     ) {
-      toast.error('Informe um peso válido para o saco');
+      toast.error(t('invalidBagWeight'));
       return;
     }
 
@@ -302,7 +306,7 @@ export default function Triage() {
       const { status } = await api.post(`/triage/bag/${activeBagId}/process`, {
         weight: parsedWeight,
       });
-      if (!isSuccessStatus(status)) throw new Error('Erro ao processar saco');
+      if (!isSuccessStatus(status)) throw new Error(t('bagProcessError'));
 
       // Atualiza o saco + o peso do pacote localmente (evita novo GET).
       setBags((current) =>
@@ -322,11 +326,11 @@ export default function Triage() {
       setActiveBagId(null);
       setBagWeight('');
       clearItemForm();
-      toast.success('Saco processado');
+      toast.success(t('bagProcessed'));
       requestAnimationFrame(() => bagInputRef.current?.focus());
     } catch (error) {
       console.error('Erro ao processar saco:', error);
-      toast.error('Não foi possível processar o saco');
+      toast.error(t('bagProcessError'));
     } finally {
       setIsProcessingBag(false);
     }
@@ -348,21 +352,21 @@ export default function Triage() {
           { items: itemIds, storageUnits: storageUnitIds, finalize: false }
         );
         if (!isSuccessStatus(bindStatus)) {
-          throw new Error('Erro ao guardar as unidades de armazenamento');
+          throw new Error(t('storageUnitsSaveError'));
         }
       }
 
       const { status } = await api.patch(`/collection-request/${selectedCollectionRequest.id}`, {
         status: CollectionRequestStatus.SCREENING,
       });
-      if (!isSuccessStatus(status)) throw new Error('Erro ao salvar progresso');
+      if (!isSuccessStatus(status)) throw new Error(t('progressSaveError'));
       setSelectedCollectionRequest((current) =>
         current ? { ...current, status: CollectionRequestStatus.SCREENING } : current
       );
-      toast.success('Progresso salvo (em triagem)');
+      toast.success(t('progressSaved'));
     } catch (error) {
       console.error('Erro ao salvar progresso:', error);
-      toast.error('Não foi possível salvar o progresso');
+      toast.error(t('progressSaveError'));
     } finally {
       setIsSavingProgress(false);
     }
@@ -371,7 +375,7 @@ export default function Triage() {
   const handleStorageCodeSubmit = async () => {
     const storageUnitId = storageCode.trim();
     if (!storageUnitId) {
-      toast.error('Informe o código do armazenamento');
+      toast.error(t('storageCodeRequired'));
       return;
     }
     setIsLoadingStorageUnit(true);
@@ -379,9 +383,9 @@ export default function Triage() {
       const { data, status } = await api.get<StorageUnitDTO>(
         `/storage-unit/${storageUnitId}`
       );
-      if (!isSuccessStatus(status)) throw new Error('Erro ao obter unidade');
+      if (!isSuccessStatus(status)) throw new Error(t('storageUnitFetchError'));
       if (storageUnits.some((unit) => unit.id === data.id)) {
-        toast.error('Esta unidade de armazenamento já foi adicionada');
+        toast.error(t('storageUnitAlreadyAdded'));
         return;
       }
       const storageKey = buildTriageKey(data);
@@ -390,16 +394,16 @@ export default function Triage() {
       );
       if (!hasMatchingItem) {
         toast.error(
-          'Os atributos desta unidade não conferem com nenhum item da lista'
+          t('storageUnitMismatch')
         );
         return;
       }
       setStorageUnits((current) => [...current, data]);
       setStorageCode('');
-      toast.success('Unidade de armazenamento adicionada com sucesso');
+      toast.success(t('storageUnitAdded'));
     } catch (error) {
       console.error('Erro ao obter unidade de armazenamento:', error);
-      toast.error('Unidade de armazenamento não encontrada');
+      toast.error(t('storageUnitNotFound'));
     } finally {
       setIsLoadingStorageUnit(false);
     }
@@ -421,19 +425,19 @@ export default function Triage() {
   const handleFinishTriage = async () => {
     if (!selectedCollectionRequest?.id) return;
     if (!allProcessed) {
-      toast.error('Processe todos os sacos antes de finalizar');
+      toast.error(t('processBagsFirst'));
       return;
     }
     if (triageItems.length === 0) {
-      toast.error('Adicione itens antes de finalizar');
+      toast.error(t('addItemsFirst'));
       return;
     }
     if (storageUnits.filter((unit) => !!unit?.id).length === 0) {
-      toast.error('Adicione unidades de armazenamento antes de finalizar');
+      toast.error(t('addStorageUnitsFirst'));
       return;
     }
     if (triageItems.some((item) => !item.id)) {
-      toast.error('Todos os itens devem ser persistidos antes de finalizar');
+      toast.error(t('persistItemsFirst'));
       return;
     }
     // Cada combinação de item precisa de uma unidade compatível (mesmo gate do
@@ -445,7 +449,7 @@ export default function Triage() {
     );
     if (triageItems.some((item) => !storageUnitKeys.has(buildTriageKey(item)))) {
       toast.error(
-        'Cada combinação de itens precisa de uma unidade de armazenamento correspondente'
+        t('storageUnitPerCombination')
       );
       return;
     }
@@ -463,7 +467,7 @@ export default function Triage() {
         { items: itemIds, storageUnits: storageUnitIds }
       );
       if (!isSuccessStatus(bindStatus)) {
-        throw new Error('Erro ao vincular itens às unidades de armazenamento');
+        throw new Error(t('bindItemsError'));
       }
 
       const { status: collectionRequestStatus } = await api.patch(
@@ -471,15 +475,15 @@ export default function Triage() {
         { status: CollectionRequestStatus.STOCKED }
       );
       if (!isSuccessStatus(collectionRequestStatus)) {
-        throw new Error('Erro ao atualizar status do pacote');
+        throw new Error(t('statusUpdateError'));
       }
 
-      toast.success('Triagem finalizada com sucesso');
+      toast.success(t('finishSuccess'));
       resetTriageState();
       requestAnimationFrame(() => scanCodeInputRef.current?.focus());
     } catch (error) {
       console.error('Erro ao finalizar triagem:', error);
-      toast.error(finishErrorMessage(error));
+      toast.error(finishErrorMessage(error, t('finishError')));
     } finally {
       setIsFinishingTriage(false);
     }
@@ -503,7 +507,7 @@ export default function Triage() {
       {/* Consulta */}
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <label className="mb-1 block text-sm font-medium text-secondary">
-          Código (solicitação ou saco) *
+          {t('lookupCodeLabel')}
         </label>
         <div className="flex flex-wrap items-center gap-3">
           <Input
@@ -517,7 +521,7 @@ export default function Triage() {
                 await handleScanCodeBlur();
               }
             }}
-            placeholder="Código da solicitação ou de um QR"
+            placeholder={t('lookupCodePlaceholder')}
             autoFocus
             disabled={!!selectedCollectionRequest || isLoadingCollectionRequest}
             className="max-w-md"
@@ -528,10 +532,10 @@ export default function Triage() {
                 {selectedCollectionRequest.friendlyCode ?? selectedCollectionRequest.id}
               </span>
               <span className="text-sm text-secondary">
-                Peso total: <strong>{collectionRequestWeight.toFixed(2)} kg</strong>
+                {t('totalWeight')} <strong>{collectionRequestWeight.toFixed(2)} kg</strong>
               </span>
               <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
-                {STATUS_LABEL[selectedCollectionRequest.status] ?? selectedCollectionRequest.status}
+                {tStatus(selectedCollectionRequest.status)}
               </span>
             </>
           )}
@@ -549,7 +553,7 @@ export default function Triage() {
       {selectedCollectionRequest && !isViewMode && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <label className="mb-1 block text-sm font-medium text-secondary">
-            Código do saco (QR) *
+            {t('bagCodeLabel')}
           </label>
           <Input
             ref={bagInputRef}
@@ -562,7 +566,7 @@ export default function Triage() {
                 handleBagScan();
               }
             }}
-            placeholder="Escaneie ou digite o código do saco e pressione Enter"
+            placeholder={t('bagCodePlaceholder')}
             disabled={!!activeBagId}
             className="max-w-md"
           />
@@ -594,7 +598,7 @@ export default function Triage() {
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-secondary">
-              Sacos (QR codes)
+              {t('bagsSection')}
             </h2>
             <span className="text-sm font-medium text-secondary">
               Processados: {processedCount} / {bags.length} sacos
@@ -603,10 +607,10 @@ export default function Triage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código</TableHead>
-                <TableHead>Peso (kg)</TableHead>
-                <TableHead>Itens</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>{tCommon('code')}</TableHead>
+                <TableHead>{tCommon('weightKg')}</TableHead>
+                <TableHead>{tCommon('items')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -642,7 +646,7 @@ export default function Triage() {
                   const stateLabel = processed
                     ? 'Processado'
                     : isActive
-                    ? 'Em processamento'
+                    ? t('inProgress')
                     : 'Pendente';
                   return (
                     <TableRow key={bag.id}>
@@ -667,7 +671,7 @@ export default function Triage() {
                     colSpan={4}
                     className="py-6 text-center text-muted-foreground"
                   >
-                    Nenhum saco nesta solicitação
+                    {t('noBags')}
                   </TableCell>
                 </TableRow>
               )}
@@ -744,7 +748,7 @@ export default function Triage() {
                 onClick={handleProcessBag}
                 disabled={isProcessingBag || !bagWeight.trim()}
               >
-                Guardar saco
+                {t('saveBag')}
               </Button>
             )}
             <Button
@@ -753,7 +757,7 @@ export default function Triage() {
               onClick={handleSaveProgress}
               disabled={isSavingProgress || isViewMode}
             >
-              Salvar progresso
+              {t('saveProgress')}
             </Button>
             <Button
               type="button"
@@ -761,14 +765,14 @@ export default function Triage() {
               onClick={handleFinishTriage}
               disabled={isFinishingTriage || isViewMode}
             >
-              Finalizar triagem
+              {t('finish')}
             </Button>
             <Button
               type="button"
               variant="ghost"
               onClick={resetTriageState}
             >
-              Nova consulta
+              {t('newLookup')}
             </Button>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -23,6 +24,8 @@ interface Props {
 }
 
 export default function FaqItemForm({ categoryId, onSave, item, trigger }: Props) {
+  const t = useTranslations('faq');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEdit = !!item;
 
@@ -55,9 +58,9 @@ export default function FaqItemForm({ categoryId, onSave, item, trigger }: Props
             onSave();
           })(),
           {
-            loading: isEdit ? 'A guardar...' : 'A adicionar...',
-            success: isEdit ? 'Item actualizado!' : 'Item adicionado!',
-            error: isEdit ? 'Erro ao actualizar item.' : 'Erro ao adicionar item.',
+            loading: isEdit ? tCommon('saving') : tCommon('adding'),
+            success: isEdit ? t('itemUpdated') : t('itemCreated'),
+            error: isEdit ? t('itemUpdateError') : t('itemCreateError'),
           }
         );
       } finally {
@@ -69,7 +72,7 @@ export default function FaqItemForm({ categoryId, onSave, item, trigger }: Props
 
   return (
     <DialogForm
-      title={isEdit ? 'Editar Item' : 'Novo Item'}
+      title={isEdit ? t('itemEditTitle') : t('itemCreateTitle')}
       onConfirm={form.handleSubmit(handleSubmit)}
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
@@ -77,26 +80,28 @@ export default function FaqItemForm({ categoryId, onSave, item, trigger }: Props
       trigger={
         trigger ?? (
           <Button variant="outline" size="sm">
-            Adicionar item
+            {t('addItemButton')}
           </Button>
         )
       }
     >
       <div className="grid grid-cols-1 gap-4">
         <InputForm
-          label="Título"
+          label={tCommon('title')}
           name="title"
           control={control}
-          rules={{ required: 'Campo obrigatório' }}
+          rules={{ required: tCommon('requiredField') }}
           errors={errors}
-          placeholder="ex: O que é a Retex?"
+          placeholder={t('itemTitlePlaceholder')}
         />
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">Resposta</label>
+          <label className="text-sm font-medium">{t('answer')}</label>
           <textarea
             className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            placeholder="Resposta à pergunta..."
-            {...register('description', { required: 'Campo obrigatório' })}
+            placeholder={t('answerPlaceholder')}
+            {...register('description', {
+              required: tCommon('requiredField'),
+            })}
           />
           {errors.description && (
             <p className="text-xs text-destructive">{errors.description.message}</p>

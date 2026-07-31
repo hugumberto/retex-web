@@ -1,5 +1,6 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { renderWithIntl } from '../../test-utils/intl';
 import RegistrationForm from './RegistrationForm';
 
 const TOMTOM_URL = 'https://api.tomtom.test/search/';
@@ -84,7 +85,7 @@ describe('RegistrationForm — normalização do endereço TomTom', () => {
         : Promise.resolve(registerResponse)
     );
 
-    render(<RegistrationForm />);
+    renderWithIntl(<RegistrationForm />);
     fillRequiredFields();
     triggerZipLookup();
 
@@ -124,7 +125,7 @@ describe('RegistrationForm — normalização do endereço TomTom', () => {
         : Promise.resolve(registerResponse)
     );
 
-    render(<RegistrationForm />);
+    renderWithIntl(<RegistrationForm />);
     fillRequiredFields();
     triggerZipLookup();
 

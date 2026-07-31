@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 
@@ -12,6 +13,8 @@ type LandingFormValues = {
 };
 
 export default function ContactForm() {
+  const t = useTranslations('contact');
+  const tValidation = useTranslations('validation');
   const {
     register,
     handleSubmit,
@@ -50,17 +53,17 @@ export default function ContactForm() {
       });
       if (!res.ok) throw new Error('Erro na requisição');
       setMessageTone('success');
-      setMessage('Formulário enviado com sucesso!');
+      setMessage(t('success'));
       reset();
     } catch {
       setMessageTone('error');
-      setMessage('Erro ao enviar o formulário.');
+      setMessage(t('error'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const req = { required: 'Campo obrigatório' as const };
+  const req = { required: tValidation('required') };
 
   return (
     <form className="landing-form-card" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -78,7 +81,7 @@ export default function ContactForm() {
       <div className="form-row">
         <label>
           <span className="form-label">
-            Nome
+            {t('fields.name')}
             <span className="form-req">*</span>
           </span>
           <input
@@ -94,7 +97,7 @@ export default function ContactForm() {
         </label>
         <label>
           <span className="form-label">
-            Telemóvel
+            {t('fields.phone')}
             <span className="form-req">*</span>
           </span>
           <input
@@ -111,7 +114,7 @@ export default function ContactForm() {
       </div>
       <label>
         <span className="form-label">
-          Email
+          {t('fields.email')}
           <span className="form-req">*</span>
         </span>
         <input
@@ -123,7 +126,7 @@ export default function ContactForm() {
             ...req,
             pattern: {
               value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-              message: 'Email inválido',
+              message: tValidation('invalidEmail'),
             },
           })}
         />
@@ -133,7 +136,7 @@ export default function ContactForm() {
       </label>
       <label>
         <span className="form-label">
-          Título
+          {t('fields.subject')}
           <span className="form-req">*</span>
         </span>
         <input
@@ -148,7 +151,7 @@ export default function ContactForm() {
       </label>
       <label>
         <span className="form-label">
-          Mensagem
+          {t('fields.message')}
           <span className="form-req">*</span>
         </span>
         <textarea
@@ -162,7 +165,7 @@ export default function ContactForm() {
         ) : null}
       </label>
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'A enviar…' : 'Submeter'}
+        {isSubmitting ? t('submitting') : t('submit')}
       </button>
     </form>
   );

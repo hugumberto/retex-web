@@ -1,11 +1,7 @@
+import { useTranslations } from 'next-intl';
 import { Brand } from '@/app/types/brand';
 import {
-  AgeGroup,
-  Quality,
-  Season,
-  Sex,
   StorageUnitDTO,
-  Type,
 } from '@/app/types/storage-unit';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
@@ -20,32 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Check, TrashIcon, X } from 'lucide-react';
-
-const QUALITY_MAP: Record<Quality, string> = {
-  [Quality.GOOD]: 'Boa',
-  [Quality.MEDIUM]: 'Regular',
-  [Quality.BAD]: 'Má',
-};
-
-const SEX_MAP: Record<Sex, string> = {
-  [Sex.MALE]: 'Homem',
-  [Sex.FEMALE]: 'Mulher',
-};
-
-const AGE_GROUP_MAP: Record<AgeGroup, string> = {
-  [AgeGroup.ADULT]: 'Adulto',
-  [AgeGroup.CHILD]: 'Infantil',
-};
-
-const TYPE_MAP: Record<Type, string> = {
-  [Type.UPPER_PART]: 'Superior',
-  [Type.UNDER_PART]: 'Inferior',
-};
-
-const SEASON_MAP: Record<Season, string> = {
-  [Season.SUMMER]: 'Verão',
-  [Season.WINTER]: 'Inverno',
-};
 
 export type TriageListItem = {
   id?: string;
@@ -103,6 +73,13 @@ export default function AddTriage({
   disableFinish,
   hideFinishButton,
 }: AddTriageProps) {
+  const t = useTranslations('triage');
+  const tCommon = useTranslations('common');
+  const tQuality = useTranslations('enums.quality');
+  const tSex = useTranslations('enums.sex');
+  const tAgeGroup = useTranslations('enums.ageGroup');
+  const tItemType = useTranslations('enums.itemType');
+  const tSeason = useTranslations('enums.season');
   const storageInputRef = useRef<HTMLInputElement>(null);
   const shouldRefocusStorageInputRef = useRef(false);
   const validStorageUnits = storageUnits.filter(
@@ -154,7 +131,7 @@ export default function AddTriage({
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-secondary">
-          Adicionar - Triagem
+          {t('itemsSection')}
         </h2>
         <X className="size-5 text-secondary" />
       </div>
@@ -163,30 +140,32 @@ export default function AddTriage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Qualidade</TableHead>
-              <TableHead>Sexo</TableHead>
-              <TableHead>Faixa etária</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Estação</TableHead>
-              <TableHead>Marca</TableHead>
-              <TableHead>Quantidade</TableHead>
-              <TableHead>Ação</TableHead>
+              <TableHead>{tCommon('quality')}</TableHead>
+              <TableHead>{tCommon('sex')}</TableHead>
+              <TableHead>{tCommon('ageGroup')}</TableHead>
+              <TableHead>{tCommon('type')}</TableHead>
+              <TableHead>{tCommon('season')}</TableHead>
+              <TableHead>{tCommon('brand')}</TableHead>
+              <TableHead>{tCommon('quantity')}</TableHead>
+              <TableHead>{tCommon('action')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.length > 0 ? (
               items.map((item, index) => (
-                <TableRow key={`${item.collectionRequestId}-${item.brandId}-${index}`}>
+                <TableRow
+                  key={`${item.collectionRequestId}-${item.brandId}-${index}`}
+                >
                   <TableCell>
-                    {QUALITY_MAP[item.quality] ?? item.quality}
+                    {tQuality(item.quality) ?? item.quality}
                   </TableCell>
-                  <TableCell>{SEX_MAP[item.sex] ?? item.sex}</TableCell>
+                  <TableCell>{tSex(item.sex) ?? item.sex}</TableCell>
                   <TableCell>
-                    {AGE_GROUP_MAP[item.ageGroup] ?? item.ageGroup}
+                    {tAgeGroup(item.ageGroup) ?? item.ageGroup}
                   </TableCell>
-                  <TableCell>{TYPE_MAP[item.type] ?? item.type}</TableCell>
+                  <TableCell>{tItemType(item.type) ?? item.type}</TableCell>
                   <TableCell>
-                    {SEASON_MAP[item.season] ?? item.season}
+                    {tSeason(item.season) ?? item.season}
                   </TableCell>
                   <TableCell>
                     {(brands.find((brand) => brand.id === item.brandId)?.name ??
@@ -196,8 +175,8 @@ export default function AddTriage({
                   <TableCell>{item.quantity}</TableCell>
                   <TableCell>
                     <ConfirmDialog
-                      title="Remover item?"
-                      description="Tem certeza que deseja remover este item da triagem?"
+                      title={t('removeItemTitle')}
+                      description={t('removeItemDescription')}
                       trigger={
                         <Button
                           type="button"
@@ -220,7 +199,7 @@ export default function AddTriage({
                   colSpan={8}
                   className="h-20 text-center text-secondary/55"
                 >
-                  Tabela de itens
+                  {t('itemsTableCaption')}
                 </TableCell>
               </TableRow>
             )}
@@ -229,7 +208,7 @@ export default function AddTriage({
 
         <div className="space-y-2">
           <label className="block text-sm font-medium text-secondary">
-            Código de Armazenamento *
+            {t('storageCodeLabel')}
           </label>
           <Input
             ref={storageInputRef}
@@ -241,7 +220,7 @@ export default function AddTriage({
                 await handleStorageCodeEnter();
               }
             }}
-            placeholder="Escaneie o QR ou digite o código"
+            placeholder={t('storageCodePlaceholder')}
             disabled={isLoadingStorageUnit || isViewMode}
           />
         </div>
@@ -249,22 +228,22 @@ export default function AddTriage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Qualidade</TableHead>
-              <TableHead>Sexo</TableHead>
-              <TableHead>Faixa etária</TableHead>
-              <TableHead>Parte</TableHead>
-              <TableHead>Estação</TableHead>
+              <TableHead>{tCommon('quality')}</TableHead>
+              <TableHead>{tCommon('sex')}</TableHead>
+              <TableHead>{tCommon('ageGroup')}</TableHead>
+              <TableHead>{tCommon('part')}</TableHead>
+              <TableHead>{tCommon('season')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {validStorageUnits.length > 0 ? (
               validStorageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
-                  <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
-                  <TableCell>{SEX_MAP[storageUnit.sex]}</TableCell>
-                  <TableCell>{AGE_GROUP_MAP[storageUnit.ageGroup]}</TableCell>
-                  <TableCell>{TYPE_MAP[storageUnit.type]}</TableCell>
-                  <TableCell>{SEASON_MAP[storageUnit.season]}</TableCell>
+                  <TableCell>{tQuality(storageUnit.quality)}</TableCell>
+                  <TableCell>{tSex(storageUnit.sex)}</TableCell>
+                  <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
+                  <TableCell>{tItemType(storageUnit.type)}</TableCell>
+                  <TableCell>{tSeason(storageUnit.season)}</TableCell>
                 </TableRow>
               ))
             ) : (
@@ -273,7 +252,7 @@ export default function AddTriage({
                   colSpan={5}
                   className="h-24 text-center text-secondary/55"
                 >
-                  Nenhuma unidade de armazenamento adicionada
+                  {t('noStorageUnits')}
                 </TableCell>
               </TableRow>
             )}
@@ -291,7 +270,7 @@ export default function AddTriage({
               aria-busy={isFinishingTriage}
             >
               <Check className="size-4" />
-              Finalizar Triagem
+              {t('finish')}
             </Button>
           </div>
         )}

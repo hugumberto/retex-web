@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -16,47 +17,11 @@ import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import api from '@/lib/api';
 import { useAppStore } from '@/store';
 import {
-  AgeGroup,
-  Quality,
-  Season,
-  Sex,
   StorageUnitDTO,
-  Type,
 } from '../../types/storage-unit';
 import StorageUnitForm from './storage-unit-form';
 
 // Constants
-const QUALITY_MAP: Record<Quality, string> = {
-  [Quality.GOOD]: 'Bom',
-  [Quality.MEDIUM]: 'Regular',
-  [Quality.BAD]: 'Mau',
-};
-
-const SEX_MAP: Record<Sex, string> = {
-  [Sex.MALE]: 'Homem',
-  [Sex.FEMALE]: 'Mulher',
-};
-
-const AGE_GROUP_MAP: Record<AgeGroup, string> = {
-  [AgeGroup.ADULT]: 'Adulto',
-  [AgeGroup.CHILD]: 'Infantil',
-};
-
-const TYPE_MAP: Record<Type, string> = {
-  [Type.UPPER_PART]: 'Superior',
-  [Type.UNDER_PART]: 'Inferior',
-};
-
-const SEASON_MAP: Record<Season, string> = {
-  [Season.SUMMER]: 'Verão',
-  [Season.WINTER]: 'Inverno',
-};
-
-const STATUS_MAP: Record<string, string> = {
-  ATIVO: 'Ativo',
-  INATIVO: 'Inativo',
-};
-
 const escapeHtml = (value: string) =>
   value
     .replace(/&/g, '&amp;')
@@ -66,6 +31,14 @@ const escapeHtml = (value: string) =>
     .replace(/'/g, '&#39;');
 
 export default function StorageUnit() {
+  const t = useTranslations('storageUnit');
+  const tCommon = useTranslations('common');
+  const tQuality = useTranslations('enums.quality');
+  const tSex = useTranslations('enums.sex');
+  const tAgeGroup = useTranslations('enums.ageGroup');
+  const tItemType = useTranslations('enums.itemType');
+  const tSeason = useTranslations('enums.season');
+  const tUnitStatus = useTranslations('enums.unitStatus');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,7 +57,7 @@ export default function StorageUnit() {
       setIsSubmitting(true);
       try {
         const res = await api.delete(`/storage-unit/${id}`);
-        if (res.status !== 200) throw new Error('Erro ao eliminar unidade');
+        if (res.status !== 200) throw new Error(t('deleteError'));
         await fetchStorageUnits();
       } catch (error) {
         console.error('Erro ao eliminar unidade:', error);
@@ -100,8 +73,8 @@ export default function StorageUnit() {
     async (id: string) => {
       await toast.promise(handleDeleteUnit(id), {
         loading: 'Carregando...',
-        success: () => 'Unidade de Armazenamento desativada com sucesso',
-        error: () => 'Erro ao desativar a Unidade de Armazenamento',
+        success: () => t('deactivateSuccess'),
+        error: () => t('deactivateError'),
       });
     },
     [handleDeleteUnit]
@@ -110,18 +83,18 @@ export default function StorageUnit() {
   const handlePrintLabel = useCallback((unit: StorageUnitDTO) => {
     const printWindow = window.open('', '_blank', 'width=420,height=640');
     if (!printWindow) {
-      toast.error('Permita pop-ups para imprimir a etiqueta');
+      toast.error(t('popupBlocked'));
       return;
     }
 
     const unitId = escapeHtml(unit.id);
     const friendlyCode = escapeHtml(unit.friendlyCode ?? '-');
-    const quality = escapeHtml(QUALITY_MAP[unit.quality]);
-    const sex = escapeHtml(SEX_MAP[unit.sex]);
-    const ageGroup = escapeHtml(AGE_GROUP_MAP[unit.ageGroup]);
-    const type = escapeHtml(TYPE_MAP[unit.type]);
-    const season = escapeHtml(SEASON_MAP[unit.season]);
-    const qrSource = `https://api.qrserver.com/v1/create-bag-code/?size=220x220&data=${encodeURIComponent(
+    const quality = escapeHtml(tQuality(unit.quality));
+    const sex = escapeHtml(tSex(unit.sex));
+    const ageGroup = escapeHtml(tAgeGroup(unit.ageGroup));
+    const type = escapeHtml(tItemType(unit.type));
+    const season = escapeHtml(tSeason(unit.season));
+    const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
       unit.id
     )}`;
 
@@ -170,20 +143,39 @@ export default function StorageUnit() {
         </head>
         <body>
           <div class="label">
-            <h1 class="title">Etiqueta do Item</h1>
+            <h1 class="title">${t('itemLabel')}</h1>
             <p class="code">${friendlyCode}</p>
             <img class="bag" src="${qrSource}" alt="QR Code ${unitId}" />
-            <p class="text"><strong>Código:</strong> ${friendlyCode}</p>
-            <p class="text"><strong>Qualidade:</strong> ${quality}</p>
-            <p class="text"><strong>Sexo:</strong> ${sex}</p>
-            <p class="text"><strong>Faixa etária:</strong> ${ageGroup}</p>
-            <p class="text"><strong>Parte:</strong> ${type}</p>
-            <p class="text"><strong>Estação:</strong> ${season}</p>
+            <p class="text"><strong>${t('codeWithColon')}</strong> ${friendlyCode}</p>
+            <p class="text"><strong>${t('qualityWithColon')}</strong> ${quality}</p>
+            <p class="text"><strong>${t('sexWithColon')}</strong> ${sex}</p>
+            <p class="text"><strong>${t('ageGroupWithColon')}</strong> ${ageGroup}</p>
+            <p class="text"><strong>${t('partWithColon')}</strong> ${type}</p>
+            <p class="text"><strong>${t('seasonWithColon')}</strong> ${season}</p>
           </div>
           <script>
-            window.onload = function () {
-              window.print();
-            };
+            (function () {
+              // Os QR codes vêm de um serviço externo: se imprimirmos no
+              // onload a caixa de impressão pode abrir antes de eles chegarem.
+              var pending = [].slice.call(document.images).filter(function (img) {
+                return !img.complete;
+              });
+              if (!pending.length) return window.print();
+
+              var left = pending.length;
+              var go = function () {
+                if (left > 0 && --left === 0) window.print();
+              };
+              pending.forEach(function (img) {
+                img.addEventListener('load', go);
+                img.addEventListener('error', go);
+              });
+
+              // Rede lenta ou imagem em falta: imprime na mesma ao fim de 5s.
+              setTimeout(function () {
+                if (left > 0) { left = 0; window.print(); }
+              }, 5000);
+            })();
           </script>
         </body>
       </html>
@@ -192,14 +184,14 @@ export default function StorageUnit() {
   }, []);
 
   useEffect(() => {
-    setPageTitle('Armazenamento');
-    setBreadcrumbs([{ label: 'Armazenamento', href: '/portal/storage-unit' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/storage-unit' }]);
     fetchStorageUnits();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits]);
+  }, [setBreadcrumbs, setPageTitle, fetchStorageUnits, t]);
 
   const handleSave = useCallback(async () => {
     await fetchStorageUnits();
@@ -212,16 +204,16 @@ export default function StorageUnit() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Qualidade</TableHead>
-              <TableHead>Sexo</TableHead>
-              <TableHead>Faixa etária</TableHead>
-              <TableHead>Parte</TableHead>
-              <TableHead>Estação</TableHead>
-              <TableHead>Peso (kg)</TableHead>
-              <TableHead>Nº de itens</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Ação</TableHead>
+              <TableHead>{tCommon('code')}</TableHead>
+              <TableHead>{tCommon('quality')}</TableHead>
+              <TableHead>{tCommon('sex')}</TableHead>
+              <TableHead>{tCommon('ageGroup')}</TableHead>
+              <TableHead>{tCommon('part')}</TableHead>
+              <TableHead>{tCommon('season')}</TableHead>
+              <TableHead>{t('weightKg')}</TableHead>
+              <TableHead>{t('itemCount')}</TableHead>
+              <TableHead>{tCommon('status')}</TableHead>
+              <TableHead>{tCommon('action')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -231,11 +223,11 @@ export default function StorageUnit() {
                   <TableCell className="font-medium">
                     {storageUnit.friendlyCode ?? '-'}
                   </TableCell>
-                  <TableCell>{QUALITY_MAP[storageUnit.quality]}</TableCell>
-                  <TableCell>{SEX_MAP[storageUnit.sex]}</TableCell>
-                  <TableCell>{AGE_GROUP_MAP[storageUnit.ageGroup]}</TableCell>
-                  <TableCell>{TYPE_MAP[storageUnit.type]}</TableCell>
-                  <TableCell>{SEASON_MAP[storageUnit.season]}</TableCell>
+                  <TableCell>{tQuality(storageUnit.quality)}</TableCell>
+                  <TableCell>{tSex(storageUnit.sex)}</TableCell>
+                  <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
+                  <TableCell>{tItemType(storageUnit.type)}</TableCell>
+                  <TableCell>{tSeason(storageUnit.season)}</TableCell>
                   <TableCell>{Number(storageUnit.weight ?? 0).toFixed(2)}</TableCell>
                   <TableCell>{storageUnit.itemsCount ?? 0}</TableCell>
                   <TableCell>
@@ -246,7 +238,7 @@ export default function StorageUnit() {
                           : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {STATUS_MAP[storageUnit.status]}
+                      {tUnitStatus(storageUnit.status)}
                     </span>
                   </TableCell>
                   <TableCell className="space-x-2">
@@ -255,7 +247,7 @@ export default function StorageUnit() {
                       size="icon"
                       className="size-8"
                       onClick={() => handlePrintLabel(storageUnit)}
-                      title="Imprimir etiqueta"
+                      title={t('printLabel')}
                     >
                       <PrinterIcon />
                     </Button>
@@ -286,7 +278,7 @@ export default function StorageUnit() {
                   colSpan={10}
                   className="text-center py-6 text-muted-foreground"
                 >
-                  Nenhum registro encontrado!
+                  {tCommon('noRecords')}
                 </TableCell>
               </TableRow>
             )}

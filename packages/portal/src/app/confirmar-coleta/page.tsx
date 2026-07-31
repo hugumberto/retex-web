@@ -2,32 +2,33 @@
 
 import Title from '@/components/custom/title';
 import api from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 type ConfirmState = 'loading' | 'success' | 'error' | 'invalid';
 
-function messageForStatus(status: number | undefined, isReject: boolean): string {
+function errorKeyForStatus(
+  status: number | undefined,
+  isReject: boolean
+): string {
   switch (status) {
     case 404:
-      return 'Link inválido ou já utilizado.';
+      return 'errorInvalidLink';
     case 400:
-      return isReject
-        ? 'Não foi possível processar o pedido.'
-        : 'O prazo para confirmar a recolha já expirou.';
+      return isReject ? 'errorRejectFailed' : 'errorDeadlineExpired';
     default:
-      return isReject
-        ? 'Não foi possível recusar a recolha. Tente novamente.'
-        : 'Não foi possível confirmar a recolha. Tente novamente.';
+      return isReject ? 'errorRejectGeneric' : 'errorConfirmGeneric';
   }
 }
 
 function ConfirmContent() {
+  const t = useTranslations('collectionConfirmation');
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const isReject = searchParams.get('action') === 'reject';
   const [state, setState] = useState<ConfirmState>('loading');
-  const [message, setMessage] = useState('');
+  const [errorKey, setErrorKey] = useState('errorConfirmGeneric');
 
   useEffect(() => {
     if (!token) {
@@ -48,7 +49,7 @@ function ConfirmContent() {
         if (cancelled) return;
         const status = (err as { response?: { status?: number } })?.response
           ?.status;
-        setMessage(messageForStatus(status, isReject));
+        setErrorKey(errorKeyForStatus(status, isReject));
         setState('error');
       }
     })();
@@ -60,33 +61,21 @@ function ConfirmContent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary-muted/10 p-6">
       <div className="w-full max-w-md rounded-2xl border border-secondary/25 bg-white p-8 text-center shadow-sm">
-        <Title as="h1">
-          {isReject ? 'Recusa de recolha' : 'Confirmação de recolha'}
-        </Title>
+        <Title as="h1">{isReject ? t('rejectTitle') : t('confirmTitle')}</Title>
         <div className="mt-4 text-sm text-secondary">
           {state === 'loading' && (
-            <p>
-              {isReject
-                ? 'A processar o seu pedido...'
-                : 'A confirmar a sua recolha...'}
-            </p>
+            <p>{isReject ? t('rejectLoading') : t('confirmLoading')}</p>
           )}
           {state === 'success' && !isReject && (
-            <p className="text-green-700">
-              Recolha confirmada! O nosso motorista passará no dia agendado.
-              Obrigado.
-            </p>
+            <p className="text-green-700">{t('confirmSuccess')}</p>
           )}
           {state === 'success' && isReject && (
-            <p className="text-green-700">
-              A sua solicitação foi removida desta recolha. Voltaremos a agendar
-              noutra altura. Obrigado.
-            </p>
+            <p className="text-green-700">{t('rejectSuccess')}</p>
           )}
           {state === 'invalid' && (
-            <p className="text-red-600">Link inválido.</p>
+            <p className="text-red-600">{t('invalidLink')}</p>
           )}
-          {state === 'error' && <p className="text-red-600">{message}</p>}
+          {state === 'error' && <p className="text-red-600">{t(errorKey)}</p>}
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
@@ -12,8 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { CollectionRequestStatus } from '@/app/types/collection-request';
-import { STATUS_LABEL } from '@/lib/collection-request-status';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
@@ -35,6 +34,9 @@ type CollectionRequestBagsResponse = {
 };
 
 export default function Bags() {
+  const t = useTranslations('bags');
+  const tCommon = useTranslations('common');
+  const tStatus = useTranslations('enums.collectionRequestStatus');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [code, setCode] = useState('');
   const [pkg, setPkg] = useState<CollectionRequestInfo | null>(null);
@@ -43,13 +45,13 @@ export default function Bags() {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
-    setPageTitle('Sacos da Solicitação');
-    setBreadcrumbs([{ label: 'Sacos da Solicitação', href: '/portal/bags' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/bags' }]);
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setPageTitle, setBreadcrumbs]);
+  }, [setPageTitle, setBreadcrumbs, t]);
 
   const search = async (value: string) => {
     const target = value.trim();
@@ -69,8 +71,8 @@ export default function Bags() {
       setBags([]);
       toast.error(
         httpStatus === 404
-          ? 'Nenhuma solicitação encontrada para o código'
-          : 'Não foi possível carregar os sacos'
+          ? t('requestNotFound')
+          : t('loadError')
       );
     } finally {
       setIsLoading(false);
@@ -88,10 +90,10 @@ export default function Bags() {
     try {
       const res = await api.patch(`/collection-request-bag/${bag.id}/unassign`);
       if (!isSuccessStatus(res.status)) throw new Error();
-      toast.success('Saco desassociado da solicitação');
+      toast.success(t('unassignSuccess'));
       await refresh();
     } catch {
-      toast.error('Não foi possível desassociar o saco');
+      toast.error(t('unassignError'));
     } finally {
       setBusyId(null);
     }
@@ -102,10 +104,10 @@ export default function Bags() {
     try {
       const res = await api.delete(`/collection-request-bag/${bag.id}`);
       if (!isSuccessStatus(res.status)) throw new Error();
-      toast.success('Saco eliminado');
+      toast.success(t('deleteSuccess'));
       await refresh();
     } catch {
-      toast.error('Não foi possível eliminar o saco');
+      toast.error(t('deleteError'));
     } finally {
       setBusyId(null);
     }
@@ -115,7 +117,7 @@ export default function Bags() {
     <section className="space-y-6">
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <label className="mb-1 block text-sm font-medium text-secondary">
-          Código da solicitação (ou UUID)
+          {t('requestCodeLabel')}
         </label>
         <div className="flex flex-wrap items-center gap-3">
           <Input
@@ -127,7 +129,7 @@ export default function Bags() {
                 search(code);
               }
             }}
-            placeholder="ex.: 2026-MCLPCM"
+            placeholder={t('requestCodePlaceholder')}
             className="max-w-xs"
           />
           <Button
@@ -150,11 +152,11 @@ export default function Bags() {
               <span>
                 Estado:{' '}
                 <strong>
-                  {STATUS_LABEL[pkg.status as CollectionRequestStatus] ?? pkg.status}
+                  {tStatus(pkg.status)}
                 </strong>
               </span>
               <span>
-                Sacos recolhidos: <strong>{pkg.bagsGenerated ?? 0}</strong>
+                {t('collectedBags')} <strong>{pkg.bagsGenerated ?? 0}</strong>
               </span>
               {pkg.estimatedBags != null && (
                 <span>
@@ -168,11 +170,11 @@ export default function Bags() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Recolhido</TableHead>
-                  <TableHead>Processado</TableHead>
-                  <TableHead>Peso (kg)</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead>{tCommon('code')}</TableHead>
+                  <TableHead>{tCommon('collected')}</TableHead>
+                  <TableHead>{tCommon('processed')}</TableHead>
+                  <TableHead>{t('weightKg')}</TableHead>
+                  <TableHead>{tCommon('actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -182,8 +184,8 @@ export default function Bags() {
                       <TableCell className="font-medium">
                         {b.friendlyCode}
                       </TableCell>
-                      <TableCell>{b.usedAt ? 'Sim' : 'Não'}</TableCell>
-                      <TableCell>{b.processedAt ? 'Sim' : 'Não'}</TableCell>
+                      <TableCell>{b.usedAt ? tCommon('yes') : tCommon('no')}</TableCell>
+                      <TableCell>{b.processedAt ? tCommon('yes') : tCommon('no')}</TableCell>
                       <TableCell>
                         {b.weight != null
                           ? Number(b.weight).toFixed(2)
@@ -191,15 +193,15 @@ export default function Bags() {
                       </TableCell>
                       <TableCell className="space-x-2">
                         <ConfirmDialog
-                          title="Desassociar saco"
-                          description="O saco será desvinculado desta solicitação (volta ao pool da rota). Continuar?"
-                          confirmText="Desassociar"
+                          title={t('unassignTitle')}
+                          description={t('unassignDescription')}
+                          confirmText={t('unassignConfirm')}
                           trigger={
                             <Button
                               variant="ghost"
                               size="icon"
                               className="size-8"
-                              title="Desassociar da solicitação"
+                              title={t('unassignTooltip')}
                               disabled={busyId === b.id}
                             >
                               <Link2Off className="size-4" />
@@ -208,15 +210,15 @@ export default function Bags() {
                           onConfirm={() => handleUnassign(b)}
                         />
                         <ConfirmDialog
-                          title="Eliminar saco"
-                          description="O saco será eliminado. Esta ação atualiza o nº de sacos recolhidos da solicitação."
-                          confirmText="Eliminar"
+                          title={t('deleteTitle')}
+                          description={t('deleteDescription')}
+                          confirmText={tCommon('delete')}
                           trigger={
                             <Button
                               variant="ghost"
                               size="icon"
                               className="size-8 text-red-600 hover:text-red-700"
-                              title="Eliminar saco"
+                              title={t('deleteTitle')}
                               disabled={busyId === b.id}
                             >
                               <TrashIcon className="size-4" />
@@ -233,7 +235,7 @@ export default function Bags() {
                       colSpan={5}
                       className="py-6 text-center text-muted-foreground"
                     >
-                      Nenhum saco associado a esta solicitação
+                      {t('empty')}
                     </TableCell>
                   </TableRow>
                 )}

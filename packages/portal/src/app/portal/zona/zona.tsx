@@ -14,12 +14,16 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { useLocale, useTranslations } from 'next-intl';
 import { SendIcon, TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import ZonaForm from './zona-form';
 
 export default function Zona() {
+  const t = useTranslations('zones');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [zones, setZones] = useState<ZoneDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,9 +35,9 @@ export default function Zona() {
       setZones(data);
     } catch (error) {
       console.error('Erro ao buscar zonas:', error);
-      toast.error('Não foi possível carregar as zonas de actuação');
+      toast.error(t('loadError'));
     }
-  }, []);
+  }, [t]);
 
   const handleDelete = useCallback(
     async (id: string) => {
@@ -57,12 +61,12 @@ export default function Zona() {
   const handleDeleteWithToast = useCallback(
     async (id: string) => {
       await toast.promise(handleDelete(id), {
-        loading: 'A eliminar zona...',
-        success: () => 'Zona eliminada com sucesso',
-        error: () => 'Erro ao eliminar a zona',
+        loading: t('deleting'),
+        success: () => t('deleteSuccess'),
+        error: () => t('deleteError'),
       });
     },
-    [handleDelete]
+    [handleDelete, t]
   );
 
   const handleNotify = useCallback(async (id: string) => {
@@ -74,24 +78,24 @@ export default function Zona() {
         return res.data?.notified ?? 0;
       })(),
       {
-        loading: 'A notificar utilizadores...',
-        success: (n: number) => `${n} utilizador(es) notificado(s)`,
-        error: () => 'Não foi possível notificar os utilizadores',
+        loading: t('notifying'),
+        success: (n: number) => t('notifySuccess', { count: n }),
+        error: () => t('notifyError'),
       }
     );
     setIsSubmitting(false);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    setPageTitle('Zonas de Actuação');
-    setBreadcrumbs([{ label: 'Zonas de Actuação', href: '/portal/zona' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/zona' }]);
     fetchZones();
 
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [fetchZones, setBreadcrumbs, setPageTitle]);
+  }, [fetchZones, setBreadcrumbs, setPageTitle, t]);
 
   const handleSave = useCallback(async () => {
     await fetchZones();
@@ -105,9 +109,9 @@ export default function Zona() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Cidade</TableHead>
-              <TableHead>Criada em</TableHead>
-              <TableHead>Ação</TableHead>
+              <TableHead>{tCommon('city')}</TableHead>
+              <TableHead>{t('createdAt')}</TableHead>
+              <TableHead>{tCommon('action')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -116,20 +120,20 @@ export default function Zona() {
                 <TableRow key={zone.id}>
                   <TableCell className="capitalize">{zone.city}</TableCell>
                   <TableCell>
-                    {new Date(zone.createdAt).toLocaleDateString('pt-PT')}
+                    {new Date(zone.createdAt).toLocaleDateString(locale)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <ConfirmDialog
-                        title="Notificar utilizadores"
-                        description="Enviar email de ativação a todos os utilizadores inativos desta zona para definirem a password?"
+                        title={t('notifyTitle')}
+                        description={t('notifyDescription')}
                         trigger={
                           <Button
                             variant="ghost"
                             size="icon"
                             disabled={isSubmitting}
                             className="size-8"
-                            title="Notificar utilizadores inativos"
+                            title={t('notifyInactiveTooltip')}
                           >
                             <SendIcon />
                           </Button>
@@ -143,7 +147,7 @@ export default function Zona() {
                             size="icon"
                             disabled={isSubmitting}
                             className="size-8"
-                            title="Eliminar zona"
+                            title={t('deleteTooltip')}
                           >
                             <TrashIcon />
                           </Button>
@@ -157,7 +161,7 @@ export default function Zona() {
             ) : (
               <TableRow>
                 <TableCell colSpan={3} className="text-center py-6 text-muted-foreground">
-                  Nenhuma zona de actuação registada!
+                  {t('empty')}
                 </TableCell>
               </TableRow>
             )}

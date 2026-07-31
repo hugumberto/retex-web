@@ -1,34 +1,34 @@
+import { useTranslations } from 'next-intl';
+
 const values = [
   {
+    key: 'collection',
     icon: '/assets/new-layout/values/fi-rs-truck-side.svg',
-    title: 'Recolha Sustentável',
-    text: 'Em Portugal, são mais de 200 mil. O problema cresce, mas temos solução.',
   },
   {
+    key: 'waste',
     icon: '/assets/new-layout/values/fi-rs-hand-holding-heart.svg',
-    title: 'Redução do Desperdício Têxtil',
-    text: 'Damos nova vida a cada peça, evitando que toneladas acabem em aterros.',
   },
   {
+    key: 'impact',
     icon: '/assets/new-layout/values/fi-rs-leaf.svg',
-    title: 'Impacto Social e Ambiental',
-    text: 'Apoiamos causas sociais e práticas sustentáveis para reduzir a pegada ecológica.',
   },
   {
+    key: 'circular',
     icon: '/assets/new-layout/values/fi-rr-refresh.svg',
-    title: 'Economia Circular',
-    text: 'Transformamos resíduos em recursos, promovendo um consumo mais consciente.',
   },
-];
+] as const;
 
 export default function LandingValues() {
+  const t = useTranslations('values');
+
   return (
     <section className="values-section">
-      <p className="values-kicker">Descobre mais sobre</p>
-      <h2>Os nossos valores</h2>
+      <p className="values-kicker">{t('kicker')}</p>
+      <h2>{t('title')}</h2>
       <div className="values-grid">
         {values.map((item) => (
-          <article key={item.title} className="value-card">
+          <article key={item.key} className="value-card">
             <span className="value-card-icon">
               <span
                 className="value-card-glyph"
@@ -38,8 +38,8 @@ export default function LandingValues() {
                 }}
               />
             </span>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
+            <h3>{t(`items.${item.key}.title`)}</h3>
+            <p>{t(`items.${item.key}.text`)}</p>
           </article>
         ))}
       </div>

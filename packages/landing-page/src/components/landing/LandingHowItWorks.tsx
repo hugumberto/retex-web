@@ -1,7 +1,8 @@
+import { useTranslations } from 'next-intl';
+
 const steps = [
   {
-    title: 'Faz o teu registo',
-    description: 'Preenche a informação necessária para ficares registado.',
+    key: 'register',
     icon: (
       <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden>
         <path
@@ -20,8 +21,7 @@ const steps = [
     ),
   },
   {
-    title: 'Agenda a tua recolha',
-    description: 'Menciona o local mais indicado para ti ',
+    key: 'schedule',
     icon: (
       <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden>
         <rect
@@ -43,8 +43,7 @@ const steps = [
     ),
   },
   {
-    title: 'Agora é connosco',
-    description: 'Aguardar o contacto de um dos nossos transportadores.',
+    key: 'rest',
     icon: (
       <svg viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden>
         <path
@@ -63,19 +62,21 @@ const steps = [
       </svg>
     ),
   },
-];
+] as const;
 
 export default function LandingHowItWorks() {
+  const t = useTranslations('howItWorks');
+
   return (
     <section id="como-funciona" className="landing-section">
-      <h2>Como funciona?</h2>
+      <h2>{t('title')}</h2>
       <div className="icon-cards">
         {steps.map((item, index) => (
-          <article key={item.title} className="icon-card">
+          <article key={item.key} className="icon-card">
             <span className="step-badge">{index + 1}</span>
             <span className="icon-card-line-icon">{item.icon}</span>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
+            <h3>{t(`steps.${item.key}.title`)}</h3>
+            <p>{t(`steps.${item.key}.description`)}</p>
           </article>
         ))}
       </div>

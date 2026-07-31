@@ -13,6 +13,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 export type ConfirmDialogProps = {
   /** Element that opens the dialog (e.g.: <Button />). */
@@ -44,10 +45,10 @@ export type ConfirmDialogProps = {
 
 export default function ConfirmDialog({
   trigger,
-  title = 'Deseja continuar?',
-  description = 'Esta ação é irreversível.',
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
+  title,
+  description,
+  confirmText,
+  cancelText,
   onConfirm,
   open,
   onOpenChange,
@@ -56,8 +57,14 @@ export default function ConfirmDialog({
   actionClassName,
   cancelClassName,
 }: ConfirmDialogProps) {
+  const t = useTranslations('common.confirmDialog');
   const isControlled = open !== undefined;
   const [internalOpen, setInternalOpen] = React.useState(false);
+
+  const resolvedTitle = title ?? t('title');
+  const resolvedDescription = description ?? t('description');
+  const resolvedConfirmText = confirmText ?? t('confirm');
+  const resolvedCancelText = cancelText ?? t('cancel');
 
   const actualOpen = isControlled ? Boolean(open) : internalOpen;
   const setOpen = (next: boolean) => {
@@ -81,7 +88,7 @@ export default function ConfirmDialog({
         <span className={disabled ? 'pointer-events-none opacity-60' : ''}>
           {trigger ?? (
             <Button variant={'ghost'} disabled={disabled}>
-              {confirmText}
+              {resolvedConfirmText}
             </Button>
           )}
         </span>
@@ -90,21 +97,21 @@ export default function ConfirmDialog({
       <AlertDialogContent className={contentClassName}>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
-            {title}
+            {resolvedTitle}
           </AlertDialogTitle>
-          {description ? (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
+          {resolvedDescription ? (
+            <AlertDialogDescription>{resolvedDescription}</AlertDialogDescription>
           ) : null}
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogCancel className={cancelClassName}>
-            {cancelText}
+            {resolvedCancelText}
           </AlertDialogCancel>
 
           <AlertDialogAction asChild>
             <Button onClick={handleConfirm} className={actionClassName}>
-              {confirmText}
+              {resolvedConfirmText}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

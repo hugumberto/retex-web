@@ -6,6 +6,7 @@ import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -15,6 +16,8 @@ type ZonaFormProps = {
 };
 
 export default function ZonaForm({ onSave }: ZonaFormProps) {
+  const t = useTranslations('zones');
+  const tCommon = useTranslations('common');
   const [, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,44 +45,44 @@ export default function ZonaForm({ onSave }: ZonaFormProps) {
             if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
           })(),
           {
-            loading: 'A criar zona...',
+            loading: tCommon('creating'),
             success: () => {
               onSave();
               setIsOpen(false);
               reset({ city: '' });
-              return 'Zona criada com sucesso!';
+              return t('createSuccess');
             },
-            error: () => 'Erro ao criar a zona.',
+            error: () => t('createError'),
           }
         );
       } finally {
         setIsSubmitting(false);
       }
     },
-    [onSave, reset]
+    [onSave, reset, t, tCommon]
   );
 
   return (
     <DialogForm
-      title="Adicionar Zona de Actuação"
+      title={t('formTitle')}
       onConfirm={form.handleSubmit(handleSubmit)}
       onOpenChange={handleOpenChange}
       loading={isSubmitting}
       errors={errors}
       trigger={
         <Button variant="secondary" className="ml-auto block">
-          Adicionar zona
+          {t('addButton')}
         </Button>
       }
     >
       <div className="grid grid-cols-1 gap-6">
         <InputForm
-          label="Cidade"
+          label={tCommon('city')}
           name="city"
           control={control}
-          rules={{ required: 'A cidade é obrigatória' }}
+          rules={{ required: t('cityRequired') }}
           errors={errors}
-          placeholder="ex: Lisboa"
+          placeholder={t('cityPlaceholder')}
         />
       </div>
     </DialogForm>

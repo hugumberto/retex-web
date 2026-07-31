@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -16,6 +17,8 @@ type FormData = {
 };
 
 export default function ResetPassword() {
+  const t = useTranslations('adminResetPassword');
+  const tValidation = useTranslations('validation');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const {
     register,
@@ -28,13 +31,13 @@ export default function ResetPassword() {
   });
 
   useEffect(() => {
-    setPageTitle('Repor Senha');
-    setBreadcrumbs([{ label: 'Repor Senha', href: '/portal/reset-password' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/reset-password' }]);
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [setPageTitle, setBreadcrumbs]);
+  }, [setPageTitle, setBreadcrumbs, t]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -43,15 +46,15 @@ export default function ResetPassword() {
         password: data.password,
       });
       if (!isSuccessStatus(status)) throw new Error();
-      toast.success('Senha reposta com sucesso');
+      toast.success(t('success'));
       reset({ email: '', password: '', confirmPassword: '' });
     } catch (error) {
       const status = (error as { response?: { status?: number } })?.response
         ?.status;
       if (status === 404) {
-        toast.error('Nenhum utilizador encontrado com esse email');
+        toast.error(t('userNotFound'));
       } else {
-        toast.error('Não foi possível repor a senha');
+        toast.error(t('error'));
       }
     }
   };
@@ -60,26 +63,26 @@ export default function ResetPassword() {
     <section className="max-w-xl">
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <h2 className="text-lg font-semibold text-secondary">
-          Repor senha de um utilizador
+          {t('cardTitle')}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Indique o email do utilizador e a nova senha. A alteração é imediata.
+          {t('cardDescription')}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-5 space-y-4">
           <div>
             <label className="block text-sm font-medium text-secondary">
-              Email do utilizador
+              {t('emailLabel')}
             </label>
             <Input
               type="email"
-              placeholder="utilizador@exemplo.pt"
+              placeholder={t('emailPlaceholder')}
               className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
               {...register('email', {
-                required: 'O email é obrigatório',
+                required: tValidation('emailRequired'),
                 pattern: {
                   value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                  message: 'Email inválido',
+                  message: tValidation('emailInvalid'),
                 },
               })}
             />
@@ -90,17 +93,17 @@ export default function ResetPassword() {
 
           <div>
             <label className="block text-sm font-medium text-secondary">
-              Nova senha
+              {t('newPasswordLabel')}
             </label>
             <Input
               type="password"
-              placeholder="Nova senha"
+              placeholder={t('newPasswordLabel')}
               className={`mt-1 ${errors.password ? 'border-red-500' : ''}`}
               {...register('password', {
-                required: 'A nova senha é obrigatória',
+                required: tValidation('passwordRequired'),
                 minLength: {
                   value: 6,
-                  message: 'A senha deve ter pelo menos 6 caracteres',
+                  message: t('passwordMinLength'),
                 },
               })}
             />
@@ -113,16 +116,17 @@ export default function ResetPassword() {
 
           <div>
             <label className="block text-sm font-medium text-secondary">
-              Confirmar nova senha
+              {t('confirmPasswordLabel')}
             </label>
             <Input
               type="password"
-              placeholder="Repita a nova senha"
+              placeholder={t('repeatPasswordPlaceholder')}
               className={`mt-1 ${errors.confirmPassword ? 'border-red-500' : ''}`}
               {...register('confirmPassword', {
-                required: 'Confirme a nova senha',
+                required: tValidation('confirmPasswordRequired'),
                 validate: (value) =>
-                  value === watch('password') || 'As senhas não coincidem',
+                  value === watch('password') ||
+                  tValidation('passwordsDoNotMatch'),
               })}
             />
             {errors.confirmPassword && (
@@ -134,7 +138,7 @@ export default function ResetPassword() {
 
           <div className="flex justify-end">
             <Button type="submit" variant="secondary" disabled={isSubmitting}>
-              {isSubmitting ? 'A repor...' : 'Repor senha'}
+              {isSubmitting ? t('submitting') : t('submit')}
             </Button>
           </div>
         </form>

@@ -15,12 +15,15 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { useTranslations } from 'next-intl';
 import { EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function BlogCrud() {
+  const t = useTranslations('blog');
+  const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [posts, setPosts] = useState<BlogPostDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,9 +36,9 @@ export default function BlogCrud() {
       if (!isSuccessStatus(status)) throw new Error('Erro ao buscar posts');
       setPosts(data.data);
     } catch {
-      toast.error('Não foi possível carregar os posts');
+      toast.error(t('loadError'));
     }
-  }, []);
+  }, [t]);
 
   const handleDelete = useCallback(
     async (id: string) => {
@@ -44,8 +47,6 @@ export default function BlogCrud() {
         const res = await api.delete(`/blog-post/${id}`);
         if (!isSuccessStatus(res.status)) throw new Error('Erro ao eliminar post');
         await fetchPosts();
-      } catch (err) {
-        throw err;
       } finally {
         setIsSubmitting(false);
       }
@@ -56,12 +57,12 @@ export default function BlogCrud() {
   const handleDeleteWithToast = useCallback(
     async (id: string) => {
       await toast.promise(handleDelete(id), {
-        loading: 'Carregando...',
-        success: 'Post eliminado com sucesso!',
-        error: 'Erro ao eliminar o post',
+        loading: tCommon('loading'),
+        success: t('deleteSuccess'),
+        error: t('deleteError'),
       });
     },
-    [handleDelete]
+    [handleDelete, t, tCommon]
   );
 
   const handlePublish = useCallback(
@@ -73,28 +74,28 @@ export default function BlogCrud() {
           await fetchPosts();
         })(),
         {
-          loading: 'Publicando...',
-          success: 'Post publicado com sucesso!',
-          error: 'Erro ao publicar o post',
+          loading: t('publishing'),
+          success: t('publishSuccess'),
+          error: t('publishError'),
         }
       );
     },
-    [fetchPosts]
+    [fetchPosts, t]
   );
 
   useEffect(() => {
-    setPageTitle('Blog');
-    setBreadcrumbs([{ label: 'Blog', href: '/portal/blog' }]);
+    setPageTitle(t('pageTitle'));
+    setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/blog' }]);
     fetchPosts();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [fetchPosts, setBreadcrumbs, setPageTitle]);
+  }, [fetchPosts, setBreadcrumbs, setPageTitle, t]);
 
   const highlightLabel = (h: BlogPostHighlight) => {
-    if (h === BlogPostHighlight.FEATURED) return 'Destaque';
-    if (h === BlogPostHighlight.HIGHLIGHTED) return 'Realçado';
+    if (h === BlogPostHighlight.FEATURED) return t('highlightFeatured');
+    if (h === BlogPostHighlight.HIGHLIGHTED) return t('highlightHighlighted');
     return '-';
   };
 
@@ -102,17 +103,17 @@ export default function BlogCrud() {
     <section className="flex flex-col">
       <div className="flex justify-end mb-4">
         <Button asChild variant="secondary">
-          <Link href="/portal/blog/new">Criar Post</Link>
+          <Link href="/portal/blog/new">{t('createPost')}</Link>
         </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Título</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Destaque</TableHead>
-            <TableHead>Ações</TableHead>
+            <TableHead>{tCommon('title')}</TableHead>
+            <TableHead>{tCommon('status')}</TableHead>
+            <TableHead>{t('highlight')}</TableHead>
+            <TableHead>{tCommon('actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -122,8 +123,8 @@ export default function BlogCrud() {
                 <TableCell>{post.title}</TableCell>
                 <TableCell>
                   {post.status === BlogPostStatus.PUBLISHED
-                    ? 'Publicado'
-                    : 'Rascunho'}
+                    ? t('statusPublished')
+                    : t('statusDraft')}
                 </TableCell>
                 <TableCell>{highlightLabel(post.highlight)}</TableCell>
                 <TableCell className="space-x-2">
@@ -137,7 +138,7 @@ export default function BlogCrud() {
                       variant="ghost"
                       size="icon"
                       className="size-8"
-                      title="Publicar"
+                      title={t('publish')}
                       onClick={() => handlePublish(post.id)}
                       disabled={isSubmitting}
                     >
@@ -166,7 +167,7 @@ export default function BlogCrud() {
                 colSpan={4}
                 className="text-center py-6 text-muted-foreground"
               >
-                Nenhum post encontrado!
+                {t('empty')}
               </TableCell>
             </TableRow>
           )}

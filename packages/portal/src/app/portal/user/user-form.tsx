@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { DialogForm } from '@/components/form/dialog-form';
 import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -19,6 +20,9 @@ interface UserFormProps {
 }
 
 export default function UserForm({ initialData, onSave }: UserFormProps) {
+  const t = useTranslations('users');
+  const tCommon = useTranslations('common');
+  const tRole = useTranslations('enums.role');
   const isEditing = !!initialData?.id;
   const [isOpen, setIsOpen] = useState(false);
   const {
@@ -29,11 +33,10 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<UserFormData>();
 
-  const roleOptions = [
-    { id: Role.ADMIN, label: 'Admin' },
-    { id: Role.OPS, label: 'Operação' },
-    { id: Role.DRIVER, label: 'Motorista' },
-  ];
+  const roleOptions = [Role.ADMIN, Role.OPS, Role.DRIVER].map((id) => ({
+    id,
+    label: tRole(id),
+  }));
 
   useEffect(() => {
     if (!isOpen) return;
@@ -64,7 +67,7 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
           password: formData.contactPhone,
         });
 
-        if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
+        if (!isSuccessStatus(status)) throw new Error(t('createError'));
         userId = data.id;
       } else {
         // Senha temporária aleatória; o utilizador define a senha real pelo
@@ -78,7 +81,7 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
           password: tempPassword,
           userType: 'PERSON',
         });
-        if (!isSuccessStatus(status)) throw new Error('Erro ao criar usuário');
+        if (!isSuccessStatus(status)) throw new Error(t('createError'));
         userId = data.id;
       }
 
@@ -86,12 +89,12 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
         await api.post(`/user/${userId}/roles`, { roles: formData.role });
       }
 
-      toast.success('Usuário salvo com sucesso!');
+      toast.success(t('saveSuccess'));
       setIsOpen(false);
       onSave?.();
       reset();
     } catch (e) {
-      toast.error('Erro ao salvar o usuário.');
+      toast.error(t('saveError'));
       console.error(e);
     }
   };
@@ -100,7 +103,7 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
     <DialogForm<UserFormData>
       open={isOpen}
       onOpenChange={handleOpenChange}
-      title={initialData ? 'Editar Usuário' : 'Cadastro de Usuário'}
+      title={initialData ? t('formEditTitle') : t('formCreateTitle')}
       onConfirm={handleSubmit(onSubmit)}
       loading={isSubmitting}
       errors={errors}
@@ -111,7 +114,7 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
           </Button>
         ) : (
           <Button variant="secondary" className="ml-auto block">
-            Criar
+            {tCommon('create')}
           </Button>
         )
       }
@@ -122,16 +125,16 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
             htmlFor="firstName"
             className="block text-sm font-medium text-secondary"
           >
-            Primeiro Nome
+            {t('firstName')}
           </label>
           <div className="w-full">
             <Input
-              placeholder="Primeiro Nome*"
+              placeholder={t('firstNamePlaceholder')}
               className={errors.firstName ? 'border-red-500' : ''}
-              {...register('firstName', { required: 'Campo obrigatório' })}
+              {...register('firstName', { required: tCommon('requiredField') })}
             />
             {errors.firstName && (
-              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+              <p className="text-red-500 text-xs mt-1">{tCommon('requiredField')}</p>
             )}
           </div>
         </div>
@@ -141,16 +144,16 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
             htmlFor="lastName"
             className="block text-sm font-medium text-secondary"
           >
-            Último Nome
+            {t('lastName')}
           </label>
           <div className="w-full">
             <Input
-              placeholder="Último Nome*"
+              placeholder={t('lastNamePlaceholder')}
               className={errors.lastName ? 'border-red-500' : ''}
-              {...register('lastName', { required: 'Campo obrigatório' })}
+              {...register('lastName', { required: tCommon('requiredField') })}
             />
             {errors.lastName && (
-              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+              <p className="text-red-500 text-xs mt-1">{tCommon('requiredField')}</p>
             )}
           </div>
         </div>
@@ -164,13 +167,13 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
           </label>
           <div className="w-full">
             <Input
-              placeholder="Email*"
+              placeholder={t('emailPlaceholder')}
               className={errors.email ? 'border-red-500' : ''}
               {...register('email', {
-                required: 'Campo obrigatório',
+                required: tCommon('requiredField'),
                 pattern: {
                   value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                  message: 'Formato de email inválido',
+                  message: tCommon('emailInvalid'),
                 },
               })}
             />
@@ -191,12 +194,12 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
           </label>
           <div className="w-full">
             <Input
-              placeholder="Telefone*"
+              placeholder={t('phonePlaceholder')}
               className={errors.contactPhone ? 'border-red-500' : ''}
-              {...register('contactPhone', { required: 'Campo obrigatório' })}
+              {...register('contactPhone', { required: tCommon('requiredField') })}
             />
             {errors.contactPhone && (
-              <p className="text-red-500 text-xs mt-1">Campo obrigatório</p>
+              <p className="text-red-500 text-xs mt-1">{tCommon('requiredField')}</p>
             )}
           </div>
         </div>
@@ -205,12 +208,12 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
             htmlFor="profile"
             className="block text-sm font-medium text-secondary"
           >
-            Perfil
+            {tCommon('role')}
           </label>
           <Controller
             name="role"
             control={control}
-            rules={{ required: 'Perfil é obrigatório' }}
+            rules={{ required: t('roleRequired') }}
             defaultValue={[]}
             render={({ field }) => (
               <div className="flex flex-col gap-2">

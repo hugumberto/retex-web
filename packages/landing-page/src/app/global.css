@@ -234,6 +234,34 @@ a.nav-cta-btn:hover {
   background: rgba(255, 255, 255, 0.85);
 }
 
+.landing-lang-switcher {
+  display: inline-flex;
+  align-items: center;
+}
+
+.landing-lang-switcher select {
+  height: 36px;
+  border: 1px solid #123b63;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  color: #123b63;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.landing-lang-switcher select:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.landing-lang-switcher select:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 .landing-nav-toggle {
   display: none;
   flex-direction: column;
