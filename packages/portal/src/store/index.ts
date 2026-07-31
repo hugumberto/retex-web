@@ -14,7 +14,7 @@ const createStateCreator: StateCreator<
   AppStore
 > = (set, get) => ({
   ...createUiSlice(set),
-  ...createAuthSlice(set),
+  ...createAuthSlice(set, get),
 });
 
 export const useAppStore = create<AppStore>()(

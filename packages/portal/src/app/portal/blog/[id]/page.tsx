@@ -1,7 +1,6 @@
 'use client';
 
 import { BlogPostDTO, BlogPostFormData } from '@/app/types/blog';
-import { PaginatedResult } from '@/app/types/helper';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -19,11 +18,10 @@ export default function EditBlogPage() {
 
   const fetchPost = useCallback(async () => {
     try {
-      const { data, status } = await api.get<PaginatedResult<BlogPostDTO>>(
-        '/blog-post?limit=100'
+      const { data: post, status } = await api.get<BlogPostDTO>(
+        `/blog-post/${params.id}`
       );
       if (!isSuccessStatus(status)) throw new Error();
-      const post = data.data.find((p) => p.id === params.id);
       if (!post) {
         toast.error(t('notFound'));
         return;

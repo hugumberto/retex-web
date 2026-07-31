@@ -128,9 +128,14 @@ export default function CollectionRequest() {
   const fetchRequests = useCallback(async () => {
     try {
       const endpoint = isUserRole ? '/me/collection-requests' : '/collection-request';
-      const { data, status } = await api.get<CollectionRequestDTO[]>(endpoint);
+      // `/me/collection-requests` devolve um array; `/collection-request` é
+      // paginado e devolve `{ data, meta }`.
+      const { data, status } = await api.get<
+        CollectionRequestDTO[] | { data: CollectionRequestDTO[] }
+      >(endpoint);
       if (!isSuccessStatus(status)) throw new Error();
-      setRequests(Array.isArray(data) ? data : []);
+      const list = Array.isArray(data) ? data : data?.data;
+      setRequests(Array.isArray(list) ? list : []);
     } catch {
       toast.error(t('loadError'));
     }
