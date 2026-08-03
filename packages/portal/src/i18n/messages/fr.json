@@ -87,7 +87,10 @@
     "more": "Plus",
     "sidebar": "Barre latérale",
     "sidebarDescription": "Affiche la barre latérale sur les petits écrans.",
-    "toggleSidebar": "Basculer la barre latérale"
+    "toggleSidebar": "Basculer la barre latérale",
+    "search": "Rechercher",
+    "edit": "Modifier",
+    "cancel": "Annuler"
   },
   "nav": {
     "home": "ACCUEIL",
@@ -110,7 +113,8 @@
     "parameters": "Paramètres",
     "emailLog": "Journal des e-mails",
     "resetPassword": "Réinitialiser le mot de passe",
-    "packageBags": "Sacs du colis"
+    "packageBags": "Sacs du colis",
+    "companies": "Entreprises"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -185,6 +189,10 @@
     "emailStatus": {
       "SENT": "Envoyé",
       "FAILED": "Échec"
+    },
+    "companyProfile": {
+      "MANAGER": "Gestionnaire",
+      "COLLABORATOR": "Collaborateur"
     }
   },
   "validation": {
@@ -819,5 +827,31 @@
     "citiesOutOfZone": "Villes hors de la zone de service",
     "citiesOutOfZoneHelp": "Demande dans des villes non encore couvertes (demande potentielle).",
     "requests": "Demandes"
+  },
+  "company": {
+    "pageTitle": "Entreprises",
+    "badgeLabel": "Entreprise",
+    "badgeTitle": "Demande d'entreprise",
+    "companyLabel": "Entreprise",
+    "name": "Nom commercial",
+    "legalName": "Raison sociale",
+    "taxId": "Numéro fiscal",
+    "phone": "Téléphone",
+    "status": "Statut",
+    "members": "Membres",
+    "profile": "Profil",
+    "manager": "Gestionnaire",
+    "addManager": "Gestionnaire initial",
+    "addMember": "Ajouter un membre",
+    "addresses": "Lieux de collecte",
+    "addAddress": "Ajouter un lieu",
+    "createSuccess": "Entreprise créée",
+    "createError": "Erreur lors de la création",
+    "updateSuccess": "Entreprise mise à jour",
+    "updateError": "Erreur lors de la mise à jour",
+    "loadError": "Erreur de chargement",
+    "memberCreateSuccess": "Membre créé ; e-mail d'activation envoyé",
+    "memberCreateError": "Erreur lors de la création du membre",
+    "noCompanies": "Aucune entreprise enregistrée"
   }
 }

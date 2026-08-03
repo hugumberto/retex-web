@@ -87,7 +87,10 @@
     "more": "More",
     "sidebar": "Sidebar",
     "sidebarDescription": "Displays the sidebar on small screens.",
-    "toggleSidebar": "Toggle sidebar"
+    "toggleSidebar": "Toggle sidebar",
+    "search": "Search",
+    "edit": "Edit",
+    "cancel": "Cancel"
   },
   "nav": {
     "home": "HOME",
@@ -110,7 +113,8 @@
     "parameters": "Parameters",
     "emailLog": "Email log",
     "resetPassword": "Reset password",
-    "packageBags": "Package bags"
+    "packageBags": "Package bags",
+    "companies": "Companies"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -185,6 +189,10 @@
     "emailStatus": {
       "SENT": "Sent",
       "FAILED": "Failed"
+    },
+    "companyProfile": {
+      "MANAGER": "Manager",
+      "COLLABORATOR": "Collaborator"
     }
   },
   "validation": {
@@ -819,5 +827,31 @@
     "citiesOutOfZone": "Cities outside the service area",
     "citiesOutOfZoneHelp": "Demand from cities not yet covered (potential demand).",
     "requests": "Requests"
+  },
+  "company": {
+    "pageTitle": "Companies",
+    "badgeLabel": "Company",
+    "badgeTitle": "Company request",
+    "companyLabel": "Company",
+    "name": "Trading name",
+    "legalName": "Legal name",
+    "taxId": "Tax ID",
+    "phone": "Phone",
+    "status": "Status",
+    "members": "Members",
+    "profile": "Profile",
+    "manager": "Manager",
+    "addManager": "Initial manager",
+    "addMember": "Add member",
+    "addresses": "Collection sites",
+    "addAddress": "Add site",
+    "createSuccess": "Company created",
+    "createError": "Error creating company",
+    "updateSuccess": "Company updated",
+    "updateError": "Error updating company",
+    "loadError": "Error loading companies",
+    "memberCreateSuccess": "Member created; activation email sent",
+    "memberCreateError": "Error creating member",
+    "noCompanies": "No companies registered"
   }
 }

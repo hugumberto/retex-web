@@ -15,6 +15,7 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal/coleta', roles: [Role.ADMIN, Role.DRIVER] },
   { path: '/portal/brand', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/user', roles: [Role.ADMIN] },
+  { path: '/portal/company', roles: [Role.ADMIN] },
   { path: '/portal/zona', roles: [Role.ADMIN] },
   { path: '/portal/parametros', roles: [Role.ADMIN] },
   { path: '/portal/email-log', roles: [Role.ADMIN] },

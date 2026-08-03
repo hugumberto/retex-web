@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import RequesterTypeBadge from '@/components/custom/requester-type-badge';
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
 import { AddressDTO, Role } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
@@ -621,6 +622,10 @@ export default function CollectionRequest() {
                       {`${request.user?.firstName ?? '-'} ${
                         request.user?.lastName ?? ''
                       }`.trim()}
+                      <RequesterTypeBadge
+                        companyId={request.companyId}
+                        company={request.company}
+                      />
                     </TableCell>
                     <TableCell>{request.user?.email ?? '-'}</TableCell>
                     <TableCell className="whitespace-normal break-words max-w-[220px] min-w-[160px]">

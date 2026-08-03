@@ -87,7 +87,10 @@
     "more": "Mais",
     "sidebar": "Barra lateral",
     "sidebarDescription": "Mostra a barra lateral em ecrãs pequenos.",
-    "toggleSidebar": "Alternar barra lateral"
+    "toggleSidebar": "Alternar barra lateral",
+    "search": "Procurar",
+    "edit": "Editar",
+    "cancel": "Cancelar"
   },
   "nav": {
     "home": "INÍCIO",
@@ -110,7 +113,8 @@
     "parameters": "Parâmetros",
     "emailLog": "Registo de Emails",
     "resetPassword": "Repor Senha",
-    "packageBags": "Sacos do Pacote"
+    "packageBags": "Sacos do Pacote",
+    "companies": "Empresas"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -185,6 +189,10 @@
     "emailStatus": {
       "SENT": "Enviado",
       "FAILED": "Falhou"
+    },
+    "companyProfile": {
+      "MANAGER": "Gestor",
+      "COLLABORATOR": "Colaborador"
     }
   },
   "validation": {
@@ -819,5 +827,31 @@
     "citiesOutOfZone": "Cidades Fora da Zona de Atuação",
     "citiesOutOfZoneHelp": "Procura por cidades ainda não abrangidas (potencial procura).",
     "requests": "Pedidos"
+  },
+  "company": {
+    "pageTitle": "Empresas",
+    "badgeLabel": "Empresa",
+    "badgeTitle": "Solicitação de empresa",
+    "companyLabel": "Empresa",
+    "name": "Nome comercial",
+    "legalName": "Razão social",
+    "taxId": "NIF",
+    "phone": "Telefone",
+    "status": "Estado",
+    "members": "Membros",
+    "profile": "Perfil",
+    "manager": "Gestor",
+    "addManager": "Gestor inicial",
+    "addMember": "Adicionar membro",
+    "addresses": "Locais de recolha",
+    "addAddress": "Adicionar local",
+    "createSuccess": "Empresa criada",
+    "createError": "Erro ao criar empresa",
+    "updateSuccess": "Empresa atualizada",
+    "updateError": "Erro ao atualizar empresa",
+    "loadError": "Erro ao carregar empresas",
+    "memberCreateSuccess": "Membro criado; foi enviado email de ativação",
+    "memberCreateError": "Erro ao criar membro",
+    "noCompanies": "Sem empresas registadas"
   }
 }

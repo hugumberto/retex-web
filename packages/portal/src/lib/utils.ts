@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import {
+  Building2,
   LayoutDashboard,
   BarChart3,
   ClipboardList,
@@ -149,6 +150,12 @@ export const NAV_ITEMS: NavEntry[] = [
         href: '/portal/user',
         labelKey: 'nav.users',
         icon: UserIcon,
+        roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/company',
+        labelKey: 'nav.companies',
+        icon: Building2,
         roles: [Role.ADMIN],
       },
       {
