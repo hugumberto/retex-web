@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { Check, TrashIcon, X } from 'lucide-react';
 
 export type TriageListItem = {
@@ -39,6 +40,14 @@ export const buildTriageKey = (attrs: {
   season: string;
 }) =>
   `${attrs.quality}::${attrs.sex}::${attrs.ageGroup}::${attrs.type}::${attrs.season}`;
+
+/**
+ * Linha de item já coberto por uma unidade de armazenamento adicionada.
+ *
+ * O `hover:` não é opcional: o `TableRow` base traz `hover:bg-muted/50`, que
+ * sem isto apagaria o verde ao passar o rato e pareceria avaria.
+ */
+const COVERED_ROW_CLASS = 'bg-green-50 hover:bg-green-100';
 
 type AddTriageProps = {
   items: TriageListItem[];
@@ -155,6 +164,14 @@ export default function AddTriage({
               items.map((item, index) => (
                 <TableRow
                   key={`${item.collectionRequestId}-${item.brandId}-${index}`}
+                  // Verde quando há uma unidade adicionada com os mesmos cinco
+                  // atributos — que é exatamente o critério com que o servidor
+                  // vincula (findCompatibleStorageUnit). Os itens que ficam
+                  // brancos são os que ainda faltam cobrir para poder finalizar.
+                  className={cn(
+                    storageTriageKeys.has(buildTriageKey(item)) &&
+                      COVERED_ROW_CLASS
+                  )}
                 >
                   <TableCell>
                     {tQuality(item.quality) ?? item.quality}
