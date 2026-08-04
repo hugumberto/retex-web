@@ -10,16 +10,67 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PrinterIcon, TrashIcon } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import api from '@/lib/api';
 import { useAppStore } from '@/store';
 import {
+  AgeGroup,
+  Quality,
+  Season,
+  Sex,
   StorageUnitDTO,
+  Type,
 } from '../../types/storage-unit';
 import StorageUnitForm from './storage-unit-form';
+
+// Sentinela do "sem filtro": o Select do shadcn não aceita value="".
+const ALL = 'ALL';
+
+/**
+ * Select de filtro por um atributo de triagem. Os cinco filtros são idênticos
+ * tirando as opções e o tradutor, por isso ficam aqui em vez de repetidos.
+ */
+function FilterSelect({
+  label,
+  allLabel,
+  value,
+  onChange,
+  options,
+  translate,
+}: {
+  label: string;
+  allLabel: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+  translate: (key: string) => string;
+}) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="w-full sm:w-40" aria-label={label}>
+        <SelectValue placeholder={label} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value={ALL}>{`${label}: ${allLabel}`}</SelectItem>
+        {options.map((option) => (
+          <SelectItem key={option} value={option}>
+            {translate(option)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 // Constants
 const escapeHtml = (value: string) =>
@@ -42,6 +93,50 @@ export default function StorageUnit() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Filtros pelos cinco atributos de triagem — são eles que respondem à
+  // pergunta do operador: "onde ponho uma peça deste tipo?". Filtrados no
+  // cliente, sobre a lista já carregada, como no ecrã de utilizadores.
+  const [qualityFilter, setQualityFilter] = useState<Quality | typeof ALL>(ALL);
+  const [sexFilter, setSexFilter] = useState<Sex | typeof ALL>(ALL);
+  const [ageGroupFilter, setAgeGroupFilter] = useState<AgeGroup | typeof ALL>(ALL);
+  const [typeFilter, setTypeFilter] = useState<Type | typeof ALL>(ALL);
+  const [seasonFilter, setSeasonFilter] = useState<Season | typeof ALL>(ALL);
+
+  const hasFilters =
+    qualityFilter !== ALL ||
+    sexFilter !== ALL ||
+    ageGroupFilter !== ALL ||
+    typeFilter !== ALL ||
+    seasonFilter !== ALL;
+
+  const filteredStorageUnits = useMemo(
+    () =>
+      storageUnits.filter(
+        (unit) =>
+          (qualityFilter === ALL || unit.quality === qualityFilter) &&
+          (sexFilter === ALL || unit.sex === sexFilter) &&
+          (ageGroupFilter === ALL || unit.ageGroup === ageGroupFilter) &&
+          (typeFilter === ALL || unit.type === typeFilter) &&
+          (seasonFilter === ALL || unit.season === seasonFilter)
+      ),
+    [
+      storageUnits,
+      qualityFilter,
+      sexFilter,
+      ageGroupFilter,
+      typeFilter,
+      seasonFilter,
+    ]
+  );
+
+  const clearFilters = useCallback(() => {
+    setQualityFilter(ALL);
+    setSexFilter(ALL);
+    setAgeGroupFilter(ALL);
+    setTypeFilter(ALL);
+    setSeasonFilter(ALL);
+  }, []);
 
   const fetchStorageUnits = useCallback(async () => {
     try {
@@ -200,6 +295,55 @@ export default function StorageUnit() {
   return (
     <section id="storage-unit-page" className="flex flex-col items-center">
       <StorageUnitForm onSave={handleSave} />
+
+      <div className="mt-4 flex w-full flex-wrap items-center gap-2">
+        <FilterSelect
+          label={tCommon('quality')}
+          allLabel={tCommon('all')}
+          value={qualityFilter}
+          onChange={(value) => setQualityFilter(value as Quality | typeof ALL)}
+          options={Object.values(Quality)}
+          translate={tQuality}
+        />
+        <FilterSelect
+          label={tCommon('sex')}
+          allLabel={tCommon('all')}
+          value={sexFilter}
+          onChange={(value) => setSexFilter(value as Sex | typeof ALL)}
+          options={Object.values(Sex)}
+          translate={tSex}
+        />
+        <FilterSelect
+          label={tCommon('ageGroup')}
+          allLabel={tCommon('all')}
+          value={ageGroupFilter}
+          onChange={(value) => setAgeGroupFilter(value as AgeGroup | typeof ALL)}
+          options={Object.values(AgeGroup)}
+          translate={tAgeGroup}
+        />
+        <FilterSelect
+          label={tCommon('part')}
+          allLabel={tCommon('all')}
+          value={typeFilter}
+          onChange={(value) => setTypeFilter(value as Type | typeof ALL)}
+          options={Object.values(Type)}
+          translate={tItemType}
+        />
+        <FilterSelect
+          label={tCommon('season')}
+          allLabel={tCommon('all')}
+          value={seasonFilter}
+          onChange={(value) => setSeasonFilter(value as Season | typeof ALL)}
+          options={Object.values(Season)}
+          translate={tSeason}
+        />
+        {hasFilters && (
+          <Button variant="ghost" onClick={clearFilters}>
+            {tCommon('clear')}
+          </Button>
+        )}
+      </div>
+
       <div className="mt-4 w-full">
         <Table>
           <TableHeader>
@@ -217,8 +361,8 @@ export default function StorageUnit() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {storageUnits?.length > 0 ? (
-              storageUnits.map((storageUnit) => (
+            {filteredStorageUnits.length > 0 ? (
+              filteredStorageUnits.map((storageUnit) => (
                 <TableRow key={storageUnit.id}>
                   <TableCell className="font-medium">
                     {storageUnit.friendlyCode ?? '-'}
