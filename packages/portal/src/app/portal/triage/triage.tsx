@@ -241,7 +241,9 @@ export default function Triage() {
     }
 
     setActiveBagId(bag.id);
-    setBagWeight('');
+    // Retoma o peso já gravado por um "Guardar progresso" anterior (o decimal
+    // do Postgres chega como string).
+    setBagWeight(bag.weight != null ? String(bag.weight) : '');
     clearItemForm();
     setBagCode('');
     requestAnimationFrame(() => weightInputRef.current?.focus());
@@ -368,8 +370,35 @@ export default function Triage() {
 
   const handleSaveProgress = async () => {
     if (!selectedCollectionRequest?.id) return;
+
+    // Campo vazio não impede guardar o resto; um valor inválido impede, para o
+    // operador dar por isso em vez de perder o peso em silêncio.
+    const parsedWeight = Number(bagWeight);
+    const hasWeight = Boolean(activeBagId && bagWeight.trim());
+    if (hasWeight && (Number.isNaN(parsedWeight) || parsedWeight < 0)) {
+      toast.error(t('invalidBagWeight'));
+      return;
+    }
+
     setIsSavingProgress(true);
     try {
+      // Grava o peso do saco ativo sem o dar por terminado, para não se perder
+      // se o operador sair do ecrã a meio da triagem deste saco.
+      if (hasWeight) {
+        const { status: weightStatus } = await api.patch(
+          `/triage/bag/${activeBagId}/weight`,
+          { weight: parsedWeight }
+        );
+        if (!isSuccessStatus(weightStatus)) {
+          throw new Error(t('progressSaveError'));
+        }
+        setBags((current) =>
+          current.map((bag) =>
+            bag.id === activeBagId ? { ...bag, weight: parsedWeight } : bag
+          )
+        );
+      }
+
       // Persiste os vínculos item→unidade de armazenamento já escaneados
       // (sem finalizar), para que reapareçam ao reconsultar a solicitação.
       const itemIds = triageItems
@@ -655,12 +684,10 @@ export default function Triage() {
                     );
                   const processed = bag.processedAt != null;
                   const isActive = bag.id === activeBagId;
-                  // O peso em edição (bagWeight) só se aplica ao saco ativo.
-                  const rawWeight = processed
-                    ? bag.weight
-                    : isActive
-                    ? bagWeight
-                    : null;
+                  // O peso em edição prevalece no saco ativo; nos restantes
+                  // mostra-se o que está gravado — incluindo o de um saco ainda
+                  // pendente cujo peso já foi guardado com o progresso.
+                  const rawWeight = isActive ? bagWeight : bag.weight;
                   const numWeight = Number(rawWeight);
                   const displayWeight =
                     rawWeight != null &&
