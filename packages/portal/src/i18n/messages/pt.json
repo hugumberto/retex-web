@@ -684,6 +684,7 @@
     "fullName": "Nome Completo",
     "recordSection": "Registo de Triagem",
     "itemsSection": "Itens da Triagem",
+    "storageUnitsSection": "Unidades de Armazenamento",
     "itemsTableCaption": "Tabela de itens",
     "brandLabel": "Marca *",
     "brandPlaceholder": "Procurar ou criar marca",

@@ -99,6 +99,21 @@ export default function AddTriage({
     validStorageUnits.map((storageUnit) => buildTriageKey(storageUnit))
   );
 
+  // Os itens já cobertos por uma unidade de armazenamento vão para o fim, para
+  // o operador ver primeiro o que ainda falta cobrir. O `sort` é estável, por
+  // isso a ordem relativa dentro de cada grupo mantém-se.
+  //
+  // O índice original vai colado ao item: `onDeleteItem` e `deletingItemIndex`
+  // são posicionais sobre `items` e apontariam para a linha errada se aqui se
+  // usasse o índice da ordenação.
+  const orderedItems = items
+    .map((item, index) => ({ item, index }))
+    .sort(
+      (a, b) =>
+        Number(storageTriageKeys.has(buildTriageKey(a.item))) -
+        Number(storageTriageKeys.has(buildTriageKey(b.item)))
+    );
+
   const hasInvalidItemCombination = items.some(
     (item) =>
       !item.quality || !item.sex || !item.ageGroup || !item.type || !item.season
@@ -146,83 +161,6 @@ export default function AddTriage({
       </div>
 
       <div className="space-y-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{tCommon('quality')}</TableHead>
-              <TableHead>{tCommon('sex')}</TableHead>
-              <TableHead>{tCommon('ageGroup')}</TableHead>
-              <TableHead>{tCommon('type')}</TableHead>
-              <TableHead>{tCommon('season')}</TableHead>
-              <TableHead>{tCommon('brand')}</TableHead>
-              <TableHead>{tCommon('quantity')}</TableHead>
-              <TableHead>{tCommon('action')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.length > 0 ? (
-              items.map((item, index) => (
-                <TableRow
-                  key={`${item.collectionRequestId}-${item.brandId}-${index}`}
-                  // Verde quando há uma unidade adicionada com os mesmos cinco
-                  // atributos — que é exatamente o critério com que o servidor
-                  // vincula (findCompatibleStorageUnit). Os itens que ficam
-                  // brancos são os que ainda faltam cobrir para poder finalizar.
-                  className={cn(
-                    storageTriageKeys.has(buildTriageKey(item)) &&
-                      COVERED_ROW_CLASS
-                  )}
-                >
-                  <TableCell>
-                    {tQuality(item.quality) ?? item.quality}
-                  </TableCell>
-                  <TableCell>{tSex(item.sex) ?? item.sex}</TableCell>
-                  <TableCell>
-                    {tAgeGroup(item.ageGroup) ?? item.ageGroup}
-                  </TableCell>
-                  <TableCell>{tItemType(item.type) ?? item.type}</TableCell>
-                  <TableCell>
-                    {tSeason(item.season) ?? item.season}
-                  </TableCell>
-                  <TableCell>
-                    {(brands.find((brand) => brand.id === item.brandId)?.name ??
-                      item.brandId) ||
-                      '-'}
-                  </TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>
-                    <ConfirmDialog
-                      title={t('removeItemTitle')}
-                      description={t('removeItemDescription')}
-                      trigger={
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-8"
-                          disabled={deletingItemIndex === index || isViewMode}
-                        >
-                          <TrashIcon className="size-4" />
-                        </Button>
-                      }
-                      onConfirm={() => onDeleteItem(item, index)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={8}
-                  className="h-20 text-center text-secondary/55"
-                >
-                  {t('itemsTableCaption')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-
         <div className="space-y-2">
           <label className="block text-sm font-medium text-secondary">
             {t('storageCodeLabel')}
@@ -242,39 +180,143 @@ export default function AddTriage({
           />
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{tCommon('quality')}</TableHead>
-              <TableHead>{tCommon('sex')}</TableHead>
-              <TableHead>{tCommon('ageGroup')}</TableHead>
-              <TableHead>{tCommon('part')}</TableHead>
-              <TableHead>{tCommon('season')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {validStorageUnits.length > 0 ? (
-              validStorageUnits.map((storageUnit) => (
-                <TableRow key={storageUnit.id}>
-                  <TableCell>{tQuality(storageUnit.quality)}</TableCell>
-                  <TableCell>{tSex(storageUnit.sex)}</TableCell>
-                  <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
-                  <TableCell>{tItemType(storageUnit.type)}</TableCell>
-                  <TableCell>{tSeason(storageUnit.season)}</TableCell>
+        {/* Lado a lado: o conteúdo de cada tabela só se lê contra o da outra.
+            O `min-w-0` nas colunas não é opcional: as células têm
+            `whitespace-nowrap`, e um item de grelha assume `min-width: auto`,
+            recusando encolher abaixo do conteúdo. Sem isto a coluna estica até
+            à largura da tabela, o `overflow-x-auto` do contentor nunca chega a
+            atuar e é a página inteira que passa a transbordar em ecrãs
+            estreitos. */}
+        <div className="grid gap-6 lg:grid-cols-5">
+          <div className="min-w-0 space-y-2 lg:col-span-3">
+            <h3 className="text-sm font-medium text-secondary">
+              {tCommon('items')}
+            </h3>
+            <Table containerClassName="max-h-[300px]">
+              <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
+                <TableRow>
+                  <TableHead>{tCommon('quality')}</TableHead>
+                  <TableHead>{tCommon('sex')}</TableHead>
+                  <TableHead>{tCommon('ageGroup')}</TableHead>
+                  <TableHead>{tCommon('type')}</TableHead>
+                  <TableHead>{tCommon('season')}</TableHead>
+                  <TableHead>{tCommon('brand')}</TableHead>
+                  <TableHead>{tCommon('quantity')}</TableHead>
+                  <TableHead>{tCommon('action')}</TableHead>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="h-24 text-center text-secondary/55"
-                >
-                  {t('noStorageUnits')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {orderedItems.length > 0 ? (
+                  orderedItems.map(({ item, index }) => (
+                    <TableRow
+                      key={
+                        item.id ??
+                        `${item.collectionRequestId}-${item.brandId}-${index}`
+                      }
+                      // Verde quando há uma unidade adicionada com os mesmos
+                      // cinco atributos — que é exatamente o critério com que o
+                      // servidor vincula (findCompatibleStorageUnit). Os itens
+                      // que ficam brancos são os que ainda faltam cobrir para
+                      // poder finalizar.
+                      className={cn(
+                        storageTriageKeys.has(buildTriageKey(item)) &&
+                          COVERED_ROW_CLASS
+                      )}
+                    >
+                      <TableCell>
+                        {tQuality(item.quality) ?? item.quality}
+                      </TableCell>
+                      <TableCell>{tSex(item.sex) ?? item.sex}</TableCell>
+                      <TableCell>
+                        {tAgeGroup(item.ageGroup) ?? item.ageGroup}
+                      </TableCell>
+                      <TableCell>
+                        {tItemType(item.type) ?? item.type}
+                      </TableCell>
+                      <TableCell>
+                        {tSeason(item.season) ?? item.season}
+                      </TableCell>
+                      <TableCell>
+                        {(brands.find((brand) => brand.id === item.brandId)
+                          ?.name ?? item.brandId) ||
+                          '-'}
+                      </TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>
+                        <ConfirmDialog
+                          title={t('removeItemTitle')}
+                          description={t('removeItemDescription')}
+                          trigger={
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="size-8"
+                              disabled={
+                                deletingItemIndex === index || isViewMode
+                              }
+                            >
+                              <TrashIcon className="size-4" />
+                            </Button>
+                          }
+                          onConfirm={() => onDeleteItem(item, index)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="h-20 text-center text-secondary/55"
+                    >
+                      {t('itemsTableCaption')}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="min-w-0 space-y-2 lg:col-span-2">
+            <h3 className="text-sm font-medium text-secondary">
+              {t('storageUnitsSection')}
+            </h3>
+            <Table containerClassName="max-h-[300px]">
+              <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
+                <TableRow>
+                  <TableHead>{tCommon('quality')}</TableHead>
+                  <TableHead>{tCommon('sex')}</TableHead>
+                  <TableHead>{tCommon('ageGroup')}</TableHead>
+                  <TableHead>{tCommon('part')}</TableHead>
+                  <TableHead>{tCommon('season')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {validStorageUnits.length > 0 ? (
+                  validStorageUnits.map((storageUnit) => (
+                    <TableRow key={storageUnit.id}>
+                      <TableCell>{tQuality(storageUnit.quality)}</TableCell>
+                      <TableCell>{tSex(storageUnit.sex)}</TableCell>
+                      <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
+                      <TableCell>{tItemType(storageUnit.type)}</TableCell>
+                      <TableCell>{tSeason(storageUnit.season)}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="h-24 text-center text-secondary/55"
+                    >
+                      {t('noStorageUnits')}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
 
         {!hideFinishButton && (
           <div className="flex justify-center pt-1">

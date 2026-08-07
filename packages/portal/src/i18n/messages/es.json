@@ -684,6 +684,7 @@
     "fullName": "Nombre completo",
     "recordSection": "Registro de triaje",
     "itemsSection": "Artículos del triaje",
+    "storageUnitsSection": "Unidades de almacenamiento",
     "itemsTableCaption": "Tabla de artículos",
     "brandLabel": "Marca *",
     "brandPlaceholder": "Buscar o crear marca",

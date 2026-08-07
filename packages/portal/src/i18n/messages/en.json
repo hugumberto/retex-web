@@ -684,6 +684,7 @@
     "fullName": "Full name",
     "recordSection": "Triage record",
     "itemsSection": "Triage items",
+    "storageUnitsSection": "Storage units",
     "itemsTableCaption": "Items table",
     "brandLabel": "Brand *",
     "brandPlaceholder": "Search or create brand",
