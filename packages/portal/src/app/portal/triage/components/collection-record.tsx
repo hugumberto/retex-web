@@ -4,13 +4,7 @@ import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { TriageListItem } from './add-triage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import Autocomplete from '@/components/custom/autocomplete';
 import {
   Table,
   TableBody,
@@ -34,7 +28,7 @@ import {
   X,
 } from 'lucide-react';
 import { PantsIcon } from '@/components/icons/pants-icon';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 type TriageOption = {
   value: string;
@@ -86,6 +80,8 @@ type CollectionRecordProps = {
   brands: Brand[];
   brandId: string;
   onBrandChange: (value: string) => void;
+  /** Persiste uma marca nova e devolve o seu id, ou null se falhou. */
+  onCreateBrand: (name: string) => Promise<string | null>;
   quantity: string;
   onQuantityChange: (value: string) => void;
   quality?: 'GOOD' | 'MEDIUM' | 'BAD';
@@ -111,6 +107,7 @@ export default function CollectionRecord({
   brands,
   brandId,
   onBrandChange,
+  onCreateBrand,
   quantity,
   onQuantityChange,
   quality,
@@ -159,6 +156,11 @@ export default function CollectionRecord({
     { value: 'ADULT', label: tAgeGroup('ADULT'), icon: User },
     { value: 'CHILD', label: tAgeGroup('CHILD'), icon: Baby },
   ];
+
+  const brandOptions = useMemo(
+    () => brands.map((item) => ({ value: item.id, label: item.name })),
+    [brands]
+  );
 
   return (
     <div className="rounded-[24px] border border-secondary/45 bg-white p-4 md:p-6">
@@ -247,18 +249,18 @@ export default function CollectionRecord({
             <label className="mb-1 block text-sm font-medium text-secondary">
               {t('brandLabel')}
             </label>
-            <Select value={brandId} onValueChange={onBrandChange}>
-              <SelectTrigger className="w-full" disabled={isViewMode}>
-                <SelectValue placeholder={t('brandPlaceholder')} />
-              </SelectTrigger>
-              <SelectContent>
-                {brands.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Autocomplete
+              options={brandOptions}
+              value={brandId}
+              onChange={onBrandChange}
+              placeholder={t('brandPlaceholder')}
+              emptyMessage={t('brandNotFound')}
+              disabled={isViewMode}
+              allowCreate={!isViewMode}
+              createLabel={(query) => t('createBrandOption', { name: query })}
+              onCreate={onCreateBrand}
+              className="w-full"
+            />
           </div>
 
           <div>

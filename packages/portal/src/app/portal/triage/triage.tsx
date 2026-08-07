@@ -18,7 +18,7 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AddTriage, { buildTriageKey, TriageListItem } from './components/add-triage';
 import CollectionRecord from './components/collection-record';
@@ -35,10 +35,17 @@ const finishErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
+// Marcas por ordem alfabética (case-insensitive, pt-PT).
+const sortBrands = (list: Brand[]) =>
+  [...list].sort((a, b) =>
+    (a.name ?? '').localeCompare(b.name ?? '', 'pt', { sensitivity: 'base' })
+  );
+
 export default function Triage() {
   const t = useTranslations('triage');
   const tCommon = useTranslations('common');
   const tStatus = useTranslations('enums.collectionRequestStatus');
+  const tBrand = useTranslations('brand');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const scanCodeInputRef = useRef<HTMLInputElement>(null);
   const bagInputRef = useRef<HTMLInputElement>(null);
@@ -79,13 +86,7 @@ export default function Triage() {
       try {
         const { data, status } = await api.get<Brand[]>('/brand');
         if (!isSuccessStatus(status)) throw new Error(t('brandsLoadError'));
-        // Marcas por ordem alfabética (case-insensitive, pt-PT).
-        const sorted = [...data].sort((a, b) =>
-          (a.name ?? '').localeCompare(b.name ?? '', 'pt', {
-            sensitivity: 'base',
-          })
-        );
-        setBrands(sorted);
+        setBrands(sortBrands(data));
       } catch (error) {
         console.error('Erro ao buscar marcas:', error);
         toast.error('Não foi possível carregar as marcas');
@@ -101,6 +102,35 @@ export default function Triage() {
       setBreadcrumbs([]);
     };
   }, [setBreadcrumbs, setPageTitle, t]);
+
+  // Cria a marca escrita na triagem sem sair do ecrã: persiste, junta-a à lista
+  // disponível (mantendo a ordem alfabética) e deixa-a selecionada.
+  const handleCreateBrand = useCallback(
+    async (name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed) return null;
+
+      try {
+        const { data, status } = await api.post<Brand>('/brand', {
+          name: trimmed,
+        });
+        if (!isSuccessStatus(status)) throw new Error();
+        setBrands((prev) => sortBrands([...prev, data]));
+        setBrandId(data.id);
+        toast.success(tBrand('createSuccess'));
+        return data.id;
+      } catch (error) {
+        // 409 = já existe uma marca com este nome (comparação sem espaços/caixa).
+        const status = (error as { response?: { status?: number } })?.response
+          ?.status;
+        toast.error(
+          status === 409 ? tBrand('duplicateName') : tBrand('createError')
+        );
+        return null;
+      }
+    },
+    [tBrand]
+  );
 
   const isViewMode = selectedCollectionRequest?.status === CollectionRequestStatus.STOCKED;
   const allProcessed =
@@ -690,6 +720,7 @@ export default function Triage() {
             brands={brands}
             brandId={brandId}
             onBrandChange={setBrandId}
+            onCreateBrand={handleCreateBrand}
             quantity={quantity}
             onQuantityChange={setQuantity}
             quality={quality}
