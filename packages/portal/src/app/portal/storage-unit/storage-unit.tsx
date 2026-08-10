@@ -176,7 +176,7 @@ export default function StorageUnit() {
   );
 
   const handlePrintLabel = useCallback((unit: StorageUnitDTO) => {
-    const printWindow = window.open('', '_blank', 'width=420,height=640');
+    const printWindow = window.open('', '_blank', 'width=900,height=560');
     if (!printWindow) {
       toast.error(t('popupBlocked'));
       return;
@@ -198,19 +198,25 @@ export default function StorageUnit() {
         <head>
           <title>Etiqueta ${unitId}</title>
           <style>
+            @page { size: landscape; margin: 10mm; }
             body {
               margin: 0;
-              padding: 24px;
+              padding: 0;
               font-family: Arial, sans-serif;
               color: #013364;
             }
+            /* Em paisagem o QR fica à esquerda e os atributos à direita, para
+               aproveitar a largura em vez de deixar a folha meia vazia. */
             .label {
               border: 2px solid #02748e;
               border-radius: 12px;
-              padding: 20px;
-              width: 320px;
+              padding: 20px 28px;
+              display: flex;
+              align-items: center;
+              gap: 28px;
+              text-align: left;
+              max-width: 660px;
               margin: 0 auto;
-              text-align: center;
             }
             .title {
               margin: 0 0 12px;
@@ -220,9 +226,10 @@ export default function StorageUnit() {
             .bag {
               width: 220px;
               height: 220px;
-              margin: 10px auto 16px;
               display: block;
+              flex-shrink: 0;
             }
+            .details { min-width: 0; }
             .text {
               margin: 6px 0;
               font-size: 15px;
@@ -238,15 +245,17 @@ export default function StorageUnit() {
         </head>
         <body>
           <div class="label">
-            <h1 class="title">${t('itemLabel')}</h1>
-            <p class="code">${friendlyCode}</p>
             <img class="bag" src="${qrSource}" alt="QR Code ${unitId}" />
-            <p class="text"><strong>${t('codeWithColon')}</strong> ${friendlyCode}</p>
-            <p class="text"><strong>${t('qualityWithColon')}</strong> ${quality}</p>
-            <p class="text"><strong>${t('sexWithColon')}</strong> ${sex}</p>
-            <p class="text"><strong>${t('ageGroupWithColon')}</strong> ${ageGroup}</p>
-            <p class="text"><strong>${t('partWithColon')}</strong> ${type}</p>
-            <p class="text"><strong>${t('seasonWithColon')}</strong> ${season}</p>
+            <div class="details">
+              <h1 class="title">${t('itemLabel')}</h1>
+              <p class="code">${friendlyCode}</p>
+              <p class="text"><strong>${t('codeWithColon')}</strong> ${friendlyCode}</p>
+              <p class="text"><strong>${t('qualityWithColon')}</strong> ${quality}</p>
+              <p class="text"><strong>${t('sexWithColon')}</strong> ${sex}</p>
+              <p class="text"><strong>${t('ageGroupWithColon')}</strong> ${ageGroup}</p>
+              <p class="text"><strong>${t('partWithColon')}</strong> ${type}</p>
+              <p class="text"><strong>${t('seasonWithColon')}</strong> ${season}</p>
+            </div>
           </div>
           <script>
             (function () {
