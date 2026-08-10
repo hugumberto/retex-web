@@ -35,6 +35,10 @@ const finishErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
+// A esmagadora maioria dos itens é registada à unidade, por isso o campo já
+// vem preenchido — poupa uma escrita por item num ecrã usado ao ritmo do scanner.
+const DEFAULT_QUANTITY = '1';
+
 // Marcas por ordem alfabética (case-insensitive, pt-PT).
 const sortBrands = (list: Brand[]) =>
   [...list].sort((a, b) =>
@@ -66,7 +70,7 @@ export default function Triage() {
   const [isFinishingTriage, setIsFinishingTriage] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [brandId, setBrandId] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [quantity, setQuantity] = useState(DEFAULT_QUANTITY);
   const [quality, setQuality] = useState<'GOOD' | 'MEDIUM' | 'BAD'>();
   const [season, setSeason] = useState<'SUMMER' | 'WINTER'>();
   const [clothingType, setClothingType] = useState<
@@ -211,7 +215,7 @@ export default function Triage() {
 
   const clearItemForm = () => {
     setBrandId('');
-    setQuantity('');
+    setQuantity(DEFAULT_QUANTITY);
     setQuality(undefined);
     setSeason(undefined);
     setClothingType(undefined);
