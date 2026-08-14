@@ -18,7 +18,7 @@ import {
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AddTriage, { buildTriageKey, TriageListItem } from './components/add-triage';
 import CollectionRecord from './components/collection-record';
@@ -35,10 +35,21 @@ const finishErrorMessage = (error: unknown, fallback: string): string => {
   return fallback;
 };
 
+// A esmagadora maioria dos itens é registada à unidade, por isso o campo já
+// vem preenchido — poupa uma escrita por item num ecrã usado ao ritmo do scanner.
+const DEFAULT_QUANTITY = '1';
+
+// Marcas por ordem alfabética (case-insensitive, pt-PT).
+const sortBrands = (list: Brand[]) =>
+  [...list].sort((a, b) =>
+    (a.name ?? '').localeCompare(b.name ?? '', 'pt', { sensitivity: 'base' })
+  );
+
 export default function Triage() {
   const t = useTranslations('triage');
   const tCommon = useTranslations('common');
   const tStatus = useTranslations('enums.collectionRequestStatus');
+  const tBrand = useTranslations('brand');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const scanCodeInputRef = useRef<HTMLInputElement>(null);
   const bagInputRef = useRef<HTMLInputElement>(null);
@@ -59,7 +70,7 @@ export default function Triage() {
   const [isFinishingTriage, setIsFinishingTriage] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [brandId, setBrandId] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [quantity, setQuantity] = useState(DEFAULT_QUANTITY);
   const [quality, setQuality] = useState<'GOOD' | 'MEDIUM' | 'BAD'>();
   const [season, setSeason] = useState<'SUMMER' | 'WINTER'>();
   const [clothingType, setClothingType] = useState<
@@ -79,13 +90,7 @@ export default function Triage() {
       try {
         const { data, status } = await api.get<Brand[]>('/brand');
         if (!isSuccessStatus(status)) throw new Error(t('brandsLoadError'));
-        // Marcas por ordem alfabética (case-insensitive, pt-PT).
-        const sorted = [...data].sort((a, b) =>
-          (a.name ?? '').localeCompare(b.name ?? '', 'pt', {
-            sensitivity: 'base',
-          })
-        );
-        setBrands(sorted);
+        setBrands(sortBrands(data));
       } catch (error) {
         console.error('Erro ao buscar marcas:', error);
         toast.error('Não foi possível carregar as marcas');
@@ -101,6 +106,35 @@ export default function Triage() {
       setBreadcrumbs([]);
     };
   }, [setBreadcrumbs, setPageTitle, t]);
+
+  // Cria a marca escrita na triagem sem sair do ecrã: persiste, junta-a à lista
+  // disponível (mantendo a ordem alfabética) e deixa-a selecionada.
+  const handleCreateBrand = useCallback(
+    async (name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed) return null;
+
+      try {
+        const { data, status } = await api.post<Brand>('/brand', {
+          name: trimmed,
+        });
+        if (!isSuccessStatus(status)) throw new Error();
+        setBrands((prev) => sortBrands([...prev, data]));
+        setBrandId(data.id);
+        toast.success(tBrand('createSuccess'));
+        return data.id;
+      } catch (error) {
+        // 409 = já existe uma marca com este nome (comparação sem espaços/caixa).
+        const status = (error as { response?: { status?: number } })?.response
+          ?.status;
+        toast.error(
+          status === 409 ? tBrand('duplicateName') : tBrand('createError')
+        );
+        return null;
+      }
+    },
+    [tBrand]
+  );
 
   const isViewMode = selectedCollectionRequest?.status === CollectionRequestStatus.STOCKED;
   const allProcessed =
@@ -181,7 +215,7 @@ export default function Triage() {
 
   const clearItemForm = () => {
     setBrandId('');
-    setQuantity('');
+    setQuantity(DEFAULT_QUANTITY);
     setQuality(undefined);
     setSeason(undefined);
     setClothingType(undefined);
@@ -211,7 +245,9 @@ export default function Triage() {
     }
 
     setActiveBagId(bag.id);
-    setBagWeight('');
+    // Retoma o peso já gravado por um "Guardar progresso" anterior (o decimal
+    // do Postgres chega como string).
+    setBagWeight(bag.weight != null ? String(bag.weight) : '');
     clearItemForm();
     setBagCode('');
     requestAnimationFrame(() => weightInputRef.current?.focus());
@@ -338,8 +374,35 @@ export default function Triage() {
 
   const handleSaveProgress = async () => {
     if (!selectedCollectionRequest?.id) return;
+
+    // Campo vazio não impede guardar o resto; um valor inválido impede, para o
+    // operador dar por isso em vez de perder o peso em silêncio.
+    const parsedWeight = Number(bagWeight);
+    const hasWeight = Boolean(activeBagId && bagWeight.trim());
+    if (hasWeight && (Number.isNaN(parsedWeight) || parsedWeight < 0)) {
+      toast.error(t('invalidBagWeight'));
+      return;
+    }
+
     setIsSavingProgress(true);
     try {
+      // Grava o peso do saco ativo sem o dar por terminado, para não se perder
+      // se o operador sair do ecrã a meio da triagem deste saco.
+      if (hasWeight) {
+        const { status: weightStatus } = await api.patch(
+          `/triage/bag/${activeBagId}/weight`,
+          { weight: parsedWeight }
+        );
+        if (!isSuccessStatus(weightStatus)) {
+          throw new Error(t('progressSaveError'));
+        }
+        setBags((current) =>
+          current.map((bag) =>
+            bag.id === activeBagId ? { ...bag, weight: parsedWeight } : bag
+          )
+        );
+      }
+
       // Persiste os vínculos item→unidade de armazenamento já escaneados
       // (sem finalizar), para que reapareçam ao reconsultar a solicitação.
       const itemIds = triageItems
@@ -625,12 +688,10 @@ export default function Triage() {
                     );
                   const processed = bag.processedAt != null;
                   const isActive = bag.id === activeBagId;
-                  // O peso em edição (bagWeight) só se aplica ao saco ativo.
-                  const rawWeight = processed
-                    ? bag.weight
-                    : isActive
-                    ? bagWeight
-                    : null;
+                  // O peso em edição prevalece no saco ativo; nos restantes
+                  // mostra-se o que está gravado — incluindo o de um saco ainda
+                  // pendente cujo peso já foi guardado com o progresso.
+                  const rawWeight = isActive ? bagWeight : bag.weight;
                   const numWeight = Number(rawWeight);
                   const displayWeight =
                     rawWeight != null &&
@@ -690,6 +751,7 @@ export default function Triage() {
             brands={brands}
             brandId={brandId}
             onBrandChange={setBrandId}
+            onCreateBrand={handleCreateBrand}
             quantity={quantity}
             onQuantityChange={setQuantity}
             quality={quality}

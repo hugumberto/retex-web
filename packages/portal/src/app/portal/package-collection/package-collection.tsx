@@ -150,7 +150,7 @@ export default function PackageCollection() {
       throw new Error(t('popupBlocked'));
     }
 
-    // A impressora usa etiquetas de 40x60mm (retrato): um QR code por página/etiqueta.
+    // A impressora usa etiquetas de 60x40mm (paisagem): um QR code por página/etiqueta.
     const labels = data
       .map((bag) => {
         const code = escapeHtml(bag.friendlyCode);
@@ -166,23 +166,25 @@ export default function PackageCollection() {
         <head>
           <title>${t('qrCodesTitle')}</title>
           <style>
-            @page { size: 40mm 60mm; margin: 0; }
+            @page { size: 60mm 40mm; margin: 0; }
             html, body { margin:0; padding:0; font-family: Arial, sans-serif; color:#013364; }
             .label {
-              width: 40mm;
-              height: 60mm;
+              width: 60mm;
+              height: 40mm;
               box-sizing: border-box;
-              padding: 3mm 2mm;
+              padding: 2mm;
               display: flex;
               flex-direction: column;
               align-items: center;
               justify-content: center;
-              gap: 3mm;
+              gap: 1.5mm;
               page-break-after: always;
               break-after: page;
             }
             .label:last-child { page-break-after: auto; break-after: auto; }
-            .label img { width: 34mm; height: 34mm; object-fit: contain; }
+            /* 26mm de QR + o código cabem na altura útil (40mm menos 4mm de
+               margem interna); em retrato o QR podia ser maior. */
+            .label img { width: 26mm; height: 26mm; object-fit: contain; }
             .code { font-size: 13pt; font-weight:700; letter-spacing:1px; color:#02748e; text-align:center; }
             @media print { .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
           </style>
