@@ -1,9 +1,9 @@
 // app/store/auth.ts
-import { AuthSlice } from '@/app/types/state';
+import { AppStore, AuthSlice } from '@/app/types/state';
 
 export const createAuthSlice = (
   set: (state: Partial<AuthSlice>) => void,
-  get: () => AuthSlice
+  get: () => AppStore
 ): AuthSlice => ({
   accessToken: null,
   refreshToken: null,
@@ -30,6 +30,7 @@ export const createAuthSlice = (
     }
 
     set({ accessToken: null, refreshToken: null, user: null });
+    get().clearCompanyContext();
     document.cookie = 'retex_session=; max-age=0; path=/; SameSite=Lax';
     document.cookie = 'sidebar_state=; max-age=0; path=/; SameSite=Strict';
     localStorage.removeItem('app-storage');

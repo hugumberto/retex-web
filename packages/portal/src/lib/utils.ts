@@ -24,6 +24,8 @@ import {
   Package,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
+import { CompanyPermission } from '@/app/types/company';
+import { CompanyRule } from '@/lib/access-control';
 import { Role } from '@/app/types/user';
 
 export type NavLeaf = {
@@ -32,7 +34,7 @@ export type NavLeaf = {
   labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
   roles: Role[];
-};
+} & CompanyRule;
 
 export type NavGroup = {
   /** Chave de tradução no namespace `nav`. */
@@ -40,7 +42,7 @@ export type NavGroup = {
   icon: React.ComponentType<{ className?: string }>;
   roles: Role[];
   children: NavLeaf[];
-};
+} & CompanyRule;
 
 export type NavEntry = NavLeaf | NavGroup;
 
@@ -187,6 +189,35 @@ export const NAV_ITEMS: NavEntry[] = [
         labelKey: 'nav.packageBags',
         icon: Package,
         roles: [Role.ADMIN],
+      },
+    ],
+  },
+  {
+    labelKey: 'nav.myCompany',
+    icon: Building2,
+    roles: [Role.ADMIN, Role.OPS, Role.USER],
+    requiresCompany: true,
+    children: [
+      {
+        href: '/portal/my-company',
+        labelKey: 'nav.myCompanyOverview',
+        icon: Building2,
+        roles: [Role.ADMIN, Role.OPS, Role.USER],
+        requiresCompany: true,
+      },
+      {
+        href: '/portal/my-company/members',
+        labelKey: 'nav.myCompanyMembers',
+        icon: UserIcon,
+        roles: [Role.ADMIN, Role.OPS, Role.USER],
+        companyPermission: CompanyPermission.MEMBER_MANAGE,
+      },
+      {
+        href: '/portal/my-company/addresses',
+        labelKey: 'nav.myCompanyAddresses',
+        icon: MapPin,
+        roles: [Role.ADMIN, Role.OPS, Role.USER],
+        requiresCompany: true,
       },
     ],
   },

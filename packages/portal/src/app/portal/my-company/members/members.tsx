@@ -8,27 +8,22 @@ import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-export default function CompanyMembersPage() {
+const BASE_PATH = '/company/me';
+
+export default function MyCompanyMembers() {
   const t = useTranslations('company');
-  const params = useParams<{ id: string }>();
   const { user, setPageTitle, setBreadcrumbs } = useAppStore();
   const [members, setMembers] = useState<CompanyMemberDTO[]>([]);
   const [profiles, setProfiles] = useState<CompanyProfileDTO[]>([]);
 
-  // Os endpoints de admin e os de self-service são os mesmos use-cases na API —
-  // muda só a forma de resolver a empresa. Daí a tabela e o formulário serem
-  // partilhados, parametrizados por este caminho.
-  const basePath = `/company/${params.id}`;
-
   const fetchAll = useCallback(async () => {
     try {
       const [m, p] = await Promise.all([
-        api.get<CompanyMemberDTO[]>(`${basePath}/members`),
-        api.get<CompanyProfileDTO[]>(`${basePath}/profiles`),
+        api.get<CompanyMemberDTO[]>(`${BASE_PATH}/members`),
+        api.get<CompanyProfileDTO[]>(`${BASE_PATH}/profiles`),
       ]);
       if (!isSuccessStatus(m.status) || !isSuccessStatus(p.status)) {
         throw new Error();
@@ -38,26 +33,26 @@ export default function CompanyMembersPage() {
     } catch {
       toast.error(t('loadError'));
     }
-  }, [basePath, t]);
+  }, [t]);
 
   useEffect(() => {
     setPageTitle(t('members'));
     setBreadcrumbs([
-      { label: t('pageTitle'), href: '/portal/company' },
-      { label: t('members'), href: `/portal/company/${params.id}/members` },
+      { label: t('myCompanyTitle'), href: '/portal/my-company' },
+      { label: t('members'), href: '/portal/my-company/members' },
     ]);
     fetchAll();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
-  }, [fetchAll, params.id, setBreadcrumbs, setPageTitle, t]);
+  }, [fetchAll, setBreadcrumbs, setPageTitle, t]);
 
   return (
-    <section id="company-members-page" className="flex flex-col gap-4">
+    <section id="my-company-members-page" className="flex flex-col gap-4">
       <div className="flex justify-end">
         <MemberForm
-          basePath={basePath}
+          basePath={BASE_PATH}
           profiles={profiles}
           onSaved={fetchAll}
           trigger={<Button variant="secondary">{t('addMember')}</Button>}
@@ -67,7 +62,7 @@ export default function CompanyMembersPage() {
       <MemberTable
         members={members}
         profiles={profiles}
-        basePath={basePath}
+        basePath={BASE_PATH}
         canManage
         currentUserId={user?.id}
         onChanged={fetchAll}

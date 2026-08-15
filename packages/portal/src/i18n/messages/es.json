@@ -90,7 +90,8 @@
     "toggleSidebar": "Alternar barra lateral",
     "search": "Buscar",
     "edit": "Editar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "lastName": "Apellido"
   },
   "nav": {
     "home": "INICIO",
@@ -114,7 +115,11 @@
     "emailLog": "Registro de emails",
     "resetPassword": "Restablecer contraseña",
     "packageBags": "Bolsas del paquete",
-    "companies": "Empresas"
+    "companies": "Empresas",
+    "myCompany": "MI EMPRESA",
+    "myCompanyOverview": "Ficha de la empresa",
+    "myCompanyMembers": "Miembros",
+    "myCompanyAddresses": "Lugares de recogida"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -193,6 +198,15 @@
     "companyProfile": {
       "MANAGER": "Gestor",
       "COLLABORATOR": "Colaborador"
+    },
+    "companyPermission": {
+      "REQUEST_CREATE": "Crear solicitudes",
+      "REQUEST_VIEW_OWN": "Ver las propias solicitudes",
+      "REQUEST_VIEW_ALL": "Ver todas las solicitudes",
+      "REQUEST_CANCEL_OWN": "Cancelar las propias solicitudes",
+      "REQUEST_CANCEL_ALL": "Cancelar todas las solicitudes",
+      "MEMBER_MANAGE": "Gestionar miembros",
+      "ADDRESS_MANAGE": "Gestionar lugares de recogida"
     }
   },
   "validation": {
@@ -855,6 +869,36 @@
     "loadError": "Error al cargar las empresas",
     "memberCreateSuccess": "Miembro creado; se envió el correo de activación",
     "memberCreateError": "Error al crear el miembro",
-    "noCompanies": "Sin empresas registradas"
+    "noCompanies": "Sin empresas registradas",
+    "myCompanyTitle": "Mi empresa",
+    "myProfile": "Mi perfil",
+    "permissions": "Permisos",
+    "readOnlyHint": "Para modificar los datos de la empresa, contacte con Retex.",
+    "noCompanyContext": "Su cuenta no está asociada a ninguna empresa.",
+    "editMember": "Editar miembro",
+    "addMemberHint": "El miembro recibe un correo de activación y permanece inactivo hasta usarlo.",
+    "memberUpdateSuccess": "Miembro actualizado",
+    "memberUpdateError": "Error al actualizar el miembro",
+    "memberActivateSuccess": "Miembro reactivado",
+    "memberDeactivateSuccess": "Miembro desactivado",
+    "deactivateMember": "Desactivar miembro",
+    "deactivateMemberHint": "El miembro dejará de poder acceder al portal. Puede reactivarlo más tarde.",
+    "activateMember": "Reactivar miembro",
+    "activateMemberHint": "El miembro podrá volver a acceder al portal.",
+    "noMembers": "Sin miembros registrados",
+    "street": "Calle",
+    "number": "Número",
+    "complement": "Complemento",
+    "zipCode": "Código postal",
+    "countryDivision": "Provincia",
+    "country": "País",
+    "serviceZone": "Zona de servicio",
+    "inServiceZone": "Cubierta",
+    "outOfServiceZone": "Fuera de área",
+    "noAddresses": "Sin lugares de recogida registrados",
+    "addressCreateSuccess": "Lugar de recogida creado",
+    "addressCreateError": "Error al crear el lugar de recogida",
+    "addressDuplicate": "Este lugar de recogida ya está registrado",
+    "addressLoadError": "Error al cargar los lugares de recogida"
   }
 }

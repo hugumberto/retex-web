@@ -90,7 +90,8 @@
     "toggleSidebar": "Basculer la barre latérale",
     "search": "Rechercher",
     "edit": "Modifier",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "lastName": "Nom de famille"
   },
   "nav": {
     "home": "ACCUEIL",
@@ -114,7 +115,11 @@
     "emailLog": "Journal des e-mails",
     "resetPassword": "Réinitialiser le mot de passe",
     "packageBags": "Sacs du colis",
-    "companies": "Entreprises"
+    "companies": "Entreprises",
+    "myCompany": "MON ENTREPRISE",
+    "myCompanyOverview": "Fiche de l'entreprise",
+    "myCompanyMembers": "Membres",
+    "myCompanyAddresses": "Lieux de collecte"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -193,6 +198,15 @@
     "companyProfile": {
       "MANAGER": "Gestionnaire",
       "COLLABORATOR": "Collaborateur"
+    },
+    "companyPermission": {
+      "REQUEST_CREATE": "Créer des demandes",
+      "REQUEST_VIEW_OWN": "Voir ses propres demandes",
+      "REQUEST_VIEW_ALL": "Voir toutes les demandes",
+      "REQUEST_CANCEL_OWN": "Annuler ses propres demandes",
+      "REQUEST_CANCEL_ALL": "Annuler toutes les demandes",
+      "MEMBER_MANAGE": "Gérer les membres",
+      "ADDRESS_MANAGE": "Gérer les lieux de collecte"
     }
   },
   "validation": {
@@ -855,6 +869,36 @@
     "loadError": "Erreur de chargement",
     "memberCreateSuccess": "Membre créé ; e-mail d'activation envoyé",
     "memberCreateError": "Erreur lors de la création du membre",
-    "noCompanies": "Aucune entreprise enregistrée"
+    "noCompanies": "Aucune entreprise enregistrée",
+    "myCompanyTitle": "Mon entreprise",
+    "myProfile": "Mon profil",
+    "permissions": "Autorisations",
+    "readOnlyHint": "Pour modifier les données de l'entreprise, contactez Retex.",
+    "noCompanyContext": "Votre compte n'est associé à aucune entreprise.",
+    "editMember": "Modifier le membre",
+    "addMemberHint": "Le membre reçoit un e-mail d'activation et reste inactif jusqu'à son utilisation.",
+    "memberUpdateSuccess": "Membre mis à jour",
+    "memberUpdateError": "Erreur lors de la mise à jour du membre",
+    "memberActivateSuccess": "Membre réactivé",
+    "memberDeactivateSuccess": "Membre désactivé",
+    "deactivateMember": "Désactiver le membre",
+    "deactivateMemberHint": "Le membre ne pourra plus se connecter au portail. Vous pourrez le réactiver plus tard.",
+    "activateMember": "Réactiver le membre",
+    "activateMemberHint": "Le membre pourra de nouveau se connecter au portail.",
+    "noMembers": "Aucun membre enregistré",
+    "street": "Rue",
+    "number": "Numéro",
+    "complement": "Complément d'adresse",
+    "zipCode": "Code postal",
+    "countryDivision": "Département",
+    "country": "Pays",
+    "serviceZone": "Zone de service",
+    "inServiceZone": "Couverte",
+    "outOfServiceZone": "Hors zone",
+    "noAddresses": "Aucun lieu de collecte enregistré",
+    "addressCreateSuccess": "Lieu de collecte créé",
+    "addressCreateError": "Erreur lors de la création du lieu de collecte",
+    "addressDuplicate": "Ce lieu de collecte est déjà enregistré",
+    "addressLoadError": "Erreur lors du chargement des lieux de collecte"
   }
 }

@@ -90,7 +90,8 @@
     "toggleSidebar": "Toggle sidebar",
     "search": "Search",
     "edit": "Edit",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "lastName": "Last name"
   },
   "nav": {
     "home": "HOME",
@@ -114,7 +115,11 @@
     "emailLog": "Email log",
     "resetPassword": "Reset password",
     "packageBags": "Package bags",
-    "companies": "Companies"
+    "companies": "Companies",
+    "myCompany": "MY COMPANY",
+    "myCompanyOverview": "Company details",
+    "myCompanyMembers": "Members",
+    "myCompanyAddresses": "Collection sites"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -193,6 +198,15 @@
     "companyProfile": {
       "MANAGER": "Manager",
       "COLLABORATOR": "Collaborator"
+    },
+    "companyPermission": {
+      "REQUEST_CREATE": "Create requests",
+      "REQUEST_VIEW_OWN": "View own requests",
+      "REQUEST_VIEW_ALL": "View all requests",
+      "REQUEST_CANCEL_OWN": "Cancel own requests",
+      "REQUEST_CANCEL_ALL": "Cancel all requests",
+      "MEMBER_MANAGE": "Manage members",
+      "ADDRESS_MANAGE": "Manage collection sites"
     }
   },
   "validation": {
@@ -855,6 +869,36 @@
     "loadError": "Error loading companies",
     "memberCreateSuccess": "Member created; activation email sent",
     "memberCreateError": "Error creating member",
-    "noCompanies": "No companies registered"
+    "noCompanies": "No companies registered",
+    "myCompanyTitle": "My company",
+    "myProfile": "My profile",
+    "permissions": "Permissions",
+    "readOnlyHint": "To change the company details, contact Retex.",
+    "noCompanyContext": "Your account is not linked to any company.",
+    "editMember": "Edit member",
+    "addMemberHint": "The member gets an activation email and stays inactive until they use it.",
+    "memberUpdateSuccess": "Member updated",
+    "memberUpdateError": "Error updating member",
+    "memberActivateSuccess": "Member reactivated",
+    "memberDeactivateSuccess": "Member deactivated",
+    "deactivateMember": "Deactivate member",
+    "deactivateMemberHint": "The member will no longer be able to sign in. You can reactivate them later.",
+    "activateMember": "Reactivate member",
+    "activateMemberHint": "The member will be able to sign in again.",
+    "noMembers": "No members registered",
+    "street": "Street",
+    "number": "Number",
+    "complement": "Additional info",
+    "zipCode": "Postcode",
+    "countryDivision": "District",
+    "country": "Country",
+    "serviceZone": "Service zone",
+    "inServiceZone": "Covered",
+    "outOfServiceZone": "Out of area",
+    "noAddresses": "No collection sites registered",
+    "addressCreateSuccess": "Collection site created",
+    "addressCreateError": "Error creating collection site",
+    "addressDuplicate": "This collection site is already registered",
+    "addressLoadError": "Error loading collection sites"
   }
 }
