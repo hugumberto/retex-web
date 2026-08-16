@@ -47,6 +47,42 @@ export interface CompanyMemberDTO extends Entity {
   profile?: CompanyProfileDTO;
 }
 
+/**
+ * Morada de recolha partilhada por uma empresa.
+ *
+ * Vive na mesma tabela das moradas pessoais (`user_address`), mas com
+ * `companyId` preenchido e `userId` a null — a base de dados garante que só um
+ * dos dois existe. Não se reutiliza o `AddressDTO` de `user.ts` porque lá o
+ * `userId` é obrigatório.
+ */
+export interface CompanyAddressDTO extends Entity {
+  companyId: string | null;
+  userId: string | null;
+  street: string;
+  number: string;
+  complement?: string | null;
+  city: string;
+  cityNormalized?: string | null;
+  cityDivision?: string | null;
+  country?: string | null;
+  countryDivision?: string | null;
+  zipCode: string;
+  lat?: string | null;
+  long?: string | null;
+  isDefault: boolean;
+  isInServiceZone: boolean;
+}
+
+export interface CompanyAddressFormData {
+  street: string;
+  number: string;
+  complement?: string;
+  city: string;
+  zipCode: string;
+  countryDivision?: string;
+  country?: string;
+}
+
 /** Resposta de GET /company/me — null quando o utilizador não é de empresa. */
 export interface CompanyContextDTO {
   company: CompanyDTO;

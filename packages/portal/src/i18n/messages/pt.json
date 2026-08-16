@@ -90,7 +90,13 @@
     "toggleSidebar": "Alternar barra lateral",
     "search": "Procurar",
     "edit": "Editar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "lastName": "Apelido",
+    "zipNotFound": "Código postal não encontrado",
+    "zipLookupError": "Não foi possível buscar o endereço pelo código postal",
+    "streetPlaceholder": "Rua / Avenida",
+    "complementPlaceholder": "Andar, apartamento...",
+    "cityDivisionPlaceholder": "Parque das Nações"
   },
   "nav": {
     "home": "INÍCIO",
@@ -114,7 +120,11 @@
     "emailLog": "Registo de Emails",
     "resetPassword": "Repor Senha",
     "packageBags": "Sacos do Pacote",
-    "companies": "Empresas"
+    "companies": "Empresas",
+    "myCompany": "A MINHA EMPRESA",
+    "myCompanyOverview": "Ficha da empresa",
+    "myCompanyMembers": "Membros",
+    "myCompanyAddresses": "Locais de recolha"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -193,6 +203,15 @@
     "companyProfile": {
       "MANAGER": "Gestor",
       "COLLABORATOR": "Colaborador"
+    },
+    "companyPermission": {
+      "REQUEST_CREATE": "Criar solicitações",
+      "REQUEST_VIEW_OWN": "Ver as próprias solicitações",
+      "REQUEST_VIEW_ALL": "Ver todas as solicitações",
+      "REQUEST_CANCEL_OWN": "Cancelar as próprias solicitações",
+      "REQUEST_CANCEL_ALL": "Cancelar todas as solicitações",
+      "MEMBER_MANAGE": "Gerir membros",
+      "ADDRESS_MANAGE": "Gerir locais de recolha"
     }
   },
   "validation": {
@@ -493,16 +512,13 @@
     "addressAdded": "Endereço adicionado com sucesso",
     "addressAddError": "Erro ao adicionar endereço",
     "zipCode": "Código Postal",
-    "zipNotFound": "Código postal não encontrado",
-    "zipLookupError": "Não foi possível buscar o endereço pelo código postal",
     "number": "Nº de Porta",
     "complement": "Complemento",
     "cityDivision": "Freguesia",
     "countryDivision": "Distrito",
-    "streetPlaceholder": "Rua / Avenida",
-    "complementPlaceholder": "Andar, apartamento...",
-    "cityDivisionPlaceholder": "Parque das Nações",
-    "setAsDefault": "Definir como endereço padrão"
+    "setAsDefault": "Definir como endereço padrão",
+    "companyAddressesNotice": "As tuas recolhas usam os locais de recolha da empresa, partilhados pela equipa. Moradas pessoais não se aplicam a membros de empresa.",
+    "companyAddressesLink": "Ver locais de recolha"
   },
   "collectionRequest": {
     "pageTitle": "Solicitação de Recolha",
@@ -554,7 +570,10 @@
     "cityDivision": "Freguesia",
     "countryDivision": "Distrito",
     "country": "País",
-    "coordinates": "Coordenadas"
+    "coordinates": "Coordenadas",
+    "noAddressInZone": "Não tem nenhum endereço dentro da zona de atuação.",
+    "noCompanyAddressInZone": "A sua empresa não tem nenhum local de recolha dentro da zona de atuação.",
+    "addCollectionSite": "Adicionar local de recolha"
   },
   "packageCollection": {
     "pageTitle": "Gerir Recolha",
@@ -738,7 +757,8 @@
     "bindItemsError": "Erro ao vincular itens às unidades de armazenamento",
     "statusUpdateError": "Erro ao atualizar o estado do pacote",
     "finishSuccess": "Triagem finalizada com sucesso",
-    "finishError": "Não foi possível finalizar a triagem"
+    "finishError": "Não foi possível finalizar a triagem",
+    "bagWithoutItems": "Adicione pelo menos um item antes de guardar o saco"
   },
   "storageUnit": {
     "pageTitle": "Armazenamento",
@@ -829,7 +849,14 @@
     "itemType": "Tipo de peça",
     "citiesOutOfZone": "Cidades Fora da Zona de Atuação",
     "citiesOutOfZoneHelp": "Procura por cidades ainda não abrangidas (potencial procura).",
-    "requests": "Pedidos"
+    "requests": "Pedidos",
+    "activeAccounts": "{count} contas ativas",
+    "companySubtitle": "Recolhas, triagem e impacto ambiental da sua empresa.",
+    "personalSubtitle": "As suas recolhas, triagem e impacto ambiental.",
+    "breakdownByMember": "Por colaborador",
+    "breakdownByAddress": "Por local de recolha",
+    "member": "Colaborador",
+    "collectionSite": "Local de recolha"
   },
   "company": {
     "pageTitle": "Empresas",
@@ -852,9 +879,40 @@
     "createError": "Erro ao criar empresa",
     "updateSuccess": "Empresa atualizada",
     "updateError": "Erro ao atualizar empresa",
-    "loadError": "Erro ao carregar empresas",
+    "loadError": "Erro ao carregar dados da empresa",
     "memberCreateSuccess": "Membro criado; foi enviado email de ativação",
     "memberCreateError": "Erro ao criar membro",
-    "noCompanies": "Sem empresas registadas"
+    "noCompanies": "Sem empresas registadas",
+    "myCompanyTitle": "A minha empresa",
+    "myProfile": "O meu perfil",
+    "permissions": "Permissões",
+    "readOnlyHint": "Para alterar os dados da empresa, contacte a Retex.",
+    "noCompanyContext": "A sua conta não está associada a nenhuma empresa.",
+    "editMember": "Editar membro",
+    "addMemberHint": "O membro recebe um email de ativação e fica inativo até o utilizar.",
+    "memberUpdateSuccess": "Membro atualizado",
+    "memberUpdateError": "Erro ao atualizar membro",
+    "memberActivateSuccess": "Membro reativado",
+    "memberDeactivateSuccess": "Membro desativado",
+    "deactivateMember": "Desativar membro",
+    "deactivateMemberHint": "O membro deixa de poder entrar no portal. Pode reativá-lo mais tarde.",
+    "activateMember": "Reativar membro",
+    "activateMemberHint": "O membro volta a poder entrar no portal.",
+    "noMembers": "Sem membros registados",
+    "street": "Rua",
+    "number": "Número",
+    "complement": "Complemento",
+    "zipCode": "Código postal",
+    "countryDivision": "Distrito",
+    "country": "País",
+    "serviceZone": "Zona de serviço",
+    "inServiceZone": "Abrangida",
+    "outOfServiceZone": "Fora de área",
+    "noAddresses": "Sem locais de recolha registados",
+    "addressCreateSuccess": "Local de recolha criado",
+    "addressCreateError": "Erro ao criar local de recolha",
+    "addressDuplicate": "Este local de recolha já está registado",
+    "addressLoadError": "Erro ao carregar locais de recolha",
+    "cityDivision": "Freguesia"
   }
 }

@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/store';
-import { canAccessPath, getFirstAllowedPortalPath } from '@/lib/access-control';
+import {
+  canAccessPath,
+  getFirstAllowedPortalPath,
+  routeRequiresCompany,
+} from '@/lib/access-control';
 
 export default function Protected({ children }: { children: React.ReactNode }) {
-  const { accessToken, user } = useAppStore();
+  const { accessToken, user, companyContext, companyContextLoaded } = useAppStore();
   const [checking, setChecking] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -20,8 +24,16 @@ export default function Protected({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (!canAccessPath(pathname, user)) {
-        router.replace(getFirstAllowedPortalPath(user));
+      // Numa rota de empresa, decidir antes de GET /company/me responder seria
+      // expulsar o gestor de cada vez que entra por URL direto ou recarrega.
+      // Ficar em `checking` é seguro: o efeito volta a correr quando o contexto
+      // chegar (companyContextLoaded está nas dependências).
+      if (!companyContextLoaded && routeRequiresCompany(pathname)) {
+        return;
+      }
+
+      if (!canAccessPath(pathname, user, companyContext)) {
+        router.replace(getFirstAllowedPortalPath(user, companyContext));
         setChecking(false);
         return;
       }
@@ -29,7 +41,7 @@ export default function Protected({ children }: { children: React.ReactNode }) {
       setChecking(false);
     }, 200);
     return () => clearTimeout(t);
-  }, [accessToken, pathname, router, user]);
+  }, [accessToken, pathname, router, user, companyContext, companyContextLoaded]);
 
   if (checking) return null; // ou skeleton
   return <>{children}</>;

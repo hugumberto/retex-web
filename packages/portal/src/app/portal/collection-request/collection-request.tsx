@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import RequesterTypeBadge from '@/components/custom/requester-type-badge';
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
+import { CompanyAddressDTO, CompanyPermission } from '@/app/types/company';
 import { AddressDTO, Role } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { TrashIcon } from 'lucide-react';
@@ -55,16 +56,24 @@ interface UserFormData {
   estimatedBags: string;
 }
 
+/** Uma solicitação pode assentar numa morada pessoal ou num local de recolha da empresa. */
+type RequestAddress = AddressDTO | CompanyAddressDTO;
+
 export default function CollectionRequest() {
   const t = useTranslations('collectionRequest');
   const tCommon = useTranslations('common');
   const tStatus = useTranslations('enums.collectionRequestStatus');
-  const { setPageTitle, setBreadcrumbs, user } = useAppStore();
+  const { setPageTitle, setBreadcrumbs, user, companyContext, companyContextLoaded } =
+    useAppStore();
   const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [addresses, setAddresses] = useState<AddressDTO[]>([]);
+  // Um membro de empresa recolhe nos locais da empresa, não em moradas
+  // pessoais — que não tem. A API já aceita ambos em POST /collection-request
+  // (ver `companyOwnsAddress` no use case); só faltava ir buscar à fonte certa.
+  const [addresses, setAddresses] = useState<RequestAddress[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 
+  const isCompanyMember = !!companyContext;
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
   const isAdmin = user?.roles?.some((r) => r.role === Role.ADMIN) ?? false;
   const [statusFilter, setStatusFilter] = useState<'ALL' | CollectionRequestStatus>(
@@ -92,9 +101,18 @@ export default function CollectionRequest() {
 
   const inZoneAddresses = addresses.filter((a) => a.isInServiceZone);
   const canRequest = inZoneAddresses.length > 0;
+  // Um gestor com REQUEST_VIEW_ALL recebe em /me/collection-requests as
+  // solicitações de TODA a empresa. A regra de "uma de cada vez" é por pessoa,
+  // pelo que sem este filtro um colega com uma recolha a decorrer bloqueava-o.
+  const seesAllCompanyRequests =
+    companyContext?.permissions.includes(CompanyPermission.REQUEST_VIEW_ALL) ??
+    false;
+  const ownRequests = seesAllCompanyRequests
+    ? requests.filter((r) => r.user?.id === user?.id)
+    : requests;
   const hasActiveRequest =
     isUserRole &&
-    requests.some(
+    ownRequests.some(
       (r) =>
         r.status !== CollectionRequestStatus.CANCELLED &&
         r.status !== CollectionRequestStatus.STOCKED
@@ -169,21 +187,30 @@ export default function CollectionRequest() {
     ]);
     fetchRequests();
 
-    if (isUserRole) {
-      setIsLoadingAddresses(true);
-      api
-        .get<AddressDTO[]>('/me/address')
-        .then(({ data }) => setAddresses(data ?? []))
-        .catch(() => toast.error(t('addressesLoadError')))
-        .finally(() => setIsLoadingAddresses(false));
-    }
-
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchRequests, setBreadcrumbs, setPageTitle]);
+
+  // A fonte das moradas depende de o utilizador ser de empresa, por isso este
+  // efeito espera pelo contexto: decidir antes de ele chegar mandaria um membro
+  // de empresa buscar /me/address, que para ele devolve sempre vazio, e o ecrã
+  // dir-lhe-ia que não pode solicitar.
+  useEffect(() => {
+    if (!isUserRole || !companyContextLoaded) return;
+
+    setIsLoadingAddresses(true);
+    api
+      .get<RequestAddress[]>(
+        isCompanyMember ? '/company/me/addresses' : '/me/address'
+      )
+      .then(({ data }) => setAddresses(data ?? []))
+      .catch(() => toast.error(t('addressesLoadError')))
+      .finally(() => setIsLoadingAddresses(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUserRole, isCompanyMember, companyContextLoaded]);
 
   const submitUser = userForm.handleSubmit(async (data) => {
     setIsSubmitting(true);
@@ -312,7 +339,7 @@ export default function CollectionRequest() {
     <section id="collection-request-page" className="space-y-6">
       <div className="flex justify-end">
         {isUserRole ? (
-          isLoadingAddresses ? (
+          isLoadingAddresses || !companyContextLoaded ? (
             <Button variant="secondary" disabled>
               {tCommon('loading')}
             </Button>
@@ -418,11 +445,19 @@ export default function CollectionRequest() {
               <MapPinOff className="size-4" />
               <AlertTitle>{t('outOfServiceZone')}</AlertTitle>
               <AlertDescription>
-                Não tem nenhum endereço dentro da zona de actuação.{' '}
-                <Link href="/portal/perfil" className="underline font-medium">
-                  {t('addAddress')}
-                </Link>{' '}
-                na zona de actuação antes de solicitar uma coleta.
+                {isCompanyMember
+                  ? t('noCompanyAddressInZone')
+                  : t('noAddressInZone')}{' '}
+                <Link
+                  href={
+                    isCompanyMember
+                      ? '/portal/my-company/addresses'
+                      : '/portal/perfil'
+                  }
+                  className="underline font-medium"
+                >
+                  {isCompanyMember ? t('addCollectionSite') : t('addAddress')}
+                </Link>
               </AlertDescription>
             </Alert>
           )

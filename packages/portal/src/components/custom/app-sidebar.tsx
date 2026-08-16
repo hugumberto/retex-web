@@ -24,8 +24,9 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { getUserRoles } from '@/lib/access-control';
+import { getUserRoles, hasCompanyAccess } from '@/lib/access-control';
 import { cn, isNavGroup, NAV_ITEMS, NavGroup, NavLeaf } from '@/lib/utils';
+import { CompanyContextDTO } from '@/app/types/company';
 import { Role } from '@/app/types/user';
 import { useAppStore } from '@/store';
 import { Label } from '../ui/label';
@@ -74,15 +75,19 @@ function NavLeafItem({ item, active }: { item: NavLeaf; active: boolean }) {
 function NavGroupItem({
   group,
   userRoles,
+  companyContext,
   pathname,
 }: {
   group: NavGroup;
   userRoles: Role[];
+  companyContext: CompanyContextDTO | null;
   pathname: string | null;
 }) {
   const t = useTranslations();
-  const children = group.children.filter((child) =>
-    child.roles.some((role) => userRoles.includes(role))
+  const children = group.children.filter(
+    (child) =>
+      child.roles.some((role) => userRoles.includes(role)) &&
+      hasCompanyAccess(companyContext, child)
   );
   const anyActive = children.some((child) =>
     isPathActive(pathname, child.href)
@@ -142,11 +147,13 @@ function NavGroupItem({
 export function AppSidebar() {
   const t = useTranslations('common');
   const pathname = usePathname();
-  const { user } = useAppStore();
+  const { user, companyContext } = useAppStore();
   const userRoles = getUserRoles(user);
 
-  const visibleNavItems = NAV_ITEMS.filter((entry) =>
-    entry.roles.some((role) => userRoles.includes(role))
+  const visibleNavItems = NAV_ITEMS.filter(
+    (entry) =>
+      entry.roles.some((role) => userRoles.includes(role)) &&
+      hasCompanyAccess(companyContext, entry)
   );
 
   return (
@@ -178,6 +185,7 @@ export function AppSidebar() {
                   key={entry.labelKey}
                   group={entry}
                   userRoles={userRoles}
+                  companyContext={companyContext}
                   pathname={pathname}
                 />
               ) : (
