@@ -1,5 +1,6 @@
 'use client';
 
+import type { KeyboardEvent } from 'react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { ChevronDownIcon, PlusIcon } from 'lucide-react';
@@ -160,7 +161,7 @@ export default function Autocomplete({
     showCreateRow,
   ]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return;
 
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
@@ -171,7 +172,9 @@ export default function Autocomplete({
       }
       if (itemCount === 0) return;
       const step = event.key === 'ArrowDown' ? 1 : -1;
-      setHighlightedIndex((current) => (current + step + itemCount) % itemCount);
+      setHighlightedIndex(
+        (current) => (current + step + itemCount) % itemCount
+      );
       return;
     }
 

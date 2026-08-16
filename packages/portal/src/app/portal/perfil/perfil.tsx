@@ -11,6 +11,7 @@ import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { AxiosError } from 'axios';
 import { CheckCircle2, MapPin, Phone, Star, XCircle } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -29,7 +30,12 @@ interface PasswordFormData {
 export default function Perfil() {
   const t = useTranslations('profile');
   const tCommon = useTranslations('common');
-  const { setPageTitle, setBreadcrumbs, user, setUser } = useAppStore();
+  const { setPageTitle, setBreadcrumbs, user, setUser, companyContext } =
+    useAppStore();
+  // Para um membro de empresa a morada de recolha é a da empresa, partilhada
+  // pela equipa e gerida em /portal/my-company/addresses. Uma morada pessoal
+  // aqui não teria efeito nenhum nas recolhas dele.
+  const isCompanyMember = !!companyContext;
   const [addresses, setAddresses] = useState<AddressDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
@@ -236,11 +242,26 @@ export default function Perfil() {
       </div>
 
       {/* Address section */}
-      <div className="flex justify-end">
-        <AddressForm onSave={fetchAddresses} />
-      </div>
+      {!isCompanyMember && (
+        <div className="flex justify-end">
+          <AddressForm onSave={fetchAddresses} />
+        </div>
+      )}
 
-      {addresses.length === 0 ? (
+      {isCompanyMember && addresses.length === 0 ? (
+        // Sem o botão de adicionar, o estado vazio genérico seria um beco sem
+        // saída: diz porquê e encaminha para onde a morada se gere de facto.
+        <div className="rounded-2xl border border-secondary/35 bg-white p-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            {t('companyAddressesNotice')}
+          </p>
+          <Button asChild variant="outline" size="sm" className="mt-3">
+            <Link href="/portal/my-company/addresses">
+              {t('companyAddressesLink')}
+            </Link>
+          </Button>
+        </div>
+      ) : addresses.length === 0 ? (
         <p className="text-center text-muted-foreground py-12">
           {t('noAddresses')}
         </p>

@@ -50,6 +50,10 @@ export function DialogForm<T extends FieldValues>({
 }: DialogFormProps<T>) {
   const t = useTranslations('common.dialogForm');
   const [internalOpen, setInternalOpen] = React.useState(false);
+  // `errors` capturado no closure é o do render anterior à submissão. Sem esta
+  // referência, a validação recém-corrida nunca é vista aqui.
+  const errorsRef = React.useRef(errors);
+  errorsRef.current = errors;
   const isControlled = open !== undefined;
 
   const resolvedTitle = title ?? t('title');
@@ -63,11 +67,21 @@ export function DialogForm<T extends FieldValues>({
   };
 
   const handleConfirm = async () => {
-    if (onConfirm) {
-      await onConfirm();
-      if (!isControlled && Object.keys(errors).length === 0) {
-        handleOpenChange(false);
-      }
+    if (!onConfirm) return;
+
+    await onConfirm();
+
+    // Ceder um tick antes de decidir fechar. `onConfirm` é tipicamente o
+    // `handleSubmit` do react-hook-form: quando ele resolve, os erros de
+    // validação já foram postos no estado do formulário mas o React ainda não
+    // voltou a renderizar, pelo que `errorsRef` continuaria a ver o estado
+    // anterior — vazio. Sem esta espera, a primeira submissão inválida fechava
+    // o diálogo e deitava fora o que o utilizador tinha escrito, sem nunca lhe
+    // mostrar o que faltava.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    if (!isControlled && Object.keys(errorsRef.current).length === 0) {
+      handleOpenChange(false);
     }
   };
 

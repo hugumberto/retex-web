@@ -1,6 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
+import RequesterTypeBadge from '@/components/custom/requester-type-badge';
 import {
   CollectionInterval,
   CollectionStatus,
@@ -392,8 +394,14 @@ export default function PackageCollectionForm({
   const addressLabel = (pkg: CollectionRequestDTO) =>
     `${pkg.address?.street ?? ''} ${pkg.address?.number ?? ''}`.trim() || '-';
 
-  const userName = (pkg: CollectionRequestDTO) =>
-    `${pkg.user?.firstName ?? ''} ${pkg.user?.lastName ?? ''}`.trim() || '-';
+  // Funil único das três tabelas (seleção, sugestões e sem-coordenadas): quem
+  // pediu, mais o crachá quando é de empresa.
+  const requesterLabel = (pkg: CollectionRequestDTO): ReactNode => (
+    <>
+      {`${pkg.user?.firstName ?? ''} ${pkg.user?.lastName ?? ''}`.trim() || '-'}
+      <RequesterTypeBadge companyId={pkg.companyId} company={pkg.company} />
+    </>
+  );
 
   return (
     <DialogForm
@@ -526,7 +534,7 @@ export default function PackageCollectionForm({
                       return (
                         <TableRow key={id}>
                           <TableCell className="whitespace-normal break-words align-top max-w-[280px]">
-                            {userName(pkg)}
+                            {requesterLabel(pkg)}
                             <br />
                             {addressLabel(pkg)}
                           </TableCell>
@@ -585,7 +593,7 @@ export default function PackageCollectionForm({
                           />
                         </TableCell>
                         <TableCell className="whitespace-normal break-words align-top max-w-[280px]">
-                          {userName(item)}
+                          {requesterLabel(item)}
                           <br />
                           {addressLabel(item)}
                         </TableCell>
@@ -640,7 +648,7 @@ export default function PackageCollectionForm({
                             disabled={isLocked}
                           />
                         </TableCell>
-                        <TableCell>{userName(item)}</TableCell>
+                        <TableCell>{requesterLabel(item)}</TableCell>
                         <TableCell>{addressLabel(item)}</TableCell>
                         <TableCell>{item.address?.city ?? '-'}</TableCell>
                         <TableCell>{item.estimatedBags ?? '-'}</TableCell>

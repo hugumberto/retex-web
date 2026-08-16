@@ -51,3 +51,29 @@ export interface DashboardStatsDTO {
   users: UsersStats;
   outOfZone: OutOfZoneStats;
 }
+
+export interface CompanyBreakdownEntry {
+  id: string;
+  label: string;
+  count: number;
+  weightKg: number;
+}
+
+/**
+ * Resposta de GET /dashboard/me — os indicadores do próprio cliente.
+ *
+ * Não traz `users` nem `outOfZone`: o primeiro é degenerado para um particular
+ * e o segundo é prospeção interna da Retex.
+ */
+export interface ScopedDashboardStatsDTO {
+  scope: 'COMPANY' | 'USER';
+  company?: { id: string; name: string };
+  collectionRequests: CollectionRequestsStats;
+  triage: TriageStats;
+  environment: EnvironmentStats;
+  /** Só para empresas. */
+  breakdown?: {
+    byMember: CompanyBreakdownEntry[];
+    byAddress: CompanyBreakdownEntry[];
+  };
+}

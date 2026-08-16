@@ -87,7 +87,16 @@
     "more": "Plus",
     "sidebar": "Barre latérale",
     "sidebarDescription": "Affiche la barre latérale sur les petits écrans.",
-    "toggleSidebar": "Basculer la barre latérale"
+    "toggleSidebar": "Basculer la barre latérale",
+    "search": "Rechercher",
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "lastName": "Nom de famille",
+    "zipNotFound": "Code postal introuvable",
+    "zipLookupError": "Impossible de rechercher l'adresse à partir du code postal",
+    "streetPlaceholder": "Rue / Avenue",
+    "complementPlaceholder": "Étage, appartement…",
+    "cityDivisionPlaceholder": "Parque das Nações"
   },
   "nav": {
     "home": "ACCUEIL",
@@ -110,7 +119,12 @@
     "parameters": "Paramètres",
     "emailLog": "Journal des e-mails",
     "resetPassword": "Réinitialiser le mot de passe",
-    "packageBags": "Sacs du colis"
+    "packageBags": "Sacs du colis",
+    "companies": "Entreprises",
+    "myCompany": "MON ENTREPRISE",
+    "myCompanyOverview": "Fiche de l'entreprise",
+    "myCompanyMembers": "Membres",
+    "myCompanyAddresses": "Lieux de collecte"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -185,6 +199,19 @@
     "emailStatus": {
       "SENT": "Envoyé",
       "FAILED": "Échec"
+    },
+    "companyProfile": {
+      "MANAGER": "Gestionnaire",
+      "COLLABORATOR": "Collaborateur"
+    },
+    "companyPermission": {
+      "REQUEST_CREATE": "Créer des demandes",
+      "REQUEST_VIEW_OWN": "Voir ses propres demandes",
+      "REQUEST_VIEW_ALL": "Voir toutes les demandes",
+      "REQUEST_CANCEL_OWN": "Annuler ses propres demandes",
+      "REQUEST_CANCEL_ALL": "Annuler toutes les demandes",
+      "MEMBER_MANAGE": "Gérer les membres",
+      "ADDRESS_MANAGE": "Gérer les lieux de collecte"
     }
   },
   "validation": {
@@ -485,16 +512,13 @@
     "addressAdded": "Adresse ajoutée avec succès",
     "addressAddError": "Erreur lors de l'ajout de l'adresse",
     "zipCode": "Code postal",
-    "zipNotFound": "Code postal introuvable",
-    "zipLookupError": "Impossible de rechercher l'adresse à partir du code postal",
     "number": "Numéro",
     "complement": "Complément d'adresse",
     "cityDivision": "Commune",
     "countryDivision": "District",
-    "streetPlaceholder": "Rue / Avenue",
-    "complementPlaceholder": "Étage, appartement…",
-    "cityDivisionPlaceholder": "Parque das Nações",
-    "setAsDefault": "Définir comme adresse par défaut"
+    "setAsDefault": "Définir comme adresse par défaut",
+    "companyAddressesNotice": "Vos collectes utilisent les lieux de collecte de l'entreprise, partagés par l'équipe. Les adresses personnelles ne s'appliquent pas aux membres d'une entreprise.",
+    "companyAddressesLink": "Voir les lieux de collecte"
   },
   "collectionRequest": {
     "pageTitle": "Demande de collecte",
@@ -546,7 +570,10 @@
     "cityDivision": "Commune",
     "countryDivision": "District",
     "country": "Pays",
-    "coordinates": "Coordonnées"
+    "coordinates": "Coordonnées",
+    "noAddressInZone": "Vous n'avez aucune adresse dans la zone de service.",
+    "noCompanyAddressInZone": "Votre entreprise n'a aucun lieu de collecte dans la zone de service.",
+    "addCollectionSite": "Ajouter un lieu de collecte"
   },
   "packageCollection": {
     "pageTitle": "Gérer la collecte",
@@ -730,7 +757,8 @@
     "bindItemsError": "Erreur lors de l'association des articles aux unités de stockage",
     "statusUpdateError": "Erreur lors de la mise à jour du statut du colis",
     "finishSuccess": "Tri finalisé avec succès",
-    "finishError": "Impossible de finaliser le tri"
+    "finishError": "Impossible de finaliser le tri",
+    "bagWithoutItems": "Ajoutez au moins un article avant d’enregistrer le sac"
   },
   "storageUnit": {
     "pageTitle": "Stockage",
@@ -821,6 +849,70 @@
     "itemType": "Type d'article",
     "citiesOutOfZone": "Villes hors de la zone de service",
     "citiesOutOfZoneHelp": "Demande dans des villes non encore couvertes (demande potentielle).",
-    "requests": "Demandes"
+    "requests": "Demandes",
+    "activeAccounts": "{count} comptes actifs",
+    "companySubtitle": "Collectes, tri et impact environnemental de votre entreprise.",
+    "personalSubtitle": "Vos collectes, votre tri et votre impact environnemental.",
+    "breakdownByMember": "Par membre",
+    "breakdownByAddress": "Par lieu de collecte",
+    "member": "Membre",
+    "collectionSite": "Lieu de collecte"
+  },
+  "company": {
+    "pageTitle": "Entreprises",
+    "badgeLabel": "Entreprise",
+    "badgeTitle": "Demande d'entreprise",
+    "companyLabel": "Entreprise",
+    "name": "Nom commercial",
+    "legalName": "Raison sociale",
+    "taxId": "Numéro fiscal",
+    "phone": "Téléphone",
+    "status": "Statut",
+    "members": "Membres",
+    "profile": "Profil",
+    "manager": "Gestionnaire",
+    "addManager": "Gestionnaire initial",
+    "addMember": "Ajouter un membre",
+    "addresses": "Lieux de collecte",
+    "addAddress": "Ajouter un lieu",
+    "createSuccess": "Entreprise créée",
+    "createError": "Erreur lors de la création",
+    "updateSuccess": "Entreprise mise à jour",
+    "updateError": "Erreur lors de la mise à jour",
+    "loadError": "Erreur lors du chargement des données de l'entreprise",
+    "memberCreateSuccess": "Membre créé ; e-mail d'activation envoyé",
+    "memberCreateError": "Erreur lors de la création du membre",
+    "noCompanies": "Aucune entreprise enregistrée",
+    "myCompanyTitle": "Mon entreprise",
+    "myProfile": "Mon profil",
+    "permissions": "Autorisations",
+    "readOnlyHint": "Pour modifier les données de l'entreprise, contactez Retex.",
+    "noCompanyContext": "Votre compte n'est associé à aucune entreprise.",
+    "editMember": "Modifier le membre",
+    "addMemberHint": "Le membre reçoit un e-mail d'activation et reste inactif jusqu'à son utilisation.",
+    "memberUpdateSuccess": "Membre mis à jour",
+    "memberUpdateError": "Erreur lors de la mise à jour du membre",
+    "memberActivateSuccess": "Membre réactivé",
+    "memberDeactivateSuccess": "Membre désactivé",
+    "deactivateMember": "Désactiver le membre",
+    "deactivateMemberHint": "Le membre ne pourra plus se connecter au portail. Vous pourrez le réactiver plus tard.",
+    "activateMember": "Réactiver le membre",
+    "activateMemberHint": "Le membre pourra de nouveau se connecter au portail.",
+    "noMembers": "Aucun membre enregistré",
+    "street": "Rue",
+    "number": "Numéro",
+    "complement": "Complément d'adresse",
+    "zipCode": "Code postal",
+    "countryDivision": "Département",
+    "country": "Pays",
+    "serviceZone": "Zone de service",
+    "inServiceZone": "Couverte",
+    "outOfServiceZone": "Hors zone",
+    "noAddresses": "Aucun lieu de collecte enregistré",
+    "addressCreateSuccess": "Lieu de collecte créé",
+    "addressCreateError": "Erreur lors de la création du lieu de collecte",
+    "addressDuplicate": "Ce lieu de collecte est déjà enregistré",
+    "addressLoadError": "Erreur lors du chargement des lieux de collecte",
+    "cityDivision": "Commune"
   }
 }

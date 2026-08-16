@@ -1,4 +1,5 @@
 import { Brand } from "./brand";
+import { CompanyDTO } from "./company";
 import { Entity } from "./helper"
 import { PackageCollectionDTO } from "./package-collection"
 import { StorageUnitDTO } from "./storage-unit";
@@ -21,6 +22,10 @@ export interface CollectionRequestDTO extends Entity {
   status: CollectionRequestStatus
   friendlyCode?: string
   user: UserDTO
+  // Preenchido quando a solicitação é de uma empresa; null para particulares.
+  // É o que distingue os dois na listagem e na construção de rotas.
+  companyId?: string | null
+  company?: CompanyDTO | null
   route?: PackageCollectionDTO
   weight?: number
   estimatedBags?: number
