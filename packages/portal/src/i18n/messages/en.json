@@ -879,7 +879,7 @@
     "createError": "Error creating company",
     "updateSuccess": "Company updated",
     "updateError": "Error updating company",
-    "loadError": "Error loading companies",
+    "loadError": "Error loading company data",
     "memberCreateSuccess": "Member created; activation email sent",
     "memberCreateError": "Error creating member",
     "noCompanies": "No companies registered",

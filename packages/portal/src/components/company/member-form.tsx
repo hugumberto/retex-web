@@ -107,7 +107,10 @@ export default function MemberForm({
               )?.response;
               // 409 = email já registado; a mensagem da API é mais útil que a nossa.
               if (response?.status === 409) {
-                return response.data?.message || t('memberCreateError');
+                return (
+                  response.data?.message ||
+                  (isEditing ? t('memberUpdateError') : t('memberCreateError'))
+                );
               }
               return isEditing ? t('memberUpdateError') : t('memberCreateError');
             },
@@ -136,21 +139,21 @@ export default function MemberForm({
               label={tCommon('name')}
               name="firstName"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: tCommon('requiredField') }}
               errors={errors}
             />
             <InputForm
               label={tCommon('lastName')}
               name="lastName"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: tCommon('requiredField') }}
               errors={errors}
             />
             <InputForm
               label={tCommon('email')}
               name="email"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: tCommon('requiredField') }}
               errors={errors}
             />
             <InputForm
@@ -166,7 +169,7 @@ export default function MemberForm({
           name="profileId"
           control={control}
           options={profileOptions}
-          rules={{ required: true }}
+          rules={{ required: tCommon('requiredField') }}
           errors={errors}
         />
       </div>

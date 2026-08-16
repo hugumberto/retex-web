@@ -75,7 +75,10 @@ export default function CompanyForm({ company, onSaved }: CompanyFormProps) {
                 err as { response?: { status?: number; data?: { message?: string } } }
               )?.response;
               if (response?.status === 409) {
-                return response.data?.message || t('createError');
+                return (
+                  response.data?.message ||
+                  (isEditing ? t('updateError') : t('createError'))
+                );
               }
               return isEditing ? t('updateError') : t('createError');
             },
@@ -122,7 +125,7 @@ export default function CompanyForm({ company, onSaved }: CompanyFormProps) {
           label={t('taxId')}
           name="taxId"
           control={control}
-          rules={{ required: true }}
+          rules={{ required: tCommon('requiredField') }}
           errors={errors}
         />
         <InputForm
@@ -149,21 +152,21 @@ export default function CompanyForm({ company, onSaved }: CompanyFormProps) {
               label={tCommon('name')}
               name="manager.firstName"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: tCommon('requiredField') }}
               errors={errors}
             />
             <InputForm
               label={tCommon('lastName')}
               name="manager.lastName"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: tCommon('requiredField') }}
               errors={errors}
             />
             <InputForm
               label={tCommon('email')}
               name="manager.email"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: tCommon('requiredField') }}
               errors={errors}
             />
             <InputForm

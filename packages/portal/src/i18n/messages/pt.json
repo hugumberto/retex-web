@@ -879,7 +879,7 @@
     "createError": "Erro ao criar empresa",
     "updateSuccess": "Empresa atualizada",
     "updateError": "Erro ao atualizar empresa",
-    "loadError": "Erro ao carregar empresas",
+    "loadError": "Erro ao carregar dados da empresa",
     "memberCreateSuccess": "Membro criado; foi enviado email de ativação",
     "memberCreateError": "Erro ao criar membro",
     "noCompanies": "Sem empresas registadas",

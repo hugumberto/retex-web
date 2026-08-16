@@ -41,16 +41,22 @@ export default function Company() {
     }
   }, [search]);
 
+  // Título e breadcrumbs só à entrada e à saída do ecrã. Juntos com a busca,
+  // como estavam, eram limpos e repostos a cada tecla escrita na pesquisa,
+  // porque `fetchCompanies` muda sempre que `search` muda.
   useEffect(() => {
     setPageTitle(t('pageTitle'));
     setBreadcrumbs([{ label: t('pageTitle'), href: '/portal/company' }]);
-    fetchCompanies();
     return () => {
       setPageTitle('');
       setBreadcrumbs([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchCompanies, setPageTitle, setBreadcrumbs]);
+  }, [setPageTitle, setBreadcrumbs]);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   return (
     <div className="flex flex-col gap-4">
