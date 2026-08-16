@@ -91,7 +91,12 @@
     "search": "Procurar",
     "edit": "Editar",
     "cancel": "Cancelar",
-    "lastName": "Apelido"
+    "lastName": "Apelido",
+    "zipNotFound": "Código postal não encontrado",
+    "zipLookupError": "Não foi possível buscar o endereço pelo código postal",
+    "streetPlaceholder": "Rua / Avenida",
+    "complementPlaceholder": "Andar, apartamento...",
+    "cityDivisionPlaceholder": "Parque das Nações"
   },
   "nav": {
     "home": "INÍCIO",
@@ -507,16 +512,13 @@
     "addressAdded": "Endereço adicionado com sucesso",
     "addressAddError": "Erro ao adicionar endereço",
     "zipCode": "Código Postal",
-    "zipNotFound": "Código postal não encontrado",
-    "zipLookupError": "Não foi possível buscar o endereço pelo código postal",
     "number": "Nº de Porta",
     "complement": "Complemento",
     "cityDivision": "Freguesia",
     "countryDivision": "Distrito",
-    "streetPlaceholder": "Rua / Avenida",
-    "complementPlaceholder": "Andar, apartamento...",
-    "cityDivisionPlaceholder": "Parque das Nações",
-    "setAsDefault": "Definir como endereço padrão"
+    "setAsDefault": "Definir como endereço padrão",
+    "companyAddressesNotice": "As tuas recolhas usam os locais de recolha da empresa, partilhados pela equipa. Moradas pessoais não se aplicam a membros de empresa.",
+    "companyAddressesLink": "Ver locais de recolha"
   },
   "collectionRequest": {
     "pageTitle": "Solicitação de Recolha",
@@ -568,7 +570,10 @@
     "cityDivision": "Freguesia",
     "countryDivision": "Distrito",
     "country": "País",
-    "coordinates": "Coordenadas"
+    "coordinates": "Coordenadas",
+    "noAddressInZone": "Não tem nenhum endereço dentro da zona de atuação.",
+    "noCompanyAddressInZone": "A sua empresa não tem nenhum local de recolha dentro da zona de atuação.",
+    "addCollectionSite": "Adicionar local de recolha"
   },
   "packageCollection": {
     "pageTitle": "Gerir Recolha",
@@ -752,7 +757,8 @@
     "bindItemsError": "Erro ao vincular itens às unidades de armazenamento",
     "statusUpdateError": "Erro ao atualizar o estado do pacote",
     "finishSuccess": "Triagem finalizada com sucesso",
-    "finishError": "Não foi possível finalizar a triagem"
+    "finishError": "Não foi possível finalizar a triagem",
+    "bagWithoutItems": "Adicione pelo menos um item antes de guardar o saco"
   },
   "storageUnit": {
     "pageTitle": "Armazenamento",
@@ -843,7 +849,14 @@
     "itemType": "Tipo de peça",
     "citiesOutOfZone": "Cidades Fora da Zona de Atuação",
     "citiesOutOfZoneHelp": "Procura por cidades ainda não abrangidas (potencial procura).",
-    "requests": "Pedidos"
+    "requests": "Pedidos",
+    "activeAccounts": "{count} contas ativas",
+    "companySubtitle": "Recolhas, triagem e impacto ambiental da sua empresa.",
+    "personalSubtitle": "As suas recolhas, triagem e impacto ambiental.",
+    "breakdownByMember": "Por colaborador",
+    "breakdownByAddress": "Por local de recolha",
+    "member": "Colaborador",
+    "collectionSite": "Local de recolha"
   },
   "company": {
     "pageTitle": "Empresas",
@@ -899,6 +912,7 @@
     "addressCreateSuccess": "Local de recolha criado",
     "addressCreateError": "Erro ao criar local de recolha",
     "addressDuplicate": "Este local de recolha já está registado",
-    "addressLoadError": "Erro ao carregar locais de recolha"
+    "addressLoadError": "Erro ao carregar locais de recolha",
+    "cityDivision": "Freguesia"
   }
 }

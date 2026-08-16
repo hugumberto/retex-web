@@ -91,7 +91,12 @@
     "search": "Rechercher",
     "edit": "Modifier",
     "cancel": "Annuler",
-    "lastName": "Nom de famille"
+    "lastName": "Nom de famille",
+    "zipNotFound": "Code postal introuvable",
+    "zipLookupError": "Impossible de rechercher l'adresse à partir du code postal",
+    "streetPlaceholder": "Rue / Avenue",
+    "complementPlaceholder": "Étage, appartement…",
+    "cityDivisionPlaceholder": "Parque das Nações"
   },
   "nav": {
     "home": "ACCUEIL",
@@ -507,16 +512,13 @@
     "addressAdded": "Adresse ajoutée avec succès",
     "addressAddError": "Erreur lors de l'ajout de l'adresse",
     "zipCode": "Code postal",
-    "zipNotFound": "Code postal introuvable",
-    "zipLookupError": "Impossible de rechercher l'adresse à partir du code postal",
     "number": "Numéro",
     "complement": "Complément d'adresse",
     "cityDivision": "Commune",
     "countryDivision": "District",
-    "streetPlaceholder": "Rue / Avenue",
-    "complementPlaceholder": "Étage, appartement…",
-    "cityDivisionPlaceholder": "Parque das Nações",
-    "setAsDefault": "Définir comme adresse par défaut"
+    "setAsDefault": "Définir comme adresse par défaut",
+    "companyAddressesNotice": "Vos collectes utilisent les lieux de collecte de l'entreprise, partagés par l'équipe. Les adresses personnelles ne s'appliquent pas aux membres d'une entreprise.",
+    "companyAddressesLink": "Voir les lieux de collecte"
   },
   "collectionRequest": {
     "pageTitle": "Demande de collecte",
@@ -568,7 +570,10 @@
     "cityDivision": "Commune",
     "countryDivision": "District",
     "country": "Pays",
-    "coordinates": "Coordonnées"
+    "coordinates": "Coordonnées",
+    "noAddressInZone": "Vous n'avez aucune adresse dans la zone de service.",
+    "noCompanyAddressInZone": "Votre entreprise n'a aucun lieu de collecte dans la zone de service.",
+    "addCollectionSite": "Ajouter un lieu de collecte"
   },
   "packageCollection": {
     "pageTitle": "Gérer la collecte",
@@ -752,7 +757,8 @@
     "bindItemsError": "Erreur lors de l'association des articles aux unités de stockage",
     "statusUpdateError": "Erreur lors de la mise à jour du statut du colis",
     "finishSuccess": "Tri finalisé avec succès",
-    "finishError": "Impossible de finaliser le tri"
+    "finishError": "Impossible de finaliser le tri",
+    "bagWithoutItems": "Ajoutez au moins un article avant d’enregistrer le sac"
   },
   "storageUnit": {
     "pageTitle": "Stockage",
@@ -843,7 +849,14 @@
     "itemType": "Type d'article",
     "citiesOutOfZone": "Villes hors de la zone de service",
     "citiesOutOfZoneHelp": "Demande dans des villes non encore couvertes (demande potentielle).",
-    "requests": "Demandes"
+    "requests": "Demandes",
+    "activeAccounts": "{count} comptes actifs",
+    "companySubtitle": "Collectes, tri et impact environnemental de votre entreprise.",
+    "personalSubtitle": "Vos collectes, votre tri et votre impact environnemental.",
+    "breakdownByMember": "Par membre",
+    "breakdownByAddress": "Par lieu de collecte",
+    "member": "Membre",
+    "collectionSite": "Lieu de collecte"
   },
   "company": {
     "pageTitle": "Entreprises",
@@ -899,6 +912,7 @@
     "addressCreateSuccess": "Lieu de collecte créé",
     "addressCreateError": "Erreur lors de la création du lieu de collecte",
     "addressDuplicate": "Ce lieu de collecte est déjà enregistré",
-    "addressLoadError": "Erreur lors du chargement des lieux de collecte"
+    "addressLoadError": "Erreur lors du chargement des lieux de collecte",
+    "cityDivision": "Commune"
   }
 }

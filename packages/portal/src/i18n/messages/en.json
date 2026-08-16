@@ -91,7 +91,12 @@
     "search": "Search",
     "edit": "Edit",
     "cancel": "Cancel",
-    "lastName": "Last name"
+    "lastName": "Last name",
+    "zipNotFound": "Postcode not found",
+    "zipLookupError": "Could not look up the address from the postcode",
+    "streetPlaceholder": "Street / Avenue",
+    "complementPlaceholder": "Floor, flat…",
+    "cityDivisionPlaceholder": "Parque das Nações"
   },
   "nav": {
     "home": "HOME",
@@ -507,16 +512,13 @@
     "addressAdded": "Address added successfully",
     "addressAddError": "Error adding address",
     "zipCode": "Postcode",
-    "zipNotFound": "Postcode not found",
-    "zipLookupError": "Could not look up the address from the postcode",
     "number": "Number",
     "complement": "Additional info",
     "cityDivision": "Parish",
     "countryDivision": "District",
-    "streetPlaceholder": "Street / Avenue",
-    "complementPlaceholder": "Floor, flat…",
-    "cityDivisionPlaceholder": "Parque das Nações",
-    "setAsDefault": "Set as default address"
+    "setAsDefault": "Set as default address",
+    "companyAddressesNotice": "Your collections use the company collection sites, shared by the team. Personal addresses do not apply to company members.",
+    "companyAddressesLink": "View collection sites"
   },
   "collectionRequest": {
     "pageTitle": "Collection request",
@@ -568,7 +570,10 @@
     "cityDivision": "Parish",
     "countryDivision": "District",
     "country": "Country",
-    "coordinates": "Coordinates"
+    "coordinates": "Coordinates",
+    "noAddressInZone": "You have no address within the service area.",
+    "noCompanyAddressInZone": "Your company has no collection site within the service area.",
+    "addCollectionSite": "Add a collection site"
   },
   "packageCollection": {
     "pageTitle": "Manage collection",
@@ -752,7 +757,8 @@
     "bindItemsError": "Error linking items to the storage units",
     "statusUpdateError": "Error updating the request status",
     "finishSuccess": "Triage finished successfully",
-    "finishError": "Could not finish the triage"
+    "finishError": "Could not finish the triage",
+    "bagWithoutItems": "Add at least one item before saving the bag"
   },
   "storageUnit": {
     "pageTitle": "Storage",
@@ -843,7 +849,14 @@
     "itemType": "Garment type",
     "citiesOutOfZone": "Cities outside the service area",
     "citiesOutOfZoneHelp": "Demand from cities not yet covered (potential demand).",
-    "requests": "Requests"
+    "requests": "Requests",
+    "activeAccounts": "{count} active accounts",
+    "companySubtitle": "Your company's collections, sorting and environmental impact.",
+    "personalSubtitle": "Your collections, sorting and environmental impact.",
+    "breakdownByMember": "By member",
+    "breakdownByAddress": "By collection site",
+    "member": "Member",
+    "collectionSite": "Collection site"
   },
   "company": {
     "pageTitle": "Companies",
@@ -899,6 +912,7 @@
     "addressCreateSuccess": "Collection site created",
     "addressCreateError": "Error creating collection site",
     "addressDuplicate": "This collection site is already registered",
-    "addressLoadError": "Error loading collection sites"
+    "addressLoadError": "Error loading collection sites",
+    "cityDivision": "Parish"
   }
 }

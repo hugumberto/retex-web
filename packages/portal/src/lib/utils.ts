@@ -67,7 +67,7 @@ export const NAV_ITEMS: NavEntry[] = [
     href: '/portal/dashboard',
     labelKey: 'nav.dashboard',
     icon: BarChart3,
-    roles: [Role.ADMIN],
+    roles: [Role.ADMIN, Role.USER],
   },
   {
     href: '/portal/triage',

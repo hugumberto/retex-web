@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
-import { firstAddressPart } from '@/utils/address';
+import { lookupPostalCode } from '@/utils/address';
 import { PlusIcon } from 'lucide-react';
 import { FocusEvent, useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -64,33 +64,27 @@ export default function AddressForm({ onSave }: Props) {
       if (!postalCode) return;
 
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_TOMTOM_API_URL}${postalCode}.json?typeahead=false&limit=1&countrySet=pt&extendedPostalCodesFor=addr&minFuzzyLevel=1&maxFuzzyLevel=2&view=Unified&relatedPois=off&key=${process.env.NEXT_PUBLIC_TOMTOM_API_KEY}`
-        );
-        if (!res.ok) throw new Error();
-
-        const { results } = await res.json();
-        if (!Array.isArray(results) || results.length === 0) {
-          toast.error(t('zipNotFound'));
+        const found = await lookupPostalCode(postalCode);
+        if (!found) {
+          toast.error(tCommon('zipNotFound'));
           return;
         }
 
-        const { address, position } = results[0];
         const set = (field: keyof AddressFormData, val: string) =>
           setValue(field, val, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
 
-        set('street', address.streetName ?? '');
-        set('city', firstAddressPart(address.municipality));
-        set('cityDivision', firstAddressPart(address.municipalitySubdivision));
-        set('country', address.country ?? '');
-        set('countryDivision', firstAddressPart(address.countrySecondarySubdivision ?? address.countrySubdivision));
-        setValue('lat', position?.lat ? String(position.lat) : '');
-        setValue('long', position?.lon ? String(position.lon) : '');
+        set('street', found.street);
+        set('city', found.city);
+        set('cityDivision', found.cityDivision);
+        set('country', found.country);
+        set('countryDivision', found.countryDivision);
+        setValue('lat', found.lat);
+        setValue('long', found.long);
       } catch {
-        toast.error(t('zipLookupError'));
+        toast.error(tCommon('zipLookupError'));
       }
     },
-    [setValue]
+    [setValue, tCommon]
   );
 
   const onSubmit = useCallback(
@@ -158,7 +152,7 @@ export default function AddressForm({ onSave }: Props) {
           control={control}
           rules={{ required: tCommon('requiredField') }}
           errors={errors}
-          placeholder={t('streetPlaceholder')}
+          placeholder={tCommon('streetPlaceholder')}
         />
 
         <div className="grid grid-cols-2 gap-3">
@@ -175,7 +169,7 @@ export default function AddressForm({ onSave }: Props) {
             name="complement"
             control={control}
             errors={errors}
-            placeholder={t('complementPlaceholder')}
+            placeholder={tCommon('complementPlaceholder')}
           />
         </div>
 
@@ -193,7 +187,7 @@ export default function AddressForm({ onSave }: Props) {
             name="cityDivision"
             control={control}
             errors={errors}
-            placeholder={t('cityDivisionPlaceholder')}
+            placeholder={tCommon('cityDivisionPlaceholder')}
           />
         </div>
 

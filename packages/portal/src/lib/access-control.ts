@@ -30,7 +30,9 @@ export type RoutePermission = {
  */
 export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal', roles: [Role.ADMIN, Role.OPS, Role.DRIVER, Role.USER] },
-  { path: '/portal/dashboard', roles: [Role.ADMIN] },
+  // Sem regra de empresa: um particular também tem dashboard. Quem distingue
+  // as audiências é o próprio ecrã, a partir do contexto de empresa.
+  { path: '/portal/dashboard', roles: [Role.ADMIN, Role.USER] },
   { path: '/portal/collection-request', roles: [Role.ADMIN, Role.OPS, Role.USER] },
   { path: '/portal/triage', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/package-collection', roles: [Role.ADMIN, Role.OPS, Role.DRIVER] },
