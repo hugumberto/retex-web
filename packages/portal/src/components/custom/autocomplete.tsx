@@ -172,7 +172,9 @@ export default function Autocomplete({
       }
       if (itemCount === 0) return;
       const step = event.key === 'ArrowDown' ? 1 : -1;
-      setHighlightedIndex((current) => (current + step + itemCount) % itemCount);
+      setHighlightedIndex(
+        (current) => (current + step + itemCount) % itemCount
+      );
       return;
     }
 
