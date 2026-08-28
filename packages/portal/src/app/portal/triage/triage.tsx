@@ -374,8 +374,21 @@ export default function Triage() {
 
   const handleProcessBag = async () => {
     if (!activeBagId) return;
-    const parsedWeight = parseBagWeight(bagWeight);
-    if (parsedWeight == null) {
+
+    // Fechar um saco vazio dá-o por triado sem deixar rasto do que lá vinha: o
+    // peso entra no pacote e o saco conta como processado, mas sem itens. A API
+    // recusa na mesma; aqui é só para o operador perceber porquê de imediato.
+    if (activeItems.length === 0) {
+      toast.error(t('bagWithoutItems'));
+      return;
+    }
+
+    const parsedWeight = Number(bagWeight);
+    if (
+      !bagWeight.trim() ||
+      Number.isNaN(parsedWeight) ||
+      parsedWeight < 0
+    ) {
       toast.error(t('invalidBagWeight'));
       requestAnimationFrame(() => weightInputRef.current?.focus());
       return;
@@ -895,7 +908,14 @@ export default function Triage() {
                 type="button"
                 variant="secondary"
                 onClick={handleProcessBag}
-                disabled={isProcessingBag || parseBagWeight(bagWeight) == null}
+                disabled={
+                  isProcessingBag ||
+                  !bagWeight.trim() ||
+                  activeItems.length === 0
+                }
+                title={
+                  activeItems.length === 0 ? t('bagWithoutItems') : undefined
+                }
               >
                 {t('saveBag')}
               </Button>

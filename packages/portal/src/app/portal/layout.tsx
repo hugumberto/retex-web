@@ -13,6 +13,7 @@ import { Breadcrumbs } from '@/components/custom/breadcrumbs';
 import React from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import AuthBootstrapper from './guard/auth-bootstrapper';
+import CompanyBootstrapper from './guard/company-bootstrapper';
 import Protected from './guard/guard';
 
 export const metadata = {
@@ -29,6 +30,7 @@ export default function PortalLayout({
     <html lang="en">
       <body>
         <AuthBootstrapper />
+        <CompanyBootstrapper />
         <Toaster richColors />
         <SidebarProvider>
           <AppSidebar />

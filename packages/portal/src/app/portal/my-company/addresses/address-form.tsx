@@ -1,20 +1,19 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { DialogForm } from '@/components/form/dialog-form';
 import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { lookupPostalCode } from '@/utils/address';
 import { PlusIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { FocusEvent, useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-type AddressFormData = {
+type CompanyAddressFormData = {
   zipCode: string;
   street: string;
   number: string;
@@ -25,10 +24,9 @@ type AddressFormData = {
   countryDivision: string;
   lat: string;
   long: string;
-  isDefault: boolean;
 };
 
-const defaultValues: AddressFormData = {
+const defaultValues: CompanyAddressFormData = {
   zipCode: '',
   street: '',
   number: '',
@@ -39,17 +37,21 @@ const defaultValues: AddressFormData = {
   countryDivision: '',
   lat: '',
   long: '',
-  isDefault: false,
 };
 
-type Props = { onSave: () => void };
+type Props = { onSaved: () => void };
 
-export default function AddressForm({ onSave }: Props) {
-  const t = useTranslations('profile');
+export default function AddressForm({ onSaved }: Props) {
+  const t = useTranslations('company');
   const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { control, handleSubmit, setValue, reset, formState: { errors } } =
-    useForm<AddressFormData>({ defaultValues });
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<CompanyAddressFormData>({ defaultValues });
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -58,6 +60,9 @@ export default function AddressForm({ onSave }: Props) {
     [reset]
   );
 
+  // Mesmo comportamento da morada pessoal: o código postal preenche o resto,
+  // incluindo as coordenadas. Sem elas a API geocodifica pelo endereço, o que é
+  // mais lento e menos exato do que o ponto que a TomTom já deu aqui.
   const handleBlurPostalCode = useCallback(
     async (e: FocusEvent<HTMLInputElement>) => {
       const postalCode = e.target.value.trim();
@@ -70,8 +75,12 @@ export default function AddressForm({ onSave }: Props) {
           return;
         }
 
-        const set = (field: keyof AddressFormData, val: string) =>
-          setValue(field, val, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
+        const set = (field: keyof CompanyAddressFormData, val: string) =>
+          setValue(field, val, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
 
         set('street', found.street);
         set('city', found.city);
@@ -88,32 +97,41 @@ export default function AddressForm({ onSave }: Props) {
   );
 
   const onSubmit = useCallback(
-    async (data: AddressFormData) => {
+    async (data: CompanyAddressFormData) => {
       setIsSubmitting(true);
       try {
         await toast.promise(
           (async () => {
-            const res = await api.post('/me/address', data);
+            const res = await api.post('/company/me/addresses', data);
             if (!isSuccessStatus(res.status)) throw new Error();
-            onSave();
+            onSaved();
             reset(defaultValues);
           })(),
           {
             loading: tCommon('saving'),
-            success: t('addressAdded'),
-            error: t('addressAddError'),
+            success: t('addressCreateSuccess'),
+            error: (err) => {
+              const response = (
+                err as { response?: { status?: number; data?: { message?: string } } }
+              )?.response;
+              // 409 = já existe a mesma rua/número/código postal nesta empresa.
+              if (response?.status === 409) {
+                return response.data?.message || t('addressDuplicate');
+              }
+              return t('addressCreateError');
+            },
           }
         );
       } finally {
         setIsSubmitting(false);
       }
     },
-    [onSave, reset]
+    [onSaved, reset, t, tCommon]
   );
 
   return (
-    <DialogForm<AddressFormData>
-      title={t('newAddressTitle')}
+    <DialogForm<CompanyAddressFormData>
+      title={t('addAddress')}
       confirmText={tCommon('save')}
       loading={isSubmitting}
       errors={errors}
@@ -138,10 +156,17 @@ export default function AddressForm({ onSave }: Props) {
                 id="zipCode"
                 type="text"
                 placeholder="0000-000"
-                onBlur={(e) => { field.onBlur(); handleBlurPostalCode(e); }}
-                className={`mt-1 w-full px-3 py-2 border ${errors.zipCode ? 'border-red-500' : 'border-secondary'} rounded-md shadow-sm text-sm`}
+                onBlur={(e) => {
+                  field.onBlur();
+                  handleBlurPostalCode(e);
+                }}
+                className={`mt-1 w-full px-3 py-2 border ${
+                  errors.zipCode ? 'border-red-500' : 'border-secondary'
+                } rounded-md shadow-sm text-sm`}
               />
-              {errors.zipCode && <p className="text-red-500 text-sm mt-1">{errors.zipCode.message}</p>}
+              {errors.zipCode && (
+                <p className="text-red-500 text-sm mt-1">{errors.zipCode.message}</p>
+              )}
             </div>
           )}
         />
@@ -197,23 +222,6 @@ export default function AddressForm({ onSave }: Props) {
           control={control}
           errors={errors}
           placeholder="Lisboa"
-        />
-
-        <Controller
-          name="isDefault"
-          control={control}
-          render={({ field }) => (
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="isDefault"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-              <Label htmlFor="isDefault" className="cursor-pointer">
-                {t('setAsDefault')}
-              </Label>
-            </div>
-          )}
         />
       </div>
     </DialogForm>

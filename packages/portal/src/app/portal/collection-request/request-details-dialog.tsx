@@ -91,6 +91,9 @@ export default function RequestDetailsDialog({ request }: Props) {
             </h3>
             <div className="grid grid-cols-2 gap-3">
               <Field label={tCommon('name')} value={fullName} />
+              {request.company ? (
+                <Field label={t('companyLabel')} value={request.company.name} />
+              ) : null}
               <Field label={tCommon('email')} value={user?.email} />
               <Field label={t('phone')} value={user?.contactPhone} />
             </div>
