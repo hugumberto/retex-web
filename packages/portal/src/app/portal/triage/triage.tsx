@@ -5,6 +5,7 @@ import { Brand } from '@/app/types/brand';
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { CollectionRequestBagDTO, TriageResponse } from '@/app/types/collection-request-bag';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,8 +17,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import { STATUS_CLASS } from '@/lib/collection-request-status';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { Ban, Info } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AddTriage, { buildTriageKey, TriageListItem } from './components/add-triage';
@@ -38,6 +41,18 @@ const finishErrorMessage = (error: unknown, fallback: string): string => {
 // A esmagadora maioria dos itens é registada à unidade, por isso o campo já
 // vem preenchido — poupa uma escrita por item num ecrã usado ao ritmo do scanner.
 const DEFAULT_QUANTITY = '1';
+
+// O peso é obrigatório para dar um saco por processado. Zero é tratado como
+// "não pesado": o backend aceita-o (@Min(0)) e um saco de 0 kg não existe.
+// Devolve o número válido ou null.
+const parseBagWeight = (value: string): number | null => {
+  const parsed = Number(value);
+  if (!value.trim() || Number.isNaN(parsed) || parsed <= 0) return null;
+  return parsed;
+};
+
+// O decimal do Postgres chega como string.
+const bagHasWeight = (bag: CollectionRequestBagDTO) => Number(bag.weight ?? 0) > 0;
 
 // Marcas por ordem alfabética (case-insensitive, pt-PT).
 const sortBrands = (list: Brand[]) =>
@@ -136,9 +151,19 @@ export default function Triage() {
     [tBrand]
   );
 
-  const isViewMode = selectedCollectionRequest?.status === CollectionRequestStatus.STOCKED;
+  // Espelha a validação do backend (process-triage-qr-use-case): só se tria em
+  // COLLECTED ou SCREENING. STOCKED abre em consulta; o resto fica bloqueado.
+  const requestStatus = selectedCollectionRequest?.status;
+  const isViewMode = requestStatus === CollectionRequestStatus.STOCKED;
+  const canTriage =
+    requestStatus === CollectionRequestStatus.COLLECTED ||
+    requestStatus === CollectionRequestStatus.SCREENING;
+  const isBlocked = !!selectedCollectionRequest && !canTriage && !isViewMode;
   const allProcessed =
     bags.length > 0 && bags.every((bag) => bag.processedAt != null);
+  // Um saco processado sem peso não pode fechar a triagem: o peso do pacote é a
+  // soma dos sacos e ficaria em falta.
+  const bagsWithoutWeight = bags.filter((bag) => !bagHasWeight(bag));
   const activeItems = triageItems.filter(
     (item) => item.bagId === activeBagId
   );
@@ -190,9 +215,26 @@ export default function Triage() {
 
       setTriageItems(mappedItems);
       setStorageUnits(mappedStorageUnits);
-      toast.success(t('requestLoaded'));
-      // Foco vai para o campo de código do saco.
-      requestAnimationFrame(() => bagInputRef.current?.focus());
+
+      // O estado ainda não passou pelo render, por isso a regra é reavaliada aqui.
+      const loadedStatus = data.collectionRequest.status;
+      const isTriageable =
+        loadedStatus === CollectionRequestStatus.COLLECTED ||
+        loadedStatus === CollectionRequestStatus.SCREENING;
+
+      if (isTriageable) {
+        toast.success(t('requestLoaded'));
+        // Foco vai para o campo de código do saco.
+        requestAnimationFrame(() => bagInputRef.current?.focus());
+      } else {
+        // Sem triagem possível: não há campo de saco para focar. O aviso fica no
+        // banner (persistente) e a saída é o botão "Nova consulta".
+        toast.warning(
+          loadedStatus === CollectionRequestStatus.STOCKED
+            ? t('stockedTitle')
+            : t('blockedTitle')
+        );
+      }
     } catch (error) {
       console.error('Erro ao consultar triagem:', error);
       setSelectedCollectionRequest(null);
@@ -237,11 +279,16 @@ export default function Triage() {
       requestAnimationFrame(() => bagInputRef.current?.focus());
       return;
     }
-    if (bag.processedAt != null) {
+    // Um saco já processado não se reabre — exceto se tiver ficado sem peso,
+    // caso em que travaria a finalização sem dar forma de o corrigir.
+    if (bag.processedAt != null && bagHasWeight(bag)) {
       toast.error(t('bagAlreadyProcessed'));
       setBagCode('');
       requestAnimationFrame(() => bagInputRef.current?.focus());
       return;
+    }
+    if (bag.processedAt != null) {
+      toast.warning(t('bagReopenedMissingWeight'));
     }
 
     setActiveBagId(bag.id);
@@ -343,6 +390,7 @@ export default function Triage() {
       parsedWeight < 0
     ) {
       toast.error(t('invalidBagWeight'));
+      requestAnimationFrame(() => weightInputRef.current?.focus());
       return;
     }
 
@@ -386,10 +434,11 @@ export default function Triage() {
 
     // Campo vazio não impede guardar o resto; um valor inválido impede, para o
     // operador dar por isso em vez de perder o peso em silêncio.
-    const parsedWeight = Number(bagWeight);
-    const hasWeight = Boolean(activeBagId && bagWeight.trim());
-    if (hasWeight && (Number.isNaN(parsedWeight) || parsedWeight < 0)) {
+    const isWeightFilled = Boolean(activeBagId && bagWeight.trim());
+    const parsedWeight = isWeightFilled ? parseBagWeight(bagWeight) : null;
+    if (isWeightFilled && parsedWeight == null) {
       toast.error(t('invalidBagWeight'));
+      requestAnimationFrame(() => weightInputRef.current?.focus());
       return;
     }
 
@@ -397,7 +446,7 @@ export default function Triage() {
     try {
       // Grava o peso do saco ativo sem o dar por terminado, para não se perder
       // se o operador sair do ecrã a meio da triagem deste saco.
-      if (hasWeight) {
+      if (parsedWeight != null) {
         const { status: weightStatus } = await api.patch(
           `/triage/bag/${activeBagId}/weight`,
           { weight: parsedWeight }
@@ -498,6 +547,16 @@ export default function Triage() {
     if (!selectedCollectionRequest?.id) return;
     if (!allProcessed) {
       toast.error(t('processBagsFirst'));
+      return;
+    }
+    if (bagsWithoutWeight.length > 0) {
+      toast.error(
+        t('bagsMissingWeight', {
+          codes: bagsWithoutWeight
+            .map((bag) => bag.friendlyCode ?? bag.token)
+            .join(', '),
+        })
+      );
       return;
     }
     if (triageItems.length === 0) {
@@ -606,12 +665,38 @@ export default function Triage() {
               <span className="text-sm text-secondary">
                 {t('totalWeight')} <strong>{collectionRequestWeight.toFixed(2)} kg</strong>
               </span>
-              <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
+              <span
+                className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                  STATUS_CLASS[selectedCollectionRequest.status]
+                }`}
+              >
                 {tStatus(selectedCollectionRequest.status)}
               </span>
             </>
           )}
         </div>
+
+        {isBlocked && (
+          <Alert variant="destructive" className="mt-4">
+            <Ban />
+            <AlertTitle>{t('blockedTitle')}</AlertTitle>
+            <AlertDescription>
+              {t('blockedDescription', {
+                status: tStatus(selectedCollectionRequest.status),
+                collected: tStatus(CollectionRequestStatus.COLLECTED),
+                screening: tStatus(CollectionRequestStatus.SCREENING),
+              })}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {isViewMode && (
+          <Alert className="mt-4">
+            <Info />
+            <AlertTitle>{t('stockedTitle')}</AlertTitle>
+            <AlertDescription>{t('stockedDescription')}</AlertDescription>
+          </Alert>
+        )}
       </div>
 
       {selectedCollectionRequest && (
@@ -622,7 +707,7 @@ export default function Triage() {
       )}
 
       {/* Consulta do saco (escaneamento) + peso do saco */}
-      {selectedCollectionRequest && !isViewMode && (
+      {selectedCollectionRequest && canTriage && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <label className="mb-1 block text-sm font-medium text-secondary">
             {t('bagCodeLabel')}
@@ -656,10 +741,16 @@ export default function Triage() {
                 ref={weightInputRef}
                 type="number"
                 min={0}
+                step={0.01}
                 value={bagWeight}
                 onChange={(e) => setBagWeight(e.target.value)}
                 className="max-w-xs"
               />
+              {parseBagWeight(bagWeight) == null && (
+                <p className="mt-1 text-sm text-amber-700">
+                  {t('bagWeightRequired')}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -751,7 +842,7 @@ export default function Triage() {
       )}
 
       {/* Itens do saco ativo */}
-      {selectedCollectionRequest && activeBagId && !isViewMode && (
+      {selectedCollectionRequest && activeBagId && canTriage && (
         <div className="flex flex-col gap-6">
           <CollectionRecord
             selectedCollectionRequestId={selectedCollectionRequest.id}
@@ -790,7 +881,7 @@ export default function Triage() {
         <AddTriage
           items={triageItems}
           brands={brands}
-          isViewMode={isViewMode}
+          isViewMode={isViewMode || isBlocked}
           storageCode={storageCode}
           onStorageCodeChange={setStorageCode}
           onStorageCodeSubmit={handleStorageCodeSubmit}
@@ -800,7 +891,7 @@ export default function Triage() {
           deletingItemIndex={null}
           onFinishTriage={handleFinishTriage}
           isFinishingTriage={isFinishingTriage}
-          disableFinish={!allProcessed}
+          disableFinish={!allProcessed || bagsWithoutWeight.length > 0}
           hideFinishButton
         />
       )}
@@ -812,7 +903,7 @@ export default function Triage() {
       {selectedCollectionRequest && (
         <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-secondary/25 bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
-            {activeBagId && !isViewMode && (
+            {activeBagId && canTriage && (
               <Button
                 type="button"
                 variant="secondary"
@@ -833,7 +924,7 @@ export default function Triage() {
               type="button"
               variant="outline"
               onClick={handleSaveProgress}
-              disabled={isSavingProgress || isViewMode}
+              disabled={isSavingProgress || !canTriage}
             >
               {t('saveProgress')}
             </Button>
@@ -841,7 +932,7 @@ export default function Triage() {
               type="button"
               variant="secondary"
               onClick={handleFinishTriage}
-              disabled={isFinishingTriage || isViewMode}
+              disabled={isFinishingTriage || !canTriage}
             >
               {t('finish')}
             </Button>
