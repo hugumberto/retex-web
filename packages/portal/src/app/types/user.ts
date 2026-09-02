@@ -45,6 +45,8 @@ export enum Role {
   DRIVER = 'DRIVER',
   OPS = 'OPS',
   ADMIN = 'ADMIN',
+  /** Acima do ADMIN: herda-o e é o único que gere contas ADMIN/MASTER. */
+  MASTER = 'MASTER',
 }
 export enum UserStatus {
   ACTIVE = 'ACTIVE',

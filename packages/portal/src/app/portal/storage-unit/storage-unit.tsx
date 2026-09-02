@@ -22,6 +22,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import api from '@/lib/api';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import {
   AgeGroup,
@@ -128,6 +130,11 @@ export default function StorageUnit() {
       typeFilter,
       seasonFilter,
     ]
+  );
+
+  const pagination = usePagination(
+    filteredStorageUnits,
+    `${qualityFilter}|${sexFilter}|${ageGroupFilter}|${typeFilter}|${seasonFilter}`
   );
 
   const clearFilters = useCallback(() => {
@@ -302,141 +309,147 @@ export default function StorageUnit() {
   }, [fetchStorageUnits]);
 
   return (
-    <section id="storage-unit-page" className="flex flex-col items-center">
-      <StorageUnitForm onSave={handleSave} />
-
-      <div className="mt-4 flex w-full flex-wrap items-center gap-2">
-        <FilterSelect
-          label={tCommon('quality')}
-          allLabel={tCommon('all')}
-          value={qualityFilter}
-          onChange={(value) => setQualityFilter(value as Quality | typeof ALL)}
-          options={Object.values(Quality)}
-          translate={tQuality}
-        />
-        <FilterSelect
-          label={tCommon('sex')}
-          allLabel={tCommon('all')}
-          value={sexFilter}
-          onChange={(value) => setSexFilter(value as Sex | typeof ALL)}
-          options={Object.values(Sex)}
-          translate={tSex}
-        />
-        <FilterSelect
-          label={tCommon('ageGroup')}
-          allLabel={tCommon('all')}
-          value={ageGroupFilter}
-          onChange={(value) => setAgeGroupFilter(value as AgeGroup | typeof ALL)}
-          options={Object.values(AgeGroup)}
-          translate={tAgeGroup}
-        />
-        <FilterSelect
-          label={tCommon('part')}
-          allLabel={tCommon('all')}
-          value={typeFilter}
-          onChange={(value) => setTypeFilter(value as Type | typeof ALL)}
-          options={Object.values(Type)}
-          translate={tItemType}
-        />
-        <FilterSelect
-          label={tCommon('season')}
-          allLabel={tCommon('all')}
-          value={seasonFilter}
-          onChange={(value) => setSeasonFilter(value as Season | typeof ALL)}
-          options={Object.values(Season)}
-          translate={tSeason}
-        />
-        {hasFilters && (
-          <Button variant="ghost" onClick={clearFilters}>
-            {tCommon('clear')}
-          </Button>
-        )}
+    <section id="storage-unit-page" className="space-y-6">
+      <div className="flex justify-end">
+        <StorageUnitForm onSave={handleSave} />
       </div>
 
-      <div className="mt-4 w-full">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{tCommon('code')}</TableHead>
-              <TableHead>{tCommon('quality')}</TableHead>
-              <TableHead>{tCommon('sex')}</TableHead>
-              <TableHead>{tCommon('ageGroup')}</TableHead>
-              <TableHead>{tCommon('part')}</TableHead>
-              <TableHead>{tCommon('season')}</TableHead>
-              <TableHead>{t('weightKg')}</TableHead>
-              <TableHead>{t('itemCount')}</TableHead>
-              <TableHead>{tCommon('status')}</TableHead>
-              <TableHead>{tCommon('action')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredStorageUnits.length > 0 ? (
-              filteredStorageUnits.map((storageUnit) => (
-                <TableRow key={storageUnit.id}>
-                  <TableCell className="font-medium">
-                    {storageUnit.friendlyCode ?? '-'}
-                  </TableCell>
-                  <TableCell>{tQuality(storageUnit.quality)}</TableCell>
-                  <TableCell>{tSex(storageUnit.sex)}</TableCell>
-                  <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
-                  <TableCell>{tItemType(storageUnit.type)}</TableCell>
-                  <TableCell>{tSeason(storageUnit.season)}</TableCell>
-                  <TableCell>{Number(storageUnit.weight ?? 0).toFixed(2)}</TableCell>
-                  <TableCell>{storageUnit.itemsCount ?? 0}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        storageUnit.status === 'ATIVO'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {tUnitStatus(storageUnit.status)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => handlePrintLabel(storageUnit)}
-                      title={t('printLabel')}
-                    >
-                      <PrinterIcon />
-                    </Button>
-                    <StorageUnitForm
-                      storageUnitId={storageUnit.id}
-                      initialData={storageUnit}
-                      onSave={handleSave}
-                    />
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isSubmitting}
-                          className="size-8"
-                        >
-                          <TrashIcon />
-                        </Button>
-                      }
-                      onConfirm={() => handleDeleteWithToast(storageUnit.id)}
-                    />
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterSelect
+            label={tCommon('quality')}
+            allLabel={tCommon('all')}
+            value={qualityFilter}
+            onChange={(value) => setQualityFilter(value as Quality | typeof ALL)}
+            options={Object.values(Quality)}
+            translate={tQuality}
+          />
+          <FilterSelect
+            label={tCommon('sex')}
+            allLabel={tCommon('all')}
+            value={sexFilter}
+            onChange={(value) => setSexFilter(value as Sex | typeof ALL)}
+            options={Object.values(Sex)}
+            translate={tSex}
+          />
+          <FilterSelect
+            label={tCommon('ageGroup')}
+            allLabel={tCommon('all')}
+            value={ageGroupFilter}
+            onChange={(value) => setAgeGroupFilter(value as AgeGroup | typeof ALL)}
+            options={Object.values(AgeGroup)}
+            translate={tAgeGroup}
+          />
+          <FilterSelect
+            label={tCommon('part')}
+            allLabel={tCommon('all')}
+            value={typeFilter}
+            onChange={(value) => setTypeFilter(value as Type | typeof ALL)}
+            options={Object.values(Type)}
+            translate={tItemType}
+          />
+          <FilterSelect
+            label={tCommon('season')}
+            allLabel={tCommon('all')}
+            value={seasonFilter}
+            onChange={(value) => setSeasonFilter(value as Season | typeof ALL)}
+            options={Object.values(Season)}
+            translate={tSeason}
+          />
+          {hasFilters && (
+            <Button variant="ghost" onClick={clearFilters}>
+              {tCommon('clear')}
+            </Button>
+          )}
+        </div>
+
+        <div className="mt-4 w-full overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{tCommon('code')}</TableHead>
+                <TableHead>{tCommon('quality')}</TableHead>
+                <TableHead>{tCommon('sex')}</TableHead>
+                <TableHead>{tCommon('ageGroup')}</TableHead>
+                <TableHead>{tCommon('part')}</TableHead>
+                <TableHead>{tCommon('season')}</TableHead>
+                <TableHead>{t('weightKg')}</TableHead>
+                <TableHead>{t('itemCount')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pagination.items.length > 0 ? (
+                pagination.items.map((storageUnit) => (
+                  <TableRow key={storageUnit.id}>
+                    <TableCell className="font-medium">
+                      {storageUnit.friendlyCode ?? '-'}
+                    </TableCell>
+                    <TableCell>{tQuality(storageUnit.quality)}</TableCell>
+                    <TableCell>{tSex(storageUnit.sex)}</TableCell>
+                    <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
+                    <TableCell>{tItemType(storageUnit.type)}</TableCell>
+                    <TableCell>{tSeason(storageUnit.season)}</TableCell>
+                    <TableCell>{Number(storageUnit.weight ?? 0).toFixed(2)}</TableCell>
+                    <TableCell>{storageUnit.itemsCount ?? 0}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          storageUnit.status === 'ATIVO'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {tUnitStatus(storageUnit.status)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8"
+                        onClick={() => handlePrintLabel(storageUnit)}
+                        title={t('printLabel')}
+                      >
+                        <PrinterIcon />
+                      </Button>
+                      <StorageUnitForm
+                        storageUnitId={storageUnit.id}
+                        initialData={storageUnit}
+                        onSave={handleSave}
+                      />
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8"
+                          >
+                            <TrashIcon />
+                          </Button>
+                        }
+                        onConfirm={() => handleDeleteWithToast(storageUnit.id)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={10}
+                    className="text-center py-6 text-muted-foreground"
+                  >
+                    {tCommon('noRecords')}
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={10}
-                  className="text-center py-6 text-muted-foreground"
-                >
-                  {tCommon('noRecords')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination pagination={pagination} />
       </div>
     </section>
   );

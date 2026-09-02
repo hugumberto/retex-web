@@ -179,7 +179,8 @@
       "USER": "Utilisateur",
       "DRIVER": "Transporteur",
       "OPS": "Opérations",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "MASTER": "Master"
     },
     "blogHighlight": {
       "NONE": "Aucun",
@@ -579,6 +580,7 @@
     "pageTitle": "Gérer la collecte",
     "formTitle": "Collecte de colis",
     "empty": "Aucune collecte de colis trouvée. Créez-en une nouvelle pour commencer.",
+    "allStatuses": "Tous les statuts",
     "statusUpdateError": "Erreur lors de la mise à jour du statut",
     "advanceTo": "Passer à {status}",
     "confirmTooltip": "Confirmer la collecte (statut Créée)",
@@ -674,6 +676,10 @@
     "bindQrPlaceholder": "Scannez ou saisissez puis appuyez sur Entrée",
     "bagBound": "Sac associé",
     "bindQrError": "Impossible d'associer le QR code",
+    "addBag": "Ajouter un sac",
+    "addBagHelp": "Crée un sac avec son propre code et le lie à cette demande, quel que soit le statut.",
+    "addBagSuccess": "Sac {code} créé et lié",
+    "addBagError": "Impossible de créer le sac",
     "collectedBags": "Sacs collectés",
     "noBagsBound": "Aucun sac associé",
     "finish": "Finaliser la collecte",
@@ -863,7 +869,15 @@
     "breakdownByMember": "Par membre",
     "breakdownByAddress": "Par lieu de collecte",
     "member": "Membre",
-    "collectionSite": "Lieu de collecte"
+    "collectionSite": "Lieu de collecte",
+    "viewAs": "Voir comme un client",
+    "viewAsTitle": "Voir le portail comme un client",
+    "viewAsDescription": "Choisissez le client. Votre session reste la vôtre et la vue est en lecture seule.",
+    "viewAsSearch": "Rechercher par nom ou e-mail",
+    "viewAsAction": "Voir comme",
+    "viewAsEmpty": "Aucun client trouvé",
+    "viewAsStarted": "Portail affiché en tant que {name}",
+    "viewAsLoadError": "Impossible de charger les clients"
   },
   "company": {
     "pageTitle": "Entreprises",
@@ -921,5 +935,9 @@
     "addressDuplicate": "Ce lieu de collecte est déjà enregistré",
     "addressLoadError": "Erreur lors du chargement des lieux de collecte",
     "cityDivision": "Commune"
+  },
+  "impersonation": {
+    "banner": "Portail affiché en tant que {name} — lecture seule",
+    "exit": "Revenir à mon compte"
   }
 }

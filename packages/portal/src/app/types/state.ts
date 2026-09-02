@@ -4,10 +4,20 @@ import { UserDTO } from './user';
 export interface AuthSlice {
   accessToken: string | null;
   refreshToken: string | null;
+  /**
+   * Utilizador efetivo: no modo "ver como" é o cliente, para que menus, guards
+   * e ecrãs funcionem sem saber que o modo existe.
+   */
   user: UserDTO | null;
+  /** Cliente a ser visto pelo master. `null` = sessão normal. */
+  impersonatedUser: UserDTO | null;
+  /** Conta real de quem entrou no modo, guardada para repor à saída. */
+  realUser: UserDTO | null;
   setAccessToken: (t: string | null) => void;
   setRefreshToken: (t: string | null) => void;
   setUser: (u: UserDTO | null) => void;
+  startImpersonation: (target: UserDTO) => void;
+  stopImpersonation: () => void;
   logout: () => Promise<void>;
 }
 

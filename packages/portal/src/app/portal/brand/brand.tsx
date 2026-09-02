@@ -16,26 +16,19 @@ import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { useTranslations } from 'next-intl';
 import { TrashIcon } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import BrandForm from './brand-form';
 
 export default function BrandCrud() {
   const t = useTranslations('brand');
   const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
-  const PAGE_SIZE = 10;
   const [brands, setBrands] = useState<Brand[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const totalPages = Math.max(1, Math.ceil(brands.length / PAGE_SIZE));
-
-  const paginatedBrands = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-    return brands.slice(start, end);
-  }, [brands, currentPage]);
+  const pagination = usePagination(brands);
 
   const fetchBrands = useCallback(async () => {
     try {
@@ -95,92 +88,65 @@ export default function BrandCrud() {
     await fetchBrands();
   }, [fetchBrands]);
 
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
-
   return (
-    <section id="brand-page" className="flex flex-col items-center">
-      <BrandForm onSave={handleSave} />
+    <section id="brand-page" className="space-y-6">
+      <div className="flex justify-end">
+        <BrandForm onSave={handleSave} />
+      </div>
 
-      <div className="mt-4 w-full">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{tCommon('name')}</TableHead>
-              <TableHead>{t('manual')}</TableHead>
-              <TableHead>{tCommon('action')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedBrands.length > 0 ? (
-              paginatedBrands.map((brand) => (
-                <TableRow key={brand.id}>
-                  <TableCell>{brand.name}</TableCell>
-                  <TableCell>{brand.manual ? tCommon('yes') : tCommon('no')}</TableCell>
-                  <TableCell className="space-x-2">
-                    <BrandForm
-                      brandId={brand.id}
-                      initialData={brand}
-                      onSave={handleSave}
-                    />
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isSubmitting}
-                          className="size-8"
-                        >
-                          <TrashIcon />
-                        </Button>
-                      }
-                      onConfirm={() => handleDeleteWithToast(brand.id)}
-                    />
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <div className="w-full overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{tCommon('name')}</TableHead>
+                <TableHead>{t('manual')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pagination.items.length > 0 ? (
+                pagination.items.map((brand) => (
+                  <TableRow key={brand.id}>
+                    <TableCell>{brand.name}</TableCell>
+                    <TableCell>{brand.manual ? tCommon('yes') : tCommon('no')}</TableCell>
+                    <TableCell className="space-x-2">
+                      <BrandForm
+                        brandId={brand.id}
+                        initialData={brand}
+                        onSave={handleSave}
+                      />
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8"
+                          >
+                            <TrashIcon />
+                          </Button>
+                        }
+                        onConfirm={() => handleDeleteWithToast(brand.id)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="text-center py-6 text-muted-foreground"
+                  >
+                    {tCommon('noRecords')}
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-center py-6 text-muted-foreground"
-                >
-                  {tCommon('noRecords')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="text-sm text-muted-foreground">
-            {tCommon('pageInfo', { current: currentPage, total: totalPages })}
-          </span>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              {tCommon('previous')}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-              }
-              disabled={currentPage === totalPages}
-            >
-              {tCommon('next')}
-            </Button>
-          </div>
+              )}
+            </TableBody>
+          </Table>
         </div>
+
+        <TablePagination pagination={pagination} />
       </div>
     </section>
   );

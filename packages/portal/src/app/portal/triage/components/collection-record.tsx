@@ -13,6 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { cn } from '@/lib/utils';
 import {
   Baby,
@@ -127,6 +129,7 @@ export default function CollectionRecord({
   isViewMode,
 }: CollectionRecordProps) {
   const t = useTranslations('triage');
+  const pagination = usePagination(items);
   const tCommon = useTranslations('common');
   const tQuality = useTranslations('enums.quality');
   const tSex = useTranslations('enums.sex');
@@ -187,8 +190,8 @@ export default function CollectionRecord({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.length > 0 ? (
-                items.map((item, index) => (
+              {pagination.items.length > 0 ? (
+                pagination.items.map((item, index) => (
                   <TableRow
                     key={`${item.collectionRequestId}-${item.brandId}-${index}`}
                   >
@@ -242,6 +245,8 @@ export default function CollectionRecord({
               )}
             </TableBody>
           </Table>
+
+          <TablePagination pagination={pagination} />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

@@ -2,6 +2,18 @@ import { CompanyContextDTO, CompanyPermission } from '@/app/types/company';
 import { Role, UserDTO } from '@/app/types/user';
 
 /**
+ * Hierarquia de perfis, espelho de `domain/user/role-hierarchy.ts` na API: quem
+ * tem a chave herda os valores. Evita ter de acrescentar `Role.MASTER` a todas
+ * as entradas de `ROUTE_PERMISSIONS` e do menu.
+ */
+const ROLE_INHERITANCE: Partial<Record<Role, Role[]>> = {
+  [Role.MASTER]: [Role.ADMIN],
+};
+
+/** Perfis cuja gestão (criar, editar, repor senha) é exclusiva do MASTER. */
+export const PRIVILEGED_ROLES: Role[] = [Role.ADMIN, Role.MASTER];
+
+/**
  * Regra de empresa aplicável a uma rota ou a um item de menu.
  *
  * Existe um segundo eixo de autorização, ortogonal às `Role`: os membros de uma
@@ -79,9 +91,36 @@ const matchesRoute = (pathname: string, routePath: string) => {
   );
 };
 
-export const getUserRoles = (user: UserDTO | null): Role[] => {
+/** Perfis tal como vêm da API, sem herança. */
+export const getRawUserRoles = (user: UserDTO | null): Role[] => {
   return user?.roles?.map((role) => role.role) ?? [];
 };
+
+/**
+ * Perfis efetivos: os do utilizador mais os que herda. É o que interessa para
+ * decidir acessos — um MASTER passa em tudo o que exige ADMIN.
+ */
+export const getUserRoles = (user: UserDTO | null): Role[] => {
+  const expanded = new Set<Role>();
+  const pending = getRawUserRoles(user);
+
+  while (pending.length) {
+    const role = pending.pop() as Role;
+    if (expanded.has(role)) continue;
+    expanded.add(role);
+    pending.push(...(ROLE_INHERITANCE[role] ?? []));
+  }
+
+  return [...expanded];
+};
+
+/** `true` se o utilizador tem mesmo o perfil MASTER (a herança não conta). */
+export const isMaster = (user: UserDTO | null): boolean =>
+  getRawUserRoles(user).includes(Role.MASTER);
+
+/** `true` se a conta é ADMIN/MASTER — só um MASTER lhe pode mexer. */
+export const isPrivilegedUser = (user: UserDTO | null): boolean =>
+  getRawUserRoles(user).some((role) => PRIVILEGED_ROLES.includes(role));
 
 /** Avalia a regra de empresa de uma rota ou item de menu. Sem regra, passa. */
 export const hasCompanyAccess = (

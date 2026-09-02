@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import { useTranslations } from 'next-intl';
 import { PencilIcon, TrashIcon } from 'lucide-react';
@@ -25,6 +27,7 @@ export default function BlogCategories() {
   const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const pagination = usePagination(categories);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchCategories = useCallback(async () => {
@@ -91,8 +94,8 @@ export default function BlogCategories() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.length > 0 ? (
-                categories.map((cat) => (
+              {pagination.items.length > 0 ? (
+                pagination.items.map((cat) => (
                   <TableRow key={cat.id}>
                     <TableCell className="font-medium">{cat.title}</TableCell>
                     <TableCell className="text-muted-foreground">
@@ -151,6 +154,8 @@ export default function BlogCategories() {
               )}
             </TableBody>
           </Table>
+
+          <TablePagination pagination={pagination} />
         </div>
       </div>
     </section>
