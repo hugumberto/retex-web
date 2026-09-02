@@ -4,6 +4,8 @@ import {
   StorageUnitDTO,
 } from '@/app/types/storage-unit';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useEffect, useRef } from 'react';
@@ -113,6 +115,8 @@ export default function AddTriage({
         Number(storageTriageKeys.has(buildTriageKey(a.item))) -
         Number(storageTriageKeys.has(buildTriageKey(b.item)))
     );
+  const itemsPagination = usePagination(orderedItems);
+  const unitsPagination = usePagination(validStorageUnits);
 
   const hasInvalidItemCombination = items.some(
     (item) =>
@@ -206,8 +210,8 @@ export default function AddTriage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orderedItems.length > 0 ? (
-                  orderedItems.map(({ item, index }) => (
+                {itemsPagination.items.length > 0 ? (
+                  itemsPagination.items.map(({ item, index }) => (
                     <TableRow
                       key={
                         item.id ??
@@ -276,6 +280,8 @@ export default function AddTriage({
                 )}
               </TableBody>
             </Table>
+
+            <TablePagination pagination={itemsPagination} />
           </div>
 
           <div className="min-w-0 space-y-2 lg:col-span-2">
@@ -293,8 +299,8 @@ export default function AddTriage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {validStorageUnits.length > 0 ? (
-                  validStorageUnits.map((storageUnit) => (
+                {unitsPagination.items.length > 0 ? (
+                  unitsPagination.items.map((storageUnit) => (
                     <TableRow key={storageUnit.id}>
                       <TableCell>{tQuality(storageUnit.quality)}</TableCell>
                       <TableCell>{tSex(storageUnit.sex)}</TableCell>
@@ -315,6 +321,8 @@ export default function AddTriage({
                 )}
               </TableBody>
             </Table>
+
+            <TablePagination pagination={unitsPagination} />
           </div>
         </div>
 

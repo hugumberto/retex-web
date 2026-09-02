@@ -10,6 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import api from '@/lib/api';
 import { STATUS_CLASS } from '@/lib/collection-request-status';
 import { useAppStore } from '@/store';
@@ -23,6 +25,7 @@ export default function Index() {
   const tStatus = useTranslations('enums.collectionRequestStatus');
   const { setPageTitle, setBreadcrumbs, user } = useAppStore();
   const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
+  const pagination = usePagination(requests);
   const [loading, setLoading] = useState(false);
 
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
@@ -78,8 +81,8 @@ export default function Index() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {requests.length > 0 ? (
-                    requests.map((req) => (
+                  {pagination.items.length > 0 ? (
+                    pagination.items.map((req) => (
                       <TableRow key={req.id}>
                         <TableCell>
                           {[req.address?.street, req.address?.number]
@@ -103,6 +106,8 @@ export default function Index() {
                   )}
                 </TableBody>
               </Table>
+
+              <TablePagination pagination={pagination} />
             </div>
           )}
         </div>

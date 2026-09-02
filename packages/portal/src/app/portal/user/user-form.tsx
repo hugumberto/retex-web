@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
+import { isMaster } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
+import { useAppStore } from '@/store';
 import { PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Role, UserFormData } from '../../types/user';
@@ -19,11 +21,18 @@ interface UserFormProps {
   onSave?: () => void;
 }
 
+/** ADMIN e MASTER só são atribuídos — e editados — por um MASTER. */
+const PRIVILEGED_ROLES = [Role.ADMIN, Role.MASTER];
+
 export default function UserForm({ initialData, onSave }: UserFormProps) {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
   const tRole = useTranslations('enums.role');
   const isEditing = !!initialData?.id;
+  const { user: currentUser } = useAppStore();
+  const currentUserIsMaster = isMaster(currentUser);
+  const editingPrivileged =
+    initialData?.role?.some((role) => PRIVILEGED_ROLES.includes(role)) ?? false;
   const [isOpen, setIsOpen] = useState(false);
   const {
     control,
@@ -33,7 +42,13 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<UserFormData>();
 
-  const roleOptions = [Role.ADMIN, Role.OPS, Role.DRIVER].map((id) => ({
+  // A API rejeita na mesma (ver `user-management.policy.ts`); aqui é só para
+  // não oferecer ao admin um perfil que ele não pode atribuir.
+  const roleOptions = (
+    currentUserIsMaster
+      ? [Role.MASTER, Role.ADMIN, Role.OPS, Role.DRIVER]
+      : [Role.OPS, Role.DRIVER]
+  ).map((id) => ({
     id,
     label: tRole(id),
   }));
@@ -54,6 +69,11 @@ export default function UserForm({ initialData, onSave }: UserFormProps) {
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
   };
+
+  // Um ADMIN não edita a conta de outro ADMIN/MASTER: nem sequer vê o botão.
+  if (editingPrivileged && !currentUserIsMaster) {
+    return null;
+  }
 
   const onSubmit: SubmitHandler<UserFormData> = async (formData) => {
     let userId = '';

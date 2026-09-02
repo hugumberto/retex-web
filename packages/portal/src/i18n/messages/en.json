@@ -179,7 +179,8 @@
       "USER": "User",
       "DRIVER": "Driver",
       "OPS": "Operations",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "MASTER": "Master"
     },
     "blogHighlight": {
       "NONE": "None",
@@ -579,6 +580,7 @@
     "pageTitle": "Manage collection",
     "formTitle": "Package collection",
     "empty": "No package collection found. Create a new one to get started.",
+    "allStatuses": "All statuses",
     "statusUpdateError": "Error updating the status",
     "advanceTo": "Advance to {status}",
     "confirmTooltip": "Confirm collection (Created status)",
@@ -674,6 +676,10 @@
     "bindQrPlaceholder": "Scan or type and press Enter",
     "bagBound": "Bag linked",
     "bindQrError": "Could not link the QR code",
+    "addBag": "Add bag",
+    "addBagHelp": "Creates a new bag with its own code and links it to this request, whatever the status.",
+    "addBagSuccess": "Bag {code} created and linked",
+    "addBagError": "Could not create the bag",
     "collectedBags": "Collected bags",
     "noBagsBound": "No bags linked",
     "finish": "Finish collection",
@@ -863,7 +869,15 @@
     "breakdownByMember": "By member",
     "breakdownByAddress": "By collection site",
     "member": "Member",
-    "collectionSite": "Collection site"
+    "collectionSite": "Collection site",
+    "viewAs": "View as customer",
+    "viewAsTitle": "View the portal as a customer",
+    "viewAsDescription": "Pick the customer. Your session stays yours and the view is read-only.",
+    "viewAsSearch": "Search by name or email",
+    "viewAsAction": "View as",
+    "viewAsEmpty": "No customer found",
+    "viewAsStarted": "Viewing the portal as {name}",
+    "viewAsLoadError": "Could not load the customers"
   },
   "company": {
     "pageTitle": "Companies",
@@ -921,5 +935,9 @@
     "addressDuplicate": "This collection site is already registered",
     "addressLoadError": "Error loading collection sites",
     "cityDivision": "Parish"
+  },
+  "impersonation": {
+    "banner": "Viewing the portal as {name} — read-only",
+    "exit": "Back to my account"
   }
 }

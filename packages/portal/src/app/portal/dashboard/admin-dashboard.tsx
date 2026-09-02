@@ -26,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import { isMaster } from '@/lib/access-control';
 import { STATUS_COLOR } from '@/lib/collection-request-status';
 import { useAppStore } from '@/store';
 import {
@@ -40,6 +41,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import ViewAsDialog from './view-as-dialog';
 import {
   Area,
   AreaChart,
@@ -63,7 +65,7 @@ export default function AdminDashboard() {
   const tQuality = useTranslations('enums.quality');
   const tSeason = useTranslations('enums.season');
   const tItemType = useTranslations('enums.itemType');
-  const { setPageTitle, setBreadcrumbs } = useAppStore();
+  const { user, setPageTitle, setBreadcrumbs } = useAppStore();
   const [stats, setStats] = useState<DashboardStatsDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -145,11 +147,15 @@ export default function AdminDashboard() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">{t('pageTitle')}</h1>
-        <p className="text-sm text-muted-foreground">
-          {t('subtitle')}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold text-foreground">{t('pageTitle')}</h1>
+          <p className="text-sm text-muted-foreground">
+            {t('subtitle')}
+          </p>
+        </div>
+        {/* Entrada do modo "ver como" — a API só o permite a um MASTER. */}
+        {isMaster(user) && <ViewAsDialog />}
       </div>
 
       {/* KPIs principais */}

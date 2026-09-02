@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import { Link2Off, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -41,6 +43,7 @@ export default function Bags() {
   const [code, setCode] = useState('');
   const [pkg, setPkg] = useState<CollectionRequestInfo | null>(null);
   const [bags, setBags] = useState<CollectionRequestBagDTO[]>([]);
+  const pagination = usePagination(bags);
   const [isLoading, setIsLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -178,8 +181,8 @@ export default function Bags() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {bags.length > 0 ? (
-                  bags.map((b) => (
+                {pagination.items.length > 0 ? (
+                  pagination.items.map((b) => (
                     <TableRow key={b.id}>
                       <TableCell className="font-medium">
                         {b.friendlyCode}
@@ -241,6 +244,8 @@ export default function Bags() {
                 )}
               </TableBody>
             </Table>
+
+            <TablePagination pagination={pagination} />
           </div>
         </div>
       )}

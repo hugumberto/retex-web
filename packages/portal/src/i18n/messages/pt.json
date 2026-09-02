@@ -179,7 +179,8 @@
       "USER": "Utilizador",
       "DRIVER": "Motorista",
       "OPS": "Operação",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "MASTER": "Master"
     },
     "blogHighlight": {
       "NONE": "Nenhum",
@@ -579,6 +580,7 @@
     "pageTitle": "Gerir Recolha",
     "formTitle": "Recolha de Encomendas",
     "empty": "Nenhuma recolha de encomendas encontrada. Crie uma nova para começar.",
+    "allStatuses": "Todos os estados",
     "statusUpdateError": "Erro ao atualizar o estado",
     "advanceTo": "Avançar para {status}",
     "confirmTooltip": "Confirmar recolha (estado Criada)",
@@ -674,6 +676,10 @@
     "bindQrPlaceholder": "Leia ou escreva e prima Enter",
     "bagBound": "Saco vinculado",
     "bindQrError": "Não foi possível vincular o QR code",
+    "addBag": "Adicionar saco",
+    "addBagHelp": "Cria um saco novo com código próprio e vincula-o a esta solicitação, independentemente do estado.",
+    "addBagSuccess": "Saco {code} criado e vinculado",
+    "addBagError": "Não foi possível criar o saco",
     "collectedBags": "Sacos recolhidos",
     "noBagsBound": "Nenhum saco vinculado",
     "finish": "Finalizar coleta",
@@ -863,7 +869,15 @@
     "breakdownByMember": "Por colaborador",
     "breakdownByAddress": "Por local de recolha",
     "member": "Colaborador",
-    "collectionSite": "Local de recolha"
+    "collectionSite": "Local de recolha",
+    "viewAs": "Ver como cliente",
+    "viewAsTitle": "Ver o portal como um cliente",
+    "viewAsDescription": "Escolha o cliente. A sessão continua a ser a sua e a vista fica em modo de leitura.",
+    "viewAsSearch": "Procurar por nome ou email",
+    "viewAsAction": "Ver como",
+    "viewAsEmpty": "Nenhum cliente encontrado",
+    "viewAsStarted": "A ver o portal como {name}",
+    "viewAsLoadError": "Não foi possível carregar os clientes"
   },
   "company": {
     "pageTitle": "Empresas",
@@ -921,5 +935,9 @@
     "addressDuplicate": "Este local de recolha já está registado",
     "addressLoadError": "Erro ao carregar locais de recolha",
     "cityDivision": "Freguesia"
+  },
+  "impersonation": {
+    "banner": "A ver o portal como {name} — modo de leitura",
+    "exit": "Voltar à minha conta"
   }
 }

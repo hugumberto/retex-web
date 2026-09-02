@@ -20,6 +20,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { CollectionRequestStatus } from '@/app/types/collection-request';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { SearchIcon } from 'lucide-react';
@@ -49,6 +51,7 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<RouteCollectionRequestBags[]>([]);
+  const pagination = usePagination(data);
 
   const handleOpenChange = async (next: boolean) => {
     setOpen(next);
@@ -104,7 +107,7 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
           </p>
         ) : (
           <div className="space-y-6">
-            {data.map((entry) => (
+            {pagination.items.map((entry) => (
               <div
                 key={entry.collectionRequest.id}
                 className="rounded-xl border border-secondary/30 p-4"
@@ -173,6 +176,7 @@ export default function RouteBagsDialog({ routeId, routeCode }: Props) {
                 </div>
               </div>
             ))}
+            <TablePagination pagination={pagination} />
           </div>
         )}
       </DialogContent>

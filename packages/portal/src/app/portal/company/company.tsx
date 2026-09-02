@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import { UsersIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -27,6 +29,7 @@ export default function Company() {
   const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [companies, setCompanies] = useState<CompanyDTO[]>([]);
+  const pagination = usePagination(companies);
   const [search, setSearch] = useState('');
 
   const fetchCompanies = useCallback(async () => {
@@ -59,60 +62,69 @@ export default function Company() {
   }, [fetchCompanies]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <Input
-          className="max-w-xs"
-          placeholder={tCommon('search')}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+    <section id="company-page" className="space-y-6">
+      <div className="flex justify-end">
         <CompanyForm onSaved={fetchCompanies} />
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{tCommon('code')}</TableHead>
-            <TableHead>{t('name')}</TableHead>
-            <TableHead>{t('taxId')}</TableHead>
-            <TableHead>{tCommon('email')}</TableHead>
-            <TableHead>{t('status')}</TableHead>
-            <TableHead>{tCommon('action')}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {companies.length === 0 ? (
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Input
+            className="max-w-xs"
+            placeholder={tCommon('search')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-4 w-full overflow-x-auto">
+          <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground">
-                {t('noCompanies')}
-              </TableCell>
+              <TableHead>{tCommon('code')}</TableHead>
+              <TableHead>{t('name')}</TableHead>
+              <TableHead>{t('taxId')}</TableHead>
+              <TableHead>{tCommon('email')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead>{tCommon('action')}</TableHead>
             </TableRow>
-          ) : (
-            companies.map((company) => (
-              <TableRow key={company.id}>
-                <TableCell>{company.friendlyCode ?? '-'}</TableCell>
-                <TableCell>{company.name}</TableCell>
-                <TableCell>{company.taxId}</TableCell>
-                <TableCell>{company.email ?? '-'}</TableCell>
-                <TableCell>
-                  {company.status === CompanyStatus.ACTIVE
-                    ? tCommon('active')
-                    : tCommon('inactive')}
-                </TableCell>
-                <TableCell className="flex gap-2">
-                  <CompanyForm company={company} onSaved={fetchCompanies} />
-                  <Button asChild variant="ghost" size="icon" title={t('members')}>
-                    <Link href={`/portal/company/${company.id}/members`}>
-                      <UsersIcon className="h-4 w-4" />
-                    </Link>
-                  </Button>
+          </TableHeader>
+          <TableBody>
+            {pagination.items.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  {t('noCompanies')}
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+            ) : (
+              pagination.items.map((company) => (
+                <TableRow key={company.id}>
+                  <TableCell>{company.friendlyCode ?? '-'}</TableCell>
+                  <TableCell>{company.name}</TableCell>
+                  <TableCell>{company.taxId}</TableCell>
+                  <TableCell>{company.email ?? '-'}</TableCell>
+                  <TableCell>
+                    {company.status === CompanyStatus.ACTIVE
+                      ? tCommon('active')
+                      : tCommon('inactive')}
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    <CompanyForm company={company} onSaved={fetchCompanies} />
+                    <Button asChild variant="ghost" size="icon" title={t('members')}>
+                      <Link href={`/portal/company/${company.id}/members`}>
+                        <UsersIcon className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination pagination={pagination} />
+      </div>
+    </section>
   );
 }

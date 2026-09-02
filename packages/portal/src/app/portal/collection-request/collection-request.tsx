@@ -2,7 +2,10 @@
 
 import { useTranslations } from 'next-intl';
 import RequesterTypeBadge from '@/components/custom/requester-type-badge';
-import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
+import {
+  CollectionRequestDTO,
+  CollectionRequestStatus,
+} from '@/app/types/collection-request';
 import { CompanyAddressDTO, CompanyPermission } from '@/app/types/company';
 import { AddressDTO, Role } from '@/app/types/user';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
@@ -20,9 +23,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import { getUserRoles } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
 import RequestDetailsDialog from './request-details-dialog';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import { MapPinOff } from 'lucide-react';
 import Link from 'next/link';
@@ -63,8 +69,13 @@ export default function CollectionRequest() {
   const t = useTranslations('collectionRequest');
   const tCommon = useTranslations('common');
   const tStatus = useTranslations('enums.collectionRequestStatus');
-  const { setPageTitle, setBreadcrumbs, user, companyContext, companyContextLoaded } =
-    useAppStore();
+  const {
+    setPageTitle,
+    setBreadcrumbs,
+    user,
+    companyContext,
+    companyContextLoaded,
+  } = useAppStore();
   const [requests, setRequests] = useState<CollectionRequestDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Um membro de empresa recolhe nos locais da empresa, não em moradas
@@ -75,10 +86,12 @@ export default function CollectionRequest() {
 
   const isCompanyMember = !!companyContext;
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
-  const isAdmin = user?.roles?.some((r) => r.role === Role.ADMIN) ?? false;
-  const [statusFilter, setStatusFilter] = useState<'ALL' | CollectionRequestStatus>(
-    'ALL'
-  );
+  // Via `getUserRoles` (e não pelas roles em bruto) para que o MASTER, que
+  // herda o ADMIN, conte como admin aqui.
+  const isAdmin = getUserRoles(user).includes(Role.ADMIN);
+  const [statusFilter, setStatusFilter] = useState<
+    'ALL' | CollectionRequestStatus
+  >('ALL');
 
   // Admin: filtra por estado e ordena (CRIADO primeiro; depois mais antigo
   // primeiro por data de criação). Restantes utilizadores veem a lista natural.
@@ -98,6 +111,8 @@ export default function CollectionRequest() {
       );
     });
   }, [requests, isAdmin, statusFilter]);
+
+  const pagination = usePagination(displayedRequests, statusFilter);
 
   const inZoneAddresses = addresses.filter((a) => a.isInServiceZone);
   const canRequest = inZoneAddresses.length > 0;
@@ -146,7 +161,9 @@ export default function CollectionRequest() {
 
   const fetchRequests = useCallback(async () => {
     try {
-      const endpoint = isUserRole ? '/me/collection-requests' : '/collection-request';
+      const endpoint = isUserRole
+        ? '/me/collection-requests'
+        : '/collection-request';
       // `/me/collection-requests` devolve um array; `/collection-request` é
       // paginado e devolve `{ data, meta }`.
       const { data, status } = await api.get<
@@ -346,9 +363,7 @@ export default function CollectionRequest() {
           ) : hasActiveRequest ? (
             <Alert className="max-w-md ml-auto">
               <AlertTitle>{t('activeRequest')}</AlertTitle>
-              <AlertDescription>
-                {t('activeRequestWarning')}
-              </AlertDescription>
+              <AlertDescription>{t('activeRequestWarning')}</AlertDescription>
             </Alert>
           ) : canRequest ? (
             <DialogForm<UserFormData>
@@ -496,7 +511,9 @@ export default function CollectionRequest() {
                 placeholder={t('emailPlaceholder')}
                 type="email"
                 className={adminErrors.email ? 'border-red-500' : ''}
-                {...adminRegister('email', { required: tCommon('requiredField') })}
+                {...adminRegister('email', {
+                  required: tCommon('requiredField'),
+                })}
               />
               <Input
                 tabIndex={4}
@@ -607,9 +624,6 @@ export default function CollectionRequest() {
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-secondary">
-            {t('listTitle')}
-          </h2>
           {isAdmin && (
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-secondary">
@@ -619,7 +633,9 @@ export default function CollectionRequest() {
                 className="h-9 rounded-md border border-secondary/40 px-2 text-sm"
                 value={statusFilter}
                 onChange={(e) =>
-                  setStatusFilter(e.target.value as 'ALL' | CollectionRequestStatus)
+                  setStatusFilter(
+                    e.target.value as 'ALL' | CollectionRequestStatus
+                  )
                 }
               >
                 <option value="ALL">{tCommon('all')}</option>
@@ -639,7 +655,9 @@ export default function CollectionRequest() {
                 <TableHead>{tCommon('code')}</TableHead>
                 <TableHead>{tCommon('name')}</TableHead>
                 <TableHead>{tCommon('email')}</TableHead>
-                <TableHead className="whitespace-normal">{tCommon('address')}</TableHead>
+                <TableHead className="whitespace-normal">
+                  {tCommon('address')}
+                </TableHead>
                 <TableHead>{t('estimatedBagsColumn')}</TableHead>
                 <TableHead>{tCommon('status')}</TableHead>
                 <TableHead>{tCommon('createdAt')}</TableHead>
@@ -647,8 +665,8 @@ export default function CollectionRequest() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {displayedRequests.length > 0 ? (
-                displayedRequests.map((request) => (
+              {pagination.items.length > 0 ? (
+                pagination.items.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
                       {request.friendlyCode ?? '-'}
@@ -669,18 +687,19 @@ export default function CollectionRequest() {
                       }`.trim()}
                     </TableCell>
                     <TableCell>{request.estimatedBags ?? '-'}</TableCell>
-                    <TableCell>
-                      {tStatus(request.status)}
-                    </TableCell>
+                    <TableCell>{tStatus(request.status)}</TableCell>
                     <TableCell className="whitespace-nowrap">
                       {request.createdAt
-                        ? new Date(request.createdAt).toLocaleDateString('pt-PT')
+                        ? new Date(request.createdAt).toLocaleDateString(
+                            'pt-PT'
+                          )
                         : '—'}
                     </TableCell>
                     <TableCell className="space-x-2">
                       <RequestDetailsDialog request={request} />
                       {(request.status === CollectionRequestStatus.CREATED ||
-                        request.status === CollectionRequestStatus.OUT_OF_ZONE) && (
+                        request.status ===
+                          CollectionRequestStatus.OUT_OF_ZONE) && (
                         <ConfirmDialog
                           trigger={
                             <Button
@@ -709,6 +728,8 @@ export default function CollectionRequest() {
               )}
             </TableBody>
           </Table>
+
+          <TablePagination pagination={pagination} />
         </div>
       </div>
     </section>

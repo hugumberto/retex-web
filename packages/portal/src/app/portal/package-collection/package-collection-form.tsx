@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/table';
 import ttServices from '@tomtom-international/web-sdk-services';
 import type { FeatureCollection } from 'geojson';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -162,6 +164,11 @@ export default function PackageCollectionForm({
     () => collectionRequests.filter((pkg) => !hasValidCoords(pkg)),
     [collectionRequests]
   );
+
+  const selectionPagination = usePagination(eligibleWithCoords);
+
+  const noCoordsPagination = usePagination(eligibleWithoutCoords);
+
 
   const selectedWithCoords = useMemo(
     () => eligibleWithCoords.filter((pkg) => collectionRequestIds?.includes(pkg.id)),
@@ -564,9 +571,13 @@ export default function PackageCollectionForm({
 
         {/* Coluna das listas */}
         <div className="min-w-0">
-          {/* Seleção de solicitações elegíveis */}
+          {/* Seleção de solicitações elegíveis (as que o mapa consegue mostrar;
+              as restantes ficam no painel "sem localização", logo abaixo, para
+              não aparecer a mesma solicitação em duas tabelas). */}
           <div className="pt-6">
-            <Title as="h3">{t('requestSelection')}</Title>
+            <Title as="h3">
+              {t('requestSelection')} ({eligibleWithCoords.length})
+            </Title>
             <div className="mt-4 w-full">
               <Table containerClassName="max-h-[50vh]">
                 <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
@@ -578,30 +589,32 @@ export default function PackageCollectionForm({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {collectionRequests.length > 0 ? (
-                    collectionRequests.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="align-top">
-                          <CheckboxForm
-                            control={control}
-                            name="collectionRequestIds"
-                            checked={collectionRequestIds?.includes(item.id)}
-                            onCheckedChange={() => toggleCollectionRequest(item.id)}
-                            label=""
-                            id={item.id}
-                            disabled={isLocked}
-                          />
-                        </TableCell>
-                        <TableCell className="whitespace-normal break-words align-top max-w-[280px]">
-                          {requesterLabel(item)}
-                          <br />
-                          {addressLabel(item)}
-                        </TableCell>
-                        <TableCell className="whitespace-normal break-words align-top">{item.address?.city ?? '-'}</TableCell>
-                        <TableCell>{item.estimatedBags ?? '-'}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
+                  {selectionPagination.items.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="align-top">
+                        <CheckboxForm
+                          control={control}
+                          name="collectionRequestIds"
+                          checked={collectionRequestIds?.includes(item.id)}
+                          onCheckedChange={() => toggleCollectionRequest(item.id)}
+                          label=""
+                          id={item.id}
+                          disabled={isLocked}
+                        />
+                      </TableCell>
+                      <TableCell className="whitespace-normal break-words align-top max-w-[280px]">
+                        {requesterLabel(item)}
+                        <br />
+                        {addressLabel(item)}
+                      </TableCell>
+                      <TableCell className="whitespace-normal break-words align-top">{item.address?.city ?? '-'}</TableCell>
+                      <TableCell>{item.estimatedBags ?? '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                  {/* Só quando não há mesmo nada: se houver solicitações sem
+                      coordenadas, elas estão listadas no painel seguinte e dizer
+                      aqui que não há nenhuma seria contraditório. */}
+                  {collectionRequests.length === 0 && (
                     <TableRow>
                       <TableCell
                         colSpan={5}
@@ -613,13 +626,17 @@ export default function PackageCollectionForm({
                   )}
                 </TableBody>
               </Table>
+
+              <TablePagination pagination={selectionPagination} />
             </div>
           </div>
 
           {/* Solicitações sem localização (não aparecem no mapa) */}
           {eligibleWithoutCoords.length > 0 && (
             <div className="pt-6">
-              <Title as="h3">{t('noLocation')}</Title>
+              <Title as="h3">
+                {t('noLocation')} ({eligibleWithoutCoords.length})
+              </Title>
               <p className="mt-1 text-xs text-muted-foreground">
                 {t('noValidCoordinates')}
               </p>
@@ -635,7 +652,7 @@ export default function PackageCollectionForm({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {eligibleWithoutCoords.map((item) => (
+                    {noCoordsPagination.items.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>
                           <CheckboxForm
@@ -656,6 +673,8 @@ export default function PackageCollectionForm({
                     ))}
                   </TableBody>
                 </Table>
+
+                <TablePagination pagination={noCoordsPagination} />
               </div>
             </div>
           )}
