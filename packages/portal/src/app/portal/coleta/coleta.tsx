@@ -24,8 +24,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import { isMaster } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { PlusIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -39,7 +41,9 @@ export default function Coleta() {
   const t = useTranslations('pickup');
   const tCommon = useTranslations('common');
   const tStatus = useTranslations('enums.collectionRequestStatus');
-  const { setPageTitle, setBreadcrumbs } = useAppStore();
+  const { user, setPageTitle, setBreadcrumbs } = useAppStore();
+  // Só o MASTER cria sacos à mão (o endpoint é exclusivo dele).
+  const canAddBag = isMaster(user);
 
   const [scanCode, setScanCode] = useState('');
   const [pkg, setPkg] = useState<CollectionRequestDTO | null>(null);
@@ -50,6 +54,7 @@ export default function Coleta() {
   const [isLoadingCollectionRequest, setIsLoadingCollectionRequest] = useState(false);
   const [qrInput, setQrInput] = useState('');
   const [isBinding, setIsBinding] = useState(false);
+  const [isAddingBag, setIsAddingBag] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
@@ -166,6 +171,29 @@ export default function Coleta() {
       requestAnimationFrame(() => qrRef.current?.focus());
     }
   }, [qrInput, pkg, canCollect]);
+
+  // Saída do MASTER quando não há etiqueta impressa: a API cria o saco com
+  // código próprio e faz o vínculo à solicitação (e à rota), em qualquer estado.
+  const handleAddBag = useCallback(async () => {
+    if (!pkg) return;
+
+    setIsAddingBag(true);
+    try {
+      const { data, status } = await api.post<CollectionRequestBagDTO>(
+        `/collection/${pkg.id}/bag`
+      );
+      if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
+      setBoundCodes((current) =>
+        current.some((bag) => bag.id === data.id) ? current : [...current, data]
+      );
+      toast.success(t('addBagSuccess', { code: data.friendlyCode }));
+    } catch (error) {
+      console.error('Erro ao criar saco:', error);
+      toast.error(errorMessage(error, t('addBagError')));
+    } finally {
+      setIsAddingBag(false);
+    }
+  }, [pkg]);
 
   const handleFinalize = useCallback(async () => {
     if (!pkg || !canCollect) return;
@@ -334,17 +362,32 @@ export default function Coleta() {
       {pkg && <CollectionRequestUserData user={pkg.user} address={pkg.address} />}
 
       {/* Vínculo de sacos */}
-      {pkg && (canCollect || isCollected) && (
+      {pkg && (canCollect || isCollected || canAddBag) && (
         <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-secondary">
               {t('collectedBags')}
             </h2>
-            <span className="text-sm text-muted-foreground">
-              {boundCodes.length}
-              {pkg.estimatedBags ? ` / ${pkg.estimatedBags}` : ''}{' '}
-              saco(s)
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">
+                {boundCodes.length}
+                {pkg.estimatedBags ? ` / ${pkg.estimatedBags}` : ''}{' '}
+                saco(s)
+              </span>
+              {canAddBag && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleAddBag}
+                  disabled={isAddingBag}
+                  title={t('addBagHelp')}
+                >
+                  <PlusIcon className="size-4" />
+                  {t('addBag')}
+                </Button>
+              )}
+            </div>
           </div>
 
           {canCollect && (
