@@ -20,6 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import { getUserRoles } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
 import RequestDetailsDialog from './request-details-dialog';
@@ -75,7 +76,9 @@ export default function CollectionRequest() {
 
   const isCompanyMember = !!companyContext;
   const isUserRole = user?.roles?.some((r) => r.role === Role.USER) ?? false;
-  const isAdmin = user?.roles?.some((r) => r.role === Role.ADMIN) ?? false;
+  // Via `getUserRoles` (e não pelas roles em bruto) para que o MASTER, que
+  // herda o ADMIN, conte como admin aqui.
+  const isAdmin = getUserRoles(user).includes(Role.ADMIN);
   const [statusFilter, setStatusFilter] = useState<'ALL' | CollectionRequestStatus>(
     'ALL'
   );

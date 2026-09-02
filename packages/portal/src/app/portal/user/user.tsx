@@ -20,6 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import { isMaster, isPrivilegedUser } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { TrashIcon } from 'lucide-react';
@@ -40,7 +41,9 @@ export default function User() {
   const tRole = useTranslations('enums.role');
   const tStatus = useTranslations('enums.userStatus');
   const tCommon = useTranslations('common');
-  const { setPageTitle, setBreadcrumbs } = useAppStore();
+  const { user: currentUser, setPageTitle, setBreadcrumbs } = useAppStore();
+  // Contas ADMIN/MASTER só são geridas por um MASTER — a API recusa na mesma.
+  const currentUserIsMaster = isMaster(currentUser);
   const [users, setUsers] = useState<UserDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -244,20 +247,24 @@ export default function User() {
                       }}
                       onSave={fetchData}
                     />
-                    <ResetPasswordForm user={user} />
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-8"
-                          disabled={isSubmitting}
-                        >
-                          <TrashIcon className="size-4" />
-                        </Button>
-                      }
-                      onConfirm={() => handleDeleteWithToast(user)}
-                    />
+                    {(currentUserIsMaster || !isPrivilegedUser(user)) && (
+                      <>
+                        <ResetPasswordForm user={user} />
+                        <ConfirmDialog
+                          trigger={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8"
+                              disabled={isSubmitting}
+                            >
+                              <TrashIcon className="size-4" />
+                            </Button>
+                          }
+                          onConfirm={() => handleDeleteWithToast(user)}
+                        />
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

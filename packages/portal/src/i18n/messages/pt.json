@@ -179,7 +179,8 @@
       "USER": "Utilizador",
       "DRIVER": "Motorista",
       "OPS": "Operação",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "MASTER": "Master"
     },
     "blogHighlight": {
       "NONE": "Nenhum",

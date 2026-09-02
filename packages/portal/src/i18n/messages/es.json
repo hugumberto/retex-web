@@ -179,7 +179,8 @@
       "USER": "Usuario",
       "DRIVER": "Transportista",
       "OPS": "Operaciones",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "MASTER": "Master"
     },
     "blogHighlight": {
       "NONE": "Ninguno",
