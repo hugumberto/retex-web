@@ -869,7 +869,15 @@
     "breakdownByMember": "Par membre",
     "breakdownByAddress": "Par lieu de collecte",
     "member": "Membre",
-    "collectionSite": "Lieu de collecte"
+    "collectionSite": "Lieu de collecte",
+    "viewAs": "Voir comme un client",
+    "viewAsTitle": "Voir le portail comme un client",
+    "viewAsDescription": "Choisissez le client. Votre session reste la vôtre et la vue est en lecture seule.",
+    "viewAsSearch": "Rechercher par nom ou e-mail",
+    "viewAsAction": "Voir comme",
+    "viewAsEmpty": "Aucun client trouvé",
+    "viewAsStarted": "Portail affiché en tant que {name}",
+    "viewAsLoadError": "Impossible de charger les clients"
   },
   "company": {
     "pageTitle": "Entreprises",
@@ -927,5 +935,9 @@
     "addressDuplicate": "Ce lieu de collecte est déjà enregistré",
     "addressLoadError": "Erreur lors du chargement des lieux de collecte",
     "cityDivision": "Commune"
+  },
+  "impersonation": {
+    "banner": "Portail affiché en tant que {name} — lecture seule",
+    "exit": "Revenir à mon compte"
   }
 }

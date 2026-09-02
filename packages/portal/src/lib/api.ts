@@ -57,13 +57,23 @@ export function refreshAccessToken(): Promise<string | null> {
 }
 
 api.interceptors.request.use((config) => {
-  const token = useAppStore.getState().accessToken;
-  if (token) {
+  const { accessToken, impersonatedUser } = useAppStore.getState();
+  if (accessToken) {
     config.headers = config.headers ?? {};
     (
       config.headers as Record<string, string>
-    ).Authorization = `Bearer ${token}`;
+    ).Authorization = `Bearer ${accessToken}`;
   }
+
+  // Modo "ver como": a API resolve o âmbito pelo cliente indicado no header. As
+  // rotas de autenticação ficam de fora — o token e o refresh são do master, e
+  // o header ali só serviria para as fazer falhar.
+  if (impersonatedUser && !config.url?.startsWith('/auth')) {
+    config.headers = config.headers ?? {};
+    (config.headers as Record<string, string>)['X-Impersonate-User'] =
+      impersonatedUser.id;
+  }
+
   return config;
 });
 

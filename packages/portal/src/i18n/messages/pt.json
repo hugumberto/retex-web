@@ -869,7 +869,15 @@
     "breakdownByMember": "Por colaborador",
     "breakdownByAddress": "Por local de recolha",
     "member": "Colaborador",
-    "collectionSite": "Local de recolha"
+    "collectionSite": "Local de recolha",
+    "viewAs": "Ver como cliente",
+    "viewAsTitle": "Ver o portal como um cliente",
+    "viewAsDescription": "Escolha o cliente. A sessão continua a ser a sua e a vista fica em modo de leitura.",
+    "viewAsSearch": "Procurar por nome ou email",
+    "viewAsAction": "Ver como",
+    "viewAsEmpty": "Nenhum cliente encontrado",
+    "viewAsStarted": "A ver o portal como {name}",
+    "viewAsLoadError": "Não foi possível carregar os clientes"
   },
   "company": {
     "pageTitle": "Empresas",
@@ -927,5 +935,9 @@
     "addressDuplicate": "Este local de recolha já está registado",
     "addressLoadError": "Erro ao carregar locais de recolha",
     "cityDivision": "Freguesia"
+  },
+  "impersonation": {
+    "banner": "A ver o portal como {name} — modo de leitura",
+    "exit": "Voltar à minha conta"
   }
 }

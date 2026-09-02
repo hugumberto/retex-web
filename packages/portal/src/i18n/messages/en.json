@@ -869,7 +869,15 @@
     "breakdownByMember": "By member",
     "breakdownByAddress": "By collection site",
     "member": "Member",
-    "collectionSite": "Collection site"
+    "collectionSite": "Collection site",
+    "viewAs": "View as customer",
+    "viewAsTitle": "View the portal as a customer",
+    "viewAsDescription": "Pick the customer. Your session stays yours and the view is read-only.",
+    "viewAsSearch": "Search by name or email",
+    "viewAsAction": "View as",
+    "viewAsEmpty": "No customer found",
+    "viewAsStarted": "Viewing the portal as {name}",
+    "viewAsLoadError": "Could not load the customers"
   },
   "company": {
     "pageTitle": "Companies",
@@ -927,5 +935,9 @@
     "addressDuplicate": "This collection site is already registered",
     "addressLoadError": "Error loading collection sites",
     "cityDivision": "Parish"
+  },
+  "impersonation": {
+    "banner": "Viewing the portal as {name} — read-only",
+    "exit": "Back to my account"
   }
 }

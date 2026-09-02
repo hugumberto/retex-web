@@ -12,6 +12,7 @@ import { AppSidebar, RetexTopBar } from '@/components/custom/app-sidebar';
 import { Breadcrumbs } from '@/components/custom/breadcrumbs';
 import React from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import ImpersonationBanner from '@/components/custom/impersonation-banner';
 import AuthBootstrapper from './guard/auth-bootstrapper';
 import CompanyBootstrapper from './guard/company-bootstrapper';
 import Protected from './guard/guard';
@@ -36,6 +37,7 @@ export default function PortalLayout({
           <AppSidebar />
           <SidebarInset className="bg-white min-w-0">
             <RetexTopBar />
+            <ImpersonationBanner />
 
             {/* Breadcrumbs */}
 

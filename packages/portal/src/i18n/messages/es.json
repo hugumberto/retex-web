@@ -869,7 +869,15 @@
     "breakdownByMember": "Por colaborador",
     "breakdownByAddress": "Por lugar de recogida",
     "member": "Colaborador",
-    "collectionSite": "Lugar de recogida"
+    "collectionSite": "Lugar de recogida",
+    "viewAs": "Ver como cliente",
+    "viewAsTitle": "Ver el portal como un cliente",
+    "viewAsDescription": "Elija el cliente. Su sesión sigue siendo la suya y la vista es de solo lectura.",
+    "viewAsSearch": "Buscar por nombre o email",
+    "viewAsAction": "Ver como",
+    "viewAsEmpty": "No se ha encontrado ningún cliente",
+    "viewAsStarted": "Viendo el portal como {name}",
+    "viewAsLoadError": "No se han podido cargar los clientes"
   },
   "company": {
     "pageTitle": "Empresas",
@@ -927,5 +935,9 @@
     "addressDuplicate": "Este lugar de recogida ya está registrado",
     "addressLoadError": "Error al cargar los lugares de recogida",
     "cityDivision": "Distrito"
+  },
+  "impersonation": {
+    "banner": "Viendo el portal como {name} — solo lectura",
+    "exit": "Volver a mi cuenta"
   }
 }
