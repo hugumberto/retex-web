@@ -27,7 +27,14 @@ import {
   TrashIcon,
 } from 'lucide-react';
 import { CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
-import { useEffect, useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { PaginatedResult } from '../../types/helper';
 import PackageCollectionForm from './package-collection-form';
@@ -40,6 +47,14 @@ const NEXT_STATUS: Partial<Record<CollectionStatus, CollectionStatus>> = {
   [CollectionStatus.WAITING_TO_START]: CollectionStatus.IN_TRANSIT,
   [CollectionStatus.IN_TRANSIT]: CollectionStatus.FINISHED,
 };
+
+// A API pagina a 10 por omissão e este ecrã não tem paginação: pedimos o máximo
+// permitido por página (o DTO limita a 100) e seguimos as páginas seguintes, para
+// a listagem ser mesmo toda. O teto de páginas é só uma salvaguarda.
+const PAGE_LIMIT = 100;
+const MAX_PAGES = 20;
+
+const ALL_STATUSES = 'ALL';
 
 const escapeHtml = (value: string) =>
   value
@@ -59,12 +74,36 @@ export default function PackageCollection() {
   const [packageCollections, setPackageCollections] = useState<
     PackageCollectionTableDTO[]
   >([]);
+  const [statusFilter, setStatusFilter] = useState<
+    CollectionStatus | typeof ALL_STATUSES
+  >(ALL_STATUSES);
+
+  // Filtro do lado do cliente: a lista já vem toda, e assim trocar de estado é
+  // imediato e não gasta um pedido — o mesmo que o ecrã de Utilizadores faz.
+  const filteredCollections = useMemo(
+    () =>
+      packageCollections.filter(
+        (collection) =>
+          statusFilter === ALL_STATUSES || collection.status === statusFilter
+      ),
+    [packageCollections, statusFilter]
+  );
 
   const fetchData = async () => {
-    const { data } = await api.get<PaginatedResult<PackageCollectionTableDTO>>(
-      `/route`
-    );
-    setPackageCollections(data.data);
+    const collected: PackageCollectionTableDTO[] = [];
+    let page = 1;
+    let totalPages = 1;
+
+    do {
+      const { data } = await api.get<PaginatedResult<PackageCollectionTableDTO>>(
+        `/route?page=${page}&limit=${PAGE_LIMIT}`
+      );
+      collected.push(...data.data);
+      totalPages = data.meta?.totalPages ?? 1;
+      page += 1;
+    } while (page <= totalPages && page <= MAX_PAGES);
+
+    setPackageCollections(collected);
   };
 
   useEffect(() => {
@@ -639,7 +678,27 @@ export default function PackageCollection() {
       id="package-collection-page"
       className=" flex flex-col items-center"
     >
-      <PackageCollectionForm onSave={() => onSave()} />
+      <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Select
+          value={statusFilter}
+          onValueChange={(value) =>
+            setStatusFilter(value as CollectionStatus | typeof ALL_STATUSES)
+          }
+        >
+          <SelectTrigger className="w-full sm:w-52">
+            <SelectValue placeholder={tCommon('status')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_STATUSES}>{t('allStatuses')}</SelectItem>
+            {Object.values(CollectionStatus).map((status) => (
+              <SelectItem key={status} value={status}>
+                {tStatus(status)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <PackageCollectionForm onSave={() => onSave()} />
+      </div>
 
       <div className="mt-4 w-full">
         <Table>
@@ -655,7 +714,7 @@ export default function PackageCollection() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {packageCollections?.map((packageCollection) => (
+            {filteredCollections?.map((packageCollection) => (
               <TableRow key={packageCollection.id}>
                 <TableCell className="font-medium">
                   {packageCollection.friendlyCode ?? '-'}
@@ -854,7 +913,7 @@ export default function PackageCollection() {
                 </TableCell>
               </TableRow>
             ))}
-            {packageCollections.length === 0 && (
+            {filteredCollections.length === 0 && (
               <TableRow>
                 <TableCell
                   colSpan={7}

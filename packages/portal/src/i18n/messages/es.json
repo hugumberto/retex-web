@@ -580,6 +580,7 @@
     "pageTitle": "Gestionar recogida",
     "formTitle": "Recogida de paquetes",
     "empty": "No se ha encontrado ninguna recogida de paquetes. Crea una nueva para empezar.",
+    "allStatuses": "Todos los estados",
     "statusUpdateError": "Error al actualizar el estado",
     "advanceTo": "Avanzar a {status}",
     "confirmTooltip": "Confirmar recogida (estado Creada)",

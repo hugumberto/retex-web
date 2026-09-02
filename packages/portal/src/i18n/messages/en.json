@@ -580,6 +580,7 @@
     "pageTitle": "Manage collection",
     "formTitle": "Package collection",
     "empty": "No package collection found. Create a new one to get started.",
+    "allStatuses": "All statuses",
     "statusUpdateError": "Error updating the status",
     "advanceTo": "Advance to {status}",
     "confirmTooltip": "Confirm collection (Created status)",

@@ -580,6 +580,7 @@
     "pageTitle": "Gérer la collecte",
     "formTitle": "Collecte de colis",
     "empty": "Aucune collecte de colis trouvée. Créez-en une nouvelle pour commencer.",
+    "allStatuses": "Tous les statuts",
     "statusUpdateError": "Erreur lors de la mise à jour du statut",
     "advanceTo": "Passer à {status}",
     "confirmTooltip": "Confirmer la collecte (statut Créée)",

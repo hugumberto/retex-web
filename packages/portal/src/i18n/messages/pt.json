@@ -580,6 +580,7 @@
     "pageTitle": "Gerir Recolha",
     "formTitle": "Recolha de Encomendas",
     "empty": "Nenhuma recolha de encomendas encontrada. Crie uma nova para começar.",
+    "allStatuses": "Todos os estados",
     "statusUpdateError": "Erro ao atualizar o estado",
     "advanceTo": "Avançar para {status}",
     "confirmTooltip": "Confirmar recolha (estado Criada)",
