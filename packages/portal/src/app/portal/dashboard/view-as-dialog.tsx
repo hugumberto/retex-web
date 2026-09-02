@@ -11,6 +11,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { isPrivilegedUser } from '@/lib/access-control';
 import api from '@/lib/api';
 import { fetchCompanyContext } from '@/service/company';
@@ -60,6 +62,8 @@ export default function ViewAsDialog() {
     );
   }, [clients, query]);
 
+  const pagination = usePagination(filtered, query);
+
   const handleSelect = async (user: UserDTO) => {
     startImpersonation(user);
     setIsOpen(false);
@@ -93,9 +97,9 @@ export default function ViewAsDialog() {
         />
 
         <div className="max-h-[45vh] overflow-y-auto">
-          {filtered.length > 0 ? (
+          {pagination.items.length > 0 ? (
             <ul className="divide-y">
-              {filtered.map((user) => (
+              {pagination.items.map((user) => (
                 <li
                   key={user.id}
                   className="flex items-center justify-between gap-3 py-2"
@@ -125,6 +129,8 @@ export default function ViewAsDialog() {
             </p>
           )}
         </div>
+
+        <TablePagination pagination={pagination} />
       </DialogContent>
     </Dialog>
   );

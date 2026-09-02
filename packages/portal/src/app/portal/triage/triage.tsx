@@ -16,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import api from '@/lib/api';
 import { STATUS_CLASS } from '@/lib/collection-request-status';
 import { isSuccessStatus } from '@/lib/utils';
@@ -171,6 +173,7 @@ export default function Triage() {
   // Mostra todos os sacos: processados, o que está em processamento (ativo)
   // e os pendentes (ainda por processar).
   const visibleBags = bags;
+  const pagination = usePagination(visibleBags);
   const activeBag = bags.find((bag) => bag.id === activeBagId) ?? null;
 
   const handleScanCodeBlur = async () => {
@@ -777,8 +780,8 @@ export default function Triage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {visibleBags.length > 0 ? (
-                visibleBags.map((bag) => {
+              {pagination.items.length > 0 ? (
+                pagination.items.map((bag) => {
                   // Soma das quantidades dos itens vinculados a este saco.
                   const itemsCount = triageItems
                     .filter((item) => item.bagId === bag.id)
@@ -838,6 +841,8 @@ export default function Triage() {
               )}
             </TableBody>
           </Table>
+
+          <TablePagination pagination={pagination} />
         </div>
       )}
 

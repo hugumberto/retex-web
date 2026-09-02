@@ -24,6 +24,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { isMaster } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
@@ -51,6 +53,8 @@ export default function Coleta() {
   // utilizador escolher qual pacote recolher.
   const [routeCollectionRequests, setRouteCollectionRequests] = useState<CollectionRequestDTO[]>([]);
   const [boundCodes, setBoundCodes] = useState<CollectionRequestBagDTO[]>([]);
+  const routePagination = usePagination(routeCollectionRequests);
+  const bagsPagination = usePagination(boundCodes);
   const [isLoadingCollectionRequest, setIsLoadingCollectionRequest] = useState(false);
   const [qrInput, setQrInput] = useState('');
   const [isBinding, setIsBinding] = useState(false);
@@ -328,7 +332,7 @@ export default function Coleta() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {routeCollectionRequests.map((item) => (
+                {routePagination.items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium tracking-wide">
                       {item.friendlyCode ?? '-'}
@@ -354,6 +358,8 @@ export default function Coleta() {
                 ))}
               </TableBody>
             </Table>
+
+            <TablePagination pagination={routePagination} />
           </div>
         </div>
       )}
@@ -420,8 +426,8 @@ export default function Coleta() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {boundCodes.length > 0 ? (
-                boundCodes.map((bag) => (
+              {bagsPagination.items.length > 0 ? (
+                bagsPagination.items.map((bag) => (
                   <TableRow key={bag.id}>
                     <TableCell className="font-medium tracking-wide">
                       {bag.friendlyCode}
@@ -445,6 +451,8 @@ export default function Coleta() {
               )}
             </TableBody>
           </Table>
+
+          <TablePagination pagination={bagsPagination} />
 
           {canCollect && (
             <div className="mt-5 flex justify-end">

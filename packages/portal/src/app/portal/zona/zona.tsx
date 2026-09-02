@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import { useLocale, useTranslations } from 'next-intl';
 import { SendIcon, TrashIcon } from 'lucide-react';
@@ -26,6 +28,7 @@ export default function Zona() {
   const locale = useLocale();
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [zones, setZones] = useState<ZoneDTO[]>([]);
+  const pagination = usePagination(zones);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchZones = useCallback(async () => {
@@ -102,71 +105,77 @@ export default function Zona() {
   }, [fetchZones]);
 
   return (
-    <section id="zona-page" className="flex flex-col items-center">
-      <ZonaForm onSave={handleSave} />
+    <section id="zona-page" className="space-y-6">
+      <div className="flex justify-end">
+        <ZonaForm onSave={handleSave} />
+      </div>
 
-      <div className="mt-4 w-full">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{tCommon('city')}</TableHead>
-              <TableHead>{t('createdAt')}</TableHead>
-              <TableHead>{tCommon('action')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {zones.length > 0 ? (
-              zones.map((zone) => (
-                <TableRow key={zone.id}>
-                  <TableCell className="capitalize">{zone.city}</TableCell>
-                  <TableCell>
-                    {new Date(zone.createdAt).toLocaleDateString(locale)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <ConfirmDialog
-                        title={t('notifyTitle')}
-                        description={t('notifyDescription')}
-                        trigger={
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            disabled={isSubmitting}
-                            className="size-8"
-                            title={t('notifyInactiveTooltip')}
-                          >
-                            <SendIcon />
-                          </Button>
-                        }
-                        onConfirm={() => handleNotify(zone.id)}
-                      />
-                      <ConfirmDialog
-                        trigger={
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            disabled={isSubmitting}
-                            className="size-8"
-                            title={t('deleteTooltip')}
-                          >
-                            <TrashIcon />
-                          </Button>
-                        }
-                        onConfirm={() => handleDeleteWithToast(zone.id)}
-                      />
-                    </div>
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <div className="w-full overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{tCommon('city')}</TableHead>
+                <TableHead>{t('createdAt')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pagination.items.length > 0 ? (
+                pagination.items.map((zone) => (
+                  <TableRow key={zone.id}>
+                    <TableCell className="capitalize">{zone.city}</TableCell>
+                    <TableCell>
+                      {new Date(zone.createdAt).toLocaleDateString(locale)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <ConfirmDialog
+                          title={t('notifyTitle')}
+                          description={t('notifyDescription')}
+                          trigger={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={isSubmitting}
+                              className="size-8"
+                              title={t('notifyInactiveTooltip')}
+                            >
+                              <SendIcon />
+                            </Button>
+                          }
+                          onConfirm={() => handleNotify(zone.id)}
+                        />
+                        <ConfirmDialog
+                          trigger={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={isSubmitting}
+                              className="size-8"
+                              title={t('deleteTooltip')}
+                            >
+                              <TrashIcon />
+                            </Button>
+                          }
+                          onConfirm={() => handleDeleteWithToast(zone.id)}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center py-6 text-muted-foreground">
+                    {t('empty')}
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3} className="text-center py-6 text-muted-foreground">
-                  {t('empty')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination pagination={pagination} />
       </div>
     </section>
   );

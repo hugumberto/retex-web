@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import { useTranslations } from 'next-intl';
 import { PencilIcon, TrashIcon } from 'lucide-react';
@@ -27,8 +29,14 @@ export default function Faq() {
   const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [categories, setCategories] = useState<FaqCategoryDTO[]>([]);
+  const pagination = usePagination(categories);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itemsCategory, setItemsCategory] = useState<FaqCategoryDTO | null>(null);
+  // A chave de reposição é a categoria: abrir outra volta à primeira página.
+  const itemsPagination = usePagination(
+    itemsCategory?.items ?? [],
+    itemsCategory?.id
+  );
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -137,8 +145,8 @@ export default function Faq() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.length > 0 ? (
-                categories.map((cat) => (
+              {pagination.items.length > 0 ? (
+                pagination.items.map((cat) => (
                   <TableRow key={cat.id}>
                     <TableCell className="font-medium">{cat.title}</TableCell>
                     <TableCell>
@@ -194,6 +202,8 @@ export default function Faq() {
               )}
             </TableBody>
           </Table>
+
+          <TablePagination pagination={pagination} />
         </div>
       </div>
 
@@ -222,8 +232,8 @@ export default function Faq() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(itemsCategory?.items?.length ?? 0) > 0 ? (
-                (itemsCategory?.items ?? []).map((item: FaqItemDTO) => (
+              {itemsPagination.items.length > 0 ? (
+                itemsPagination.items.map((item: FaqItemDTO) => (
                   <TableRow key={item.id}>
                     <TableCell className="max-w-[200px] truncate">{item.title}</TableCell>
                     <TableCell className="max-w-[200px] truncate text-muted-foreground">{item.description}</TableCell>
@@ -262,6 +272,8 @@ export default function Faq() {
               )}
             </TableBody>
           </Table>
+
+          <TablePagination pagination={itemsPagination} />
         </DialogContent>
       </Dialog>
     </section>

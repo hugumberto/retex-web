@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/table';
 import ttServices from '@tomtom-international/web-sdk-services';
 import type { FeatureCollection } from 'geojson';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -162,6 +164,11 @@ export default function PackageCollectionForm({
     () => collectionRequests.filter((pkg) => !hasValidCoords(pkg)),
     [collectionRequests]
   );
+
+  const selectionPagination = usePagination(eligibleWithCoords);
+
+  const noCoordsPagination = usePagination(eligibleWithoutCoords);
+
 
   const selectedWithCoords = useMemo(
     () => eligibleWithCoords.filter((pkg) => collectionRequestIds?.includes(pkg.id)),
@@ -582,7 +589,7 @@ export default function PackageCollectionForm({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {eligibleWithCoords.map((item) => (
+                  {selectionPagination.items.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="align-top">
                         <CheckboxForm
@@ -619,6 +626,8 @@ export default function PackageCollectionForm({
                   )}
                 </TableBody>
               </Table>
+
+              <TablePagination pagination={selectionPagination} />
             </div>
           </div>
 
@@ -643,7 +652,7 @@ export default function PackageCollectionForm({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {eligibleWithoutCoords.map((item) => (
+                    {noCoordsPagination.items.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>
                           <CheckboxForm
@@ -664,6 +673,8 @@ export default function PackageCollectionForm({
                     ))}
                   </TableBody>
                 </Table>
+
+                <TablePagination pagination={noCoordsPagination} />
               </div>
             </div>
           )}

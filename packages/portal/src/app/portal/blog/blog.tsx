@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/table';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import { useTranslations } from 'next-intl';
 import { EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
@@ -26,6 +28,7 @@ export default function BlogCrud() {
   const tCommon = useTranslations('common');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [posts, setPosts] = useState<BlogPostDTO[]>([]);
+  const pagination = usePagination(posts);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchPosts = useCallback(async () => {
@@ -100,79 +103,85 @@ export default function BlogCrud() {
   };
 
   return (
-    <section className="flex flex-col">
-      <div className="flex justify-end mb-4">
+    <section className="space-y-6">
+      <div className="flex justify-end">
         <Button asChild variant="secondary">
           <Link href="/portal/blog/new">{t('createPost')}</Link>
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{tCommon('title')}</TableHead>
-            <TableHead>{tCommon('status')}</TableHead>
-            <TableHead>{t('highlight')}</TableHead>
-            <TableHead>{tCommon('actions')}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {posts.length > 0 ? (
-            posts.map((post) => (
-              <TableRow key={post.id}>
-                <TableCell>{post.title}</TableCell>
-                <TableCell>
-                  {post.status === BlogPostStatus.PUBLISHED
-                    ? t('statusPublished')
-                    : t('statusDraft')}
-                </TableCell>
-                <TableCell>{highlightLabel(post.highlight)}</TableCell>
-                <TableCell className="space-x-2">
-                  <Button asChild variant="ghost" size="icon" className="size-8">
-                    <Link href={`/portal/blog/${post.id}`}>
-                      <PencilIcon className="size-4" />
-                    </Link>
-                  </Button>
-                  {post.status === BlogPostStatus.DRAFT && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8"
-                      title={t('publish')}
-                      onClick={() => handlePublish(post.id)}
-                      disabled={isSubmitting}
-                    >
-                      <EyeIcon className="size-4" />
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <div className="w-full overflow-x-auto">
+          <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{tCommon('title')}</TableHead>
+              <TableHead>{tCommon('status')}</TableHead>
+              <TableHead>{t('highlight')}</TableHead>
+              <TableHead>{tCommon('actions')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pagination.items.length > 0 ? (
+              pagination.items.map((post) => (
+                <TableRow key={post.id}>
+                  <TableCell>{post.title}</TableCell>
+                  <TableCell>
+                    {post.status === BlogPostStatus.PUBLISHED
+                      ? t('statusPublished')
+                      : t('statusDraft')}
+                  </TableCell>
+                  <TableCell>{highlightLabel(post.highlight)}</TableCell>
+                  <TableCell className="space-x-2">
+                    <Button asChild variant="ghost" size="icon" className="size-8">
+                      <Link href={`/portal/blog/${post.id}`}>
+                        <PencilIcon className="size-4" />
+                      </Link>
                     </Button>
-                  )}
-                  <ConfirmDialog
-                    trigger={
+                    {post.status === BlogPostStatus.DRAFT && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        disabled={isSubmitting}
                         className="size-8"
+                        title={t('publish')}
+                        onClick={() => handlePublish(post.id)}
+                        disabled={isSubmitting}
                       >
-                        <TrashIcon className="size-4" />
+                        <EyeIcon className="size-4" />
                       </Button>
-                    }
-                    onConfirm={() => handleDeleteWithToast(post.id)}
-                  />
+                    )}
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isSubmitting}
+                          className="size-8"
+                        >
+                          <TrashIcon className="size-4" />
+                        </Button>
+                      }
+                      onConfirm={() => handleDeleteWithToast(post.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="text-center py-6 text-muted-foreground"
+                >
+                  {t('empty')}
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={4}
-                className="text-center py-6 text-muted-foreground"
-              >
-                {t('empty')}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination pagination={pagination} />
+      </div>
     </section>
   );
 }

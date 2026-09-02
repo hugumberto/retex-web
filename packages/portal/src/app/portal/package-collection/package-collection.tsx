@@ -17,6 +17,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import TablePagination from '@/components/custom/table-pagination';
+import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import {
   CheckCircle2Icon,
@@ -88,6 +90,8 @@ export default function PackageCollection() {
       ),
     [packageCollections, statusFilter]
   );
+
+  const pagination = usePagination(filteredCollections, statusFilter);
 
   const fetchData = async () => {
     const collected: PackageCollectionTableDTO[] = [];
@@ -674,257 +678,261 @@ export default function PackageCollection() {
   };
 
   return (
-    <section
-      id="package-collection-page"
-      className=" flex flex-col items-center"
-    >
-      <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Select
-          value={statusFilter}
-          onValueChange={(value) =>
-            setStatusFilter(value as CollectionStatus | typeof ALL_STATUSES)
-          }
-        >
-          <SelectTrigger className="w-full sm:w-52">
-            <SelectValue placeholder={tCommon('status')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL_STATUSES}>{t('allStatuses')}</SelectItem>
-            {Object.values(CollectionStatus).map((status) => (
-              <SelectItem key={status} value={status}>
-                {tStatus(status)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <section id="package-collection-page" className="space-y-6">
+      <div className="flex justify-end">
         <PackageCollectionForm onSave={() => onSave()} />
       </div>
 
-      <div className="mt-4 w-full">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{tCommon('code')}</TableHead>
-              <TableHead>{t('driver')}</TableHead>
-              <TableHead>{t('pickupDate')}</TableHead>
-              <TableHead>{t('requestCount')}</TableHead>
-              <TableHead>{t('confirmations')}</TableHead>
-              <TableHead>{tCommon('status')}</TableHead>
-              <TableHead>{tCommon('action')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCollections?.map((packageCollection) => (
-              <TableRow key={packageCollection.id}>
-                <TableCell className="font-medium">
-                  {packageCollection.friendlyCode ?? '-'}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}
-                </TableCell>
-                <TableCell>
-                  {packageCollection.startDate
-                    ? new Date(packageCollection.startDate).toLocaleDateString(
-                        'pt-PT'
-                      )
-                    : '-'}
-                </TableCell>
-                <TableCell>
-                  {packageCollection.collectionRequestsCount}
-                </TableCell>
-                <TableCell>
-                  {packageCollection.confirmedCount ?? 0}
-                  {' / '}
-                  {packageCollection.collectionRequestsCount}
-                </TableCell>
-                <TableCell>
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      packageCollection.status === CollectionStatus.IN_TRANSIT
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : packageCollection.status ===
-                          CollectionStatus.WAITING_TO_START
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}
-                  >
-                    {tStatus(packageCollection.status) ??
-                      packageCollection.status}
-                  </span>
-                </TableCell>
-                <TableCell className="space-x-2">
-                  <RouteBagsDialog
-                    routeId={packageCollection.id}
-                    routeCode={packageCollection.friendlyCode}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-8"
-                    onClick={async () => {
-                      await toast.promise(
-                        handlePrintRoute(packageCollection.id),
-                        {
-                          loading: t('preparingPrint'),
-                          success: () => t('printReady'),
-                          error: () => t('printError'),
-                        }
-                      );
-                    }}
-                    title={t('printRouteTooltip')}
-                  >
-                    <PrinterIcon />
-                  </Button>
-                  {(packageCollection.status === CollectionStatus.IN_TRANSIT ||
-                    packageCollection.status === CollectionStatus.FINISHED) && (
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Select
+            value={statusFilter}
+            onValueChange={(value) =>
+              setStatusFilter(value as CollectionStatus | typeof ALL_STATUSES)
+            }
+          >
+            <SelectTrigger className="w-full sm:w-52">
+              <SelectValue placeholder={tCommon('status')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_STATUSES}>{t('allStatuses')}</SelectItem>
+              {Object.values(CollectionStatus).map((status) => (
+                <SelectItem key={status} value={status}>
+                  {tStatus(status)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="mt-4 w-full overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{tCommon('code')}</TableHead>
+                <TableHead>{t('driver')}</TableHead>
+                <TableHead>{t('pickupDate')}</TableHead>
+                <TableHead>{t('requestCount')}</TableHead>
+                <TableHead>{t('confirmations')}</TableHead>
+                <TableHead>{tCommon('status')}</TableHead>
+                <TableHead>{tCommon('action')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pagination.items.map((packageCollection) => (
+                <TableRow key={packageCollection.id}>
+                  <TableCell className="font-medium">
+                    {packageCollection.friendlyCode ?? '-'}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {`${packageCollection.driver.firstName} ${packageCollection.driver.lastName}`}
+                  </TableCell>
+                  <TableCell>
+                    {packageCollection.startDate
+                      ? new Date(packageCollection.startDate).toLocaleDateString(
+                          'pt-PT'
+                        )
+                      : '-'}
+                  </TableCell>
+                  <TableCell>
+                    {packageCollection.collectionRequestsCount}
+                  </TableCell>
+                  <TableCell>
+                    {packageCollection.confirmedCount ?? 0}
+                    {' / '}
+                    {packageCollection.collectionRequestsCount}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        packageCollection.status === CollectionStatus.IN_TRANSIT
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : packageCollection.status ===
+                            CollectionStatus.WAITING_TO_START
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}
+                    >
+                      {tStatus(packageCollection.status) ??
+                        packageCollection.status}
+                    </span>
+                  </TableCell>
+                  <TableCell className="space-x-2">
+                    <RouteBagsDialog
+                      routeId={packageCollection.id}
+                      routeCode={packageCollection.friendlyCode}
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
                       className="size-8"
                       onClick={async () => {
                         await toast.promise(
-                          handlePrintQrCodes(packageCollection.id),
+                          handlePrintRoute(packageCollection.id),
                           {
-                            loading: t('preparingQr'),
-                            success: () => t('qrPrintReady'),
-                            error: (e) =>
-                              (e as Error)?.message || t('qrPrintError'),
+                            loading: t('preparingPrint'),
+                            success: () => t('printReady'),
+                            error: () => t('printError'),
                           }
                         );
                       }}
-                      title={t('printQrTooltip')}
+                      title={t('printRouteTooltip')}
                     >
-                      <QrCodeIcon />
+                      <PrinterIcon />
                     </Button>
-                  )}
-                  {packageCollection.status === CollectionStatus.FINISHED && (
-                    <ConfirmDialog
-                      title={t('surveyTitle')}
-                      description={t('surveyDescription')}
-                      confirmText={t('surveyConfirm')}
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isSubmitting}
-                          className="size-8 text-secondary hover:text-secondary/80"
-                          title={t('surveyTooltip')}
-                        >
-                          <MailIcon />
-                        </Button>
-                      }
-                      onConfirm={async () => {
-                        await toast.promise(
-                          handleDispatchSurvey(packageCollection.id),
-                          {
-                            loading: t('sendingSurvey'),
-                            success: () => t('surveySuccess'),
-                            error: () => t('surveyError'),
-                          }
-                        );
-                      }}
+                    {(packageCollection.status === CollectionStatus.IN_TRANSIT ||
+                      packageCollection.status === CollectionStatus.FINISHED) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8"
+                        onClick={async () => {
+                          await toast.promise(
+                            handlePrintQrCodes(packageCollection.id),
+                            {
+                              loading: t('preparingQr'),
+                              success: () => t('qrPrintReady'),
+                              error: (e) =>
+                                (e as Error)?.message || t('qrPrintError'),
+                            }
+                          );
+                        }}
+                        title={t('printQrTooltip')}
+                      >
+                        <QrCodeIcon />
+                      </Button>
+                    )}
+                    {packageCollection.status === CollectionStatus.FINISHED && (
+                      <ConfirmDialog
+                        title={t('surveyTitle')}
+                        description={t('surveyDescription')}
+                        confirmText={t('surveyConfirm')}
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8 text-secondary hover:text-secondary/80"
+                            title={t('surveyTooltip')}
+                          >
+                            <MailIcon />
+                          </Button>
+                        }
+                        onConfirm={async () => {
+                          await toast.promise(
+                            handleDispatchSurvey(packageCollection.id),
+                            {
+                              loading: t('sendingSurvey'),
+                              success: () => t('surveySuccess'),
+                              error: () => t('surveyError'),
+                            }
+                          );
+                        }}
+                      />
+                    )}
+                    <PackageCollectionForm
+                      packageCollectionId={packageCollection.id}
+                      onSave={() => onSave()}
                     />
-                  )}
-                  <PackageCollectionForm
-                    packageCollectionId={packageCollection.id}
-                    onSave={() => onSave()}
-                  />
-                  {packageCollection.status === CollectionStatus.DRAFTING && (
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isSubmitting}
-                          className="size-8 text-green-600 hover:text-green-700"
-                          title={t('confirmTooltip')}
-                        >
-                          <CheckCircle2Icon />
-                        </Button>
-                      }
-                      onConfirm={async () => {
-                        await toast.promise(
-                          handleSetCreated(packageCollection.id),
-                          {
-                            loading: 'Loading...',
-                            success: () => t('confirmSuccess'),
-                            error: () => t('confirmError'),
-                          }
-                        );
-                      }}
-                    />
-                  )}
-                  {NEXT_STATUS[packageCollection.status] && (
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isSubmitting}
-                          className="size-8 text-blue-600 hover:text-blue-700"
-                          title={t('advanceTo', {
-                            status: tStatus(
-                              NEXT_STATUS[packageCollection.status]!
-                            ),
-                          })}
-                        >
-                          <ChevronsRightIcon />
-                        </Button>
-                      }
-                      onConfirm={async () => {
-                        const next = NEXT_STATUS[packageCollection.status];
-                        if (!next) return;
-                        await toast.promise(
-                          handleAdvanceStatus(packageCollection.id, next),
-                          {
-                            loading: 'Loading...',
-                            success: () =>
-                              `Estado atualizado para ${tStatus(next) ?? next}`,
-                            error: () => t('statusUpdateError'),
-                          }
-                        );
-                      }}
-                    />
-                  )}
-                  {packageCollection.status !== CollectionStatus.FINISHED && (
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isSubmitting}
-                          className="size-8"
-                        >
-                          <TrashIcon />
-                        </Button>
-                      }
-                      onConfirm={async () => {
-                        await toast.promise(
-                          handleDelete(packageCollection.id),
-                          {
-                            loading: 'Loading...',
-                            success: () => t('deactivateSuccess'),
-                            error: () => t('deactivateError'),
-                          }
-                        );
-                      }}
-                    />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredCollections.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center text-sm text-gray-500"
-                >
-                  {t('empty')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                    {packageCollection.status === CollectionStatus.DRAFTING && (
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8 text-green-600 hover:text-green-700"
+                            title={t('confirmTooltip')}
+                          >
+                            <CheckCircle2Icon />
+                          </Button>
+                        }
+                        onConfirm={async () => {
+                          await toast.promise(
+                            handleSetCreated(packageCollection.id),
+                            {
+                              loading: 'Loading...',
+                              success: () => t('confirmSuccess'),
+                              error: () => t('confirmError'),
+                            }
+                          );
+                        }}
+                      />
+                    )}
+                    {NEXT_STATUS[packageCollection.status] && (
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8 text-blue-600 hover:text-blue-700"
+                            title={t('advanceTo', {
+                              status: tStatus(
+                                NEXT_STATUS[packageCollection.status]!
+                              ),
+                            })}
+                          >
+                            <ChevronsRightIcon />
+                          </Button>
+                        }
+                        onConfirm={async () => {
+                          const next = NEXT_STATUS[packageCollection.status];
+                          if (!next) return;
+                          await toast.promise(
+                            handleAdvanceStatus(packageCollection.id, next),
+                            {
+                              loading: 'Loading...',
+                              success: () =>
+                                `Estado atualizado para ${tStatus(next) ?? next}`,
+                              error: () => t('statusUpdateError'),
+                            }
+                          );
+                        }}
+                      />
+                    )}
+                    {packageCollection.status !== CollectionStatus.FINISHED && (
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={isSubmitting}
+                            className="size-8"
+                          >
+                            <TrashIcon />
+                          </Button>
+                        }
+                        onConfirm={async () => {
+                          await toast.promise(
+                            handleDelete(packageCollection.id),
+                            {
+                              loading: 'Loading...',
+                              success: () => t('deactivateSuccess'),
+                              error: () => t('deactivateError'),
+                            }
+                          );
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {pagination.items.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="text-center text-sm text-gray-500"
+                  >
+                    {t('empty')}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination pagination={pagination} />
       </div>
     </section>
   );

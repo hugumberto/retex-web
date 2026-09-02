@@ -49,7 +49,7 @@ export default function MyCompanyMembers() {
   }, [fetchAll, setBreadcrumbs, setPageTitle, t]);
 
   return (
-    <section id="my-company-members-page" className="flex flex-col gap-4">
+    <section id="my-company-members-page" className="space-y-6">
       <div className="flex justify-end">
         <MemberForm
           basePath={BASE_PATH}
@@ -59,14 +59,18 @@ export default function MyCompanyMembers() {
         />
       </div>
 
-      <MemberTable
-        members={members}
-        profiles={profiles}
-        basePath={BASE_PATH}
-        canManage
-        currentUserId={user?.id}
-        onChanged={fetchAll}
-      />
+      <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
+        <div className="w-full overflow-x-auto">
+          <MemberTable
+            members={members}
+            profiles={profiles}
+            basePath={BASE_PATH}
+            canManage
+            currentUserId={user?.id}
+            onChanged={fetchAll}
+          />
+        </div>
+      </div>
     </section>
   );
 }
