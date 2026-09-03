@@ -878,7 +878,17 @@
     "viewAsAction": "View as",
     "viewAsEmpty": "No customer found",
     "viewAsStarted": "Viewing the portal as {name}",
-    "viewAsLoadError": "Could not load the customers"
+    "viewAsLoadError": "Could not load the customers",
+    "activityTitle": "Activity in the period",
+    "activityDescription": "With no filter, counts everything.",
+    "activityFrom": "Start date",
+    "activityTo": "End date",
+    "activityRequests": "Requests",
+    "activityCollections": "Collections done",
+    "activityTriages": "Triages done",
+    "activityPieces": "Items triaged",
+    "activityHint": "Each number uses its own date: request creation, bag collection, triage and item entry. Over a short range the four do not add up to one another — a July request may be triaged in September.",
+    "activityLoadError": "Could not load the activity for the period"
   },
   "company": {
     "pageTitle": "Companies",

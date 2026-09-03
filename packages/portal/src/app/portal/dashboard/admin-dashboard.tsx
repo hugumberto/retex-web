@@ -41,6 +41,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import ActivityPanel from './activity-panel';
 import ViewAsDialog from './view-as-dialog';
 import {
   Area,
@@ -191,6 +192,8 @@ export default function AdminDashboard() {
           value={fmt(outOfZone.totalCollectionRequests)}
         />
       </div>
+
+      <ActivityPanel />
 
       {/* Impacto ambiental */}
       <div>

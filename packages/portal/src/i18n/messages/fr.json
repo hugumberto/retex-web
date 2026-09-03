@@ -878,7 +878,17 @@
     "viewAsAction": "Voir comme",
     "viewAsEmpty": "Aucun client trouvé",
     "viewAsStarted": "Portail affiché en tant que {name}",
-    "viewAsLoadError": "Impossible de charger les clients"
+    "viewAsLoadError": "Impossible de charger les clients",
+    "activityTitle": "Activité de la période",
+    "activityDescription": "Sans filtre, compte depuis toujours.",
+    "activityFrom": "Date de début",
+    "activityTo": "Date de fin",
+    "activityRequests": "Demandes",
+    "activityCollections": "Collectes réalisées",
+    "activityTriages": "Tris effectués",
+    "activityPieces": "Pièces triées",
+    "activityHint": "Chaque nombre utilise sa propre date : création de la demande, collecte des sacs, tri et saisie des pièces. Sur un intervalle court, les quatre ne se recoupent pas — une demande de juillet peut être triée en septembre.",
+    "activityLoadError": "Impossible de charger l'activité de la période"
   },
   "company": {
     "pageTitle": "Entreprises",

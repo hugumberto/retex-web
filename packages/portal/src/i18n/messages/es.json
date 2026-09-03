@@ -878,7 +878,17 @@
     "viewAsAction": "Ver como",
     "viewAsEmpty": "No se ha encontrado ningún cliente",
     "viewAsStarted": "Viendo el portal como {name}",
-    "viewAsLoadError": "No se han podido cargar los clientes"
+    "viewAsLoadError": "No se han podido cargar los clientes",
+    "activityTitle": "Actividad del período",
+    "activityDescription": "Sin filtro, cuenta desde siempre.",
+    "activityFrom": "Fecha inicial",
+    "activityTo": "Fecha final",
+    "activityRequests": "Solicitudes",
+    "activityCollections": "Recogidas realizadas",
+    "activityTriages": "Clasificaciones hechas",
+    "activityPieces": "Prendas clasificadas",
+    "activityHint": "Cada número usa su propia fecha: creación de la solicitud, recogida de las bolsas, clasificación y registro de las prendas. En un intervalo corto los cuatro no cuadran entre sí — una solicitud de julio puede clasificarse en septiembre.",
+    "activityLoadError": "No se ha podido cargar la actividad del período"
   },
   "company": {
     "pageTitle": "Empresas",
