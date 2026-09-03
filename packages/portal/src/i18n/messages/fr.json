@@ -31,6 +31,7 @@
     "deleting": "Suppression en cours…",
     "description": "Description",
     "email": "E-mail",
+    "phone": "Téléphone",
     "emailInvalid": "Format d'e-mail invalide",
     "filter": "Filtrer",
     "from": "Du",

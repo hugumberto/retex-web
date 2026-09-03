@@ -31,6 +31,7 @@
     "deleting": "Deleting…",
     "description": "Description",
     "email": "Email",
+    "phone": "Phone",
     "emailInvalid": "Invalid email format",
     "filter": "Filter",
     "from": "From",
