@@ -77,3 +77,18 @@ export interface ScopedDashboardStatsDTO {
     byAddress: CompanyBreakdownEntry[];
   };
 }
+
+/**
+ * Resposta de GET /dashboard/activity — o funil do período.
+ *
+ * `from`/`to` ecoam o filtro aplicado (null = sem limite), para o ecrã poder
+ * confirmar o que está a mostrar.
+ */
+export interface DashboardActivityDTO {
+  from: string | null;
+  to: string | null;
+  requests: number;
+  collections: number;
+  triages: number;
+  pieces: number;
+}

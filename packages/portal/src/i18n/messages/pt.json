@@ -31,6 +31,7 @@
     "deleting": "A eliminar...",
     "description": "Descrição",
     "email": "Email",
+    "phone": "Telefone",
     "emailInvalid": "Formato de email inválido",
     "filter": "Filtrar",
     "from": "De",
@@ -877,7 +878,17 @@
     "viewAsAction": "Ver como",
     "viewAsEmpty": "Nenhum cliente encontrado",
     "viewAsStarted": "A ver o portal como {name}",
-    "viewAsLoadError": "Não foi possível carregar os clientes"
+    "viewAsLoadError": "Não foi possível carregar os clientes",
+    "activityTitle": "Atividade do período",
+    "activityDescription": "Sem filtro, conta desde sempre.",
+    "activityFrom": "Data inicial",
+    "activityTo": "Data final",
+    "activityRequests": "Solicitações",
+    "activityCollections": "Coletas realizadas",
+    "activityTriages": "Triagens feitas",
+    "activityPieces": "Peças triadas",
+    "activityHint": "Cada número tem a sua própria data: criação da solicitação, recolha dos sacos, triagem e lançamento das peças. Num intervalo curto os quatro não fecham entre si — uma solicitação de julho pode ser triada em setembro.",
+    "activityLoadError": "Não foi possível carregar a atividade do período"
   },
   "company": {
     "pageTitle": "Empresas",

@@ -301,14 +301,17 @@ export default function PackageCollection() {
           }`.trim() || '-'
         );
         const code = escapeHtml(pkg.friendlyCode ?? '-');
+        // O motorista precisa de ligar ao cliente a partir desta folha, sem ter
+        // de procurar a ficha individual mais à frente.
+        const phone = escapeHtml(pkg.user.contactPhone ?? '-');
 
-        return `<tr><td>${code}</td><td>${requester}</td><td>${address}</td></tr>`;
+        return `<tr><td>${code}</td><td>${requester}</td><td>${phone}</td><td>${address}</td></tr>`;
       })
       .join('');
 
     const tableRows =
       rows ||
-      `<tr><td colspan="3" style="text-align:center;color:#6b7280;">${t(
+      `<tr><td colspan="4" style="text-align:center;color:#6b7280;">${t(
         'noRouteItems'
       )}</td></tr>`;
 
@@ -636,6 +639,7 @@ export default function PackageCollection() {
                   <tr>
                     <th>${tCommon('code')}</th>
                     <th>${t('requester')}</th>
+                    <th>${tCommon('phone')}</th>
                     <th>${tCommon('address')}</th>
                   </tr>
                 </thead>
