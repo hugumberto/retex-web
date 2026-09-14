@@ -60,6 +60,7 @@ export default function Coleta() {
   const [isBinding, setIsBinding] = useState(false);
   const [isAddingBag, setIsAddingBag] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
+  const [showFinalize, setShowFinalize] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
@@ -199,8 +200,19 @@ export default function Coleta() {
     }
   }, [pkg]);
 
-  const handleFinalize = useCallback(async () => {
+  // A trava não vive só no `disabled` do botão: aqui é o último ponto do portal
+  // antes do pedido, e a API recusa na mesma com `bagRequiredToFinalize`.
+  const handleFinalizeClick = useCallback(() => {
     if (!pkg || !canCollect) return;
+    if (boundCodes.length === 0) {
+      toast.error(t('finishBagRequired'));
+      return;
+    }
+    setShowFinalize(true);
+  }, [pkg, canCollect, boundCodes.length, t]);
+
+  const handleFinalize = useCallback(async () => {
+    if (!pkg || !canCollect || boundCodes.length === 0) return;
 
     setIsFinalizing(true);
     try {
@@ -209,6 +221,7 @@ export default function Coleta() {
       );
       if (!isSuccessStatus(status)) throw new Error('Erro na requisição');
       setPkg(data);
+      setShowFinalize(false);
       toast.success(t('finishSuccess'));
     } catch (error) {
       console.error('Erro ao finalizar coleta:', error);
@@ -216,7 +229,7 @@ export default function Coleta() {
     } finally {
       setIsFinalizing(false);
     }
-  }, [pkg, canCollect]);
+  }, [pkg, canCollect, boundCodes.length]);
 
   const handleCancel = useCallback(async () => {
     if (!pkg) return;
@@ -250,6 +263,7 @@ export default function Coleta() {
     setRouteCollectionRequests([]);
     setBoundCodes([]);
     setQrInput('');
+    setShowFinalize(false);
     setShowCancel(false);
     setCancelReason('');
     requestAnimationFrame(() => scanRef.current?.focus());
@@ -455,11 +469,16 @@ export default function Coleta() {
           <TablePagination pagination={bagsPagination} />
 
           {canCollect && (
-            <div className="mt-5 flex justify-end">
+            <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
+              {boundCodes.length === 0 && (
+                <span className="text-sm text-muted-foreground">
+                  {t('finishBagRequired')}
+                </span>
+              )}
               <Button
                 type="button"
                 variant="secondary"
-                onClick={handleFinalize}
+                onClick={handleFinalizeClick}
                 disabled={isFinalizing || boundCodes.length === 0}
               >
                 {t('finish')}
@@ -468,6 +487,39 @@ export default function Coleta() {
           )}
         </div>
       )}
+
+      {/* Confirmação de finalização: passar a COLLECTED não tem retorno */}
+      <Dialog open={showFinalize} onOpenChange={setShowFinalize}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-secondary">
+              {t('finishConfirmTitle')}
+            </DialogTitle>
+            <DialogDescription>{t('finishConfirmBody')}</DialogDescription>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {t('finishConfirmBags', { count: boundCodes.length })}
+          </p>
+          <DialogFooter className="mt-2 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowFinalize(false)}
+              disabled={isFinalizing}
+            >
+              {tCommon('back')}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleFinalize}
+              disabled={isFinalizing || boundCodes.length === 0}
+            >
+              {t('finishConfirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Diálogo de cancelamento com motivo */}
       <Dialog open={showCancel} onOpenChange={setShowCancel}>
