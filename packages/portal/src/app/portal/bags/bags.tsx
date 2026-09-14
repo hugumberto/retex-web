@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { CollectionRequestBagDTO } from '@/app/types/collection-request-bag';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import ScanInput from '@/components/custom/scan-input';
 import {
   Table,
   TableBody,
@@ -123,15 +123,10 @@ export default function Bags() {
           {t('requestCodeLabel')}
         </label>
         <div className="flex flex-wrap items-center gap-3">
-          <Input
+          <ScanInput
             value={code}
-            onChange={(e) => setCode(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                search(code);
-              }
-            }}
+            onChange={setCode}
+            onScan={search}
             placeholder={t('requestCodePlaceholder')}
             className="max-w-xs"
           />

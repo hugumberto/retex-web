@@ -7,7 +7,7 @@ import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import TablePagination from '@/components/custom/table-pagination';
 import { usePagination } from '@/hooks/use-pagination';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import ScanInput from '@/components/custom/scan-input';
 import { useEffect, useRef } from 'react';
 import {
   Table,
@@ -57,7 +57,7 @@ type AddTriageProps = {
   isViewMode?: boolean;
   storageCode: string;
   onStorageCodeChange: (value: string) => void;
-  onStorageCodeSubmit: () => Promise<void>;
+  onStorageCodeSubmit: (code?: string) => Promise<void>;
   storageUnits: StorageUnitDTO[];
   isLoadingStorageUnit?: boolean;
   onDeleteItem: (item: TriageListItem, index: number) => void | Promise<void>;
@@ -145,11 +145,11 @@ export default function AddTriage({
     }
   }, [isLoadingStorageUnit]);
 
-  const handleStorageCodeEnter = async () => {
+  const handleStorageCodeEnter = async (scanned?: string) => {
     shouldRefocusStorageInputRef.current = true;
 
     try {
-      await onStorageCodeSubmit();
+      await onStorageCodeSubmit(scanned);
     } finally {
       onStorageCodeChange('');
     }
@@ -169,16 +169,12 @@ export default function AddTriage({
           <label className="block text-sm font-medium text-secondary">
             {t('storageCodeLabel')}
           </label>
-          <Input
-            ref={storageInputRef}
+          <ScanInput
+            inputRef={storageInputRef}
             value={storageCode}
-            onChange={(e) => onStorageCodeChange(e.target.value)}
-            onKeyDown={async (e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                await handleStorageCodeEnter();
-              }
-            }}
+            onChange={onStorageCodeChange}
+            onScan={handleStorageCodeEnter}
+            scanTitle={t('storageCodeLabel')}
             placeholder={t('storageCodePlaceholder')}
             disabled={isLoadingStorageUnit || isViewMode}
           />
