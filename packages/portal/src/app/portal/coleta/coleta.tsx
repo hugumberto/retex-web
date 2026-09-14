@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import ScanInput from '@/components/custom/scan-input';
 import {
   Table,
   TableBody,
@@ -99,8 +99,10 @@ export default function Coleta() {
     // O foco no input de QR é feito pelo useEffect ao ficar coletável.
   }, []);
 
-  const handleScanBlur = useCallback(async () => {
-    const code = scanCode.trim();
+  // Recebe o código por argumento porque a câmara não pode contar com o estado:
+  // `setScanCode` não é síncrono e o handler leria o valor anterior.
+  const handleScanBlur = useCallback(async (scanned?: string) => {
+    const code = (scanned ?? scanCode).trim();
     if (!code || pkg) return;
 
     setIsLoadingCollectionRequest(true);
@@ -150,8 +152,8 @@ export default function Coleta() {
     [loadCollectionRequest]
   );
 
-  const handleBind = useCallback(async () => {
-    const code = qrInput.trim();
+  const handleBind = useCallback(async (scanned?: string) => {
+    const code = (scanned ?? qrInput).trim();
     if (!code || !pkg || !canCollect) return;
 
     setIsBinding(true);
@@ -277,17 +279,13 @@ export default function Coleta() {
           {t('requestCodeLabel')}
         </label>
         <div className="flex flex-wrap items-center gap-3">
-          <Input
-            ref={scanRef}
+          <ScanInput
+            inputRef={scanRef}
             value={scanCode}
-            onChange={(e) => setScanCode(e.target.value)}
-            onBlur={handleScanBlur}
-            onKeyDown={async (e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                await handleScanBlur();
-              }
-            }}
+            onChange={setScanCode}
+            onScan={handleScanBlur}
+            submitOnBlur
+            scanTitle={t('requestCodeLabel')}
             placeholder={t('requestCodePlaceholder')}
             autoFocus
             disabled={!!pkg || isLoadingCollectionRequest}
@@ -415,16 +413,12 @@ export default function Coleta() {
               <label className="mb-1 block text-sm font-medium text-secondary">
                 {t('bindQrLabel')}
               </label>
-              <Input
-                ref={qrRef}
+              <ScanInput
+                inputRef={qrRef}
                 value={qrInput}
-                onChange={(e) => setQrInput(e.target.value)}
-                onKeyDown={async (e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    await handleBind();
-                  }
-                }}
+                onChange={setQrInput}
+                onScan={handleBind}
+                scanTitle={t('bindQrLabel')}
                 placeholder={t('bindQrPlaceholder')}
                 disabled={isBinding}
                 className="max-w-md"
