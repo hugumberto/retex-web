@@ -20,7 +20,7 @@ import TablePagination from '@/components/custom/table-pagination';
 import { usePagination } from '@/hooks/use-pagination';
 import api from '@/lib/api';
 import { STATUS_CLASS } from '@/lib/collection-request-status';
-import { isSuccessStatus } from '@/lib/utils';
+import { isSuccessStatus, normalizeFriendlyCode } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { Ban, Info } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -273,8 +273,13 @@ export default function Triage() {
     const code = bagCode.trim();
     if (!code || !selectedCollectionRequest) return;
 
+    // O token sai do leitor de QR e compara-se tal e qual; o código amigável é
+    // digitado a partir da etiqueta, por isso ignora-se a caixa.
+    const normalized = normalizeFriendlyCode(code);
     const bag = bags.find(
-      (q) => q.token === code || q.friendlyCode === code
+      (q) =>
+        q.token === code ||
+        (!!q.friendlyCode && normalizeFriendlyCode(q.friendlyCode) === normalized)
     );
     if (!bag) {
       toast.error(t('bagNotInRequest'));
