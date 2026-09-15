@@ -204,10 +204,12 @@ export default function PackageCollection() {
       // dessa regra existir cortaria a impressão sem aviso. Cortar aqui é
       // preferível a imprimir um rolo inteiro para o deitar fora.
       const usable = Math.min(width, height) - 2 * LABEL_PADDING_MM;
+      const rotation = Number(data.labelRotationDeg);
       return {
         labelWidthMm: width,
         labelHeightMm: height,
         labelQrSizeMm: Math.max(10, Math.min(qr, usable)),
+        labelRotationDeg: [0, 90, 180, 270].includes(rotation) ? rotation : 0,
       };
     } catch {
       return DEFAULT_LABEL_SIZE;
@@ -215,14 +217,20 @@ export default function PackageCollection() {
   };
 
   const handlePrintQrCodes = async (id: string) => {
-    const { labelWidthMm, labelHeightMm, labelQrSizeMm } =
+    const { labelWidthMm, labelHeightMm, labelQrSizeMm, labelRotationDeg } =
       await fetchLabelSize();
+
+    // A rotação de 90 ou 270 troca o que é largura e o que é altura para o
+    // conteúdo: a caixa é desenhada deitada e só depois rodada.
+    const isQuarterTurn = labelRotationDeg === 90 || labelRotationDeg === 270;
+    const contentWidthMm = isQuarterTurn ? labelHeightMm : labelWidthMm;
+    const contentHeightMm = isQuarterTurn ? labelWidthMm : labelHeightMm;
 
     // A orientação decide-se aqui e não por `@media (orientation)`: as media
     // queries de orientação faziam o Chrome gerar uma página em branco a mais
     // por lote, e o rolo avançava uma etiqueta a cada impressão. Como as
     // medidas são conhecidas, o CSS sai já resolvido.
-    const isPortrait = labelHeightMm > labelWidthMm;
+    const isPortrait = contentHeightMm > contentWidthMm;
 
     const { data, status } = await api.get<CollectionRequestBagDTO[]>(
       `/route/${id}/bags`
@@ -253,9 +261,9 @@ export default function PackageCollection() {
         const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=${encodeURIComponent(
           bag.token
         )}`;
-        return `<div class="label"><img src="${qrSource}" alt="QR ${code}" /><div class="code"><span>${escapeHtml(
+        return `<div class="label"><div class="content"><img src="${qrSource}" alt="QR ${code}" /><div class="code"><span>${escapeHtml(
           year
-        )}</span><span class="serial">${serial}</span></div></div>`;
+        )}</span><span class="serial">${serial}</span></div></div></div>`;
       })
       .join('');
 
@@ -270,9 +278,24 @@ export default function PackageCollection() {
                avançava várias etiquetas por cada uma impressa. */
             @page { size: ${labelWidthMm}mm ${labelHeightMm}mm; margin: 0; }
             html, body { margin:0; padding:0; height:100%; font-family: Arial, sans-serif; color:#013364; }
+            /* A etiqueta é só o palco — uma página — e centra o conteúdo.
+               Rodar aqui dentro, e não na página, mantém uma etiqueta por
+               página seja qual for o ângulo. */
             .label {
               width: 100%;
               height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              page-break-after: always;
+              break-after: page;
+            }
+            .label:last-child { page-break-after: auto; break-after: auto; }
+            .content {
+              width: ${contentWidthMm}mm;
+              height: ${contentHeightMm}mm;
+              flex: none;
               box-sizing: border-box;
               padding: ${LABEL_PADDING_MM}mm;
               display: flex;
@@ -281,15 +304,13 @@ export default function PackageCollection() {
               align-items: center;
               justify-content: center;
               gap: ${LABEL_PADDING_MM}mm;
-              page-break-after: always;
-              break-after: page;
+              transform: rotate(${labelRotationDeg}deg);
             }
-            .label:last-child { page-break-after: auto; break-after: auto; }
             /* O QR cresce com a etiqueta, mas nunca passa do tamanho
                configurado: numa folha grande por engano não fica gigante, e
                numa etiqueta pequena encolhe em vez de transbordar. O branco à
                volta é que faz de zona silenciosa, já que o QR é gerado sem ela. */
-            .label img {
+            .content img {
               flex: none;
               aspect-ratio: 1 / 1;
               object-fit: contain;
@@ -297,7 +318,7 @@ export default function PackageCollection() {
               max-height: ${labelQrSizeMm}mm;
               ${isPortrait ? 'width: 100%; height: auto;' : 'height: 100%; width: auto;'}
             }
-            .code {
+            .content .code {
               display: flex;
               flex-direction: column;
               min-width: 0;
@@ -310,7 +331,7 @@ export default function PackageCollection() {
             }
             /* Os códigos de recurso podem ser mais longos que ano-XXXXXX;
                partir aqui é preferível a transbordar da etiqueta. */
-            .code .serial { overflow-wrap: anywhere; }
+            .content .serial { overflow-wrap: anywhere; }
             @media print { .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
           </style>
         </head>

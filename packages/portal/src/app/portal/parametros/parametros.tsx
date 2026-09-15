@@ -3,9 +3,11 @@
 import { useTranslations } from 'next-intl';
 import {
   DEFAULT_LABEL_SIZE,
+  LABEL_ROTATIONS,
   SystemParameterDTO,
 } from '@/app/types/system-parameter';
 import { InputForm } from '@/components/form/input-form';
+import { SelectForm } from '@/components/form/select-form';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
@@ -20,6 +22,7 @@ interface ParametrosFormData {
   labelWidthMm: number;
   labelHeightMm: number;
   labelQrSizeMm: number;
+  labelRotationDeg: number;
 }
 
 export default function Parametros() {
@@ -51,6 +54,7 @@ export default function Parametros() {
         labelWidthMm: data.labelWidthMm,
         labelHeightMm: data.labelHeightMm,
         labelQrSizeMm: data.labelQrSizeMm,
+        labelRotationDeg: data.labelRotationDeg,
       });
     } catch (error) {
       console.error('Erro ao buscar parâmetros:', error);
@@ -78,6 +82,7 @@ export default function Parametros() {
         labelWidthMm: Number(data.labelWidthMm),
         labelHeightMm: Number(data.labelHeightMm),
         labelQrSizeMm: Number(data.labelQrSizeMm),
+        labelRotationDeg: Number(data.labelRotationDeg),
       });
       if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
       toast.success(t('saveSuccess'));
@@ -183,6 +188,23 @@ export default function Parametros() {
           <p className="text-xs text-muted-foreground">
             {t('labelQrSizeHelp')}
           </p>
+
+          <div className="sm:max-w-xs">
+            <SelectForm
+              label={t('labelRotationLabel')}
+              name="labelRotationDeg"
+              control={control}
+              options={LABEL_ROTATIONS.map((deg) => ({
+                label: `${deg}°`,
+                value: deg,
+              }))}
+              rules={{ required: t('measureRequired') }}
+              errors={errors}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('labelRotationHelp')}
+            </p>
+          </div>
         </div>
 
         <Button type="submit" variant="secondary" disabled={isSubmitting}>

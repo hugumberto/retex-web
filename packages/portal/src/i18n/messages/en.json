@@ -862,6 +862,8 @@
     "labelHeightLabel": "Height (mm)",
     "labelQrSizeLabel": "QR side (mm)",
     "labelQrSizeHelp": "The QR sits on the left with the code beside it. A bigger QR reads from further away — but it has to fit the label, with a 2 mm margin.",
+    "labelRotationLabel": "Content rotation",
+    "labelRotationHelp": "If the content comes out sideways or upside down on the label, rotate it here. The print direction depends on the model and how the roll is loaded.",
     "measureRequired": "Enter the measurement",
     "minTen": "Minimum 10",
     "minTwenty": "Minimum 20",
