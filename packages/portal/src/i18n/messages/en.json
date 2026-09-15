@@ -857,7 +857,7 @@
     "saveSuccess": "Parameters updated",
     "saveError": "Could not save the parameters",
     "labelSectionTitle": "Print labels",
-    "labelSectionHelp": "Size of the label roll used to print the bag QR codes. One label per page.",
+    "labelSectionHelp": "Size of the label roll. The page size comes from the printer driver — these measurements cap the printed QR.",
     "labelWidthLabel": "Width (mm)",
     "labelHeightLabel": "Height (mm)",
     "labelQrSizeLabel": "QR side (mm)",
