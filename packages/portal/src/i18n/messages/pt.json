@@ -855,7 +855,19 @@
     "maxThirty": "Máximo de 30",
     "maxHundred": "Máximo de 100",
     "saveSuccess": "Parâmetros atualizados",
-    "saveError": "Não foi possível guardar os parâmetros"
+    "saveError": "Não foi possível guardar os parâmetros",
+    "labelSectionTitle": "Etiquetas de impressão",
+    "labelSectionHelp": "Medidas do rolo de etiquetas usado para imprimir os QR dos sacos. Uma etiqueta por página.",
+    "labelWidthLabel": "Largura (mm)",
+    "labelHeightLabel": "Altura (mm)",
+    "labelQrSizeLabel": "Lado do QR (mm)",
+    "labelQrSizeHelp": "O QR fica à esquerda e o código ao lado. Quanto maior o QR, mais longe a câmara o consegue ler — mas tem de caber na etiqueta, com 2 mm de margem.",
+    "measureRequired": "Indique a medida",
+    "minTen": "Mínimo 10",
+    "minTwenty": "Mínimo 20",
+    "maxWidth": "Máximo 210",
+    "maxHeight": "Máximo 297",
+    "maxQrSize": "Máximo 200"
   },
   "dashboard": {
     "pageTitle": "Dashboard",
