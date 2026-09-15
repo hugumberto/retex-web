@@ -857,7 +857,7 @@
     "saveSuccess": "Paramètres mis à jour",
     "saveError": "Impossible d'enregistrer les paramètres",
     "labelSectionTitle": "Étiquettes d'impression",
-    "labelSectionHelp": "Dimensions du rouleau d'étiquettes utilisé pour imprimer les QR des sacs. Une étiquette par page.",
+    "labelSectionHelp": "Dimensions du rouleau d'étiquettes. La taille de page vient du pilote d'imprimante — ces mesures limitent la taille du QR imprimé.",
     "labelWidthLabel": "Largeur (mm)",
     "labelHeightLabel": "Hauteur (mm)",
     "labelQrSizeLabel": "Côté du QR (mm)",
