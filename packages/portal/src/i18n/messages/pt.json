@@ -862,6 +862,8 @@
     "labelHeightLabel": "Altura (mm)",
     "labelQrSizeLabel": "Lado do QR (mm)",
     "labelQrSizeHelp": "O QR fica à esquerda e o código ao lado. Quanto maior o QR, mais longe a câmara o consegue ler — mas tem de caber na etiqueta, com 2 mm de margem.",
+    "labelRotationLabel": "Rotação do conteúdo",
+    "labelRotationHelp": "Se o conteúdo sair deitado ou ao contrário na etiqueta, roda aqui. A direção de impressão depende do modelo e de como o rolo é carregado.",
     "measureRequired": "Indique a medida",
     "minTen": "Mínimo 10",
     "minTwenty": "Mínimo 20",
