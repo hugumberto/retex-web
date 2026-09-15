@@ -7,6 +7,7 @@ import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { CollectionRequestBagDTO, TriageResponse } from '@/app/types/collection-request-bag';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import ScanInput from '@/components/custom/scan-input';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -176,8 +177,10 @@ export default function Triage() {
   const pagination = usePagination(visibleBags);
   const activeBag = bags.find((bag) => bag.id === activeBagId) ?? null;
 
-  const handleScanCodeBlur = async () => {
-    const code = scanCode.trim();
+  // O código chega por argumento quando vem da câmara: `setScanCode` não é
+  // síncrono e ler o estado aqui apanharia o valor anterior.
+  const handleScanCodeBlur = async (scanned?: string) => {
+    const code = (scanned ?? scanCode).trim();
     if (!code || selectedCollectionRequest) return;
 
     setIsLoadingCollectionRequest(true);
@@ -269,8 +272,8 @@ export default function Triage() {
   };
 
   // Escaneia/consulta o saco localmente contra os sacos da solicitação.
-  const handleBagScan = () => {
-    const code = bagCode.trim();
+  const handleBagScan = (scanned?: string) => {
+    const code = (scanned ?? bagCode).trim();
     if (!code || !selectedCollectionRequest) return;
 
     // O token sai do leitor de QR e compara-se tal e qual; o código amigável é
@@ -501,8 +504,8 @@ export default function Triage() {
     }
   };
 
-  const handleStorageCodeSubmit = async () => {
-    const storageUnitId = storageCode.trim();
+  const handleStorageCodeSubmit = async (scanned?: string) => {
+    const storageUnitId = (scanned ?? storageCode).trim();
     if (!storageUnitId) {
       toast.error(t('storageCodeRequired'));
       return;
@@ -649,17 +652,13 @@ export default function Triage() {
           {t('lookupCodeLabel')}
         </label>
         <div className="flex flex-wrap items-center gap-3">
-          <Input
-            ref={scanCodeInputRef}
+          <ScanInput
+            inputRef={scanCodeInputRef}
             value={scanCode}
-            onChange={(e) => setScanCode(e.target.value)}
-            onBlur={handleScanCodeBlur}
-            onKeyDown={async (e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                await handleScanCodeBlur();
-              }
-            }}
+            onChange={setScanCode}
+            onScan={handleScanCodeBlur}
+            submitOnBlur
+            scanTitle={t('lookupCodeLabel')}
             placeholder={t('lookupCodePlaceholder')}
             autoFocus
             disabled={!!selectedCollectionRequest || isLoadingCollectionRequest}
@@ -720,17 +719,16 @@ export default function Triage() {
           <label className="mb-1 block text-sm font-medium text-secondary">
             {t('bagCodeLabel')}
           </label>
-          <Input
-            ref={bagInputRef}
+          <ScanInput
+            inputRef={bagInputRef}
             value={bagCode}
-            onChange={(e) => setBagCode(e.target.value)}
-            onBlur={handleBagScan}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleBagScan();
-              }
-            }}
+            onChange={setBagCode}
+            onScan={handleBagScan}
+            submitOnBlur
+            // Uma leitura válida salta para o campo do peso; devolver o foco ao
+            // código do saco roubava-lho, e o campo fica desativado na mesma.
+            focusOnClose={false}
+            scanTitle={t('bagCodeLabel')}
             placeholder={t('bagCodePlaceholder')}
             disabled={!!activeBagId}
             className="max-w-md"
