@@ -857,7 +857,7 @@
     "saveSuccess": "Parámetros actualizados",
     "saveError": "No se han podido guardar los parámetros",
     "labelSectionTitle": "Etiquetas de impresión",
-    "labelSectionHelp": "Medidas del rollo de etiquetas. El tamaño de página viene del controlador de la impresora — estas medidas limitan el tamaño del QR impreso.",
+    "labelSectionHelp": "Medidas del rollo de etiquetas usado para imprimir los QR de los sacos: definen la página, una etiqueta por página. Selecciona la impresora de etiquetas en el diálogo de impresión.",
     "labelWidthLabel": "Ancho (mm)",
     "labelHeightLabel": "Alto (mm)",
     "labelQrSizeLabel": "Lado del QR (mm)",
