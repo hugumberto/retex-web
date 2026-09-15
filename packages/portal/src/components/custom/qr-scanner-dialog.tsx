@@ -68,8 +68,12 @@ export default function QrScannerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* O diálogo é limitado à altura do ecrã e disposto em coluna para que o
+          visor possa encolher. Sem isto transbordava com o telemóvel deitado ou
+          com o teclado aberto — que é o caso normal na recolha, onde o campo do
+          QR está focado quando se carrega no botão da câmara. */}
       <DialogContent
-        className="sm:max-w-md"
+        className="flex max-h-[calc(100svh-2rem)] flex-col gap-3 overflow-y-auto p-4 sm:max-w-md sm:p-6"
         onCloseAutoFocus={onCloseAutoFocus}
       >
         <DialogHeader>
@@ -79,7 +83,10 @@ export default function QrScannerDialog({
           <DialogDescription>{hint ?? t('hint')}</DialogDescription>
         </DialogHeader>
 
-        <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-black">
+        {/* Quadrado por omissão, mas `min-h-0` e `shrink` deixam-no ceder
+            altura quando o ecrã é baixo, em vez de empurrar o diálogo para
+            fora. */}
+        <div className="relative aspect-square min-h-0 w-full shrink overflow-hidden rounded-lg bg-black">
           {/* `playsInline` e `muted` não são opcionais: sem eles o iOS abre o
               vídeo em fullscreen nativo ou bloqueia o arranque. */}
           <video
