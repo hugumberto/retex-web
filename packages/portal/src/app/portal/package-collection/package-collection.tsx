@@ -215,7 +215,14 @@ export default function PackageCollection() {
   };
 
   const handlePrintQrCodes = async (id: string) => {
-    const { labelQrSizeMm } = await fetchLabelSize();
+    const { labelWidthMm, labelHeightMm, labelQrSizeMm } =
+      await fetchLabelSize();
+
+    // A orientação decide-se aqui e não por `@media (orientation)`: as media
+    // queries de orientação faziam o Chrome gerar uma página em branco a mais
+    // por lote, e o rolo avançava uma etiqueta a cada impressão. Como as
+    // medidas são conhecidas, o CSS sai já resolvido.
+    const isPortrait = labelHeightMm > labelWidthMm;
 
     const { data, status } = await api.get<CollectionRequestBagDTO[]>(
       `/route/${id}/bags`
@@ -257,11 +264,11 @@ export default function PackageCollection() {
         <head>
           <title>${t('qrCodesTitle')}</title>
           <style>
-            /* size:auto e não uma medida fixa: declarar 50x30 obrigava o Chrome a
-               impor paisagem e, numa impressora em A4, saía uma folha de
-               297x210 com a etiqueta pequena a um canto. Assim quem manda é o
-               controlador da impressora, e a etiqueta preenche o que ele der. */
-            @page { size: auto; margin: 0; }
+            /* O tamanho declarado é o que prende a página ao passo físico do
+               rolo. Com size:auto o controlador entregava a folha por omissão
+               (Letter/A4) e cada etiqueta consumia uma página inteira — o rolo
+               avançava várias etiquetas por cada uma impressa. */
+            @page { size: ${labelWidthMm}mm ${labelHeightMm}mm; margin: 0; }
             html, body { margin:0; padding:0; height:100%; font-family: Arial, sans-serif; color:#013364; }
             .label {
               width: 100%;
@@ -269,15 +276,14 @@ export default function PackageCollection() {
               box-sizing: border-box;
               padding: ${LABEL_PADDING_MM}mm;
               display: flex;
+              /* Deitada, o QR fica ao lado do código; ao alto, por cima dele. */
+              flex-direction: ${isPortrait ? 'column' : 'row'};
               align-items: center;
               justify-content: center;
               gap: ${LABEL_PADDING_MM}mm;
               page-break-after: always;
               break-after: page;
             }
-            /* Deitada, o QR fica ao lado do código; ao alto, por cima dele. */
-            @media print and (orientation: landscape) { .label { flex-direction: row; } }
-            @media print and (orientation: portrait) { .label { flex-direction: column; } }
             .label:last-child { page-break-after: auto; break-after: auto; }
             /* O QR cresce com a etiqueta, mas nunca passa do tamanho
                configurado: numa folha grande por engano não fica gigante, e
@@ -289,9 +295,8 @@ export default function PackageCollection() {
               object-fit: contain;
               max-width: ${labelQrSizeMm}mm;
               max-height: ${labelQrSizeMm}mm;
+              ${isPortrait ? 'width: 100%; height: auto;' : 'height: 100%; width: auto;'}
             }
-            @media print and (orientation: landscape) { .label img { height: 100%; width: auto; } }
-            @media print and (orientation: portrait) { .label img { width: 100%; height: auto; } }
             .code {
               display: flex;
               flex-direction: column;
