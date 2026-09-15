@@ -17,6 +17,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/api';
+import { isSuccessStatus } from '@/lib/utils';
+import {
+  DEFAULT_LABEL_SIZE,
+  LABEL_PADDING_MM,
+  SystemParameterDTO,
+} from '@/app/types/system-parameter';
 import TablePagination from '@/components/custom/table-pagination';
 import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
@@ -177,7 +183,41 @@ export default function PackageCollection() {
     }
   };
 
+  /**
+   * Medidas da etiqueta, vindas dos parâmetros de sistema.
+   *
+   * Falhar aqui não pode impedir a impressão: sem rede, ou com um perfil sem
+   * acesso ao endpoint, imprime-se com as medidas do rolo em uso.
+   */
+  const fetchLabelSize = async () => {
+    try {
+      const { data, status } =
+        await api.get<SystemParameterDTO>('/system-parameter');
+      if (!isSuccessStatus(status) || !data) return DEFAULT_LABEL_SIZE;
+
+      const width = Number(data.labelWidthMm) || DEFAULT_LABEL_SIZE.labelWidthMm;
+      const height =
+        Number(data.labelHeightMm) || DEFAULT_LABEL_SIZE.labelHeightMm;
+      const qr = Number(data.labelQrSizeMm) || DEFAULT_LABEL_SIZE.labelQrSizeMm;
+
+      // A API já recusa um QR maior que a etiqueta, mas uma linha gravada antes
+      // dessa regra existir cortaria a impressão sem aviso. Cortar aqui é
+      // preferível a imprimir um rolo inteiro para o deitar fora.
+      const usable = Math.min(width, height) - 2 * LABEL_PADDING_MM;
+      return {
+        labelWidthMm: width,
+        labelHeightMm: height,
+        labelQrSizeMm: Math.max(10, Math.min(qr, usable)),
+      };
+    } catch {
+      return DEFAULT_LABEL_SIZE;
+    }
+  };
+
   const handlePrintQrCodes = async (id: string) => {
+    const { labelWidthMm, labelHeightMm, labelQrSizeMm } =
+      await fetchLabelSize();
+
     const { data, status } = await api.get<CollectionRequestBagDTO[]>(
       `/route/${id}/bags`
     );
@@ -193,14 +233,23 @@ export default function PackageCollection() {
       throw new Error(t('popupBlocked'));
     }
 
-    // A impressora usa etiquetas de 60x40mm (paisagem): um QR code por página/etiqueta.
+    // Uma etiqueta por página, nas medidas configuradas em /portal/parametros.
+    // O QR e o código ficam lado a lado, não empilhados: numa etiqueta baixa,
+    // empilhar obriga a encolher muito o QR, e o tamanho do módulo é o que
+    // decide se a câmara do telemóvel o lê.
     const labels = data
       .map((bag) => {
         const code = escapeHtml(bag.friendlyCode);
+        // `ano-XXXXXX`: separar no hífen dá uma quebra de linha previsível na
+        // coluna estreita, em vez de o browser partir o código a meio.
+        const [year, ...rest] = bag.friendlyCode.split('-');
+        const serial = escapeHtml(rest.join('-'));
         const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=${encodeURIComponent(
           bag.token
         )}`;
-        return `<div class="label"><img src="${qrSource}" alt="QR ${code}" /><div class="code">${code}</div></div>`;
+        return `<div class="label"><img src="${qrSource}" alt="QR ${code}" /><div class="code"><span>${escapeHtml(
+          year
+        )}</span><span class="serial">${serial}</span></div></div>`;
       })
       .join('');
 
@@ -209,26 +258,40 @@ export default function PackageCollection() {
         <head>
           <title>${t('qrCodesTitle')}</title>
           <style>
-            @page { size: 60mm 40mm; margin: 0; }
+            @page { size: ${labelWidthMm}mm ${labelHeightMm}mm; margin: 0; }
             html, body { margin:0; padding:0; font-family: Arial, sans-serif; color:#013364; }
             .label {
-              width: 60mm;
-              height: 40mm;
+              width: ${labelWidthMm}mm;
+              height: ${labelHeightMm}mm;
               box-sizing: border-box;
-              padding: 2mm;
+              padding: ${LABEL_PADDING_MM}mm;
               display: flex;
-              flex-direction: column;
+              flex-direction: row;
               align-items: center;
               justify-content: center;
-              gap: 1.5mm;
+              gap: 3mm;
               page-break-after: always;
               break-after: page;
             }
             .label:last-child { page-break-after: auto; break-after: auto; }
-            /* 26mm de QR + o código cabem na altura útil (40mm menos 4mm de
-               margem interna); em retrato o QR podia ser maior. */
-            .label img { width: 26mm; height: 26mm; object-fit: contain; }
-            .code { font-size: 13pt; font-weight:700; letter-spacing:1px; color:#02748e; text-align:center; }
+            /* O QR é gerado sem zona silenciosa própria: é o branco da
+               etiqueta — a margem interna e o espaço até ao texto — que faz
+               esse papel. Por isso o QR nunca ocupa a altura toda. */
+            .label img { width: ${labelQrSizeMm}mm; height: ${labelQrSizeMm}mm; object-fit: contain; flex: none; }
+            .code {
+              display: flex;
+              flex-direction: column;
+              min-width: 0;
+              font-size: 12pt;
+              font-weight: 700;
+              line-height: 1.15;
+              letter-spacing: 0.5px;
+              color: #02748e;
+              text-align: center;
+            }
+            /* Os códigos de recurso podem ser mais longos que ano-XXXXXX;
+               partir aqui é preferível a transbordar da etiqueta. */
+            .code .serial { overflow-wrap: anywhere; }
             @media print { .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
           </style>
         </head>

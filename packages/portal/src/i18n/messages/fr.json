@@ -855,7 +855,19 @@
     "maxThirty": "Maximum de 30",
     "maxHundred": "Maximum de 100",
     "saveSuccess": "Paramètres mis à jour",
-    "saveError": "Impossible d'enregistrer les paramètres"
+    "saveError": "Impossible d'enregistrer les paramètres",
+    "labelSectionTitle": "Étiquettes d'impression",
+    "labelSectionHelp": "Dimensions du rouleau d'étiquettes utilisé pour imprimer les QR des sacs. Une étiquette par page.",
+    "labelWidthLabel": "Largeur (mm)",
+    "labelHeightLabel": "Hauteur (mm)",
+    "labelQrSizeLabel": "Côté du QR (mm)",
+    "labelQrSizeHelp": "Le QR est à gauche et le code à côté. Plus le QR est grand, plus la caméra le lit de loin — mais il doit tenir sur l'étiquette, avec 2 mm de marge.",
+    "measureRequired": "Indiquez la mesure",
+    "minTen": "Minimum 10",
+    "minTwenty": "Minimum 20",
+    "maxWidth": "Maximum 210",
+    "maxHeight": "Maximum 297",
+    "maxQrSize": "Maximum 200"
   },
   "dashboard": {
     "pageTitle": "Tableau de bord",
