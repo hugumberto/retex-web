@@ -19,7 +19,9 @@ export const DEFAULT_LABEL_SIZE = {
   labelWidthMm: 50,
   labelHeightMm: 30,
   labelQrSizeMm: 24,
-  labelRotationDeg: 0,
+  // Nas impressoras em uso a cabeça térmica imprime ao alto; sem rodar, a
+  // etiqueta sai deitada.
+  labelRotationDeg: 90,
 } as const;
 
 /** Margem interna da etiqueta, em mm — igual de cada lado. */

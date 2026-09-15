@@ -318,8 +318,13 @@ export default function PackageCollection() {
               max-height: ${labelQrSizeMm}mm;
               ${isPortrait ? 'width: 100%; height: auto;' : 'height: 100%; width: auto;'}
             }
+            /* Ao lado do QR, o código é escrito na vertical: a coluna que
+               sobra é estreita e alta, e na horizontal obrigava a letra mais
+               pequena. Empilhado (etiqueta ao alto) mantém-se na horizontal,
+               onde a largura é que sobra. */
             .content .code {
               display: flex;
+              ${isPortrait ? '' : 'writing-mode: vertical-lr;'}
               flex-direction: column;
               min-width: 0;
               font-size: 12pt;
