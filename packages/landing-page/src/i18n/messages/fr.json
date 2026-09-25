@@ -20,6 +20,10 @@
       "title": "Créer un compte | RETEX",
       "description": "Créez votre compte RETEX et commencez à contribuer à un avenir plus durable."
     },
+    "prr": {
+      "title": "Projet PRR | RETEX",
+      "description": "Projet RETEX n° 23720 — Vouchers para Startups – Novos Produtos Digitais/Tecnológicos, financé par le PRR et par l'Union européenne – NextGenerationEU."
+    },
     "post": {
       "notFound": "Article introuvable | RETEX"
     }
@@ -184,13 +188,68 @@
     "next": "Suivant →",
     "pageInfo": "Page {current} sur {total}"
   },
+  "prr": {
+    "hero": {
+      "kicker": "FINANCEMENT",
+      "title": "Projet RETEX",
+      "subtitle": "Vouchers para Startups – Novos Produtos Digitais/Tecnológicos",
+      "lead": "Développer des solutions numériques pour un avenir plus circulaire dans le secteur textile."
+    },
+    "about": {
+      "title": "À propos du projet",
+      "body1": "Le projet RETEX, n° {number}, avait pour objectif le développement d'une solution numérique et technologique pour l'économie circulaire dans le secteur textile, en intégrant des outils de soutien à la collecte, au tri, à la traçabilité, au suivi et à l'analyse de l'information.",
+      "body2": "Le projet a permis de développer et de tester des composants technologiques destinés à soutenir la gestion de la collecte en porte-à-porte, le tri des produits textiles et la <strong>mise à disposition d'indicateurs environnementaux et opérationnels</strong>, contribuant à une plus grande efficacité et transparence dans la chaîne de valeur de la mode circulaire."
+    },
+    "facts": {
+      "ariaLabel": "Données du projet",
+      "number": {
+        "label": "Projet n°"
+      },
+      "investment": {
+        "label": "Investissement éligible"
+      },
+      "support": {
+        "label": "Soutien financier (PRR)"
+      },
+      "program": {
+        "label": "Programme",
+        "value": "Vouchers para Startups – Novos Produtos Digitais/Tecnológicos"
+      }
+    },
+    "objectives": {
+      "title": "Principaux objectifs",
+      "items": {
+        "platform": "Développer une plateforme numérique pour <strong>l'économie circulaire textile</strong>",
+        "components": "<strong>Tester et valider</strong> des composants technologiques innovants",
+        "impact": "Promouvoir la <strong>traçabilité</strong> et le <strong>suivi</strong> de l'impact environnemental"
+      }
+    },
+    "results": {
+      "title": "Résultats attendus",
+      "items": {
+        "sorting": "Des solutions numériques appliquées à la gestion de la collecte et du tri",
+        "transparency": "Une efficacité et une transparence accrues dans la chaîne de valeur",
+        "climate": "Une contribution à la transition climatique et à un modèle plus circulaire dans le secteur textile"
+      }
+    },
+    "funding": {
+      "title": "Financement",
+      "body": "Ce projet est financé par le Plan de relance et de résilience (PRR), dans le cadre de la mesure Vouchers para Startups – Novos Produtos Digitais/Tecnológicos, avec le soutien de l'Union européenne – NextGenerationEU.",
+      "barAlt": "PRR – Plan de relance et de résilience, République portugaise et Financé par l'Union européenne – NextGenerationEU"
+    },
+    "cta": {
+      "text": "Ensemble pour une mode plus circulaire.",
+      "button": "En savoir plus sur RETEX"
+    }
+  },
   "footer": {
     "tagline": "wear. care. share. repeat.",
     "nav": {
       "howItWorks": "COMMENT ÇA MARCHE",
       "faq": "FAQ",
       "blog": "BLOG",
-      "about": "À PROPOS"
+      "about": "À PROPOS",
+      "prrProject": "PROJET PRR"
     },
     "contactTitle": "Contactez-nous pour en savoir plus",
     "privacyPolicy": "Politique de Confidentialité",
