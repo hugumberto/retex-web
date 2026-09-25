@@ -11,7 +11,7 @@ const outDir = fileURLToPath(new URL('../shots/', import.meta.url));
 await mkdir(outDir, { recursive: true });
 
 // Páginas a validar e os tamanhos/dispositivos.
-const pages = ['/', '/blog', '/faq', '/register'];
+const pages = ['/', '/blog', '/faq', '/register', '/projeto-prr'];
 const targets = [
   { name: 'iphone13', engine: webkit, context: devices['iPhone 13'] },
   { name: 'pixel7', engine: chromium, context: devices['Pixel 7'] },

@@ -25,6 +25,7 @@ export default function LandingFooter() {
           <Link href="/faq">{t('nav.faq')}</Link>
           <Link href="/#blog">{t('nav.blog')}</Link>
           <Link href="/#sobre-nos">{t('nav.about')}</Link>
+          <Link href="/projeto-prr">{t('nav.prrProject')}</Link>
         </nav>
 
         <div className="footer-col--contact">
