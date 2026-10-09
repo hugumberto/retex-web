@@ -1,48 +1,31 @@
-export enum Quality {
-  GOOD = 'GOOD',
-  MEDIUM = 'MEDIUM',
-  BAD = 'BAD',
-}
+import { Season, StorageGroup, Type } from './triage';
+
+export { AgeGroup, Season, Sex, StorageGroup, Type } from './triage';
+
 export enum Status {
   ATIVO = 'ATIVO',
   INATIVO = 'INATIVO',
-}
-export enum Sex {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-}
-export enum AgeGroup {
-  ADULT = 'ADULT',
-  CHILD = 'CHILD',
-}
-export enum Type {
-  UPPER_PART = 'UPPER_PART',
-  UNDER_PART = 'UNDER_PART',
-}
-export enum Season {
-  SUMMER = 'SUMMER',
-  WINTER = 'WINTER',
 }
 
 export type StorageUnitDTO = {
   id: string;
   friendlyCode?: string;
-  quality: Quality;
-  sex: Sex;
-  ageGroup: AgeGroup;
-  type: Type;
-  season: Season;
+  group: StorageGroup;
+  // Nulos apenas no lote NON_REUSABLE.
+  type?: Type | null;
+  season?: Season | null;
+  // Localização física (armazém / posição).
+  location?: string | null;
   status: Status;
   weight: number;
   itemsCount?: number;
 };
 
 export type StorageUnitFormData = {
-  quality: Quality;
-  sex: Sex;
-  ageGroup: AgeGroup;
-  type: Type;
-  season: Season;
+  group: StorageGroup;
+  type: Type | '';
+  season: Season | '';
+  location: string;
   state: Status;
   weight: number;
 };

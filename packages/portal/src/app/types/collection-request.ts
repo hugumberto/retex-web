@@ -4,6 +4,17 @@ import { Entity } from "./helper"
 import { PackageCollectionDTO } from "./package-collection"
 import { StorageUnitDTO } from "./storage-unit";
 import { UserDTO } from "./user"
+import {
+  AgeGroup,
+  Category,
+  Condition,
+  Destination,
+  Season,
+  Sex,
+  Type,
+} from "./triage";
+
+export { AgeGroup, Season, Sex, Type } from "./triage";
 
 export interface Address {
   street: string;
@@ -34,41 +45,23 @@ export interface CollectionRequestDTO extends Entity {
 }
 export interface CollectionRequestItemDTO extends Entity {
   collectionRequest: CollectionRequestDTO
-  quality: Quality
-  type: Type
   storageUnit: StorageUnitDTO
-  season: Season
-  sex: Sex
-  ageGroup: AgeGroup
-  brand: Brand
   quantity: number
   bag?: { id: string; friendlyCode?: string } | null
-}
-
-export enum Quality {
-  GOOD = "GOOD",
-  MEDIUM = "MEDIUM",
-  BAD = "BAD",
-}
-
-export enum Type {
-  UPPER_PART = "UPPER_PART",
-  UNDER_PART = "UNDER_PART",
-}
-
-export enum Season {
-  SUMMER = "SUMMER",
-  WINTER = "WINTER",
-}
-
-export enum Sex {
-  MALE = "MALE",
-  FEMALE = "FEMALE",
-}
-
-export enum AgeGroup {
-  ADULT = "ADULT",
-  CHILD = "CHILD",
+  // Indicadores básicos (decidem o lote).
+  destination: Destination
+  sex?: Sex | null
+  ageGroup?: AgeGroup | null
+  season?: Season | null
+  type?: Type | null
+  // Indicadores informativos.
+  category?: Category | null
+  condition?: Condition | null
+  brand?: Brand | null
+  denim?: boolean | null
+  material?: string | null
+  color?: string | null
+  size?: string | null
 }
 
 export enum CollectionRequestStatus {

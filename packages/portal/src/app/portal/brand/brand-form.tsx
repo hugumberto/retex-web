@@ -1,6 +1,7 @@
 'use client';
 
 import { Brand, BrandFormData } from '@/app/types/brand';
+import { CheckboxForm } from '@/components/form/checkbox-form';
 import { DialogForm } from '@/components/form/dialog-form';
 import { InputForm } from '@/components/form/input-form';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,8 @@ export default function BrandForm({
   const form = useForm<BrandFormData>({
     defaultValues: {
       name: initialData?.name ?? '',
+      manual: initialData?.manual ?? false,
+      premium: initialData?.premium ?? false,
     },
   });
 
@@ -39,7 +42,11 @@ export default function BrandForm({
     control,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = form;
+
+  const premium = watch('premium');
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -48,10 +55,11 @@ export default function BrandForm({
         reset({
           name: initialData?.name ?? '',
           manual: initialData?.manual ?? false,
+          premium: initialData?.premium ?? false,
         });
       }
     },
-    [initialData?.manual, initialData?.name, reset]
+    [initialData?.manual, initialData?.name, initialData?.premium, reset]
   );
 
   const handleSubmit = useCallback(
@@ -64,6 +72,7 @@ export default function BrandForm({
               const res = await api.put(`/brand/${brandId}`, {
                 name: data.name,
                 manual: data.manual,
+                premium: data.premium,
               });
               if (!isSuccessStatus(res.status)) {
                 throw new Error('Erro na requisição');
@@ -72,6 +81,7 @@ export default function BrandForm({
               const res = await api.post('/brand', {
                 name: data.name,
                 manual: data.manual,
+                premium: data.premium,
               });
               if (!isSuccessStatus(res.status)) {
                 throw new Error('Erro na requisição');
@@ -83,7 +93,7 @@ export default function BrandForm({
             success: () => {
               onSave();
               setIsOpen(false);
-              reset({ name: '', manual: false });
+              reset({ name: '', manual: false, premium: false });
               return isEditing ? t('updateSuccess') : t('createSuccess');
             },
             error: (err) => {
@@ -135,6 +145,16 @@ export default function BrandForm({
           rules={{ required: tCommon('nameRequired') }}
           errors={errors}
           placeholder={t('namePlaceholder')}
+        />
+        <CheckboxForm
+          label={t('premium')}
+          name="premium"
+          control={control}
+          checked={!!premium}
+          onCheckedChange={(checked) =>
+            setValue('premium', checked === true, { shouldDirty: true })
+          }
+          errors={errors}
         />
       </div>
     </DialogForm>

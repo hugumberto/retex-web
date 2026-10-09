@@ -116,7 +116,13 @@
     "zipLookupError": "Could not look up the address from the postcode",
     "streetPlaceholder": "Street / Avenue",
     "complementPlaceholder": "Floor, flat…",
-    "cityDivisionPlaceholder": "Parque das Nações"
+    "cityDivisionPlaceholder": "Parque das Nações",
+    "category": "Category",
+    "condition": "Condition",
+    "destination": "Destination",
+    "group": "Group",
+    "location": "Location",
+    "storageSlot": "Lot"
   },
   "nav": {
     "home": "HOME",
@@ -166,11 +172,6 @@
       "IN_TRANSIT": "In transit",
       "FINISHED": "Completed"
     },
-    "quality": {
-      "GOOD": "Good",
-      "MEDIUM": "Fair",
-      "BAD": "Poor"
-    },
     "sex": {
       "MALE": "Men",
       "FEMALE": "Women"
@@ -180,8 +181,8 @@
       "CHILD": "Children"
     },
     "itemType": {
-      "UPPER_PART": "Upper body",
-      "UNDER_PART": "Lower body"
+      "UPPER_PART": "Top",
+      "UNDER_PART": "Bottom"
     },
     "season": {
       "SUMMER": "Summer",
@@ -233,6 +234,48 @@
       "REQUEST_CANCEL_ALL": "Cancel all requests",
       "MEMBER_MANAGE": "Manage members",
       "ADDRESS_MANAGE": "Manage collection sites"
+    },
+    "category": {
+      "TOP": "T-shirt / Shirt / Top",
+      "SWEATER": "Sweater",
+      "COAT": "Coat",
+      "DRESS": "Dress",
+      "SUIT_JACKET": "Suit – jacket",
+      "PAJAMA_TOP": "Pyjama – top",
+      "SPORTSWEAR_TOP": "Sportswear – top",
+      "BRA": "Bra",
+      "UNDERSHIRT": "Undershirt",
+      "SWIM_TOP": "Bikini – top",
+      "SWIMSUIT": "Swimsuit",
+      "TROUSERS": "Trousers",
+      "SHORTS": "Shorts",
+      "SKIRT": "Skirt",
+      "JUMPSUIT": "Jumpsuit",
+      "SUIT_TROUSERS": "Suit – trousers",
+      "PAJAMA_BOTTOM": "Pyjama – bottom",
+      "SPORTSWEAR_BOTTOM": "Sportswear – bottom",
+      "UNDERPANTS": "Underpants / Boxers",
+      "SWIM_BOTTOM": "Swimwear – bottom"
+    },
+    "condition": {
+      "EXCELLENT": "Excellent",
+      "GOOD": "Good",
+      "REGULAR": "Fair"
+    },
+    "destination": {
+      "REUSE": "Reuse",
+      "VINTAGE": "Vintage / Direct resale",
+      "RECONDITIONING": "Reconditioning",
+      "UPCYCLING": "Upcycling",
+      "STOCK_RESERVE": "Stock reserve",
+      "NON_REUSABLE": "Non-reusable",
+      "ACCESSORY": "Accessory"
+    },
+    "storageGroup": {
+      "MEN": "Men",
+      "WOMEN": "Women",
+      "CHILDREN": "Children",
+      "NON_REUSABLE": "Non-reusable"
     }
   },
   "validation": {
@@ -335,7 +378,8 @@
     "updateSuccess": "Brand updated successfully!",
     "createError": "Error creating the brand.",
     "updateError": "Error updating the brand.",
-    "duplicateName": "A brand with this name already exists"
+    "duplicateName": "A brand with this name already exists",
+    "premium": "Premium"
   },
   "blog": {
     "pageTitle": "Blog",
@@ -757,14 +801,10 @@
     "createBrandOption": "Create brand \"{name}\"",
     "brandsLoadError": "Could not load the brands",
     "quantityLabel": "Quantity *",
-    "qualityLabel": "Quality *",
     "seasonLabel": "Season *",
-    "clothingTypeLabel": "Garment type *",
-    "sexLabel": "Sex *",
-    "ageGroupLabel": "Age group *",
     "selectBagFirst": "Select a bag before adding the item",
     "selectBrand": "Select a brand",
-    "selectAttributes": "Select quality, season, type, sex and age group",
+    "selectAttributes": "Select category, condition and season",
     "invalidQuantity": "Enter a valid quantity",
     "itemAdded": "Item added to the bag",
     "itemCreateError": "Could not create the item",
@@ -778,7 +818,7 @@
     "storageCodeRequired": "Enter the storage code",
     "storageUnitNotFound": "Storage unit not found",
     "storageUnitAlreadyAdded": "This storage unit has already been added",
-    "storageUnitMismatch": "The attributes of this unit do not match any item in the list",
+    "storageUnitMismatch": "This unit does not match the lot of any item in the list",
     "storageUnitAdded": "Storage unit added successfully",
     "storageUnitFetchError": "Error fetching the unit",
     "noStorageUnits": "No storage units added",
@@ -790,21 +830,71 @@
     "persistItemsFirst": "All items must be saved before finishing",
     "processBagsFirst": "Process every bag before finishing",
     "addStorageUnitsFirst": "Add storage units before finishing",
-    "storageUnitPerCombination": "Each item combination needs a matching storage unit",
+    "storageUnitPerCombination": "Each item lot needs a matching storage unit",
     "storageUnitsSaveError": "Error saving the storage units",
     "bindItemsError": "Error linking items to the storage units",
     "statusUpdateError": "Error updating the request status",
     "finishSuccess": "Triage finished successfully",
     "finishError": "Could not finish the triage",
-    "bagWithoutItems": "Add at least one item before saving the bag"
+    "bagWithoutItems": "Add at least one item before saving the bag",
+    "classificationTitle": "Clothing classification",
+    "classificationSubtitle": "Select the category and record the details of each item",
+    "maleTitle": "Male",
+    "maleSubtitle": "Clothing for men, babies and children",
+    "femaleTitle": "Female",
+    "femaleSubtitle": "Clothing for women, babies and children",
+    "adultMale": "Adult (Men)",
+    "childMale": "Baby & Kids (Boy)",
+    "adultFemale": "Adult (Women)",
+    "childFemale": "Baby & Kids (Girl)",
+    "partChoice": "Which part is it? Each part is recorded as one item.",
+    "denimLabel": "Denim",
+    "denimHint": "(jeans only)",
+    "conditionLabel": "Quality / Condition *",
+    "destinationLabel": "Destination",
+    "moreDetails": "More details (optional)",
+    "materialLabel": "Material",
+    "colorLabel": "Colour",
+    "sizeLabel": "Size",
+    "registerItem": "Record item",
+    "otherRecordsTitle": "Outside reuse",
+    "otherRecordsHint": "Records only the quantity, without classifying the item.",
+    "nonReusableButton": "Non-reusable",
+    "accessoryButton": "Accessory",
+    "placeIn": "Place in: {slot}",
+    "noStorage": "Record only (not stored in any lot)",
+    "selectCategory": "Select a category",
+    "tiles": {
+      "tops": "T-shirts, Polos, Shirts",
+      "topsFemale": "T-shirts, Tops, Blouses, Shirts",
+      "trousers": "Trousers",
+      "trousersHint": "Jeans, Chinos, Leggings",
+      "shorts": "Shorts",
+      "sweaters": "Sweaters",
+      "sweatersHint": "Sweatshirts, Knitwear",
+      "coats": "Coats",
+      "coatsHint": "Jackets, Parkas",
+      "suits": "Suits",
+      "suitsHint": "Blazers, Sets",
+      "underwear": "Underwear",
+      "underwearMaleHint": "Boxers, Briefs",
+      "underwearFemaleHint": "Bras, Briefs",
+      "sportswear": "Sportswear",
+      "sportswearHint": "Fitness, Outdoor",
+      "swimwear": "Swimwear",
+      "swimwearMaleHint": "Swim shorts",
+      "swimwearFemaleHint": "Bikinis, Swimsuits",
+      "pajamas": "Pyjamas",
+      "pajamasHint": "and loungewear",
+      "dresses": "Dresses",
+      "skirts": "Skirts",
+      "jumpsuits": "Jumpsuits"
+    }
   },
   "storageUnit": {
     "pageTitle": "Storage",
     "formCreateTitle": "New storage unit",
     "formEditTitle": "Update storage unit",
-    "qualityRequired": "Quality is required",
-    "sexRequired": "Sex is required",
-    "ageGroupRequired": "Age group is required",
     "typeRequired": "Garment part is required",
     "seasonRequired": "Season is required",
     "weightRequired": "Weight is required",
@@ -818,10 +908,12 @@
     "weightKg": "Weight (kg)",
     "codeWithColon": "Code:",
     "seasonWithColon": "Season:",
-    "ageGroupWithColon": "Age group:",
-    "qualityWithColon": "Quality:",
-    "sexWithColon": "Sex:",
-    "partWithColon": "Part:"
+    "partWithColon": "Part:",
+    "groupRequired": "Group is required",
+    "groupWithColon": "Group:",
+    "locationWithColon": "Location:",
+    "locationPlaceholder": "E.g. Warehouse A · Aisle 3",
+    "nonReusableHint": "The non-reusable unit has no season or part."
   },
   "bags": {
     "pageTitle": "Request bags",
@@ -895,8 +987,6 @@
     "lastTwelveMonths": "Last 12 months (kg)",
     "topBrands": "Top brands",
     "itemsPerBrand": "Number of items per brand",
-    "itemQuality": "Item quality",
-    "quantityPerQuality": "Quantity per quality",
     "itemsPerSeason": "Items per season",
     "itemType": "Garment type",
     "citiesOutOfZone": "Cities outside the service area",
@@ -926,7 +1016,13 @@
     "activityTriages": "Triages done",
     "activityPieces": "Items triaged",
     "activityHint": "Each number uses its own date: request creation, bag collection, triage and item entry. Over a short range the four do not add up to one another — a July request may be triaged in September.",
-    "activityLoadError": "Could not load the activity for the period"
+    "activityLoadError": "Could not load the activity for the period",
+    "itemCondition": "Item condition",
+    "quantityPerCondition": "Quantity per condition",
+    "itemDestination": "Item destination",
+    "quantityPerDestination": "Quantity per destination",
+    "itemCategory": "Item categories",
+    "quantityPerCategory": "Quantity per category"
   },
   "company": {
     "pageTitle": "Companies",
