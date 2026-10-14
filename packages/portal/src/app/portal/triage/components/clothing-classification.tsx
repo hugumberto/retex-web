@@ -97,24 +97,28 @@ type PanelTheme = {
   tile: string;
 };
 
+// Os dois painéis distinguem-se pelos tons da marca — o azul-escuro do
+// `primary` e o azul-petróleo do `secondary` — e não por azul/rosa, que não
+// pertencem à paleta. O que separa um painel do outro é sobretudo o ícone, o
+// título e a posição; a cor é só reforço.
 const MALE_THEME: PanelTheme = {
-  border: 'border-blue-200',
-  surface: 'bg-blue-50/40',
-  title: 'text-blue-700',
-  activeTab: 'bg-blue-700 text-white border-blue-700',
-  tab: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
-  activeTile: 'border-blue-700 bg-blue-50 ring-2 ring-blue-700/25',
-  tile: 'text-blue-700',
+  border: 'border-primary/20',
+  surface: 'bg-primary/5',
+  title: 'text-primary',
+  activeTab: 'bg-primary text-white border-primary',
+  tab: 'bg-white text-primary border-primary/25 hover:bg-primary/10',
+  activeTile: 'border-primary bg-primary/5 ring-2 ring-primary/25',
+  tile: 'text-primary',
 };
 
 const FEMALE_THEME: PanelTheme = {
-  border: 'border-pink-200',
-  surface: 'bg-pink-50/40',
-  title: 'text-pink-600',
-  activeTab: 'bg-pink-600 text-white border-pink-600',
-  tab: 'bg-pink-50 text-pink-600 border-pink-200 hover:bg-pink-100',
-  activeTile: 'border-pink-600 bg-pink-50 ring-2 ring-pink-600/25',
-  tile: 'text-pink-600',
+  border: 'border-secondary/25',
+  surface: 'bg-secondary/5',
+  title: 'text-secondary',
+  activeTab: 'bg-secondary text-white border-secondary',
+  tab: 'bg-white text-secondary border-secondary/25 hover:bg-secondary/10',
+  activeTile: 'border-secondary bg-secondary/5 ring-2 ring-secondary/25',
+  tile: 'text-secondary',
 };
 
 function ChoiceButtons<T extends string>({
