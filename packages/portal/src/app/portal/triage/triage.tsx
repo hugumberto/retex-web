@@ -5,6 +5,12 @@ import { Brand } from '@/app/types/brand';
 import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
 import { CollectionRequestBagDTO, TriageResponse } from '@/app/types/collection-request-bag';
+import {
+  CATEGORY_PART,
+  Destination,
+  StorageSlot,
+  isReusableDestination,
+} from '@/app/types/triage';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import ScanInput from '@/components/custom/scan-input';
@@ -26,7 +32,16 @@ import { useAppStore } from '@/store';
 import { Ban, Info } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import AddTriage, { buildTriageKey, TriageListItem } from './components/add-triage';
+import AddTriage, {
+  itemSlotKey,
+  TriageListItem,
+  unitSlotKey,
+  useSlotLabel,
+} from './components/add-triage';
+import ClothingClassification, {
+  ClassificationForm,
+  EMPTY_CLASSIFICATION,
+} from './components/clothing-classification';
 import CollectionRecord from './components/collection-record';
 import CollectionRequestUserData from './components/collection-request-user-data';
 
@@ -40,10 +55,6 @@ const finishErrorMessage = (error: unknown, fallback: string): string => {
   if (typeof message === 'string') return message;
   return fallback;
 };
-
-// A esmagadora maioria dos itens é registada à unidade, por isso o campo já
-// vem preenchido — poupa uma escrita por item num ecrã usado ao ritmo do scanner.
-const DEFAULT_QUANTITY = '1';
 
 // O peso é obrigatório para dar um saco por processado. Zero é tratado como
 // "não pesado": o backend aceita-o (@Min(0)) e um saco de 0 kg não existe.
@@ -68,6 +79,7 @@ export default function Triage() {
   const tCommon = useTranslations('common');
   const tStatus = useTranslations('enums.collectionRequestStatus');
   const tBrand = useTranslations('brand');
+  const slotLabel = useSlotLabel();
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const scanCodeInputRef = useRef<HTMLInputElement>(null);
   const bagInputRef = useRef<HTMLInputElement>(null);
@@ -87,15 +99,7 @@ export default function Triage() {
   const [isSavingProgress, setIsSavingProgress] = useState(false);
   const [isFinishingTriage, setIsFinishingTriage] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [brandId, setBrandId] = useState('');
-  const [quantity, setQuantity] = useState(DEFAULT_QUANTITY);
-  const [quality, setQuality] = useState<'GOOD' | 'MEDIUM' | 'BAD'>();
-  const [season, setSeason] = useState<'SUMMER' | 'WINTER'>();
-  const [clothingType, setClothingType] = useState<
-    'UPPER_PART' | 'UNDER_PART'
-  >();
-  const [sex, setSex] = useState<'MALE' | 'FEMALE'>();
-  const [ageGroup, setAgeGroup] = useState<'ADULT' | 'CHILD'>();
+  const [itemForm, setItemForm] = useState<ClassificationForm>(EMPTY_CLASSIFICATION);
   const [triageItems, setTriageItems] = useState<TriageListItem[]>([]);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
@@ -138,7 +142,7 @@ export default function Triage() {
         });
         if (!isSuccessStatus(status)) throw new Error();
         setBrands((prev) => sortBrands([...prev, data]));
-        setBrandId(data.id);
+        setItemForm((current) => ({ ...current, brandId: data.id }));
         toast.success(tBrand('createSuccess'));
         return data.id;
       } catch (error) {
@@ -200,11 +204,13 @@ export default function Triage() {
         id: collectionRequestItem.id,
         collectionRequestId: data.collectionRequest.id,
         bagId: collectionRequestItem.bag?.id,
-        quality: collectionRequestItem.quality,
+        destination: collectionRequestItem.destination,
         type: collectionRequestItem.type,
         season: collectionRequestItem.season,
         sex: collectionRequestItem.sex,
         ageGroup: collectionRequestItem.ageGroup,
+        category: collectionRequestItem.category,
+        condition: collectionRequestItem.condition,
         brandId: collectionRequestItem.brand?.id ?? '',
         quantity: collectionRequestItem.quantity,
       })) as TriageListItem[];
@@ -261,15 +267,10 @@ export default function Triage() {
     0
   );
 
-  const clearItemForm = () => {
-    setBrandId('');
-    setQuantity(DEFAULT_QUANTITY);
-    setQuality(undefined);
-    setSeason(undefined);
-    setClothingType(undefined);
-    setSex(undefined);
-    setAgeGroup(undefined);
-  };
+  const clearItemForm = () => setItemForm(EMPTY_CLASSIFICATION);
+
+  const updateItemForm = (patch: Partial<ClassificationForm>) =>
+    setItemForm((current) => ({ ...current, ...patch }));
 
   // Escaneia/consulta o saco localmente contra os sacos da solicitação.
   const handleBagScan = (scanned?: string) => {
@@ -311,54 +312,98 @@ export default function Triage() {
     requestAnimationFrame(() => weightInputRef.current?.focus());
   };
 
-  const handleAddTriageItem = async () => {
+  // `quickDestination` regista já, só com a quantidade (e a marca, se houver):
+  // peça não reutilizável ou acessório, sem classificar.
+  const handleRegisterItem = async (
+    quickDestination?: Destination.NON_REUSABLE | Destination.ACCESSORY
+  ) => {
     if (!selectedCollectionRequest?.id || !activeBagId) {
       toast.error(t('selectBagFirst'));
       return;
     }
-    if (!brandId) {
-      toast.error(t('selectBrand'));
-      return;
+    const destination = quickDestination ?? itemForm.destination;
+    const reusable = isReusableDestination(destination);
+    if (reusable) {
+      if (!itemForm.category) {
+        toast.error(t('selectCategory'));
+        return;
+      }
+      if (!itemForm.brandId) {
+        toast.error(t('selectBrand'));
+        return;
+      }
+      if (!itemForm.condition || !itemForm.season) {
+        toast.error(t('selectAttributes'));
+        return;
+      }
     }
-    if (!quality || !season || !clothingType || !sex || !ageGroup) {
-      toast.error(t('selectAttributes'));
-      return;
-    }
-    const parsedQuantity = Number(quantity);
-    if (!quantity.trim() || Number.isNaN(parsedQuantity) || parsedQuantity < 1) {
+    const parsedQuantity = Number(itemForm.quantity);
+    if (
+      !itemForm.quantity.trim() ||
+      Number.isNaN(parsedQuantity) ||
+      parsedQuantity < 1
+    ) {
       toast.error(t('invalidQuantity'));
       return;
     }
 
-    const payload = {
-      collectionRequestId: selectedCollectionRequest.id,
-      bagId: activeBagId,
-      quality,
-      type: clothingType,
-      season,
-      sex,
-      ageGroup,
-      brandId,
-      quantity: parsedQuantity,
-    };
+    const payload = reusable
+      ? {
+          collectionRequestId: selectedCollectionRequest.id,
+          bagId: activeBagId,
+          destination,
+          sex: itemForm.sex,
+          ageGroup: itemForm.ageGroup,
+          category: itemForm.category,
+          condition: itemForm.condition,
+          season: itemForm.season,
+          denim: itemForm.denim,
+          brandId: itemForm.brandId,
+          quantity: parsedQuantity,
+          material: itemForm.material.trim() || undefined,
+          color: itemForm.color.trim() || undefined,
+          size: itemForm.size.trim() || undefined,
+        }
+      : {
+          collectionRequestId: selectedCollectionRequest.id,
+          bagId: activeBagId,
+          destination,
+          brandId: itemForm.brandId || undefined,
+          quantity: parsedQuantity,
+        };
 
     setIsCreatingItem(true);
     try {
-      const { data, status } = await api.post<{ id?: string }>(
-        '/items',
-        payload
-      );
+      const { data, status } = await api.post<{
+        id?: string;
+        storageSlot?: StorageSlot | null;
+      }>('/items', payload);
       if (!isSuccessStatus(status)) throw new Error(t('itemCreateError'));
 
       setTriageItems((current) => [
         ...current,
-        { ...payload, id: data?.id } as TriageListItem,
+        {
+          ...payload,
+          id: data?.id,
+          type: reusable && itemForm.category ? CATEGORY_PART[itemForm.category] : null,
+        } as TriageListItem,
       ]);
-      clearItemForm();
-      toast.success(t('itemAdded'));
+      // O que fica de uma peça para a seguinte é o painel (sexo e faixa
+      // etária): as peças de um saco costumam vir do mesmo grupo.
+      setItemForm({
+        ...EMPTY_CLASSIFICATION,
+        sex: itemForm.sex,
+        ageGroup: itemForm.ageGroup,
+      });
+      // Diz ao operador em que caixote pôr a peça.
+      toast.success(t('itemAdded'), {
+        description: data?.storageSlot
+          ? t('placeIn', { slot: slotLabel(data.storageSlot) })
+          : t('noStorage'),
+      });
     } catch (error) {
       console.error('Erro ao criar item:', error);
-      toast.error('Não foi possível adicionar o item');
+      toast.error(finishErrorMessage(error, t('itemCreateError')));
     } finally {
       setIsCreatingItem(false);
     }
@@ -520,9 +565,9 @@ export default function Triage() {
         toast.error(t('storageUnitAlreadyAdded'));
         return;
       }
-      const storageKey = buildTriageKey(data);
+      const storageKey = unitSlotKey(data);
       const hasMatchingItem = triageItems.some(
-        (item) => buildTriageKey(item) === storageKey
+        (item) => itemSlotKey(item) === storageKey
       );
       if (!hasMatchingItem) {
         toast.error(
@@ -574,7 +619,14 @@ export default function Triage() {
       toast.error(t('addItemsFirst'));
       return;
     }
-    if (storageUnits.filter((unit) => !!unit?.id).length === 0) {
+    // Peças sem lote (acessórios) não precisam de unidade de armazenamento.
+    const itemKeys = triageItems
+      .map(itemSlotKey)
+      .filter((key): key is string => key != null);
+    if (
+      itemKeys.length > 0 &&
+      storageUnits.filter((unit) => !!unit?.id).length === 0
+    ) {
       toast.error(t('addStorageUnitsFirst'));
       return;
     }
@@ -582,14 +634,12 @@ export default function Triage() {
       toast.error(t('persistItemsFirst'));
       return;
     }
-    // Cada combinação de item precisa de uma unidade compatível (mesmo gate do
+    // Cada lote das peças precisa de uma unidade compatível (mesmo gate do
     // servidor). Evita o round-trip: dá mensagem imediata em vez de erro 400.
     const storageUnitKeys = new Set(
-      storageUnits
-        .filter((unit) => !!unit?.id)
-        .map((unit) => buildTriageKey(unit))
+      storageUnits.filter((unit) => !!unit?.id).map(unitSlotKey)
     );
-    if (triageItems.some((item) => !storageUnitKeys.has(buildTriageKey(item)))) {
+    if (itemKeys.some((key) => !storageUnitKeys.has(key))) {
       toast.error(
         t('storageUnitPerCombination')
       );
@@ -604,12 +654,16 @@ export default function Triage() {
 
     setIsFinishingTriage(true);
     try {
-      const { status: bindStatus } = await api.post(
-        '/items/bind-storage-units',
-        { items: itemIds, storageUnits: storageUnitIds }
-      );
-      if (!isSuccessStatus(bindStatus)) {
-        throw new Error(t('bindItemsError'));
+      // Só com acessórios não há nada para vincular; o PATCH abaixo fecha a
+      // triagem na mesma.
+      if (storageUnitIds.length > 0) {
+        const { status: bindStatus } = await api.post(
+          '/items/bind-storage-units',
+          { items: itemIds, storageUnits: storageUnitIds }
+        );
+        if (!isSuccessStatus(bindStatus)) {
+          throw new Error(t('bindItemsError'));
+        }
       }
 
       const { status: collectionRequestStatus } = await api.patch(
@@ -635,14 +689,11 @@ export default function Triage() {
     !selectedCollectionRequest ||
     !activeBagId ||
     isLoadingCollectionRequest ||
-    isCreatingItem ||
-    !brandId ||
-    !quantity.trim() ||
-    !quality ||
-    !season ||
-    !clothingType ||
-    !sex ||
-    !ageGroup;
+    !itemForm.brandId ||
+    !itemForm.quantity.trim() ||
+    !itemForm.category ||
+    !itemForm.condition ||
+    !itemForm.season;
 
   return (
     <section id="triage-page" className="flex flex-col gap-6">
@@ -853,33 +904,26 @@ export default function Triage() {
       {selectedCollectionRequest && activeBagId && canTriage && (
         <div className="flex flex-col gap-6">
           <CollectionRecord
-            selectedCollectionRequestId={selectedCollectionRequest.id}
             isViewMode={isViewMode}
             items={activeItems}
             brands={brands}
-            brandId={brandId}
-            onBrandChange={setBrandId}
-            onCreateBrand={handleCreateBrand}
-            quantity={quantity}
-            onQuantityChange={setQuantity}
-            quality={quality}
-            onQualityChange={setQuality}
-            season={season}
-            onSeasonChange={setSeason}
-            clothingType={clothingType}
-            onClothingTypeChange={setClothingType}
-            sex={sex}
-            onSexChange={setSex}
-            ageGroup={ageGroup}
-            onAgeGroupChange={setAgeGroup}
-            onAdd={handleAddTriageItem}
             onDeleteItem={(item) => handleDeleteTriageItem(item)}
             deletingItemIndex={
               activeItems.findIndex((it) => it.id === deletingItemId) < 0
                 ? null
                 : activeItems.findIndex((it) => it.id === deletingItemId)
             }
-            isAddDisabled={isAddFormInvalid}
+          />
+          <ClothingClassification
+            form={itemForm}
+            onChange={updateItemForm}
+            brands={brands}
+            onCreateBrand={handleCreateBrand}
+            onRegister={() => handleRegisterItem()}
+            onQuickRegister={handleRegisterItem}
+            isRegisterDisabled={isAddFormInvalid}
+            isBusy={isCreatingItem}
+            disabled={isViewMode}
           />
         </div>
       )}

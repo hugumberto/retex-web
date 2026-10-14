@@ -116,7 +116,13 @@
     "zipLookupError": "No se ha podido buscar la dirección por el código postal",
     "streetPlaceholder": "Calle / Avenida",
     "complementPlaceholder": "Piso, puerta…",
-    "cityDivisionPlaceholder": "Parque das Nações"
+    "cityDivisionPlaceholder": "Parque das Nações",
+    "category": "Categoría",
+    "condition": "Estado",
+    "destination": "Destino",
+    "group": "Grupo",
+    "location": "Ubicación",
+    "storageSlot": "Lote"
   },
   "nav": {
     "home": "INICIO",
@@ -166,11 +172,6 @@
       "IN_TRANSIT": "En tránsito",
       "FINISHED": "Completada"
     },
-    "quality": {
-      "GOOD": "Buena",
-      "MEDIUM": "Regular",
-      "BAD": "Mala"
-    },
     "sex": {
       "MALE": "Hombre",
       "FEMALE": "Mujer"
@@ -180,8 +181,8 @@
       "CHILD": "Infantil"
     },
     "itemType": {
-      "UPPER_PART": "Parte de arriba",
-      "UNDER_PART": "Parte de abajo"
+      "UPPER_PART": "Superior",
+      "UNDER_PART": "Inferior"
     },
     "season": {
       "SUMMER": "Verano",
@@ -233,6 +234,48 @@
       "REQUEST_CANCEL_ALL": "Cancelar todas las solicitudes",
       "MEMBER_MANAGE": "Gestionar miembros",
       "ADDRESS_MANAGE": "Gestionar lugares de recogida"
+    },
+    "category": {
+      "TOP": "Camiseta / Camisa / Top",
+      "SWEATER": "Jersey",
+      "COAT": "Abrigo",
+      "DRESS": "Vestido",
+      "SUIT_JACKET": "Traje – chaqueta",
+      "PAJAMA_TOP": "Pijama – parte de arriba",
+      "SPORTSWEAR_TOP": "Deportiva – parte de arriba",
+      "BRA": "Sujetador",
+      "UNDERSHIRT": "Camiseta interior",
+      "SWIM_TOP": "Bikini – parte de arriba",
+      "SWIMSUIT": "Bañador entero",
+      "TROUSERS": "Pantalones",
+      "SHORTS": "Pantalones cortos",
+      "SKIRT": "Falda",
+      "JUMPSUIT": "Mono",
+      "SUIT_TROUSERS": "Traje – pantalón",
+      "PAJAMA_BOTTOM": "Pijama – parte de abajo",
+      "SPORTSWEAR_BOTTOM": "Deportiva – parte de abajo",
+      "UNDERPANTS": "Calzoncillos / Bragas",
+      "SWIM_BOTTOM": "Baño – parte de abajo"
+    },
+    "condition": {
+      "EXCELLENT": "Excelente",
+      "GOOD": "Bueno",
+      "REGULAR": "Regular"
+    },
+    "destination": {
+      "REUSE": "Reutilización",
+      "VINTAGE": "Vintage / Reventa directa",
+      "RECONDITIONING": "Reacondicionamiento",
+      "UPCYCLING": "Upcycling",
+      "STOCK_RESERVE": "Reserva de stock",
+      "NON_REUSABLE": "No reutilizable",
+      "ACCESSORY": "Accesorio"
+    },
+    "storageGroup": {
+      "MEN": "Hombre",
+      "WOMEN": "Mujer",
+      "CHILDREN": "Niños",
+      "NON_REUSABLE": "No reutilizable"
     }
   },
   "validation": {
@@ -335,7 +378,8 @@
     "updateSuccess": "¡Marca actualizada con éxito!",
     "createError": "Error al crear la marca.",
     "updateError": "Error al actualizar la marca.",
-    "duplicateName": "Ya existe una marca con este nombre"
+    "duplicateName": "Ya existe una marca con este nombre",
+    "premium": "Premium"
   },
   "blog": {
     "pageTitle": "Blog",
@@ -757,14 +801,10 @@
     "createBrandOption": "Crear marca \"{name}\"",
     "brandsLoadError": "No se han podido cargar las marcas",
     "quantityLabel": "Cantidad *",
-    "qualityLabel": "Calidad *",
     "seasonLabel": "Temporada *",
-    "clothingTypeLabel": "Tipo de prenda *",
-    "sexLabel": "Sexo *",
-    "ageGroupLabel": "Franja de edad *",
     "selectBagFirst": "Selecciona una bolsa antes de añadir el artículo",
     "selectBrand": "Selecciona una marca",
-    "selectAttributes": "Selecciona calidad, temporada, tipo, sexo y franja de edad",
+    "selectAttributes": "Seleccione categoría, estado y temporada",
     "invalidQuantity": "Indica una cantidad válida",
     "itemAdded": "Artículo añadido a la bolsa",
     "itemCreateError": "No se ha podido crear el artículo",
@@ -778,7 +818,7 @@
     "storageCodeRequired": "Indica el código del almacenamiento",
     "storageUnitNotFound": "Unidad de almacenamiento no encontrada",
     "storageUnitAlreadyAdded": "Esta unidad de almacenamiento ya se ha añadido",
-    "storageUnitMismatch": "Los atributos de esta unidad no coinciden con ningún artículo de la lista",
+    "storageUnitMismatch": "Esta unidad no corresponde al lote de ninguna prenda de la lista",
     "storageUnitAdded": "Unidad de almacenamiento añadida con éxito",
     "storageUnitFetchError": "Error al obtener la unidad",
     "noStorageUnits": "No se ha añadido ninguna unidad de almacenamiento",
@@ -790,21 +830,71 @@
     "persistItemsFirst": "Todos los artículos deben guardarse antes de finalizar",
     "processBagsFirst": "Procesa todas las bolsas antes de finalizar",
     "addStorageUnitsFirst": "Añade unidades de almacenamiento antes de finalizar",
-    "storageUnitPerCombination": "Cada combinación de artículos necesita una unidad de almacenamiento correspondiente",
+    "storageUnitPerCombination": "Cada lote de las prendas necesita una unidad de almacenamiento correspondiente",
     "storageUnitsSaveError": "Error al guardar las unidades de almacenamiento",
     "bindItemsError": "Error al vincular los artículos a las unidades de almacenamiento",
     "statusUpdateError": "Error al actualizar el estado del paquete",
     "finishSuccess": "Triaje finalizado con éxito",
     "finishError": "No se ha podido finalizar el triaje",
-    "bagWithoutItems": "Añade al menos un artículo antes de guardar el saco"
+    "bagWithoutItems": "Añade al menos un artículo antes de guardar el saco",
+    "classificationTitle": "Clasificación de ropa",
+    "classificationSubtitle": "Seleccione la categoría y registre los detalles de cada prenda",
+    "maleTitle": "Masculino",
+    "maleSubtitle": "Ropa de hombre, bebé y niño",
+    "femaleTitle": "Femenino",
+    "femaleSubtitle": "Ropa de mujer, bebé y niña",
+    "adultMale": "Adulto (Hombre)",
+    "childMale": "Bebé e Infantil (Niño)",
+    "adultFemale": "Adulto (Mujer)",
+    "childFemale": "Bebé e Infantil (Niña)",
+    "partChoice": "¿Qué parte es? Cada parte se registra como una prenda.",
+    "denimLabel": "Denim",
+    "denimHint": "(solo para vaqueros)",
+    "conditionLabel": "Calidad / Estado *",
+    "destinationLabel": "Destino",
+    "moreDetails": "Más detalles (opcional)",
+    "materialLabel": "Material",
+    "colorLabel": "Color",
+    "sizeLabel": "Talla",
+    "registerItem": "Registrar prenda",
+    "otherRecordsTitle": "Fuera de la reutilización",
+    "otherRecordsHint": "Registra solo la cantidad, sin clasificar la prenda.",
+    "nonReusableButton": "No reutilizable",
+    "accessoryButton": "Accesorio",
+    "placeIn": "Colocar en: {slot}",
+    "noStorage": "Solo registro (no va a ningún lote)",
+    "selectCategory": "Seleccione una categoría",
+    "tiles": {
+      "tops": "Camisetas, Polos, Camisas",
+      "topsFemale": "Camisetas, Tops, Blusas, Camisas",
+      "trousers": "Pantalones",
+      "trousersHint": "Vaqueros, Chinos, Leggings",
+      "shorts": "Pantalones cortos",
+      "sweaters": "Jerséis",
+      "sweatersHint": "Sudaderas, Punto",
+      "coats": "Abrigos",
+      "coatsHint": "Cazadoras, Parkas",
+      "suits": "Trajes",
+      "suitsHint": "Blazers, Conjuntos",
+      "underwear": "Ropa interior",
+      "underwearMaleHint": "Bóxers, Calzoncillos",
+      "underwearFemaleHint": "Sujetadores, Bragas",
+      "sportswear": "Ropa deportiva",
+      "sportswearHint": "Fitness, Outdoor",
+      "swimwear": "Ropa de baño",
+      "swimwearMaleHint": "Bañadores",
+      "swimwearFemaleHint": "Bikinis, Bañadores",
+      "pajamas": "Pijamas",
+      "pajamasHint": "y ropa de casa",
+      "dresses": "Vestidos",
+      "skirts": "Faldas",
+      "jumpsuits": "Monos"
+    }
   },
   "storageUnit": {
     "pageTitle": "Almacenamiento",
     "formCreateTitle": "Nueva unidad de almacenamiento",
     "formEditTitle": "Actualizar unidad de almacenamiento",
-    "qualityRequired": "La calidad es obligatoria",
-    "sexRequired": "El sexo es obligatorio",
-    "ageGroupRequired": "La franja de edad es obligatoria",
     "typeRequired": "La parte de la prenda es obligatoria",
     "seasonRequired": "La temporada es obligatoria",
     "weightRequired": "El peso es obligatorio",
@@ -818,10 +908,12 @@
     "weightKg": "Peso (kg)",
     "codeWithColon": "Código:",
     "seasonWithColon": "Temporada:",
-    "ageGroupWithColon": "Franja de edad:",
-    "qualityWithColon": "Calidad:",
-    "sexWithColon": "Sexo:",
-    "partWithColon": "Parte:"
+    "partWithColon": "Parte:",
+    "groupRequired": "El grupo es obligatorio",
+    "groupWithColon": "Grupo:",
+    "locationWithColon": "Ubicación:",
+    "locationPlaceholder": "Ej.: Almacén A · Pasillo 3",
+    "nonReusableHint": "El lote no reutilizable no tiene temporada ni parte."
   },
   "bags": {
     "pageTitle": "Bolsas de la solicitud",
@@ -895,8 +987,6 @@
     "lastTwelveMonths": "Últimos 12 meses (kg)",
     "topBrands": "Top marcas",
     "itemsPerBrand": "Cantidad de artículos por marca",
-    "itemQuality": "Calidad de las prendas",
-    "quantityPerQuality": "Cantidad por calidad",
     "itemsPerSeason": "Prendas por temporada",
     "itemType": "Tipo de prenda",
     "citiesOutOfZone": "Ciudades fuera de la zona de servicio",
@@ -926,7 +1016,13 @@
     "activityTriages": "Clasificaciones hechas",
     "activityPieces": "Prendas clasificadas",
     "activityHint": "Cada número usa su propia fecha: creación de la solicitud, recogida de las bolsas, clasificación y registro de las prendas. En un intervalo corto los cuatro no cuadran entre sí — una solicitud de julio puede clasificarse en septiembre.",
-    "activityLoadError": "No se ha podido cargar la actividad del período"
+    "activityLoadError": "No se ha podido cargar la actividad del período",
+    "itemCondition": "Estado de las prendas",
+    "quantityPerCondition": "Cantidad por estado",
+    "itemDestination": "Destino de las prendas",
+    "quantityPerDestination": "Cantidad por destino",
+    "itemCategory": "Categorías de prendas",
+    "quantityPerCategory": "Cantidad por categoría"
   },
   "company": {
     "pageTitle": "Empresas",

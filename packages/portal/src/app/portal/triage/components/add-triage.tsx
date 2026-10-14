@@ -1,8 +1,18 @@
 import { useTranslations } from 'next-intl';
 import { Brand } from '@/app/types/brand';
+import { StorageUnitDTO } from '@/app/types/storage-unit';
 import {
-  StorageUnitDTO,
-} from '@/app/types/storage-unit';
+  AgeGroup,
+  Category,
+  Condition,
+  Destination,
+  Season,
+  Sex,
+  StorageSlot,
+  Type,
+  resolveStorageSlot,
+  storageSlotKey,
+} from '@/app/types/triage';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import TablePagination from '@/components/custom/table-pagination';
 import { usePagination } from '@/hooks/use-pagination';
@@ -24,24 +34,77 @@ export type TriageListItem = {
   id?: string;
   collectionRequestId: string;
   bagId?: string;
-  quality: 'GOOD' | 'MEDIUM' | 'BAD';
-  type: 'UPPER_PART' | 'UNDER_PART';
-  season: 'SUMMER' | 'WINTER';
-  sex: 'MALE' | 'FEMALE';
-  ageGroup: 'ADULT' | 'CHILD';
-  brandId: string;
+  destination: Destination;
+  sex?: Sex | null;
+  ageGroup?: AgeGroup | null;
+  season?: Season | null;
+  type?: Type | null;
+  category?: Category | null;
+  condition?: Condition | null;
+  brandId?: string;
   quantity: number;
 };
 
-// Chave de casamento item <-> unidade de armazenamento (atributos de triagem).
-export const buildTriageKey = (attrs: {
-  quality: string;
-  sex: string;
-  ageGroup: string;
-  type: string;
-  season: string;
-}) =>
-  `${attrs.quality}::${attrs.sex}::${attrs.ageGroup}::${attrs.type}::${attrs.season}`;
+/**
+ * Chave do lote de uma peça (null = não vai para lote nenhum, ex.: acessório).
+ * Só os indicadores básicos contam — o mesmo critério com que o servidor
+ * vincula as peças às unidades de armazenamento.
+ */
+export const itemSlotKey = (item: TriageListItem) => {
+  const slot = resolveStorageSlot(item);
+  return slot ? storageSlotKey(slot) : null;
+};
+
+export const unitSlotKey = (unit: StorageUnitDTO) => storageSlotKey(unit);
+
+// "Homem · Verão · Superior" — rótulo legível de um lote.
+export function useSlotLabel() {
+  const tGroup = useTranslations('enums.storageGroup');
+  const tSeason = useTranslations('enums.season');
+  const tItemType = useTranslations('enums.itemType');
+  return (slot: Pick<StorageSlot, 'group'> & Partial<StorageSlot>) =>
+    [
+      tGroup(slot.group),
+      slot.season ? tSeason(slot.season) : null,
+      slot.type ? tItemType(slot.type) : null,
+    ]
+      .filter(Boolean)
+      .join(' · ');
+}
+
+/** Colunas comuns das tabelas de peças (registo do saco e itens da triagem). */
+export function useItemColumns(brands: Brand[]) {
+  const tCommon = useTranslations('common');
+  const tCategory = useTranslations('enums.category');
+  const tCondition = useTranslations('enums.condition');
+  const tDestination = useTranslations('enums.destination');
+  const slotLabel = useSlotLabel();
+  const t = useTranslations('triage');
+
+  const headers = [
+    tCommon('category'),
+    tCommon('storageSlot'),
+    tCommon('condition'),
+    tCommon('destination'),
+    tCommon('brand'),
+    tCommon('quantity'),
+  ];
+
+  const cells = (item: TriageListItem) => {
+    const slot = resolveStorageSlot(item);
+    return [
+      item.category ? tCategory(item.category) : '-',
+      slot ? slotLabel(slot) : t('noStorage'),
+      item.condition ? tCondition(item.condition) : '-',
+      tDestination(item.destination),
+      (brands.find((brand) => brand.id === item.brandId)?.name ?? item.brandId) ||
+        '-',
+      item.quantity,
+    ];
+  };
+
+  return { headers, cells };
+}
 
 /**
  * Linha de item já coberto por uma unidade de armazenamento adicionada.
@@ -86,20 +149,22 @@ export default function AddTriage({
 }: AddTriageProps) {
   const t = useTranslations('triage');
   const tCommon = useTranslations('common');
-  const tQuality = useTranslations('enums.quality');
-  const tSex = useTranslations('enums.sex');
-  const tAgeGroup = useTranslations('enums.ageGroup');
-  const tItemType = useTranslations('enums.itemType');
-  const tSeason = useTranslations('enums.season');
+  const slotLabel = useSlotLabel();
+  const itemColumns = useItemColumns(brands);
   const storageInputRef = useRef<HTMLInputElement>(null);
   const shouldRefocusStorageInputRef = useRef(false);
   const validStorageUnits = storageUnits.filter(
     (storageUnit): storageUnit is StorageUnitDTO => Boolean(storageUnit?.id)
   );
-  const itemTriageKeys = new Set(items.map((item) => buildTriageKey(item)));
-  const storageTriageKeys = new Set(
-    validStorageUnits.map((storageUnit) => buildTriageKey(storageUnit))
+  // Peças sem lote (acessórios) não precisam de unidade de armazenamento.
+  const itemTriageKeys = new Set(
+    items.map(itemSlotKey).filter((key): key is string => key != null)
   );
+  const storageTriageKeys = new Set(validStorageUnits.map(unitSlotKey));
+  const isCovered = (item: TriageListItem) => {
+    const key = itemSlotKey(item);
+    return key == null || storageTriageKeys.has(key);
+  };
 
   // Os itens já cobertos por uma unidade de armazenamento vão para o fim, para
   // o operador ver primeiro o que ainda falta cobrir. O `sort` é estável, por
@@ -111,20 +176,13 @@ export default function AddTriage({
   const orderedItems = items
     .map((item, index) => ({ item, index }))
     .sort(
-      (a, b) =>
-        Number(storageTriageKeys.has(buildTriageKey(a.item))) -
-        Number(storageTriageKeys.has(buildTriageKey(b.item)))
+      (a, b) => Number(isCovered(a.item)) - Number(isCovered(b.item))
     );
   const itemsPagination = usePagination(orderedItems);
   const unitsPagination = usePagination(validStorageUnits);
 
-  const hasInvalidItemCombination = items.some(
-    (item) =>
-      !item.quality || !item.sex || !item.ageGroup || !item.type || !item.season
-  );
-
   const allStorageKeysInItems = validStorageUnits.every((storageUnit) =>
-    itemTriageKeys.has(buildTriageKey(storageUnit))
+    itemTriageKeys.has(unitSlotKey(storageUnit))
   );
   const allItemKeysInStorage = [...itemTriageKeys].every((key) =>
     storageTriageKeys.has(key)
@@ -133,8 +191,7 @@ export default function AddTriage({
   const isFinishDisabled =
     disableFinish ||
     items.length === 0 ||
-    validStorageUnits.length === 0 ||
-    hasInvalidItemCombination ||
+    (itemTriageKeys.size > 0 && validStorageUnits.length === 0) ||
     !allStorageKeysInItems ||
     !allItemKeysInStorage;
 
@@ -195,13 +252,9 @@ export default function AddTriage({
             <Table containerClassName="max-h-[300px]">
               <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                 <TableRow>
-                  <TableHead>{tCommon('quality')}</TableHead>
-                  <TableHead>{tCommon('sex')}</TableHead>
-                  <TableHead>{tCommon('ageGroup')}</TableHead>
-                  <TableHead>{tCommon('type')}</TableHead>
-                  <TableHead>{tCommon('season')}</TableHead>
-                  <TableHead>{tCommon('brand')}</TableHead>
-                  <TableHead>{tCommon('quantity')}</TableHead>
+                  {itemColumns.headers.map((header) => (
+                    <TableHead key={header}>{header}</TableHead>
+                  ))}
                   <TableHead>{tCommon('action')}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -213,35 +266,16 @@ export default function AddTriage({
                         item.id ??
                         `${item.collectionRequestId}-${item.brandId}-${index}`
                       }
-                      // Verde quando há uma unidade adicionada com os mesmos
-                      // cinco atributos — que é exatamente o critério com que o
-                      // servidor vincula (findCompatibleStorageUnit). Os itens
-                      // que ficam brancos são os que ainda faltam cobrir para
-                      // poder finalizar.
-                      className={cn(
-                        storageTriageKeys.has(buildTriageKey(item)) &&
-                          COVERED_ROW_CLASS
-                      )}
+                      // Verde quando há uma unidade adicionada do mesmo lote
+                      // (grupo × estação × parte) — o critério com que o servidor
+                      // vincula — ou quando a peça não vai para lote nenhum. Os
+                      // itens que ficam brancos são os que ainda faltam cobrir
+                      // para poder finalizar.
+                      className={cn(isCovered(item) && COVERED_ROW_CLASS)}
                     >
-                      <TableCell>
-                        {tQuality(item.quality) ?? item.quality}
-                      </TableCell>
-                      <TableCell>{tSex(item.sex) ?? item.sex}</TableCell>
-                      <TableCell>
-                        {tAgeGroup(item.ageGroup) ?? item.ageGroup}
-                      </TableCell>
-                      <TableCell>
-                        {tItemType(item.type) ?? item.type}
-                      </TableCell>
-                      <TableCell>
-                        {tSeason(item.season) ?? item.season}
-                      </TableCell>
-                      <TableCell>
-                        {(brands.find((brand) => brand.id === item.brandId)
-                          ?.name ?? item.brandId) ||
-                          '-'}
-                      </TableCell>
-                      <TableCell>{item.quantity}</TableCell>
+                      {itemColumns.cells(item).map((value, cellIndex) => (
+                        <TableCell key={cellIndex}>{value}</TableCell>
+                      ))}
                       <TableCell>
                         <ConfirmDialog
                           title={t('removeItemTitle')}
@@ -267,7 +301,7 @@ export default function AddTriage({
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={itemColumns.headers.length + 1}
                       className="h-20 text-center text-secondary/55"
                     >
                       {t('itemsTableCaption')}
@@ -287,28 +321,26 @@ export default function AddTriage({
             <Table containerClassName="max-h-[300px]">
               <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">
                 <TableRow>
-                  <TableHead>{tCommon('quality')}</TableHead>
-                  <TableHead>{tCommon('sex')}</TableHead>
-                  <TableHead>{tCommon('ageGroup')}</TableHead>
-                  <TableHead>{tCommon('part')}</TableHead>
-                  <TableHead>{tCommon('season')}</TableHead>
+                  <TableHead>{tCommon('code')}</TableHead>
+                  <TableHead>{tCommon('storageSlot')}</TableHead>
+                  <TableHead>{tCommon('location')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {unitsPagination.items.length > 0 ? (
                   unitsPagination.items.map((storageUnit) => (
                     <TableRow key={storageUnit.id}>
-                      <TableCell>{tQuality(storageUnit.quality)}</TableCell>
-                      <TableCell>{tSex(storageUnit.sex)}</TableCell>
-                      <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
-                      <TableCell>{tItemType(storageUnit.type)}</TableCell>
-                      <TableCell>{tSeason(storageUnit.season)}</TableCell>
+                      <TableCell className="font-medium">
+                        {storageUnit.friendlyCode ?? '-'}
+                      </TableCell>
+                      <TableCell>{slotLabel(storageUnit)}</TableCell>
+                      <TableCell>{storageUnit.location || '-'}</TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={3}
                       className="h-24 text-center text-secondary/55"
                     >
                       {t('noStorageUnits')}

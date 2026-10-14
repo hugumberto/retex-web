@@ -6,7 +6,8 @@ import {
   ChartCard,
   DashboardSkeleton,
   KpiCard,
-  QUALITY_COLOR,
+  CONDITION_COLOR,
+  DESTINATION_COLOR,
   fmt,
 } from '@/components/dashboard';
 import { Button } from '@/components/ui/button';
@@ -57,7 +58,9 @@ export default function ScopedDashboard() {
   const t = useTranslations('dashboard');
   const tCommon = useTranslations('common');
   const tStatus = useTranslations('enums.collectionRequestStatus');
-  const tQuality = useTranslations('enums.quality');
+  const tCondition = useTranslations('enums.condition');
+  const tDestination = useTranslations('enums.destination');
+  const tCategory = useTranslations('enums.category');
   const tSeason = useTranslations('enums.season');
   const tItemType = useTranslations('enums.itemType');
   const { setPageTitle, setBreadcrumbs } = useAppStore();
@@ -117,11 +120,23 @@ export default function ScopedDashboard() {
     color: STATUS_COLOR[row.status as CollectionRequestStatus] ?? '#64748b',
   }));
 
-  const qualityData = triage.byQuality.map((row) => ({
-    label: tQuality(row.key),
+  const conditionData = triage.byCondition.map((row) => ({
+    label: tCondition(row.key),
     value: row.quantity,
-    color: QUALITY_COLOR[row.key] ?? '#64748b',
+    color: CONDITION_COLOR[row.key] ?? '#64748b',
   }));
+
+  const destinationData = triage.byDestination.map((row) => ({
+    label: tDestination(row.key),
+    value: row.quantity,
+    color: DESTINATION_COLOR[row.key] ?? '#64748b',
+  }));
+
+  // Há muitas categorias: mostra só as mais frequentes, como nas marcas.
+  const categoryData = [...triage.byCategory]
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 8)
+    .map((row) => ({ label: tCategory(row.key), value: row.quantity }));
 
   const seasonData = triage.bySeason.map((row) => ({
     label: tSeason(row.key),
@@ -251,26 +266,70 @@ export default function ScopedDashboard() {
         </ChartCard>
 
         <ChartCard
-          title={t('itemQuality')}
-          description={t('quantityPerQuality')}
-          isEmpty={qualityData.length === 0}
+          title={t('itemCondition')}
+          description={t('quantityPerCondition')}
+          isEmpty={conditionData.length === 0}
         >
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie
-                data={qualityData}
+                data={conditionData}
                 dataKey="value"
                 nameKey="label"
                 innerRadius={55}
                 outerRadius={90}
                 label={(d: { label: string }) => d.label}
               >
-                {qualityData.map((entry, i) => (
+                {conditionData.map((entry, i) => (
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip />
             </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard
+          title={t('itemDestination')}
+          description={t('quantityPerDestination')}
+          isEmpty={destinationData.length === 0}
+        >
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie
+                data={destinationData}
+                dataKey="value"
+                nameKey="label"
+                innerRadius={55}
+                outerRadius={90}
+                label={(d: { label: string }) => d.label}
+              >
+                {destinationData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard
+          title={t('itemCategory')}
+          description={t('quantityPerCategory')}
+          isEmpty={categoryData.length === 0}
+        >
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={categoryData} layout="vertical" margin={{ left: 24 }}>
+              <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+              <YAxis
+                type="category"
+                dataKey="label"
+                width={90}
+                tick={{ fontSize: 11 }}
+              />
+              <Tooltip />
+              <Bar dataKey="value" fill="#f97316" radius={[0, 4, 4, 0]} />
+            </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
