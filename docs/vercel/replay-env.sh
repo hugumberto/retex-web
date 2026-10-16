@@ -81,8 +81,11 @@ for project in "${PROJECTS[@]}"; do
           *)              info "  [$environment] $key = $value" ;;
         esac
       else
+        # `--type config --yes`: sem isto o CLI recusa valores que lhe pareçam
+        # credenciais num NEXT_PUBLIC_, e pede confirmação interativa. O valor
+        # vai por stdin para não ficar visível na lista de processos.
         printf '%s' "$value" \
-          | (cd "$workdir" && npx -y vercel@latest env add "$key" "$environment" --scope "$SCOPE" >/dev/null 2>&1) \
+          | (cd "$workdir" && npx -y vercel@latest env add "$key" "$environment" --type config --yes --scope "$SCOPE" >/dev/null 2>&1) \
           && ok "  [$environment] $key" \
           || warn "  [$environment] $key — falhou (já existe?)"
       fi
