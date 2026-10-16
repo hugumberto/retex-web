@@ -17,14 +17,20 @@ está (`github.com/hugumberto/retex-web`), e cortar os domínios fora de horas.
 | Passo | |
 |---|---|
 | 1. Exportar as variáveis | ✅ feito |
-| 2. Criar os projetos na conta nova | ⬜ por fazer — é no dashboard, só tu |
-| 3. Repor as variáveis | ⬜ script pronto e ensaiado, à espera do passo 2 |
-| 4. Validar por URL de preview | ⬜ |
-| 5. Cortar os nove domínios | ⬜ |
+| 2. Criar os quatro projetos | ✅ feito, por API |
+| 3. Repor as variáveis | ✅ feito e conferido |
+| 4. Validar os builds | ✅ os quatro em READY, cada um com a app certa |
+| 5. Cortar os nove domínios | ⬜ **o que falta a sério** |
 | 6. Limpeza | ⬜ |
 
-Destino confirmado: equipa **`tiago-8652's projects`** (Pro), hoje vazia. Vale a
-pena renomeá-la em Settings → General: o nome foi gerado pela Vercel.
+**Falta ainda um acerto antes do passo 5:** a *Production Branch* dos dois
+projetos de dev ficou em `main` e tem de ser `dev`. Não é configurável pela API
+(três formas tentadas, todas recusadas) — é mesmo no dashboard, em cada
+projeto: Settings → Git → Production Branch.
+
+Destino: equipa **`tiago-8652's projects`** (Pro), que já tem os quatro
+projetos. Vale a pena renomeá-la em Settings → General: o nome foi gerado pela
+Vercel a partir de quem criou a conta.
 
 ## O que existe hoje
 
@@ -79,17 +85,21 @@ O `retexid.com` tem **DNSSEC ligado** (o `.pt` não). Irrelevante enquanto a zon
 ficar na Amen; só seria preciso desligá-lo antes de alguma vez mudar os
 nameservers para a Vercel.
 
-> ⚠️ **Renovação:** o painel da Amen tem um alerta de expiração associado ao
-> `retex.pt`. Com seis domínios a redirecionar para `www.retex.pt`, se o
-> principal expirar não cai só o site — cai tudo o que aponta para ele.
+> **Renovação:** o painel da Amen tinha um alerta de expiração associado ao
+> `retex.pt` — encaminhado para o responsável a 16/10/2026. Fica o registo
+> porque é o ponto único de falha de todo o conjunto: com seis domínios a
+> redirecionar para `www.retex.pt`, se o principal expirar não cai só o site,
+> cai tudo o que aponta para ele.
 
 ## Pré-requisitos
 
-- [ ] Seres membro da equipa da empresa na Vercel, com permissão para criar projetos
-- [ ] A **Vercel GitHub App** da equipa da empresa com acesso a `hugumberto/retex-web`
-      (GitHub → Settings → Applications → Vercel → Repository access)
+- [x] Seres membro da equipa da empresa na Vercel, com permissão para criar projetos
+- [x] A conta de destino com uma **conta de GitHub ligada à Vercel** e com acesso a
+      `hugumberto/retex-web` — feito a 16/10/2026. Não basta ter permissões no
+      repositório: sem a ligação, `GET /v1/integrations/git-namespaces` vem
+      vazio e nenhum projeto se cria
 - [ ] Acesso ao painel de DNS da Amen (só para confirmar; não deve ser preciso mexer)
-- [ ] Valores das variáveis de ambiente — ver passo 1
+- [x] Valores das variáveis de ambiente — exportados no passo 1
 
 ## 1. Exportar as variáveis da conta antiga — **feito em 16/10/2026**
 
@@ -146,35 +156,55 @@ em `auth/login/page.tsx`), e num build de produção o ramo é eliminado. Ainda
 assim, não as leves para os projetos de produção novos: são credenciais num
 `NEXT_PUBLIC_`, que é o prefixo que o Next inlina no bundle do browser.
 
-## 2. Criar os quatro projetos na equipa da empresa
+## 2. Criar os quatro projetos — **feito em 16/10/2026**
 
-Para cada um: **Add New → Project → Import** `hugumberto/retex-web`.
+Criados por API, com os nomes iguais aos da conta antiga (não colidem: os nomes
+são por equipa). O CLI não serve para isto — não aceita Root nem Output
+Directory — mas a API aceita:
 
-Configuração igual nos quatro, **exceto** `NX_APP` e o Output Directory:
+```bash
+POST https://api.vercel.com/v11/projects?teamId=<team>
+{
+  "name": "retex-web-portal",
+  "framework": "nextjs",
+  "gitRepository": {"type": "github", "repo": "hugumberto/retex-web"},
+  "outputDirectory": "packages/portal/.next"
+}
+```
 
-| Definição | Valor |
-|---|---|
-| Framework Preset | Next.js |
-| Root Directory | `./` (a raiz — o `vercel.json` está lá) |
-| Build Command | deixar o do `vercel.json`: `npx nx build ${NX_APP:-landing-page}` |
-| Install Command | deixar o do `vercel.json`: `npm install --include=dev` |
-| Output Directory | `packages/portal/.next` ou `packages/landing-page/.next` |
-| Production Branch | `main` (produção) / `dev` (os de dev) |
+| Definição | Valor | Como ficou |
+|---|---|---|
+| Framework | Next.js | no corpo do POST |
+| Root Directory | a raiz (o `vercel.json` está lá) | por omissão, `null` |
+| Build / Install Command | os do `vercel.json` | por omissão, `null` |
+| Output Directory | `packages/portal/.next` ou `packages/landing-page/.next` | no corpo do POST |
+| Node | 24.x nas landings, 22.x nos portais | `PATCH /v9/projects/<id>` com `{"nodeVersion":"22.x"}` |
+| Production Branch | `main` / `dev` | ⚠️ **não** é configurável por API — ver abaixo |
 
-> O `vercel.json` na raiz já fixa o install e o build; o que distingue um projeto
-> do outro é a variável `NX_APP` e o Output Directory.
+Duas armadilhas da API, descobertas à força:
 
-Sugestão de nomes, para não colidirem com os antigos enquanto convivem:
-`retex-landing`, `retex-portal`, `retex-landing-dev`, `retex-portal-dev`.
+- O `nodeVersion` é recusado no **POST** de criação (`should NOT have additional
+  property`), mas aceite num **PATCH** a seguir.
+- A *Production Branch* não é configurável de todo: rejeitada como `link`,
+  como `gitRepository.productionBranch` e como campo de topo; o endpoint
+  `POST /projects/<id>/link` aceita a chamada mas ignora-a. Fica para o
+  dashboard.
 
-**Não adicionar domínios nesta fase.** Deixar construir e validar pelo URL
-`*.vercel.app` que a Vercel atribui.
+**Pré-requisito que bloqueia tudo:** a conta de destino tem de ter uma conta de
+GitHub ligada à Vercel (não basta ter permissões no repositório). Confirma-se com
+`GET /v1/integrations/git-namespaces?provider=github` — se vier vazio, nenhum
+projeto se consegue criar ligado ao repositório.
 
-## 3. Repor as variáveis
+Não foram adicionados domínios nesta fase, de propósito: a validação faz-se
+pelos URLs `*.vercel.app`.
 
-Há um script pronto, `replay-env.sh`, ao lado dos ficheiros exportados. Repõe
-as variáveis dos quatro projetos em `production` e `preview`, lendo os valores
-do passo 1 e usando os valores inferidos no caso do `dev-retex-portal`:
+## 3. Repor as variáveis — **feito em 16/10/2026**
+
+O `replay-env.sh` repõe as variáveis dos quatro projetos em `production` e
+`preview`, lendo os valores exportados no passo 1 e usando os inferidos no caso
+do `dev-retex-portal`. **Corre-o a partir da pasta onde estão os ficheiros
+`*.production.env`** — a cópia versionada aqui não os tem ao lado, e sem eles o
+script não escreve quase nada:
 
 ```bash
 ./replay-env.sh --dry-run                 # mostra o que faria, sem escrever
@@ -184,22 +214,44 @@ do passo 1 e usando os valores inferidos no caso do `dev-retex-portal`:
 O ensaio não precisa de sessão iniciada nem dos projetos criados. A aplicação
 precisa das duas coisas.
 
-Confirmar que `NX_APP` ficou definido em **todos os ambientes** (production,
-preview, development) — sem ele o build cai no `landing-page` por omissão e o
-projeto do portal serve o site errado.
+> **A armadilha que custou umas tentativas:** o `vercel env add` recusa-se a
+> gravar um valor que lhe pareça uma credencial num `NEXT_PUBLIC_` sem
+> confirmação, e pede-a de forma interativa — num script, falha em silêncio. Foi
+> o que aconteceu à chave da TomTom, nas oito tentativas, enquanto tudo o resto
+> entrava. O script passou a usar `--type config --yes` (commit `3780f0a`); o
+> valor continua a ir por stdin, para não aparecer na lista de processos.
+>
+> A mensagem de falha do script é genérica ("já existe?"). Se alguma variável
+> falhar, corre o mesmo `vercel env add` à mão, sem silenciar o `stderr`.
 
-## 4. Validar antes de cortar
+Estado final, conferido por `GET /v10/projects/<p>/env`: cada projeto com
+exatamente as variáveis que tinha na conta antiga, em `production` e `preview` —
+`NX_APP` só nos portais, `NEXT_PUBLIC_PORTAL_URL` só nas landings.
 
-Para cada projeto novo, pelo URL `*.vercel.app`:
+## 4. Validar os builds — **feito em 16/10/2026**
 
-- [ ] A landing abre e mostra as páginas principais
-- [ ] O portal abre o login
-- [ ] Login funciona → fala com a API certa (o chip de ambiente mostra o host)
-- [ ] No portal de dev, o chip diz `DEV` e aponta à API de dev
-- [ ] Triagem: ler um código de teste (`2026-H3KCBJ` na base de dev)
+Disparado um deploy por projeto, da branch certa, por
+`POST /v13/deployments` com `gitSource`. Os quatro acabaram em **READY**.
 
-O chip de ambiente só não aparece em `portal.retex.pt` — num URL `*.vercel.app`
-aparece como `PREVIEW`, que é o esperado enquanto o domínio não estiver trocado.
+A verificação que interessa é qual app cada projeto compilou — é aqui que o
+`NX_APP` trocado se denuncia. Os URLs `*.vercel.app` de uma equipa Pro estão
+protegidos por SSO e respondem 302 a quem não tem sessão, por isso confirmou-se
+pelos registos de build:
+
+```bash
+GET /v3/deployments/<id>/events   # procurar "Successfully ran target build for project"
+```
+
+| Projeto | App compilada | Node |
+|---|---|---|
+| `retex-web` | `@retex-web/landing-page` | 24.x |
+| `retex-web-portal` | `@retex-web/portal` | 22.x |
+| `dev-retex-web` | `@retex-web/landing-page` | 24.x |
+| `dev-retex-portal` | `@retex-web/portal` | 22.x |
+
+O que falta validar só é possível depois do corte, com os domínios já no sítio:
+login no portal, o chip de ambiente a apontar à API certa, e a triagem a ler um
+código de teste (`2026-H3KCBJ` na base de dev).
 
 ## 5. Cortar os domínios (fora de horas)
 
