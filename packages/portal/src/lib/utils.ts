@@ -22,6 +22,7 @@ import {
   Mail,
   KeyRound,
   Package,
+  Wrench,
 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { CompanyPermission } from '@/app/types/company';
@@ -189,6 +190,12 @@ export const NAV_ITEMS: NavEntry[] = [
         labelKey: 'nav.packageBags',
         icon: Package,
         roles: [Role.ADMIN],
+      },
+      {
+        href: '/portal/gestao-recolha',
+        labelKey: 'nav.collectionManagement',
+        icon: Wrench,
+        roles: [Role.MASTER],
       },
     ],
   },

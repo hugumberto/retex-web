@@ -74,6 +74,8 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: '/portal/email-log', roles: [Role.ADMIN] },
   { path: '/portal/reset-password', roles: [Role.ADMIN] },
   { path: '/portal/bags', roles: [Role.ADMIN] },
+  // Correções manuais a uma recolha (rota, sacos, estado). Só o MASTER.
+  { path: '/portal/gestao-recolha', roles: [Role.MASTER] },
   { path: '/portal/faq', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/blog', roles: [Role.ADMIN, Role.OPS] },
   { path: '/portal/blog-categories', roles: [Role.ADMIN, Role.OPS] },
