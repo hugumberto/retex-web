@@ -1041,7 +1041,8 @@
     "itemDestination": "Destino de las prendas",
     "quantityPerDestination": "Cantidad por destino",
     "itemCategory": "Categorías de prendas",
-    "quantityPerCategory": "Cantidad por categoría"
+    "quantityPerCategory": "Cantidad por categoría",
+    "notSpecified": "Sin indicar"
   },
   "company": {
     "pageTitle": "Empresas",

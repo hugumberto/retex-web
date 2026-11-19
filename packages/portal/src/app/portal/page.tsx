@@ -52,11 +52,11 @@ export default function Index() {
   return (
     <section className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">
+        <h2 className="text-xl font-semibold text-navy">
           {user?.firstName
             ? t('greetingWithName', { name: user.firstName })
             : t('greeting')}
-        </h1>
+        </h2>
         <p className="text-sm text-muted-foreground">{t('welcome')}</p>
       </div>
 
