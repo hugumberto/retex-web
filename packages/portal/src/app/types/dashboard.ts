@@ -7,6 +7,8 @@ export interface CollectionRequestsStats {
   totalCollectedBags: number;
   byStatus: { status: CollectionRequestStatus; count: number }[];
   trend: { period: string; weightKg: number; count: number }[];
+  /** Peso recolhido por concelho, do maior para o menor (só no dashboard de admin). */
+  byCity?: { city: string; weightKg: number; count: number }[];
 }
 
 export interface DimensionStat {

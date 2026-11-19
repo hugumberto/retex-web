@@ -1165,7 +1165,62 @@
     "quantityPerDestination": "Quantité par destination",
     "itemCategory": "Catégories d’articles",
     "quantityPerCategory": "Quantité par catégorie",
-    "notSpecified": "Non renseigné"
+    "notSpecified": "Non renseigné",
+    "impact": {
+      "title": "Impact en {year}",
+      "allCities": "Toutes les communes",
+      "cityFilter": "Commune",
+      "export": "Exporter le rapport",
+      "moreIndicators": "Plus d'indicateurs",
+      "empty": "Aucune donnée pour cette période.",
+      "periods": {
+        "month": "Mois",
+        "quarter": "Trimestre",
+        "ytd": "Depuis le début de l'année"
+      },
+      "kpi": {
+        "collected": "Textiles collectés",
+        "pieces": "Pièces triées",
+        "piecesPerKg": "≈ {value} pièces/kg",
+        "valorisation": "Taux de valorisation",
+        "valorisationHint": "réemploi + upcycling",
+        "completed": "Demandes terminées",
+        "kgPerRequest": "{value} kg par demande",
+        "co2": "CO₂e évité",
+        "co2Factor": "facteur {factor} kg CO₂e/kg"
+      },
+      "monthly": {
+        "title": "Tonnes collectées par mois",
+        "average": "moyenne {value} t/mois"
+      },
+      "destination": {
+        "title": "Destination des textiles",
+        "outOfLandfill": "hors décharge",
+        "reuse": "Réemploi",
+        "recycling": "Recyclage",
+        "upcycling": "Upcycling"
+      },
+      "cities": {
+        "title": "Tonnes par commune",
+        "mapLink": "Voir sur la carte des tournées",
+        "footer": "{count, plural, one {# commune avec collectes} other {# communes avec collectes}} sur cette période"
+      },
+      "brands": {
+        "title": "Top marques au tri",
+        "unit": "pièces",
+        "footer": "Utile pour des propositions de reprise avec les marques (REP textile)"
+      },
+      "alerts": {
+        "title": "Alertes",
+        "none": "Aucune alerte.",
+        "stale": "{count, plural, one {# demande de plus de 48 h sans tournée} other {# demandes de plus de 48 h sans tournée}}",
+        "staleBody": "{cities}{more, plural, =0 {} other { et # autres}}",
+        "awaiting": "{count, plural, one {# tournée en attente de confirmation} other {# tournées en attente de confirmation}}",
+        "awaitingBody": "Les clients n'ont pas encore confirmé le créneau.",
+        "outOfZone": "{count, plural, one {# demande hors zone} other {# demandes hors zone}}",
+        "outOfZoneBody": "Adresses hors des zones de collecte."
+      }
+    }
   },
   "company": {
     "pageTitle": "Entreprises",

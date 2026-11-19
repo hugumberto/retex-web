@@ -1165,7 +1165,62 @@
     "quantityPerDestination": "Cantidad por destino",
     "itemCategory": "Categorías de prendas",
     "quantityPerCategory": "Cantidad por categoría",
-    "notSpecified": "Sin indicar"
+    "notSpecified": "Sin indicar",
+    "impact": {
+      "title": "Impacto en {year}",
+      "allCities": "Todos los municipios",
+      "cityFilter": "Municipio",
+      "export": "Exportar informe",
+      "moreIndicators": "Más indicadores",
+      "empty": "Sin datos en este periodo.",
+      "periods": {
+        "month": "Mes",
+        "quarter": "Trimestre",
+        "ytd": "Año hasta la fecha"
+      },
+      "kpi": {
+        "collected": "Textiles recogidos",
+        "pieces": "Prendas clasificadas",
+        "piecesPerKg": "≈ {value} prendas/kg",
+        "valorisation": "Tasa de valorización",
+        "valorisationHint": "reutilización + upcycling",
+        "completed": "Solicitudes completadas",
+        "kgPerRequest": "{value} kg por solicitud",
+        "co2": "CO₂e evitado",
+        "co2Factor": "factor {factor} kg CO₂e/kg"
+      },
+      "monthly": {
+        "title": "Toneladas recogidas por mes",
+        "average": "media {value} t/mes"
+      },
+      "destination": {
+        "title": "Destino de los textiles",
+        "outOfLandfill": "fuera del vertedero",
+        "reuse": "Reutilización",
+        "recycling": "Reciclaje",
+        "upcycling": "Upcycling"
+      },
+      "cities": {
+        "title": "Toneladas por municipio",
+        "mapLink": "Ver en el mapa de rutas",
+        "footer": "{count, plural, one {# municipio con recogidas} other {# municipios con recogidas}} en este periodo"
+      },
+      "brands": {
+        "title": "Top marcas en la clasificación",
+        "unit": "prendas",
+        "footer": "Útil para propuestas de recogida con marcas (RAP textil)"
+      },
+      "alerts": {
+        "title": "Alertas",
+        "none": "Sin alertas.",
+        "stale": "{count, plural, one {# solicitud con más de 48 h sin ruta} other {# solicitudes con más de 48 h sin ruta}}",
+        "staleBody": "{cities}{more, plural, =0 {} other { y # más}}",
+        "awaiting": "{count, plural, one {# ruta esperando confirmación} other {# rutas esperando confirmación}}",
+        "awaitingBody": "Los clientes aún no han confirmado la franja.",
+        "outOfZone": "{count, plural, one {# solicitud fuera de zona} other {# solicitudes fuera de zona}}",
+        "outOfZoneBody": "Direcciones fuera de las zonas de recogida."
+      }
+    }
   },
   "company": {
     "pageTitle": "Empresas",

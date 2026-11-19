@@ -1165,7 +1165,62 @@
     "quantityPerDestination": "Quantity per destination",
     "itemCategory": "Item categories",
     "quantityPerCategory": "Quantity per category",
-    "notSpecified": "Not specified"
+    "notSpecified": "Not specified",
+    "impact": {
+      "title": "Impact in {year}",
+      "allCities": "All municipalities",
+      "cityFilter": "Municipality",
+      "export": "Export report",
+      "moreIndicators": "More indicators",
+      "empty": "No data for this period.",
+      "periods": {
+        "month": "Month",
+        "quarter": "Quarter",
+        "ytd": "Year to date"
+      },
+      "kpi": {
+        "collected": "Textiles collected",
+        "pieces": "Items sorted",
+        "piecesPerKg": "≈ {value} items/kg",
+        "valorisation": "Recovery rate",
+        "valorisationHint": "reuse + upcycling",
+        "completed": "Completed requests",
+        "kgPerRequest": "{value} kg per request",
+        "co2": "CO₂e avoided",
+        "co2Factor": "factor {factor} kg CO₂e/kg"
+      },
+      "monthly": {
+        "title": "Tonnes collected per month",
+        "average": "average {value} t/month"
+      },
+      "destination": {
+        "title": "Where textiles go",
+        "outOfLandfill": "kept out of landfill",
+        "reuse": "Reuse",
+        "recycling": "Recycling",
+        "upcycling": "Upcycling"
+      },
+      "cities": {
+        "title": "Tonnes per municipality",
+        "mapLink": "See on the routes map",
+        "footer": "{count, plural, one {# municipality with pickups} other {# municipalities with pickups}} in this period"
+      },
+      "brands": {
+        "title": "Top brands in sorting",
+        "unit": "items",
+        "footer": "Useful for take-back proposals with brands (textile EPR)"
+      },
+      "alerts": {
+        "title": "Alerts",
+        "none": "No alerts.",
+        "stale": "{count, plural, one {# request over 48 h without a route} other {# requests over 48 h without a route}}",
+        "staleBody": "{cities}{more, plural, =0 {} other { and # more}}",
+        "awaiting": "{count, plural, one {# route awaiting confirmation} other {# routes awaiting confirmation}}",
+        "awaitingBody": "Customers have not confirmed the time slot yet.",
+        "outOfZone": "{count, plural, one {# request out of area} other {# requests out of area}}",
+        "outOfZoneBody": "Addresses outside the pickup areas."
+      }
+    }
   },
   "company": {
     "pageTitle": "Companies",
