@@ -1783,5 +1783,90 @@
       "sent": "Invitation envoyée à {email}.",
       "error": "Impossible d'envoyer l'invitation."
     }
+  },
+  "driver": {
+    "badge": "Chauffeur",
+    "titles": {
+      "route": "Tournée du jour",
+      "stops": "Demandes",
+      "vehicle": "Véhicule",
+      "profile": "Profil",
+      "routeOn": "Tournée du {date}"
+    },
+    "progress": "{done} sur {total} faites",
+    "loading": "Chargement…",
+    "loadError": "Impossible de charger la tournée.",
+    "noRoute": "Pas de tournée aujourd'hui.",
+    "noRouteHint": "Quand une tournée vous est attribuée, elle apparaît ici.",
+    "notStarted": "Départ à {time} · {count, plural, one {# arrêt} other {# arrêts}}.",
+    "start": "Démarrer la tournée",
+    "started": "Tournée démarrée. Bonne collecte !",
+    "startError": "Impossible de démarrer la tournée.",
+    "notConfirmed": "Cette tournée est encore en préparation.",
+    "stop": {
+      "next": "Arrêt {n} · suivant",
+      "bags": "sacs",
+      "navigate": "Naviguer",
+      "call": "Appeler",
+      "collect": "Marquer comme collecté",
+      "fail": "Collecte impossible",
+      "bagsCount": "{count, plural, one {# sac} other {# sacs}}"
+    },
+    "allDone": "Tous les arrêts faits",
+    "backToWarehouse": "Retournez à l'entrepôt avec {count, plural, one {# sac} other {# sacs}}.",
+    "finished": "Tournée terminée.",
+    "upcoming": "Prochains arrêts",
+    "noStops": "Cette tournée n'a pas d'arrêts.",
+    "stops": {
+      "collected": "Collecté",
+      "cancelled": "Annulé",
+      "todo": "À collecter"
+    },
+    "vehicle": {
+      "load": "{bags} sur {capacity} sacs dans la camionnette",
+      "remaining": "Environ {count} sacs restent à collecter.",
+      "none": "Aucun véhicule attribué à cette tournée.",
+      "routeCode": "Code de la tournée"
+    },
+    "profile": {
+      "account": "Mon compte",
+      "manual": "Collecte par code",
+      "manualHint": "Scanner une demande ou une tournée à la main.",
+      "portal": "Aller au portail"
+    },
+    "tabs": {
+      "route": "Tournée",
+      "stops": "Demandes",
+      "vehicle": "Véhicule",
+      "profile": "Profil"
+    },
+    "close": "Fermer",
+    "collect": {
+      "hint": "Scannez l'étiquette de chaque sac. Le client a indiqué {count, plural, one {# sac} other {# sacs}}.",
+      "placeholder": "Code du sac",
+      "scan": "Scanner un sac",
+      "bagRead": "Sac {code} scanné.",
+      "bagError": "Impossible de lire ce sac.",
+      "none": "Aucun sac scanné pour l'instant.",
+      "finish": "Terminer la collecte · {count, plural, one {# sac} other {# sacs}}",
+      "readFirst": "Scannez au moins un sac",
+      "done": "Collecte de {name} terminée.",
+      "finishError": "Impossible de terminer la collecte."
+    },
+    "fail": {
+      "title": "Collecte impossible ?",
+      "body": "Indiquez le motif. La demande de {name} sera annulée.",
+      "reasons": {
+        "absent": "Client absent",
+        "wrongAddress": "Mauvaise adresse",
+        "noAccess": "Pas d'accès",
+        "refused": "Le client a renoncé"
+      },
+      "placeholder": "Motif",
+      "warning": "Le client est prévenu par email et la demande ne peut plus être collectée.",
+      "confirm": "Annuler la collecte",
+      "done": "Collecte annulée.",
+      "error": "Impossible d'annuler la collecte."
+    }
   }
 }
