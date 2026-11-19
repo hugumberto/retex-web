@@ -42,8 +42,12 @@ body {
   margin: 0;
 }
 
-h1 {
-  @apply text-4xl md:text-4xl font-bold text-center;
+/* Em @layer base para as classes utilitárias poderem sobrepor-se (o
+   cabeçalho das páginas do portal usa um título de 28 px alinhado à esquerda). */
+@layer base {
+  h1 {
+    @apply text-4xl md:text-4xl font-bold text-center;
+  }
 }
 
 /*
@@ -64,6 +68,26 @@ h1 {
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: #02748e;
   --color-secondary-muted: #cce3e8;
+
+  /* Paleta da marca (Figma "Portal", 2026). */
+  --color-navy: #013364;
+  --color-teal: #02748e;
+  --color-ink: #4a6070;
+  --color-canvas: #eef3f4;
+  --color-mist: #f6f9f9;
+  --color-panel: #f1f5f6;
+  --color-line: #e4eef0;
+  --color-line-soft: #dce7ea;
+  --color-field: #c3d5da;
+  --color-sky: #cce3e8;
+  --color-mint: #ddf0e6;
+  --color-forest: #2d5a4e;
+  --color-slate: #8fb0c4;
+  --color-row-selected: #eaf4f7;
+  --color-neutral-badge: #eef1f2;
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
 
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -180,4 +204,12 @@ h1 {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Barra lateral do portal (Figma "RETEX Backoffice"): gradiente vertical da
+   marca. Aplica-se ao contentor interno do shadcn, no desktop e na gaveta do
+   telemóvel. */
+[data-sidebar='sidebar'] {
+  background-image: linear-gradient(180deg, #013364 0%, #02748e 100%);
+  color: #fff;
 }

@@ -1,18 +1,13 @@
-import Image from 'next/image';
 import { Toaster } from 'sonner';
 import '../global.css';
 
 // shadcn/ui sidebar v3.1
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
-// tua sidebar e topbar (client)
-import { AppSidebar, RetexTopBar } from '@/components/custom/app-sidebar';
-
-// shadcn/ui breadcrumbs
-import { Breadcrumbs } from '@/components/custom/breadcrumbs';
-import React from 'react';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { AppSidebar, PageHeader } from '@/components/custom/app-sidebar';
 import ImpersonationBanner from '@/components/custom/impersonation-banner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import React from 'react';
 import AuthBootstrapper from './guard/auth-bootstrapper';
 import CompanyBootstrapper from './guard/company-bootstrapper';
 import Protected from './guard/guard';
@@ -28,46 +23,24 @@ export default function PortalLayout({
   children: React.ReactNode;
 }) {
   // Sem <html>/<body> próprios: quem os define é o layout raiz, já com o
-  // idioma resolvido. Aninhá-los aqui era markup inválido — o browser descarta
-  // o interior — e deixava um `lang="en"` a contradizer a app, que é toda em
-  // português por omissão.
+  // idioma resolvido.
   return (
     <>
       <AuthBootstrapper />
       <CompanyBootstrapper />
       <Toaster richColors />
-      <SidebarProvider>
+      <SidebarProvider
+        // Largura da barra lateral do Figma "RETEX Backoffice".
+        style={{ '--sidebar-width': '232px' } as React.CSSProperties}
+      >
         <AppSidebar />
-        <SidebarInset className="bg-white min-w-0">
-          <RetexTopBar />
+        <SidebarInset className="min-w-0 bg-canvas">
           <ImpersonationBanner />
-
-          {/* Breadcrumbs */}
-
-          <main className="relative min-h-[calc(100dvh-4rem)] flex flex-col">
-            <div className="flex-1 p-4 sm:p-6 lg:p-8">
-              <Breadcrumbs />
-              <TooltipProvider>
-                <Protected>{children}</Protected>
-              </TooltipProvider>
-            </div>
-
-            {/* Footer fixed at the bottom */}
-            <footer className="w-full flex justify-center items-center py-6 mt-auto">
-              <div className="flex flex-col items-center gap-1">
-                <Image
-                  src="/assets/logo.png"
-                  alt="retex"
-                  height={28}
-                  width={100}
-                  className="h-7 opacity-90"
-                  priority
-                />
-                <span className="text-[11px] tracking-wide text-[#0b6b79]">
-                  wear. care. share. repeat.
-                </span>
-              </div>
-            </footer>
+          <main className="flex min-h-dvh flex-col gap-5 px-4 pb-10 pt-6 sm:px-6 lg:px-9">
+            <PageHeader />
+            <TooltipProvider>
+              <Protected>{children}</Protected>
+            </TooltipProvider>
           </main>
         </SidebarInset>
       </SidebarProvider>
