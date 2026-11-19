@@ -604,7 +604,7 @@
     "companyAddressesLink": "Voir les lieux de collecte"
   },
   "collectionRequest": {
-    "pageTitle": "Demande de collecte",
+    "pageTitle": "Demandes de collecte",
     "listTitle": "Demandes de collecte",
     "formTitle": "Nouvelle demande de collecte",
     "createConfirm": "Créer la demande",
@@ -656,7 +656,91 @@
     "coordinates": "Coordonnées",
     "noAddressInZone": "Vous n'avez aucune adresse dans la zone de service.",
     "noCompanyAddressInZone": "Votre entreprise n'a aucun lieu de collecte dans la zone de service.",
-    "addCollectionSite": "Ajouter un lieu de collecte"
+    "addCollectionSite": "Ajouter un lieu de collecte",
+    "admin": {
+      "searchPlaceholder": "Rechercher une demande, un client, un code postal",
+      "exportCsv": "Exporter en CSV",
+      "cityFilter": "Commune",
+      "allCities": "Toutes les communes",
+      "thisWeek": "Cette semaine",
+      "selectedCount": "{count, plural, one {# sélectionnée} other {# sélectionnées}}",
+      "selectAll": "Tout sélectionner",
+      "selectRequest": "Sélectionner {code}",
+      "cancel": "Annuler la demande",
+      "empty": "Aucune demande avec ces filtres.",
+      "showing": "{shown} sur {total}",
+      "loadMore": "Afficher plus",
+      "columns": {
+        "request": "Demande",
+        "client": "Client",
+        "place": "Lieu",
+        "window": "Créneau",
+        "bags": "Sacs",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "cards": {
+        "new": {
+          "label": "Nouvelle demande",
+          "chip": "Nouvelles",
+          "hint": "{count} depuis plus de 48h"
+        },
+        "scheduled": {
+          "label": "Planifiée",
+          "chip": "Planifiées",
+          "hint": "{count, plural, one {# tournée cette semaine} other {# tournées cette semaine}}"
+        },
+        "transit": {
+          "label": "En transport",
+          "chip": "En transport",
+          "hint": "{count, plural, one {# chauffeur sur la route} other {# chauffeurs sur la route}}"
+        },
+        "collected": {
+          "label": "Collectée",
+          "chip": "Collectées",
+          "hint": "en route vers l'entrepôt"
+        },
+        "warehouse": {
+          "label": "En entrepôt",
+          "chip": "En entrepôt",
+          "hint": "{count} ce mois-ci · {weight}"
+        },
+        "other": {
+          "chip": "Annulées et hors zone"
+        }
+      },
+      "csv": {
+        "code": "Demande",
+        "client": "Client",
+        "email": "Email",
+        "phone": "Mobile",
+        "zipCode": "Code postal",
+        "city": "Commune",
+        "street": "Adresse",
+        "bags": "Sacs",
+        "window": "Créneau",
+        "status": "Statut",
+        "createdAt": "Créée le"
+      },
+      "route": {
+        "title": "Nouvelle tournée",
+        "empty": "Sélectionnez des demandes nouvelles dans le tableau pour créer une tournée.",
+        "warehouse": "Entrepôt RETEX · départ",
+        "stop": "{name} · {bags, plural, one {# sac} other {# sacs}}",
+        "driver": "Chauffeur",
+        "driverPlaceholder": "Choisir un chauffeur",
+        "date": "Date",
+        "interval": "Créneau",
+        "intervalPlaceholder": "Choisir un créneau",
+        "totalBags": "Total de sacs de la tournée",
+        "submit": "Planifier et prévenir les clients",
+        "saving": "Planification…",
+        "footnote": "{count, plural, =0 {Les demandes passent à \"Planifiée\" et chaque client reçoit un email pour confirmer le créneau.} one {La demande passe à \"Planifiée\" et le client reçoit un email pour confirmer le créneau.} other {Les # demandes passent à \"Planifiée\" et chaque client reçoit un email pour confirmer le créneau.}}",
+        "success": "{count, plural, one {Tournée créée ; le client a été prévenu.} other {Tournée créée ; les # clients ont été prévenus.}}",
+        "draftOnly": "La tournée a été créée mais reste en brouillon : les clients n'ont pas encore été prévenus. Terminez-la dans Tournées et chauffeurs.",
+        "error": "Impossible de créer la tournée."
+      }
+    }
   },
   "packageCollection": {
     "pageTitle": "Gérer la collecte",

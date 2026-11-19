@@ -604,7 +604,7 @@
     "companyAddressesLink": "Ver lugares de recogida"
   },
   "collectionRequest": {
-    "pageTitle": "Solicitud de recogida",
+    "pageTitle": "Solicitudes de recogida",
     "listTitle": "Solicitudes de recogida",
     "formTitle": "Nueva solicitud de recogida",
     "createConfirm": "Crear solicitud",
@@ -656,7 +656,91 @@
     "coordinates": "Coordenadas",
     "noAddressInZone": "No tienes ninguna dirección dentro de la zona de servicio.",
     "noCompanyAddressInZone": "Tu empresa no tiene ningún lugar de recogida dentro de la zona de servicio.",
-    "addCollectionSite": "Añadir lugar de recogida"
+    "addCollectionSite": "Añadir lugar de recogida",
+    "admin": {
+      "searchPlaceholder": "Buscar solicitud, cliente, código postal",
+      "exportCsv": "Exportar CSV",
+      "cityFilter": "Municipio",
+      "allCities": "Todos los municipios",
+      "thisWeek": "Esta semana",
+      "selectedCount": "{count, plural, one {# seleccionada} other {# seleccionadas}}",
+      "selectAll": "Seleccionar todas",
+      "selectRequest": "Seleccionar {code}",
+      "cancel": "Cancelar solicitud",
+      "empty": "No hay solicitudes con estos filtros.",
+      "showing": "Mostrando {shown} de {total}",
+      "loadMore": "Cargar más",
+      "columns": {
+        "request": "Solicitud",
+        "client": "Cliente",
+        "place": "Lugar",
+        "window": "Franja",
+        "bags": "Bolsas",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "cards": {
+        "new": {
+          "label": "Nueva solicitud",
+          "chip": "Nuevas",
+          "hint": "{count} hace más de 48h"
+        },
+        "scheduled": {
+          "label": "Programada",
+          "chip": "Programadas",
+          "hint": "{count, plural, one {# ruta esta semana} other {# rutas esta semana}}"
+        },
+        "transit": {
+          "label": "En transporte",
+          "chip": "En transporte",
+          "hint": "{count, plural, one {# conductor en ruta} other {# conductores en ruta}}"
+        },
+        "collected": {
+          "label": "Recogida",
+          "chip": "Recogidas",
+          "hint": "camino del almacén"
+        },
+        "warehouse": {
+          "label": "En almacén",
+          "chip": "En almacén",
+          "hint": "{count} este mes · {weight}"
+        },
+        "other": {
+          "chip": "Canceladas y fuera de zona"
+        }
+      },
+      "csv": {
+        "code": "Solicitud",
+        "client": "Cliente",
+        "email": "Email",
+        "phone": "Móvil",
+        "zipCode": "Código postal",
+        "city": "Municipio",
+        "street": "Dirección",
+        "bags": "Bolsas",
+        "window": "Franja",
+        "status": "Estado",
+        "createdAt": "Creada el"
+      },
+      "route": {
+        "title": "Nueva ruta",
+        "empty": "Selecciona solicitudes nuevas en la tabla para montar una ruta.",
+        "warehouse": "Almacén RETEX · salida",
+        "stop": "{name} · {bags, plural, one {# bolsa} other {# bolsas}}",
+        "driver": "Conductor",
+        "driverPlaceholder": "Elegir conductor",
+        "date": "Fecha",
+        "interval": "Franja",
+        "intervalPlaceholder": "Elegir franja",
+        "totalBags": "Total de bolsas de la ruta",
+        "submit": "Programar y avisar a los clientes",
+        "saving": "Programando…",
+        "footnote": "{count, plural, =0 {Las solicitudes pasan a \"Programada\" y cada cliente recibe un email para confirmar la franja.} one {La solicitud pasa a \"Programada\" y el cliente recibe un email para confirmar la franja.} other {Las # solicitudes pasan a \"Programada\" y cada cliente recibe un email para confirmar la franja.}}",
+        "success": "{count, plural, one {Ruta creada; se avisó al cliente.} other {Ruta creada; se avisó a los # clientes.}}",
+        "draftOnly": "La ruta se creó pero quedó en borrador: aún no se avisó a los clientes. Termínala en Rutas y conductores.",
+        "error": "No se pudo crear la ruta."
+      }
+    }
   },
   "packageCollection": {
     "pageTitle": "Gestionar recogida",
