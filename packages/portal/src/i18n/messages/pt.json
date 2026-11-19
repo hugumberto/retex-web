@@ -604,7 +604,7 @@
     "companyAddressesLink": "Ver locais de recolha"
   },
   "collectionRequest": {
-    "pageTitle": "Solicitação de Recolha",
+    "pageTitle": "Pedidos de recolha",
     "listTitle": "Solicitações de Recolha",
     "formTitle": "Nova Solicitação de Recolha",
     "createConfirm": "Criar Solicitação",
@@ -656,7 +656,91 @@
     "coordinates": "Coordenadas",
     "noAddressInZone": "Não tem nenhum endereço dentro da zona de atuação.",
     "noCompanyAddressInZone": "A sua empresa não tem nenhum local de recolha dentro da zona de atuação.",
-    "addCollectionSite": "Adicionar local de recolha"
+    "addCollectionSite": "Adicionar local de recolha",
+    "admin": {
+      "searchPlaceholder": "Pesquisar pedido, cliente, código postal",
+      "exportCsv": "Exportar CSV",
+      "cityFilter": "Concelho",
+      "allCities": "Todos os concelhos",
+      "thisWeek": "Esta semana",
+      "selectedCount": "{count, plural, one {# selecionado} other {# selecionados}}",
+      "selectAll": "Selecionar todos",
+      "selectRequest": "Selecionar {code}",
+      "cancel": "Cancelar pedido",
+      "empty": "Não há pedidos com estes filtros.",
+      "showing": "A mostrar {shown} de {total}",
+      "loadMore": "Carregar mais",
+      "columns": {
+        "request": "Pedido",
+        "client": "Cliente",
+        "place": "Local",
+        "window": "Janela",
+        "bags": "Sacos",
+        "status": "Estado",
+        "actions": "Ações"
+      },
+      "cards": {
+        "new": {
+          "label": "Novo pedido",
+          "chip": "Novos",
+          "hint": "{count} há mais de 48h"
+        },
+        "scheduled": {
+          "label": "Agendado",
+          "chip": "Agendados",
+          "hint": "{count, plural, one {# rota esta semana} other {# rotas esta semana}}"
+        },
+        "transit": {
+          "label": "Em transporte",
+          "chip": "Em transporte",
+          "hint": "{count, plural, one {# motorista na rua} other {# motoristas na rua}}"
+        },
+        "collected": {
+          "label": "Recolhido",
+          "chip": "Recolhidos",
+          "hint": "a caminho do armazém"
+        },
+        "warehouse": {
+          "label": "Em armazém",
+          "chip": "Em armazém",
+          "hint": "{count} este mês · {weight}"
+        },
+        "other": {
+          "chip": "Cancelados e fora de zona"
+        }
+      },
+      "csv": {
+        "code": "Pedido",
+        "client": "Cliente",
+        "email": "Email",
+        "phone": "Telemóvel",
+        "zipCode": "Código postal",
+        "city": "Concelho",
+        "street": "Morada",
+        "bags": "Sacos",
+        "window": "Janela",
+        "status": "Estado",
+        "createdAt": "Criado em"
+      },
+      "route": {
+        "title": "Nova rota",
+        "empty": "Seleciona pedidos novos na tabela para montar uma rota.",
+        "warehouse": "Armazém RETEX · saída",
+        "stop": "{name} · {bags, plural, one {# saco} other {# sacos}}",
+        "driver": "Motorista",
+        "driverPlaceholder": "Escolher motorista",
+        "date": "Data",
+        "interval": "Período",
+        "intervalPlaceholder": "Escolher período",
+        "totalBags": "Total de sacos da rota",
+        "submit": "Agendar e notificar clientes",
+        "saving": "A agendar…",
+        "footnote": "{count, plural, =0 {Os pedidos passam a \"Agendado\" e cada cliente recebe um email para confirmar a janela.} one {O pedido passa a \"Agendado\" e o cliente recebe um email para confirmar a janela.} other {Os # pedidos passam a \"Agendado\" e cada cliente recebe um email para confirmar a janela.}}",
+        "success": "{count, plural, one {Rota criada; o cliente foi notificado.} other {Rota criada; os # clientes foram notificados.}}",
+        "draftOnly": "A rota foi criada, mas ficou em rascunho: os clientes ainda não foram notificados. Termina em Rotas e motoristas.",
+        "error": "Não foi possível criar a rota."
+      }
+    }
   },
   "packageCollection": {
     "pageTitle": "Gerir Recolha",

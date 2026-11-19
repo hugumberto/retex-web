@@ -604,7 +604,7 @@
     "companyAddressesLink": "View collection sites"
   },
   "collectionRequest": {
-    "pageTitle": "Collection request",
+    "pageTitle": "Pickup requests",
     "listTitle": "Collection requests",
     "formTitle": "New collection request",
     "createConfirm": "Create request",
@@ -656,7 +656,91 @@
     "coordinates": "Coordinates",
     "noAddressInZone": "You have no address within the service area.",
     "noCompanyAddressInZone": "Your company has no collection site within the service area.",
-    "addCollectionSite": "Add a collection site"
+    "addCollectionSite": "Add a collection site",
+    "admin": {
+      "searchPlaceholder": "Search request, customer, postcode",
+      "exportCsv": "Export CSV",
+      "cityFilter": "Municipality",
+      "allCities": "All municipalities",
+      "thisWeek": "This week",
+      "selectedCount": "{count} selected",
+      "selectAll": "Select all",
+      "selectRequest": "Select {code}",
+      "cancel": "Cancel request",
+      "empty": "No requests match these filters.",
+      "showing": "Showing {shown} of {total}",
+      "loadMore": "Load more",
+      "columns": {
+        "request": "Request",
+        "client": "Customer",
+        "place": "Place",
+        "window": "Window",
+        "bags": "Bags",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "cards": {
+        "new": {
+          "label": "New request",
+          "chip": "New",
+          "hint": "{count} older than 48h"
+        },
+        "scheduled": {
+          "label": "Scheduled",
+          "chip": "Scheduled",
+          "hint": "{count, plural, one {# route this week} other {# routes this week}}"
+        },
+        "transit": {
+          "label": "In transit",
+          "chip": "In transit",
+          "hint": "{count, plural, one {# driver out} other {# drivers out}}"
+        },
+        "collected": {
+          "label": "Collected",
+          "chip": "Collected",
+          "hint": "on the way to the warehouse"
+        },
+        "warehouse": {
+          "label": "In warehouse",
+          "chip": "In warehouse",
+          "hint": "{count} this month · {weight}"
+        },
+        "other": {
+          "chip": "Cancelled and out of area"
+        }
+      },
+      "csv": {
+        "code": "Request",
+        "client": "Customer",
+        "email": "Email",
+        "phone": "Mobile",
+        "zipCode": "Postcode",
+        "city": "Municipality",
+        "street": "Address",
+        "bags": "Bags",
+        "window": "Window",
+        "status": "Status",
+        "createdAt": "Created at"
+      },
+      "route": {
+        "title": "New route",
+        "empty": "Select new requests in the table to build a route.",
+        "warehouse": "RETEX warehouse · departure",
+        "stop": "{name} · {bags, plural, one {# bag} other {# bags}}",
+        "driver": "Driver",
+        "driverPlaceholder": "Choose driver",
+        "date": "Date",
+        "interval": "Time slot",
+        "intervalPlaceholder": "Choose time slot",
+        "totalBags": "Total bags on the route",
+        "submit": "Schedule and notify customers",
+        "saving": "Scheduling…",
+        "footnote": "{count, plural, =0 {Requests become \"Scheduled\" and each customer gets an email to confirm the time slot.} one {The request becomes \"Scheduled\" and the customer gets an email to confirm the time slot.} other {The # requests become \"Scheduled\" and each customer gets an email to confirm the time slot.}}",
+        "success": "{count, plural, one {Route created; the customer was notified.} other {Route created; # customers were notified.}}",
+        "draftOnly": "The route was created but is still a draft: customers have not been notified yet. Finish it in Routes and drivers.",
+        "error": "Could not create the route."
+      }
+    }
   },
   "packageCollection": {
     "pageTitle": "Manage collection",

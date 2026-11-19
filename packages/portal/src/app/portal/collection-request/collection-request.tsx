@@ -26,6 +26,7 @@ import api from '@/lib/api';
 import { getUserRoles } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
+import AdminRequests from './admin-requests';
 import RequestDetailsDialog from './request-details-dialog';
 import TablePagination from '@/components/custom/table-pagination';
 import { usePagination } from '@/hooks/use-pagination';
@@ -352,6 +353,165 @@ export default function CollectionRequest() {
     required: tCommon('requiredField'),
   });
 
+  // Criar um pedido para um cliente ao balcão (ADMIN/OPS).
+  const adminCreateDialog = (
+    <DialogForm<AdminFormData>
+      title={t('formTitle')}
+      confirmText={t('createConfirm')}
+      loading={isSubmitting}
+      errors={adminErrors}
+      onConfirm={submitAdmin}
+      trigger={
+        <Button variant="secondary" disabled={isSubmitting}>
+          {t('createConfirm')}
+        </Button>
+      }
+    >
+      <div className="grid max-h-[70vh] grid-cols-1 gap-4 overflow-y-auto pr-1 md:grid-cols-2">
+        <Input
+          tabIndex={1}
+          placeholder={t('firstNamePlaceholder')}
+          className={adminErrors.firstName ? 'border-red-500' : ''}
+          {...adminRegister('firstName', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={2}
+          placeholder={t('lastNamePlaceholder')}
+          className={adminErrors.lastName ? 'border-red-500' : ''}
+          {...adminRegister('lastName', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={3}
+          placeholder={t('emailPlaceholder')}
+          type="email"
+          className={adminErrors.email ? 'border-red-500' : ''}
+          {...adminRegister('email', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={4}
+          placeholder={t('phonePlaceholder')}
+          className={adminErrors.contactPhone ? 'border-red-500' : ''}
+          {...adminRegister('contactPhone', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={5}
+          placeholder={t('zipPlaceholder')}
+          className={adminErrors.address?.zipCode ? 'border-red-500' : ''}
+          {...zipCodeField}
+          onBlur={(event) => {
+            zipCodeField.onBlur(event);
+            void handleBlurPostalCode(event);
+          }}
+        />
+        <Input
+          tabIndex={6}
+          placeholder={t('streetPlaceholder')}
+          className={adminErrors.address?.street ? 'border-red-500' : ''}
+          {...adminRegister('address.street', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={7}
+          placeholder={t('cityDivisionPlaceholder')}
+          className={
+            adminErrors.address?.cityDivision ? 'border-red-500' : ''
+          }
+          {...adminRegister('address.cityDivision', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={8}
+          placeholder={t('cityPlaceholder')}
+          className={adminErrors.address?.city ? 'border-red-500' : ''}
+          {...adminRegister('address.city', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={9}
+          placeholder={t('countryDivisionPlaceholder')}
+          className={
+            adminErrors.address?.countryDivision ? 'border-red-500' : ''
+          }
+          {...adminRegister('address.countryDivision', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={10}
+          placeholder={t('countryPlaceholder')}
+          className={adminErrors.address?.country ? 'border-red-500' : ''}
+          {...adminRegister('address.country', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={11}
+          placeholder={t('numberPlaceholder')}
+          className={adminErrors.address?.number ? 'border-red-500' : ''}
+          {...adminRegister('address.number', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={12}
+          placeholder={t('complementPlaceholder')}
+          {...adminRegister('address.complement')}
+        />
+        <Input
+          tabIndex={13}
+          placeholder={t('latPlaceholder')}
+          className={adminErrors.address?.lat ? 'border-red-500' : ''}
+          {...adminRegister('address.lat', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={14}
+          placeholder={t('longPlaceholder')}
+          className={adminErrors.address?.long ? 'border-red-500' : ''}
+          {...adminRegister('address.long', {
+            required: tCommon('requiredField'),
+          })}
+        />
+        <Input
+          tabIndex={15}
+          type="number"
+          min={1}
+          placeholder={t('estimatedBagsPlaceholder')}
+          className={adminErrors.estimatedBags ? 'border-red-500' : ''}
+          {...adminRegister('estimatedBags', {
+            required: tCommon('requiredField'),
+            min: { value: 1, message: t('minOneBag') },
+          })}
+        />
+      </div>
+    </DialogForm>
+  );
+
+  // ADMIN e OPS têm o ecrã de gestão (Figma "RETEX Backoffice" → 08-Admin); o
+  // cliente continua com a sua lista e o pedido de recolha.
+  if (!isUserRole) {
+    return (
+      <AdminRequests
+        requests={requests}
+        onRefresh={fetchRequests}
+        onCancel={cancelRequest}
+        createAction={adminCreateDialog}
+      />
+    );
+  }
+
   return (
     <section id="collection-request-page" className="space-y-6">
       <div className="flex justify-end">
@@ -476,150 +636,7 @@ export default function CollectionRequest() {
               </AlertDescription>
             </Alert>
           )
-        ) : (
-          <DialogForm<AdminFormData>
-            title={t('formTitle')}
-            confirmText={t('createConfirm')}
-            loading={isSubmitting}
-            errors={adminErrors}
-            onConfirm={submitAdmin}
-            trigger={
-              <Button variant="secondary" disabled={isSubmitting}>
-                {t('createConfirm')}
-              </Button>
-            }
-          >
-            <div className="grid max-h-[70vh] grid-cols-1 gap-4 overflow-y-auto pr-1 md:grid-cols-2">
-              <Input
-                tabIndex={1}
-                placeholder={t('firstNamePlaceholder')}
-                className={adminErrors.firstName ? 'border-red-500' : ''}
-                {...adminRegister('firstName', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={2}
-                placeholder={t('lastNamePlaceholder')}
-                className={adminErrors.lastName ? 'border-red-500' : ''}
-                {...adminRegister('lastName', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={3}
-                placeholder={t('emailPlaceholder')}
-                type="email"
-                className={adminErrors.email ? 'border-red-500' : ''}
-                {...adminRegister('email', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={4}
-                placeholder={t('phonePlaceholder')}
-                className={adminErrors.contactPhone ? 'border-red-500' : ''}
-                {...adminRegister('contactPhone', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={5}
-                placeholder={t('zipPlaceholder')}
-                className={adminErrors.address?.zipCode ? 'border-red-500' : ''}
-                {...zipCodeField}
-                onBlur={(event) => {
-                  zipCodeField.onBlur(event);
-                  void handleBlurPostalCode(event);
-                }}
-              />
-              <Input
-                tabIndex={6}
-                placeholder={t('streetPlaceholder')}
-                className={adminErrors.address?.street ? 'border-red-500' : ''}
-                {...adminRegister('address.street', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={7}
-                placeholder={t('cityDivisionPlaceholder')}
-                className={
-                  adminErrors.address?.cityDivision ? 'border-red-500' : ''
-                }
-                {...adminRegister('address.cityDivision', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={8}
-                placeholder={t('cityPlaceholder')}
-                className={adminErrors.address?.city ? 'border-red-500' : ''}
-                {...adminRegister('address.city', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={9}
-                placeholder={t('countryDivisionPlaceholder')}
-                className={
-                  adminErrors.address?.countryDivision ? 'border-red-500' : ''
-                }
-                {...adminRegister('address.countryDivision', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={10}
-                placeholder={t('countryPlaceholder')}
-                className={adminErrors.address?.country ? 'border-red-500' : ''}
-                {...adminRegister('address.country', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={11}
-                placeholder={t('numberPlaceholder')}
-                className={adminErrors.address?.number ? 'border-red-500' : ''}
-                {...adminRegister('address.number', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={12}
-                placeholder={t('complementPlaceholder')}
-                {...adminRegister('address.complement')}
-              />
-              <Input
-                tabIndex={13}
-                placeholder={t('latPlaceholder')}
-                className={adminErrors.address?.lat ? 'border-red-500' : ''}
-                {...adminRegister('address.lat', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={14}
-                placeholder={t('longPlaceholder')}
-                className={adminErrors.address?.long ? 'border-red-500' : ''}
-                {...adminRegister('address.long', {
-                  required: tCommon('requiredField'),
-                })}
-              />
-              <Input
-                tabIndex={15}
-                type="number"
-                min={1}
-                placeholder={t('estimatedBagsPlaceholder')}
-                className={adminErrors.estimatedBags ? 'border-red-500' : ''}
-                {...adminRegister('estimatedBags', {
-                  required: tCommon('requiredField'),
-                  min: { value: 1, message: t('minOneBag') },
-                })}
-              />
-            </div>
-          </DialogForm>
-        )}
+        ) : null}
       </div>
 
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
