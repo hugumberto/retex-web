@@ -1041,7 +1041,8 @@
     "itemDestination": "Destination des articles",
     "quantityPerDestination": "Quantité par destination",
     "itemCategory": "Catégories d’articles",
-    "quantityPerCategory": "Quantité par catégorie"
+    "quantityPerCategory": "Quantité par catégorie",
+    "notSpecified": "Non renseigné"
   },
   "company": {
     "pageTitle": "Entreprises",

@@ -125,7 +125,7 @@ export default function AdminDashboard() {
   }));
 
   const conditionData = triage.byCondition.map((row) => ({
-    label: tCondition(row.key),
+    label: (row.key ? tCondition(row.key) : t('notSpecified')),
     value: row.quantity,
     color: CONDITION_COLOR[row.key] ?? '#64748b',
   }));
@@ -140,15 +140,15 @@ export default function AdminDashboard() {
   const categoryData = [...triage.byCategory]
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 8)
-    .map((row) => ({ label: tCategory(row.key), value: row.quantity }));
+    .map((row) => ({ label: (row.key ? tCategory(row.key) : t('notSpecified')), value: row.quantity }));
 
   const seasonData = triage.bySeason.map((row) => ({
-    label: tSeason(row.key),
+    label: (row.key ? tSeason(row.key) : t('notSpecified')),
     value: row.quantity,
   }));
 
   const typeData = triage.byType.map((row) => ({
-    label: tItemType(row.key),
+    label: (row.key ? tItemType(row.key) : t('notSpecified')),
     value: row.quantity,
   }));
 
@@ -164,12 +164,8 @@ export default function AdminDashboard() {
   return (
     <section className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">{t('pageTitle')}</h1>
-          <p className="text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
-        </div>
+        {/* O título já vem no cabeçalho da página. */}
+        <p className="text-sm text-ink">{t('subtitle')}</p>
         {/* Entrada do modo "ver como" — a API só o permite a um MASTER. */}
         {isMaster(user) && <ViewAsDialog />}
       </div>

@@ -121,7 +121,7 @@ export default function ScopedDashboard() {
   }));
 
   const conditionData = triage.byCondition.map((row) => ({
-    label: tCondition(row.key),
+    label: (row.key ? tCondition(row.key) : t('notSpecified')),
     value: row.quantity,
     color: CONDITION_COLOR[row.key] ?? '#64748b',
   }));
@@ -136,15 +136,15 @@ export default function ScopedDashboard() {
   const categoryData = [...triage.byCategory]
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 8)
-    .map((row) => ({ label: tCategory(row.key), value: row.quantity }));
+    .map((row) => ({ label: (row.key ? tCategory(row.key) : t('notSpecified')), value: row.quantity }));
 
   const seasonData = triage.bySeason.map((row) => ({
-    label: tSeason(row.key),
+    label: (row.key ? tSeason(row.key) : t('notSpecified')),
     value: row.quantity,
   }));
 
   const typeData = triage.byType.map((row) => ({
-    label: tItemType(row.key),
+    label: (row.key ? tItemType(row.key) : t('notSpecified')),
     value: row.quantity,
   }));
 
@@ -156,10 +156,12 @@ export default function ScopedDashboard() {
   return (
     <section id="scoped-dashboard" className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">
-          {isCompany ? company?.name : t('pageTitle')}
-        </h1>
-        <p className="text-sm text-muted-foreground">
+        {/* O título da página já vem no cabeçalho; aqui fica só o nome da
+            empresa, quando o painel é de uma. */}
+        {isCompany ? (
+          <h2 className="text-xl font-semibold text-navy">{company?.name}</h2>
+        ) : null}
+        <p className="text-sm text-ink">
           {isCompany ? t('companySubtitle') : t('personalSubtitle')}
         </p>
       </div>
