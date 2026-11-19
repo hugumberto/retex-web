@@ -1,262 +1,186 @@
 'use client';
 
-import { Bell, ChevronDown, Info, LogOut } from 'lucide-react';
-import Image from 'next/image';
+import { LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import EnvBadge from './env-badge';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
-// shadcn/ui sidebar v3.1
+// shadcn/ui sidebar v3.1 — dá o comportamento (gaveta no telemóvel); o aspeto
+// é o do Figma "RETEX Backoffice".
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarRail,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { getUserRoles, hasCompanyAccess } from '@/lib/access-control';
-import { cn, isNavGroup, NAV_ITEMS, NavGroup, NavLeaf } from '@/lib/utils';
-import { CompanyContextDTO } from '@/app/types/company';
-import { Role } from '@/app/types/user';
+import {
+  findActiveNav,
+  NAV_SECTIONS,
+  primaryRole,
+} from '@/lib/navigation';
+import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store';
-import { Label } from '../ui/label';
+import EnvBadge from './env-badge';
 import { LanguageSwitcher } from './language-switcher';
-import Title from './title';
-
-const isPathActive = (pathname: string | null, href: string): boolean => {
-  if (href === '/portal') return pathname === '/portal';
-  return (
-    !!pathname &&
-    pathname.startsWith(href) &&
-    (pathname.length === href.length || pathname.charAt(href.length) === '/')
-  );
-};
-
-const leafButtonClasses = (active: boolean) =>
-  cn(
-    'px-3 py-3 rounded-lg text-[13px] tracking-wide',
-    '[&_*]:text-secondary',
-    active && '[&_*]:text-white',
-    'hover:[&_*]:text-white',
-    active
-      ? 'bg-secondary/60 font-semibold shadow-sm text-white'
-      : 'hover:bg-secondary/40'
-  );
-
-function NavLeafItem({ item, active }: { item: NavLeaf; active: boolean }) {
-  const t = useTranslations();
-  const Icon = item.icon;
-  return (
-    <SidebarMenuItem>
-      <SidebarMenuButton
-        asChild
-        isActive={active}
-        className={leafButtonClasses(active)}
-      >
-        <Link href={item.href}>
-          <Icon className={cn('size-5')} />
-          <Label className="text-[13px]">{t(item.labelKey)}</Label>
-        </Link>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  );
-}
-
-function NavGroupItem({
-  group,
-  userRoles,
-  companyContext,
-  pathname,
-}: {
-  group: NavGroup;
-  userRoles: Role[];
-  companyContext: CompanyContextDTO | null;
-  pathname: string | null;
-}) {
-  const t = useTranslations();
-  const children = group.children.filter(
-    (child) =>
-      child.roles.some((role) => userRoles.includes(role)) &&
-      hasCompanyAccess(companyContext, child)
-  );
-  const anyActive = children.some((child) =>
-    isPathActive(pathname, child.href)
-  );
-  const [open, setOpen] = useState(anyActive);
-
-  // Keep the group open when navigating into one of its children.
-  useEffect(() => {
-    if (anyActive) setOpen(true);
-  }, [anyActive]);
-
-  if (children.length === 0) return null;
-
-  const Icon = group.icon;
-
-  return (
-    <SidebarMenuItem>
-      <SidebarMenuButton
-        onClick={() => setOpen((value) => !value)}
-        className={leafButtonClasses(false)}
-      >
-        <Icon className={cn('size-5')} />
-        <Label className="text-[13px] flex-1 text-left cursor-pointer">
-          {t(group.labelKey)}
-        </Label>
-        <ChevronDown
-          className={cn('size-4 transition-transform', open && 'rotate-180')}
-        />
-      </SidebarMenuButton>
-
-      {open && (
-        <SidebarMenuSub>
-          {children.map((child) => {
-            const active = isPathActive(pathname, child.href);
-            const ChildIcon = child.icon;
-            return (
-              <SidebarMenuSubItem key={child.href}>
-                <SidebarMenuSubButton
-                  asChild
-                  isActive={active}
-                  className={leafButtonClasses(active)}
-                >
-                  <Link href={child.href}>
-                    <ChildIcon className={cn('size-4')} />
-                    <span className="text-[13px]">{t(child.labelKey)}</span>
-                  </Link>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            );
-          })}
-        </SidebarMenuSub>
-      )}
-    </SidebarMenuItem>
-  );
-}
 
 export function AppSidebar() {
-  const t = useTranslations('common');
+  const t = useTranslations('nav');
+  const tCommon = useTranslations('common');
   const pathname = usePathname();
   const { user, companyContext } = useAppStore();
+  const { setOpenMobile } = useSidebar();
   const userRoles = getUserRoles(user);
+  const role = primaryRole(userRoles);
+  const activeHref = findActiveNav(pathname)?.item.href;
 
-  const visibleNavItems = NAV_ITEMS.filter(
-    (entry) =>
-      entry.roles.some((role) => userRoles.includes(role)) &&
-      hasCompanyAccess(companyContext, entry)
-  );
+  const sections = NAV_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.filter(
+      (item) =>
+        item.roles.some((r) => userRoles.includes(r)) &&
+        hasCompanyAccess(companyContext, item)
+    ),
+  })).filter((section) => section.items.length > 0);
 
   return (
-    <Sidebar
-      collapsible="icon"
-      className="border-0 rounded-tr-3xl rounded-br-3xl"
-    >
-      <SidebarHeader className="px-6 pt-6 flex justify-center items-center">
-        <Image
-          src="/assets/logo.png"
-          alt="retex"
-          height={28}
-          width={207}
-          className="h-12 opacity-90"
-          style={{ width: 'auto' }}
-          priority
-        />
+    <Sidebar collapsible="offcanvas" className="border-0">
+      <SidebarHeader className="px-[14px] pb-0 pt-8">
+        <div className="flex items-center justify-between pl-2.5 pr-1.5">
+          <Link href="/portal" aria-label="ReTeX:ID">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/logo-branco.svg"
+              alt="ReTeX:ID"
+              width={113}
+              height={20}
+            />
+          </Link>
+          {role ? (
+            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-white/60">
+              {t(`roles.${role}`)}
+            </span>
+          ) : null}
+        </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-3">
-        <SidebarGroup>
-          <SidebarGroupLabel className="sr-only">
-            {t('navigation')}
-          </SidebarGroupLabel>
-          <SidebarMenu>
-            {visibleNavItems.map((entry) =>
-              isNavGroup(entry) ? (
-                <NavGroupItem
-                  key={entry.labelKey}
-                  group={entry}
-                  userRoles={userRoles}
-                  companyContext={companyContext}
-                  pathname={pathname}
-                />
-              ) : (
-                <NavLeafItem
-                  key={entry.href}
-                  item={entry}
-                  active={isPathActive(pathname, entry.href)}
-                />
-              )
-            )}
-          </SidebarMenu>
-        </SidebarGroup>
+      <SidebarContent className="px-[14px] pt-[30px]">
+        <nav aria-label={tCommon('navigation')} className="flex flex-col gap-1">
+          {sections.map((section, index) => (
+            <div key={section.labelKey ?? index} className="flex flex-col gap-1">
+              {section.labelKey ? (
+                <p className="pb-1 pl-3 pt-3 font-mono text-[10px] uppercase tracking-[0.08em] text-slate">
+                  {t(`sections.${section.labelKey}`)}
+                </p>
+              ) : null}
+              {section.items.map((item) => {
+                // Só o item mais específico fica ativo: em
+                // /portal/my-company/members não se acende também a ficha.
+                const active = item.href === activeHref;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpenMobile(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      'flex h-[42px] items-center justify-between rounded-lg pl-3 pr-2.5 text-sm transition-colors',
+                      active
+                        ? 'bg-white font-semibold text-navy'
+                        : 'text-white/90 hover:bg-white/10'
+                    )}
+                  >
+                    {t(item.labelKey)}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
       </SidebarContent>
 
-      <SidebarFooter className="px-6 pb-6">
-        <div className="flex items-center gap-2 text-sm text-secondary">
-          <span className="inline-flex size-6 items-center justify-center rounded-full border">
-            <Info className="size-3.5" />
-          </span>
-          <span className="font-medium">{t('info')}</span>
+      <SidebarFooter className="gap-4 px-6 pb-6 pt-4 text-white">
+        <div className="[&_button]:border-white/30 [&_button]:bg-transparent [&_button]:text-white [&_svg]:text-white/70">
+          <LanguageSwitcher />
         </div>
-
-        <div className="mt-6 flex items-center gap-3">
-          <div
-            className="size-10 rounded-full shrink-0"
-            style={{
-              background: 'linear-gradient(180deg, #0b6b79 0%, #00364a 100%)',
-            }}
-          />
-          <div className="text-sm font-semibold min-w-0 truncate flex-1 text-secondary">
-            {user ? `${user.firstName} ${user.lastName}` : t('user')}
-          </div>
+        <div className="flex items-center gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold">
+            {user
+              ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`
+              : '·'}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+            {user ? `${user.firstName} ${user.lastName}` : tCommon('user')}
+          </span>
           <button
+            type="button"
             onClick={() => useAppStore.getState().logout()}
-            title={t('logout')}
-            className="shrink-0 text-secondary hover:text-destructive transition-colors"
+            title={tCommon('logout')}
+            aria-label={tCommon('logout')}
+            className="shrink-0 text-white/70 transition-colors hover:text-white"
           >
             <LogOut className="size-4" />
           </button>
         </div>
       </SidebarFooter>
-
-      <SidebarRail />
     </Sidebar>
   );
 }
 
-export function RetexTopBar() {
-  const t = useTranslations('common');
-  const { pageTitle } = useAppStore();
+/**
+ * Cabeçalho de cada página: caminho em DM Mono ("CHECK-IN / PEDIDOS DE
+ * RECOLHA") e o título. A secção sai da navegação; o resto do caminho são as
+ * breadcrumbs que cada página já define, e o título é o `pageTitle` dela.
+ */
+export function PageHeader() {
+  const t = useTranslations('nav');
+  const tCommon = useTranslations('common');
+  const pathname = usePathname();
+  const { pageTitle, breadcrumbs } = useAppStore();
+  const active = findActiveNav(pathname);
+
+  const trail: { label: string; href?: string }[] = [];
+  if (active?.section.labelKey) {
+    trail.push({ label: t(`sections.${active.section.labelKey}`) });
+  }
+  if (breadcrumbs.length > 0) {
+    trail.push(...breadcrumbs);
+  } else if (active) {
+    trail.push({ label: t(active.item.labelKey) });
+  }
 
   return (
-    <header className="sticky top-0 z-40 bg-white">
-      <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
-        <SidebarTrigger className="-ml-1 md:hidden" />
-        <Title>{pageTitle || t('home')}</Title>
-        <EnvBadge />
-
-        <div className="ml-auto flex items-center gap-5">
-          <LanguageSwitcher />
-          <Bell className="size-5" />
-          <div
-            className="size-10 rounded-full"
-            style={{
-              background: 'linear-gradient(180deg, #0b6b79 0%, #00364a 100%)',
-            }}
-          />
+    <header className="flex items-start gap-3">
+      <SidebarTrigger className="mt-1 text-navy md:hidden" />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        {trail.length > 0 ? (
+          <p className="truncate font-mono text-[10px] uppercase tracking-[0.06em] text-ink">
+            {trail.map((crumb, index) => {
+              const isLast = index === trail.length - 1;
+              return (
+                <span key={`${crumb.label}-${index}`}>
+                  {index > 0 ? ' / ' : ''}
+                  {crumb.href && !isLast ? (
+                    <Link href={crumb.href} className="hover:text-navy">
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    crumb.label
+                  )}
+                </span>
+              );
+            })}
+          </p>
+        ) : null}
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-left text-[28px] font-bold tracking-[-0.02em] text-navy md:text-[28px]">
+            {pageTitle || (active ? t(active.item.labelKey) : tCommon('home'))}
+          </h1>
+          <EnvBadge />
         </div>
       </div>
-      <div className="h-[2px] w-full bg-secondary-muted" />
     </header>
   );
 }
