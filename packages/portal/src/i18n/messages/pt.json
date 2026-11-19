@@ -745,7 +745,16 @@
         "vehicleOption": "{name} · {plate} ({capacity} sacos)",
         "occupancy": "Ocupação da carrinha",
         "occupancyValue": "{bags} / {capacity} sacos",
-        "overCapacity": "Os sacos estimados passam a capacidade deste veículo."
+        "overCapacity": "Os sacos estimados passam a capacidade deste veículo.",
+        "map": {
+          "calculating": "A calcular o percurso…",
+          "summary": "{km} km · ~{duration}",
+          "noRoute": "Percurso por calcular",
+          "noWarehouse": "Para ver km e horas, defina a morada do armazém em <link>Parâmetros</link>.",
+          "routingError": "Não foi possível calcular o percurso.",
+          "noCoords": "sem coordenadas",
+          "etaTitle": "Hora prevista de chegada"
+        }
       }
     },
     "window": {
@@ -1080,7 +1089,21 @@
     "minTwenty": "Mínimo 20",
     "maxWidth": "Máximo 210",
     "maxHeight": "Máximo 297",
-    "maxQrSize": "Máximo 200"
+    "maxQrSize": "Máximo 200",
+    "routesSectionTitle": "Armazém e rotas",
+    "routesSectionHelp": "Ponto de partida e chegada das rotas e tempo de cada recolha. Servem para calcular os km e a hora prevista de cada paragem em \"Nova rota\".",
+    "warehouseAddressLabel": "Morada do armazém",
+    "locate": "Localizar",
+    "locating": "A localizar…",
+    "warehouseLocated": "Armazém localizado. Guarde para aplicar.",
+    "warehouseNotFound": "Não foi possível localizar esta morada.",
+    "warehouseCoords": "Coordenadas: {lat}, {long}",
+    "warehouseNoCoords": "Sem coordenadas: escreva a morada e carregue em \"Localizar\".",
+    "stopBaseMinutesLabel": "Minutos fixos por paragem",
+    "stopMinutesPerBagLabel": "Minutos por saco",
+    "maxStopBase": "Máximo 120 minutos",
+    "maxPerBag": "Máximo 30 minutos",
+    "stopTimeHelp": "Ex.: 5 + 1 por saco → uma recolha de 4 sacos conta 9 minutos."
   },
   "dashboard": {
     "pageTitle": "Dashboard",

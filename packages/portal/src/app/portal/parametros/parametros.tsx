@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import ttServices from '@tomtom-international/web-sdk-services';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -23,6 +24,11 @@ interface ParametrosFormData {
   labelHeightMm: number;
   labelQrSizeMm: number;
   labelRotationDeg: number;
+  warehouseAddress: string;
+  warehouseLat: string;
+  warehouseLong: string;
+  stopBaseMinutes: number;
+  stopMinutesPerBag: number;
 }
 
 export default function Parametros() {
@@ -31,18 +37,30 @@ export default function Parametros() {
   const { setPageTitle, setBreadcrumbs } = useAppStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [isLocating, setIsLocating] = useState(false);
+
   const {
     control,
     handleSubmit,
     reset,
+    getValues,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ParametrosFormData>({
     defaultValues: {
       collectionConfirmationDeadlineDays: 2,
       qrCodeThresholdPercentage: 10,
       ...DEFAULT_LABEL_SIZE,
+      warehouseAddress: '',
+      warehouseLat: '',
+      warehouseLong: '',
+      stopBaseMinutes: 5,
+      stopMinutesPerBag: 1,
     },
   });
+  const warehouseLat = watch('warehouseLat');
+  const warehouseLong = watch('warehouseLong');
 
   const fetchParameters = useCallback(async () => {
     try {
@@ -55,6 +73,11 @@ export default function Parametros() {
         labelHeightMm: data.labelHeightMm,
         labelQrSizeMm: data.labelQrSizeMm,
         labelRotationDeg: data.labelRotationDeg,
+        warehouseAddress: data.warehouseAddress ?? '',
+        warehouseLat: data.warehouseLat != null ? String(data.warehouseLat) : '',
+        warehouseLong: data.warehouseLong != null ? String(data.warehouseLong) : '',
+        stopBaseMinutes: data.stopBaseMinutes ?? 5,
+        stopMinutesPerBag: data.stopMinutesPerBag ?? 1,
       });
     } catch (error) {
       console.error('Erro ao buscar parâmetros:', error);
@@ -83,6 +106,11 @@ export default function Parametros() {
         labelHeightMm: Number(data.labelHeightMm),
         labelQrSizeMm: Number(data.labelQrSizeMm),
         labelRotationDeg: Number(data.labelRotationDeg),
+        warehouseAddress: data.warehouseAddress.trim() || null,
+        warehouseLat: data.warehouseLat === '' ? null : Number(data.warehouseLat),
+        warehouseLong: data.warehouseLong === '' ? null : Number(data.warehouseLong),
+        stopBaseMinutes: Number(data.stopBaseMinutes),
+        stopMinutesPerBag: Number(data.stopMinutesPerBag),
       });
       if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
       toast.success(t('saveSuccess'));
@@ -98,6 +126,35 @@ export default function Parametros() {
       setIsSubmitting(false);
     }
   }, [t]);
+
+  // Coordenadas do armazém a partir da morada (TomTom, a mesma chave do mapa).
+  const locateWarehouse = async () => {
+    const query = getValues('warehouseAddress').trim();
+    const key = process.env.NEXT_PUBLIC_TOMTOM_API_KEY;
+    if (!query || !key) return;
+    setIsLocating(true);
+    try {
+      const response = (await ttServices.services.geocode({
+        key,
+        query,
+        countrySet: 'PT',
+        limit: 1,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)) as { results?: { position?: { lat: number; lng: number } }[] };
+      const position = response.results?.[0]?.position;
+      if (!position) {
+        toast.error(t('warehouseNotFound'));
+        return;
+      }
+      setValue('warehouseLat', position.lat.toFixed(7), { shouldDirty: true });
+      setValue('warehouseLong', position.lng.toFixed(7), { shouldDirty: true });
+      toast.success(t('warehouseLocated'));
+    } catch {
+      toast.error(t('warehouseNotFound'));
+    } finally {
+      setIsLocating(false);
+    }
+  };
 
   return (
     <section id="parametros-page" className="max-w-lg">
@@ -205,6 +262,67 @@ export default function Parametros() {
               {t('labelRotationHelp')}
             </p>
           </div>
+        </div>
+
+        <div className="space-y-4 border-t border-secondary/20 pt-6">
+          <div>
+            <h2 className="text-sm font-semibold text-secondary">
+              {t('routesSectionTitle')}
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('routesSectionHelp')}
+            </p>
+          </div>
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <InputForm
+                label={t('warehouseAddressLabel')}
+                name="warehouseAddress"
+                control={control}
+                errors={errors}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={locateWarehouse}
+              disabled={isLocating}
+            >
+              {isLocating ? t('locating') : t('locate')}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {warehouseLat && warehouseLong
+              ? t('warehouseCoords', { lat: warehouseLat, long: warehouseLong })
+              : t('warehouseNoCoords')}
+          </p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <InputForm
+              label={t('stopBaseMinutesLabel')}
+              name="stopBaseMinutes"
+              type="number"
+              control={control}
+              rules={{
+                required: t('measureRequired'),
+                min: { value: 0, message: t('minZero') },
+                max: { value: 120, message: t('maxStopBase') },
+              }}
+              errors={errors}
+            />
+            <InputForm
+              label={t('stopMinutesPerBagLabel')}
+              name="stopMinutesPerBag"
+              type="number"
+              control={control}
+              rules={{
+                required: t('measureRequired'),
+                min: { value: 0, message: t('minZero') },
+                max: { value: 30, message: t('maxPerBag') },
+              }}
+              errors={errors}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">{t('stopTimeHelp')}</p>
         </div>
 
         <Button type="submit" variant="secondary" disabled={isSubmitting}>
