@@ -849,7 +849,81 @@
     "emailWithColon": "E-mail :",
     "phoneWithColon": "Téléphone :",
     "customerWithColon": "Client :",
-    "driverWithColon": "Transporteur :"
+    "driverWithColon": "Transporteur :",
+    "day": {
+      "titleToday": "Tournées du jour",
+      "titleDay": "Tournées du {day}",
+      "previousDay": "Jour précédent",
+      "today": "Aujourd'hui",
+      "nextDay": "Demain",
+      "newRoute": "Nouvelle tournée",
+      "loading": "Chargement des tournées…",
+      "noRoutes": "Aucune tournée ce jour-là.",
+      "and": " et ",
+      "stopsCount": "{count, plural, one {# arrêt} other {# arrêts}}",
+      "progress": "{done} sur {total}",
+      "next": "prochain",
+      "bags": "{count, plural, one {# sac} other {# sacs}}",
+      "tabs": {
+        "day": "Jour",
+        "all": "Toutes les tournées"
+      },
+      "kpi": {
+        "routes": "Tournées",
+        "suggested": "+1 suggérée",
+        "stops": "Arrêts",
+        "done": "{count, plural, one {# fait} other {# faits}}",
+        "km": "Kilomètres",
+        "kg": "Kg prévus",
+        "noHistory": "sans historique",
+        "occupancy": "Remplissage moyen"
+      },
+      "map": {
+        "title": "Demandes en attente par commune",
+        "source": "district de Porto · CAOP2025 (DGT)",
+        "legend": {
+          "0": "aucune demande",
+          "1": "1–2",
+          "2": "3–5",
+          "3": "6–8",
+          "4": "9+"
+        },
+        "stale": "plus de 48 h",
+        "route": "tournée du jour",
+        "warehouse": "entrepôt"
+      },
+      "status": {
+        "DRAFTING": "Brouillon",
+        "CREATED": "En attente de confirmation",
+        "WAITING_TO_START": "Planifiée",
+        "IN_TRANSIT": "En cours",
+        "FINISHED": "Terminée",
+        "scheduledAt": "Planifiée {time}",
+        "confirmed": "Clients ayant confirmé le créneau",
+        "code": "Code de la tournée",
+        "driverScreen": "Voir l'écran du chauffeur"
+      },
+      "suggestion": {
+        "title": "Suggestion · {cities}",
+        "body": "{count, plural, one {# demande en attente} other {# demandes en attente}}{stale, plural, =0 {.} other {, # depuis plus de 48 h.}}",
+        "km": "Tournée de ≈ {km} km depuis l'entrepôt.",
+        "cta": "Créer la tournée pour demain"
+      },
+      "stops": {
+        "title": "{route} — arrêts dans l'ordre",
+        "departure": "Départ de l'entrepôt à",
+        "return": "Retour prévu à",
+        "collected": "Collecté",
+        "cancelled": "Annulé",
+        "next": "Prochain",
+        "todo": "À faire"
+      },
+      "van": {
+        "inVan": "Sacs dans la camionnette",
+        "remaining": "Il reste {bags} sacs sur {stops} arrêts · termine avec {end} sur {capacity}",
+        "none": "Cette tournée n'a pas de véhicule : choisissez-en un en créant la tournée pour voir le remplissage."
+      }
+    }
   },
   "pickup": {
     "pageTitle": "Collecte",
