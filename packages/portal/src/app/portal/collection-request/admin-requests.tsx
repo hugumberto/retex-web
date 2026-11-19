@@ -105,6 +105,16 @@ export default function AdminRequests({
   const [city, setCity] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState<string[]>([]);
+  // Vindo da sugestão de rota (Rotas e motoristas): ?select=id,id&date=YYYY-MM-DD.
+  const [suggestedDate, setSuggestedDate] = useState('');
+  const [prefill, setPrefill] = useState<string[] | null>(null);
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const ids = query.get('select')?.split(',').filter(Boolean) ?? [];
+    if (ids.length) setPrefill(ids);
+    const day = query.get('date');
+    if (day && /^\d{4}-\d{2}-\d{2}$/.test(day)) setSuggestedDate(day);
+  }, []);
   const [transitRoutes, setTransitRoutes] = useState<PackageCollectionDTO[]>([]);
 
   const number = useCallback(
@@ -230,8 +240,13 @@ export default function AdminRequests({
   }, [bucket]);
   useEffect(() => {
     const available = new Set(byBucket.new.map((r) => r.id));
+    if (prefill && available.size > 0) {
+      setSelected(prefill.filter((id) => available.has(id)));
+      setPrefill(null);
+      return;
+    }
     setSelected((current) => current.filter((id) => available.has(id)));
-  }, [byBucket]);
+  }, [byBucket, prefill]);
 
   const rows = filtered.slice(0, visible);
   const selectedRequests = selected
@@ -531,6 +546,7 @@ export default function AdminRequests({
 
         <NewRoutePanel
           requests={selectedRequests}
+          initialDate={suggestedDate}
           onCreated={async () => {
             setSelected([]);
             await onRefresh();
@@ -547,9 +563,11 @@ const INTERVALS = Object.values(CollectionInterval);
 function NewRoutePanel({
   requests,
   onCreated,
+  initialDate = '',
 }: {
   requests: CollectionRequestDTO[];
   onCreated: () => Promise<void>;
+  initialDate?: string;
 }) {
   const t = useTranslations('collectionRequest.admin.route');
   const locale = useLocale();
@@ -558,6 +576,9 @@ function NewRoutePanel({
   const [vehicles, setVehicles] = useState<VehicleDTO[]>([]);
   const [vehicleId, setVehicleId] = useState('');
   const [date, setDate] = useState('');
+  useEffect(() => {
+    if (initialDate) setDate(initialDate);
+  }, [initialDate]);
   const [interval, setInterval] = useState<CollectionInterval | ''>('');
   const [isSaving, setIsSaving] = useState(false);
 

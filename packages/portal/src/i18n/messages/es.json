@@ -849,7 +849,81 @@
     "emailWithColon": "Email:",
     "phoneWithColon": "Teléfono:",
     "customerWithColon": "Cliente:",
-    "driverWithColon": "Transportista:"
+    "driverWithColon": "Transportista:",
+    "day": {
+      "titleToday": "Rutas de hoy",
+      "titleDay": "Rutas del {day}",
+      "previousDay": "Día anterior",
+      "today": "Hoy",
+      "nextDay": "Mañana",
+      "newRoute": "Nueva ruta",
+      "loading": "Cargando rutas…",
+      "noRoutes": "No hay rutas este día.",
+      "and": " y ",
+      "stopsCount": "{count, plural, one {# parada} other {# paradas}}",
+      "progress": "{done} de {total}",
+      "next": "próxima",
+      "bags": "{count, plural, one {# bolsa} other {# bolsas}}",
+      "tabs": {
+        "day": "Día",
+        "all": "Todas las rutas"
+      },
+      "kpi": {
+        "routes": "Rutas",
+        "suggested": "+1 sugerida",
+        "stops": "Paradas",
+        "done": "{count, plural, one {# hecha} other {# hechas}}",
+        "km": "Kilómetros",
+        "kg": "Kg previstos",
+        "noHistory": "sin histórico",
+        "occupancy": "Ocupación media"
+      },
+      "map": {
+        "title": "Solicitudes pendientes por municipio",
+        "source": "distrito de Oporto · CAOP2025 (DGT)",
+        "legend": {
+          "0": "sin solicitudes",
+          "1": "1–2",
+          "2": "3–5",
+          "3": "6–8",
+          "4": "9+"
+        },
+        "stale": "más de 48 h",
+        "route": "ruta del día",
+        "warehouse": "almacén"
+      },
+      "status": {
+        "DRAFTING": "Borrador",
+        "CREATED": "Esperando confirmación",
+        "WAITING_TO_START": "Programada",
+        "IN_TRANSIT": "En curso",
+        "FINISHED": "Terminada",
+        "scheduledAt": "Programada {time}",
+        "confirmed": "Clientes que confirmaron la franja",
+        "code": "Código de la ruta",
+        "driverScreen": "Ver la pantalla del conductor"
+      },
+      "suggestion": {
+        "title": "Sugerencia · {cities}",
+        "body": "{count, plural, one {# solicitud pendiente} other {# solicitudes pendientes}}{stale, plural, =0 {.} other {, # con más de 48 h.}}",
+        "km": "Ruta de ≈ {km} km desde el almacén.",
+        "cta": "Crear ruta para mañana"
+      },
+      "stops": {
+        "title": "{route} — paradas por orden",
+        "departure": "Salida del almacén a las",
+        "return": "Regreso previsto a las",
+        "collected": "Recogido",
+        "cancelled": "Cancelado",
+        "next": "Próxima",
+        "todo": "Pendiente"
+      },
+      "van": {
+        "inVan": "Bolsas en la furgoneta",
+        "remaining": "Faltan {bags} bolsas en {stops} paradas · termina con {end} de {capacity}",
+        "none": "Esta ruta no tiene vehículo: elige uno al crear la ruta para ver la ocupación."
+      }
+    }
   },
   "pickup": {
     "pageTitle": "Recogida",

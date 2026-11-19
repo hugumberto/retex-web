@@ -849,7 +849,81 @@
     "emailWithColon": "Email:",
     "phoneWithColon": "Telefone:",
     "customerWithColon": "Cliente:",
-    "driverWithColon": "Motorista:"
+    "driverWithColon": "Motorista:",
+    "day": {
+      "titleToday": "Rotas de hoje",
+      "titleDay": "Rotas de {day}",
+      "previousDay": "Dia anterior",
+      "today": "Hoje",
+      "nextDay": "Amanhã",
+      "newRoute": "Nova rota",
+      "loading": "A carregar as rotas…",
+      "noRoutes": "Não há rotas neste dia.",
+      "and": " e ",
+      "stopsCount": "{count, plural, one {# paragem} other {# paragens}}",
+      "progress": "{done} de {total}",
+      "next": "próxima",
+      "bags": "{count, plural, one {# saco} other {# sacos}}",
+      "tabs": {
+        "day": "Dia",
+        "all": "Todas as rotas"
+      },
+      "kpi": {
+        "routes": "Rotas",
+        "suggested": "+1 sugerida",
+        "stops": "Paragens",
+        "done": "{count, plural, one {# feita} other {# feitas}}",
+        "km": "Quilómetros",
+        "kg": "Kg previstos",
+        "noHistory": "sem histórico",
+        "occupancy": "Ocupação média"
+      },
+      "map": {
+        "title": "Pedidos pendentes por concelho",
+        "source": "distrito do Porto · CAOP2025 (DGT)",
+        "legend": {
+          "0": "sem pedidos",
+          "1": "1–2",
+          "2": "3–5",
+          "3": "6–8",
+          "4": "9+"
+        },
+        "stale": "há mais de 48 h",
+        "route": "rota do dia",
+        "warehouse": "armazém"
+      },
+      "status": {
+        "DRAFTING": "Rascunho",
+        "CREATED": "À espera de confirmação",
+        "WAITING_TO_START": "Agendada",
+        "IN_TRANSIT": "Em curso",
+        "FINISHED": "Concluída",
+        "scheduledAt": "Agendada {time}",
+        "confirmed": "Clientes que confirmaram a janela",
+        "code": "Código da rota",
+        "driverScreen": "Ver o ecrã do motorista"
+      },
+      "suggestion": {
+        "title": "Sugestão · {cities}",
+        "body": "{count, plural, one {# pedido pendente} other {# pedidos pendentes}}{stale, plural, =0 {.} other {, # com mais de 48 h.}}",
+        "km": "Rota de ≈ {km} km a partir do armazém.",
+        "cta": "Criar rota para amanhã"
+      },
+      "stops": {
+        "title": "{route} — paragens por ordem",
+        "departure": "Saída do armazém às",
+        "return": "Regresso previsto às",
+        "collected": "Recolhido",
+        "cancelled": "Cancelado",
+        "next": "Próxima",
+        "todo": "Por fazer"
+      },
+      "van": {
+        "inVan": "Sacos na carrinha",
+        "remaining": "Faltam {bags} sacos em {stops} paragens · termina com {end} de {capacity}",
+        "none": "Esta rota não tem veículo: escolha um ao criar a rota para ver a ocupação."
+      }
+    }
   },
   "pickup": {
     "pageTitle": "Recolha",

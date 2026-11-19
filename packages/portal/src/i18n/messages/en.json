@@ -849,7 +849,81 @@
     "emailWithColon": "Email:",
     "phoneWithColon": "Phone:",
     "customerWithColon": "Customer:",
-    "driverWithColon": "Driver:"
+    "driverWithColon": "Driver:",
+    "day": {
+      "titleToday": "Today's routes",
+      "titleDay": "Routes for {day}",
+      "previousDay": "Previous day",
+      "today": "Today",
+      "nextDay": "Tomorrow",
+      "newRoute": "New route",
+      "loading": "Loading routes…",
+      "noRoutes": "No routes on this day.",
+      "and": " and ",
+      "stopsCount": "{count, plural, one {# stop} other {# stops}}",
+      "progress": "{done} of {total}",
+      "next": "next",
+      "bags": "{count, plural, one {# bag} other {# bags}}",
+      "tabs": {
+        "day": "Day",
+        "all": "All routes"
+      },
+      "kpi": {
+        "routes": "Routes",
+        "suggested": "+1 suggested",
+        "stops": "Stops",
+        "done": "{count} done",
+        "km": "Kilometres",
+        "kg": "Expected kg",
+        "noHistory": "no history",
+        "occupancy": "Average occupancy"
+      },
+      "map": {
+        "title": "Pending requests by municipality",
+        "source": "Porto district · CAOP2025 (DGT)",
+        "legend": {
+          "0": "no requests",
+          "1": "1–2",
+          "2": "3–5",
+          "3": "6–8",
+          "4": "9+"
+        },
+        "stale": "over 48 h",
+        "route": "route of the day",
+        "warehouse": "warehouse"
+      },
+      "status": {
+        "DRAFTING": "Draft",
+        "CREATED": "Awaiting confirmation",
+        "WAITING_TO_START": "Scheduled",
+        "IN_TRANSIT": "In progress",
+        "FINISHED": "Finished",
+        "scheduledAt": "Scheduled {time}",
+        "confirmed": "Customers who confirmed the slot",
+        "code": "Route code",
+        "driverScreen": "Open the driver screen"
+      },
+      "suggestion": {
+        "title": "Suggestion · {cities}",
+        "body": "{count, plural, one {# pending request} other {# pending requests}}{stale, plural, =0 {.} other {, # over 48 h.}}",
+        "km": "Route of ≈ {km} km from the warehouse.",
+        "cta": "Create route for tomorrow"
+      },
+      "stops": {
+        "title": "{route} — stops in order",
+        "departure": "Leaves the warehouse at",
+        "return": "Expected back at",
+        "collected": "Collected",
+        "cancelled": "Cancelled",
+        "next": "Next",
+        "todo": "To do"
+      },
+      "van": {
+        "inVan": "Bags in the van",
+        "remaining": "{bags} bags left over {stops} stops · ends with {end} of {capacity}",
+        "none": "This route has no vehicle: choose one when creating the route to see occupancy."
+      }
+    }
   },
   "pickup": {
     "pageTitle": "Collection",
