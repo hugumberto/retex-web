@@ -9,6 +9,13 @@ export interface SystemParameterDTO {
   labelQrSizeMm: number;
   /** Rotação do conteúdo dentro da etiqueta: 0, 90, 180 ou 270 graus. */
   labelRotationDeg: number;
+  /** Armazém: partida e chegada das rotas. As coordenadas chegam como string (decimal). */
+  warehouseAddress?: string | null;
+  warehouseLat?: number | string | null;
+  warehouseLong?: number | string | null;
+  /** Tempo de cada recolha: parte fixa + minutos por saco estimado. */
+  stopBaseMinutes: number;
+  stopMinutesPerBag: number;
 }
 
 /** As únicas rotações que enquadram o conteúdo na etiqueta. */

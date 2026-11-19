@@ -745,7 +745,16 @@
         "vehicleOption": "{name} · {plate} ({capacity} bags)",
         "occupancy": "Van occupancy",
         "occupancyValue": "{bags} / {capacity} bags",
-        "overCapacity": "The estimated bags exceed this vehicle's capacity."
+        "overCapacity": "The estimated bags exceed this vehicle's capacity.",
+        "map": {
+          "calculating": "Calculating route…",
+          "summary": "{km} km · ~{duration}",
+          "noRoute": "Route not calculated",
+          "noWarehouse": "To see km and times, set the warehouse address in <link>Parameters</link>.",
+          "routingError": "Could not calculate the route.",
+          "noCoords": "no coordinates",
+          "etaTitle": "Expected arrival time"
+        }
       }
     },
     "window": {
@@ -1080,7 +1089,21 @@
     "minTwenty": "Minimum 20",
     "maxWidth": "Maximum 210",
     "maxHeight": "Maximum 297",
-    "maxQrSize": "Maximum 200"
+    "maxQrSize": "Maximum 200",
+    "routesSectionTitle": "Warehouse and routes",
+    "routesSectionHelp": "Start and end point of routes and time spent at each pickup. Used to compute km and the expected time at each stop in \"New route\".",
+    "warehouseAddressLabel": "Warehouse address",
+    "locate": "Locate",
+    "locating": "Locating…",
+    "warehouseLocated": "Warehouse located. Save to apply.",
+    "warehouseNotFound": "Could not locate this address.",
+    "warehouseCoords": "Coordinates: {lat}, {long}",
+    "warehouseNoCoords": "No coordinates: type the address and press \"Locate\".",
+    "stopBaseMinutesLabel": "Fixed minutes per stop",
+    "stopMinutesPerBagLabel": "Minutes per bag",
+    "maxStopBase": "Maximum 120 minutes",
+    "maxPerBag": "Maximum 30 minutes",
+    "stopTimeHelp": "E.g. 5 + 1 per bag → a 4-bag pickup counts 9 minutes."
   },
   "dashboard": {
     "pageTitle": "Dashboard",

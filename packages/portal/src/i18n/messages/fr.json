@@ -745,7 +745,16 @@
         "vehicleOption": "{name} · {plate} ({capacity} sacs)",
         "occupancy": "Remplissage de la camionnette",
         "occupancyValue": "{bags} / {capacity} sacs",
-        "overCapacity": "Les sacs estimés dépassent la capacité de ce véhicule."
+        "overCapacity": "Les sacs estimés dépassent la capacité de ce véhicule.",
+        "map": {
+          "calculating": "Calcul de l'itinéraire…",
+          "summary": "{km} km · ~{duration}",
+          "noRoute": "Itinéraire non calculé",
+          "noWarehouse": "Pour voir les km et les heures, renseignez l'adresse de l'entrepôt dans <link>Paramètres</link>.",
+          "routingError": "Impossible de calculer l'itinéraire.",
+          "noCoords": "sans coordonnées",
+          "etaTitle": "Heure d'arrivée prévue"
+        }
       }
     },
     "window": {
@@ -1080,7 +1089,21 @@
     "minTwenty": "Minimum 20",
     "maxWidth": "Maximum 210",
     "maxHeight": "Maximum 297",
-    "maxQrSize": "Maximum 200"
+    "maxQrSize": "Maximum 200",
+    "routesSectionTitle": "Entrepôt et tournées",
+    "routesSectionHelp": "Point de départ et d'arrivée des tournées et temps de chaque collecte. Servent à calculer les km et l'heure prévue à chaque arrêt dans \"Nouvelle tournée\".",
+    "warehouseAddressLabel": "Adresse de l'entrepôt",
+    "locate": "Localiser",
+    "locating": "Localisation…",
+    "warehouseLocated": "Entrepôt localisé. Enregistrez pour appliquer.",
+    "warehouseNotFound": "Impossible de localiser cette adresse.",
+    "warehouseCoords": "Coordonnées : {lat}, {long}",
+    "warehouseNoCoords": "Pas de coordonnées : saisissez l'adresse et cliquez sur \"Localiser\".",
+    "stopBaseMinutesLabel": "Minutes fixes par arrêt",
+    "stopMinutesPerBagLabel": "Minutes par sac",
+    "maxStopBase": "Maximum 120 minutes",
+    "maxPerBag": "Maximum 30 minutes",
+    "stopTimeHelp": "Ex. : 5 + 1 par sac → une collecte de 4 sacs compte 9 minutes."
   },
   "dashboard": {
     "pageTitle": "Tableau de bord",

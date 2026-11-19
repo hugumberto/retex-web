@@ -19,7 +19,13 @@ import { Search, TrashIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import RequestDetailsDialog from './request-details-dialog';
+import { clockAfter, useRoutePlan } from './use-route-plan';
+
+// O SDK de mapas da TomTom mexe no `window`: só no browser.
+const RoutePreviewMap = dynamic(() => import('./route-preview-map'), { ssr: false });
 
 /**
  * Pedidos de recolha — vista de ADMIN/OPS (Figma "RETEX Backoffice" → 08-Admin).
@@ -587,6 +593,27 @@ function NewRoutePanel({
     );
   }, [first]);
 
+  const plan = useRoutePlan(requests);
+  const departure = interval ? interval.split(' - ')[0] : null;
+  const duration = (minutes: number) => {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return h > 0 ? `${h}h${String(m).padStart(2, '0')}` : `${m} min`;
+  };
+  const mapPoints = useMemo(() => {
+    const points = plan.warehouse
+      ? [{ label: 'A', lat: plan.warehouse.lat, long: plan.warehouse.long }]
+      : [];
+    plan.stops.forEach(({ request }, index) => {
+      const lat = Number(request.address?.lat);
+      const long = Number(request.address?.long);
+      if (Number.isFinite(lat) && Number.isFinite(long) && !(lat === 0 && long === 0)) {
+        points.push({ label: String(index + 1), lat, long });
+      }
+    });
+    return points;
+  }, [plan.stops, plan.warehouse]);
+
   const totalBags = requests.reduce((acc, r) => acc + (r.estimatedBags ?? 0), 0);
   const vehicle = vehicles.find((v) => v.id === vehicleId);
   // Os sacos são a estimativa do cliente: passar a capacidade avisa, não bloqueia.
@@ -614,7 +641,8 @@ function NewRoutePanel({
         driverId,
         startDate,
         collectionInterval: interval,
-        collectionRequestIds: requests.map((r) => r.id),
+        // Pela ordem do percurso calculado (a seleção, sem percurso).
+        collectionRequestIds: plan.stops.map((stop) => stop.request.id),
         vehicleId: vehicleId || undefined,
         status: CollectionStatus.DRAFTING,
       });
@@ -654,29 +682,70 @@ function NewRoutePanel({
           {t('empty')}
         </p>
       ) : (
-        <ol className="flex flex-col gap-2.5">
-          <li className="flex items-center gap-2.5 text-[13px]">
-            <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-navy text-[10px] font-semibold text-white">
-              A
+        <>
+          <div className="relative">
+            <RoutePreviewMap points={mapPoints} route={plan.geoJson} />
+            <span className="absolute bottom-2.5 left-2.5 rounded bg-white/85 px-1.5 py-0.5 font-mono text-[10px] text-navy">
+              {plan.isLoading
+                ? t('map.calculating')
+                : plan.distanceKm !== null && plan.totalMinutes !== null
+                  ? t('map.summary', {
+                      km: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(
+                        plan.distanceKm
+                      ),
+                      duration: duration(plan.totalMinutes),
+                    })
+                  : t('map.noRoute')}
             </span>
-            {/* Hora de saída = início do período ("09:00 - 13:00" → 09:00). */}
-            {interval ? `${t('warehouse')} ${interval.split(' - ')[0]}` : t('warehouse')}
-          </li>
-          {requests.map((r, i) => (
-            <li key={r.id} className="flex items-center gap-2.5 text-[13px]">
+          </div>
+          {plan.error === 'noWarehouse' ? (
+            <p className="-mt-1 text-xs text-ink">
+              {t.rich('map.noWarehouse', {
+                link: (chunks) => (
+                  <Link href="/portal/parametros" className="font-semibold text-teal underline">
+                    {chunks}
+                  </Link>
+                ),
+              })}
+            </p>
+          ) : plan.error === 'routing' ? (
+            <p className="-mt-1 text-xs text-red-700">{t('map.routingError')}</p>
+          ) : null}
+          <ol className="flex flex-col gap-2.5">
+            <li className="flex items-center gap-2.5 text-[13px]">
               <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-navy text-[10px] font-semibold text-white">
-                {i + 1}
+                A
               </span>
-              <span className="min-w-0 flex-1 truncate">
-                {t('stop', {
-                  name: r.company?.name ?? clientName(r),
-                  bags: r.estimatedBags ?? 0,
-                })}
-              </span>
-              <span className="font-mono text-[11px] text-ink">{r.address?.zipCode}</span>
+              {/* Hora de saída = início do período ("09:00 - 13:00" → 09:00). */}
+              {departure ? `${t('warehouse')} ${departure}` : t('warehouse')}
             </li>
-          ))}
-        </ol>
+            {plan.stops.map(({ request: r, arrivalMinutes }, i) => {
+              const eta =
+                interval && arrivalMinutes !== null ? clockAfter(interval, arrivalMinutes) : null;
+              return (
+                <li key={r.id} className="flex items-center gap-2.5 text-[13px]">
+                  <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-navy text-[10px] font-semibold text-white">
+                    {i + 1}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">
+                    {t('stop', {
+                      name: r.company?.name ?? clientName(r),
+                      bags: r.estimatedBags ?? 0,
+                    })}
+                  </span>
+                  <span
+                    className="font-mono text-[11px] text-ink"
+                    title={eta ? t('map.etaTitle') : undefined}
+                  >
+                    {eta ?? (arrivalMinutes === null && plan.distanceKm !== null
+                      ? t('map.noCoords')
+                      : r.address?.zipCode)}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        </>
       )}
 
       <label className="flex flex-col gap-2">

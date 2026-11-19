@@ -745,7 +745,16 @@
         "vehicleOption": "{name} · {plate} ({capacity} bolsas)",
         "occupancy": "Ocupación de la furgoneta",
         "occupancyValue": "{bags} / {capacity} bolsas",
-        "overCapacity": "Las bolsas estimadas superan la capacidad de este vehículo."
+        "overCapacity": "Las bolsas estimadas superan la capacidad de este vehículo.",
+        "map": {
+          "calculating": "Calculando la ruta…",
+          "summary": "{km} km · ~{duration}",
+          "noRoute": "Ruta sin calcular",
+          "noWarehouse": "Para ver km y horas, define la dirección del almacén en <link>Parámetros</link>.",
+          "routingError": "No se pudo calcular la ruta.",
+          "noCoords": "sin coordenadas",
+          "etaTitle": "Hora prevista de llegada"
+        }
       }
     },
     "window": {
@@ -1080,7 +1089,21 @@
     "minTwenty": "Mínimo 20",
     "maxWidth": "Máximo 210",
     "maxHeight": "Máximo 297",
-    "maxQrSize": "Máximo 200"
+    "maxQrSize": "Máximo 200",
+    "routesSectionTitle": "Almacén y rutas",
+    "routesSectionHelp": "Punto de salida y llegada de las rutas y tiempo de cada recogida. Sirven para calcular los km y la hora prevista de cada parada en \"Nueva ruta\".",
+    "warehouseAddressLabel": "Dirección del almacén",
+    "locate": "Localizar",
+    "locating": "Localizando…",
+    "warehouseLocated": "Almacén localizado. Guarda para aplicar.",
+    "warehouseNotFound": "No se pudo localizar esta dirección.",
+    "warehouseCoords": "Coordenadas: {lat}, {long}",
+    "warehouseNoCoords": "Sin coordenadas: escribe la dirección y pulsa \"Localizar\".",
+    "stopBaseMinutesLabel": "Minutos fijos por parada",
+    "stopMinutesPerBagLabel": "Minutos por bolsa",
+    "maxStopBase": "Máximo 120 minutos",
+    "maxPerBag": "Máximo 30 minutos",
+    "stopTimeHelp": "Ej.: 5 + 1 por bolsa → una recogida de 4 bolsas cuenta 9 minutos."
   },
   "dashboard": {
     "pageTitle": "Dashboard",
