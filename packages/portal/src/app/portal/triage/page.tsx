@@ -1,7 +1,7 @@
 'use client';
 
-import Triage from './triage';
+import TriageStation from './triage-station';
 
 export default function TriagePage() {
-  return <Triage />;
+  return <TriageStation />;
 }
