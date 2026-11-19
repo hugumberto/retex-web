@@ -1,8 +1,9 @@
 'use client';
 
-import { CompanyDTO, CompanyFormData } from '@/app/types/company';
+import { CompanyDTO, CompanyFormData, CompanyKind } from '@/app/types/company';
 import { DialogForm } from '@/components/form/dialog-form';
 import { InputForm } from '@/components/form/input-form';
+import { SelectForm } from '@/components/form/select-form';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
@@ -20,6 +21,8 @@ type CompanyFormProps = {
 export default function CompanyForm({ company, onSaved }: CompanyFormProps) {
   const t = useTranslations('company');
   const tCommon = useTranslations('common');
+  const tKind = useTranslations('enums.companyKind');
+  const kindOptions = Object.values(CompanyKind).map((value) => ({ value, label: tKind(value) }));
   const isEditing = useMemo(() => !!company?.id, [company?.id]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,6 +33,7 @@ export default function CompanyForm({ company, onSaved }: CompanyFormProps) {
       taxId: company?.taxId ?? '',
       email: company?.email ?? '',
       phone: company?.phone ?? '',
+      kind: company?.kind ?? CompanyKind.COMPANY,
       manager: { firstName: '', lastName: '', email: '', contactPhone: '' },
     },
   });
@@ -54,6 +58,7 @@ export default function CompanyForm({ company, onSaved }: CompanyFormProps) {
               taxId: data.taxId,
               email: data.email || undefined,
               phone: data.phone || undefined,
+              kind: data.kind,
               ...(isEditing ? {} : { manager: data.manager }),
             };
             const res = isEditing
@@ -119,6 +124,13 @@ export default function CompanyForm({ company, onSaved }: CompanyFormProps) {
           label={t('legalName')}
           name="legalName"
           control={control}
+          errors={errors}
+        />
+        <SelectForm
+          label={t('kind')}
+          name="kind"
+          control={control}
+          options={kindOptions}
           errors={errors}
         />
         <InputForm

@@ -21,6 +21,14 @@ export enum CompanyPermission {
   ADDRESS_MANAGE = 'ADDRESS_MANAGE',
 }
 
+/** Tipo de entidade: decide o separador em Utilizadores. */
+export enum CompanyKind {
+  COMPANY = 'COMPANY',
+  MUNICIPALITY = 'MUNICIPALITY',
+  SCHOOL = 'SCHOOL',
+  ASSOCIATION = 'ASSOCIATION',
+}
+
 export interface CompanyDTO extends Entity {
   name: string;
   legalName?: string | null;
@@ -28,6 +36,7 @@ export interface CompanyDTO extends Entity {
   email?: string | null;
   phone?: string | null;
   status: CompanyStatus;
+  kind?: CompanyKind;
   friendlyCode?: string | null;
 }
 
@@ -98,6 +107,7 @@ export interface CompanyFormData {
   email?: string;
   phone?: string;
   status?: CompanyStatus;
+  kind: CompanyKind;
   manager?: {
     firstName: string;
     lastName: string;

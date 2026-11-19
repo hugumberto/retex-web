@@ -295,6 +295,12 @@
       "WOMEN": "Mujer",
       "CHILDREN": "Niños",
       "NON_REUSABLE": "No reutilizable"
+    },
+    "companyKind": {
+      "COMPANY": "Empresa",
+      "MUNICIPALITY": "Municipio",
+      "SCHOOL": "Escuela",
+      "ASSOCIATION": "Asociación / ONG"
     }
   },
   "validation": {
@@ -1370,7 +1376,8 @@
     "addressCreateError": "Error al crear el lugar de recogida",
     "addressDuplicate": "Este lugar de recogida ya está registrado",
     "addressLoadError": "Error al cargar los lugares de recogida",
-    "cityDivision": "Distrito"
+    "cityDivision": "Distrito",
+    "kind": "Tipo de entidad"
   },
   "impersonation": {
     "banner": "Viendo el portal como {name} — solo lectura",
@@ -1705,6 +1712,76 @@
       "backToQueue": "Volver a las solicitudes",
       "next": "Próxima solicitud",
       "clientSees": "El cliente ya ve el resultado del triaje en el portal."
+    }
+  },
+  "usersDirectory": {
+    "title": "Usuarios",
+    "search": "Nombre, email, NIF o código postal",
+    "loading": "Cargando…",
+    "empty": "No se encontraron usuarios.",
+    "open": "Abrir",
+    "manage": "Gestionar",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "showing": "Mostrando {shown} de {total}",
+    "privacy": "Los datos personales solo son visibles para cuentas ADMIN y MASTER.",
+    "taxId": "NIF {taxId}",
+    "locations": "{count, plural, one {# local} other {# locales}}",
+    "vehicle": "furgoneta {plate}",
+    "tabs": {
+      "ALL": "Todos",
+      "PERSON": "Particulares",
+      "COMPANY": "Empresas",
+      "MUNICIPALITY": "Municipios",
+      "DRIVER": "Conductores",
+      "TEAM": "Equipo RETEX"
+    },
+    "kinds": {
+      "PERSON": "Particular",
+      "COMPANY": "Empresa",
+      "MUNICIPALITY": "Municipio",
+      "DRIVER": "Conductor",
+      "TEAM": "Equipo"
+    },
+    "columns": {
+      "name": "Nombre",
+      "type": "Tipo",
+      "city": "Municipio",
+      "collections": "Recogidas",
+      "kg": "Kg entregados",
+      "activity": "Última actividad",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "activity": {
+      "today": "hoy",
+      "yesterday": "ayer",
+      "inRoute": "en ruta"
+    },
+    "status": {
+      "ACTIVE": "Activo",
+      "INACTIVE": "Inactivo",
+      "PENDING_EMAIL": "Email por confirmar"
+    },
+    "actions": {
+      "edit": "Editar datos y perfiles",
+      "password": "Restablecer contraseña",
+      "deactivate": "Desactivar cuenta",
+      "masterOnly": "Solo un MASTER puede restablecer la contraseña o desactivar cuentas ADMIN/MASTER."
+    },
+    "invite": {
+      "button": "Invitar",
+      "title": "Invitar usuario",
+      "body": "La persona recibe un email para activar la cuenta y definir la contraseña. Hasta entonces, aparece como «Email por confirmar».",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Email",
+      "phone": "Teléfono (opcional)",
+      "role": "Perfil",
+      "send": "Enviar invitación",
+      "sending": "Enviando…",
+      "sent": "Invitación enviada a {email}.",
+      "error": "No se pudo enviar la invitación."
     }
   }
 }

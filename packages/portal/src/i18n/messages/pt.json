@@ -295,6 +295,12 @@
       "WOMEN": "Mulher",
       "CHILDREN": "Criança",
       "NON_REUSABLE": "Não reutilizável"
+    },
+    "companyKind": {
+      "COMPANY": "Empresa",
+      "MUNICIPALITY": "Município",
+      "SCHOOL": "Escola",
+      "ASSOCIATION": "Associação / IPSS"
     }
   },
   "validation": {
@@ -1370,7 +1376,8 @@
     "addressCreateError": "Erro ao criar local de recolha",
     "addressDuplicate": "Este local de recolha já está registado",
     "addressLoadError": "Erro ao carregar locais de recolha",
-    "cityDivision": "Freguesia"
+    "cityDivision": "Freguesia",
+    "kind": "Tipo de entidade"
   },
   "impersonation": {
     "banner": "A ver o portal como {name} — modo de leitura",
@@ -1705,6 +1712,76 @@
       "backToQueue": "Voltar aos pedidos",
       "next": "Próximo pedido",
       "clientSees": "O cliente passa a ver o resultado da triagem no portal."
+    }
+  },
+  "usersDirectory": {
+    "title": "Utilizadores",
+    "search": "Nome, email, NIF ou código postal",
+    "loading": "A carregar…",
+    "empty": "Nenhum utilizador encontrado.",
+    "open": "Abrir",
+    "manage": "Gerir",
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "showing": "A mostrar {shown} de {total}",
+    "privacy": "Os dados pessoais só são visíveis a contas ADMIN e MASTER.",
+    "taxId": "NIF {taxId}",
+    "locations": "{count, plural, one {# local} other {# locais}}",
+    "vehicle": "carrinha {plate}",
+    "tabs": {
+      "ALL": "Todos",
+      "PERSON": "Particulares",
+      "COMPANY": "Empresas",
+      "MUNICIPALITY": "Municípios",
+      "DRIVER": "Motoristas",
+      "TEAM": "Equipa RETEX"
+    },
+    "kinds": {
+      "PERSON": "Particular",
+      "COMPANY": "Empresa",
+      "MUNICIPALITY": "Município",
+      "DRIVER": "Motorista",
+      "TEAM": "Equipa"
+    },
+    "columns": {
+      "name": "Nome",
+      "type": "Tipo",
+      "city": "Concelho",
+      "collections": "Recolhas",
+      "kg": "Kg entregues",
+      "activity": "Última atividade",
+      "status": "Estado",
+      "actions": "Ações"
+    },
+    "activity": {
+      "today": "hoje",
+      "yesterday": "ontem",
+      "inRoute": "em rota"
+    },
+    "status": {
+      "ACTIVE": "Ativo",
+      "INACTIVE": "Inativo",
+      "PENDING_EMAIL": "Email por confirmar"
+    },
+    "actions": {
+      "edit": "Editar dados e perfis",
+      "password": "Repor palavra-passe",
+      "deactivate": "Desativar conta",
+      "masterOnly": "Só um MASTER pode repor a palavra-passe ou desativar contas ADMIN/MASTER."
+    },
+    "invite": {
+      "button": "Convidar",
+      "title": "Convidar utilizador",
+      "body": "A pessoa recebe um email para ativar a conta e definir a palavra-passe. Até lá, aparece como «Email por confirmar».",
+      "firstName": "Nome",
+      "lastName": "Apelido",
+      "email": "Email",
+      "phone": "Telefone (opcional)",
+      "role": "Perfil",
+      "send": "Enviar convite",
+      "sending": "A enviar…",
+      "sent": "Convite enviado para {email}.",
+      "error": "Não foi possível enviar o convite."
     }
   }
 }

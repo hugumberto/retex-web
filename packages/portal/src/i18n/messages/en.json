@@ -295,6 +295,12 @@
       "WOMEN": "Women",
       "CHILDREN": "Children",
       "NON_REUSABLE": "Non-reusable"
+    },
+    "companyKind": {
+      "COMPANY": "Company",
+      "MUNICIPALITY": "Municipality",
+      "SCHOOL": "School",
+      "ASSOCIATION": "Association / NGO"
     }
   },
   "validation": {
@@ -1370,7 +1376,8 @@
     "addressCreateError": "Error creating collection site",
     "addressDuplicate": "This collection site is already registered",
     "addressLoadError": "Error loading collection sites",
-    "cityDivision": "Parish"
+    "cityDivision": "Parish",
+    "kind": "Entity type"
   },
   "impersonation": {
     "banner": "Viewing the portal as {name} — read-only",
@@ -1705,6 +1712,76 @@
       "backToQueue": "Back to requests",
       "next": "Next request",
       "clientSees": "The client can now see the sorting result in the portal."
+    }
+  },
+  "usersDirectory": {
+    "title": "Users",
+    "search": "Name, email, tax ID or postcode",
+    "loading": "Loading…",
+    "empty": "No users found.",
+    "open": "Open",
+    "manage": "Manage",
+    "previous": "Previous",
+    "next": "Next",
+    "showing": "Showing {shown} of {total}",
+    "privacy": "Personal data is only visible to ADMIN and MASTER accounts.",
+    "taxId": "Tax ID {taxId}",
+    "locations": "{count, plural, one {# site} other {# sites}}",
+    "vehicle": "van {plate}",
+    "tabs": {
+      "ALL": "All",
+      "PERSON": "Individuals",
+      "COMPANY": "Companies",
+      "MUNICIPALITY": "Municipalities",
+      "DRIVER": "Drivers",
+      "TEAM": "RETEX team"
+    },
+    "kinds": {
+      "PERSON": "Individual",
+      "COMPANY": "Company",
+      "MUNICIPALITY": "Municipality",
+      "DRIVER": "Driver",
+      "TEAM": "Team"
+    },
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "city": "Municipality",
+      "collections": "Collections",
+      "kg": "Kg delivered",
+      "activity": "Last activity",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "activity": {
+      "today": "today",
+      "yesterday": "yesterday",
+      "inRoute": "on route"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "PENDING_EMAIL": "Email not confirmed"
+    },
+    "actions": {
+      "edit": "Edit details and roles",
+      "password": "Reset password",
+      "deactivate": "Deactivate account",
+      "masterOnly": "Only a MASTER can reset the password or deactivate ADMIN/MASTER accounts."
+    },
+    "invite": {
+      "button": "Invite",
+      "title": "Invite user",
+      "body": "They receive an email to activate the account and set a password. Until then, they show as “Email not confirmed”.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "role": "Role",
+      "send": "Send invite",
+      "sending": "Sending…",
+      "sent": "Invite sent to {email}.",
+      "error": "Couldn't send the invite."
     }
   }
 }
