@@ -26,10 +26,8 @@ import TablePagination from '@/components/custom/table-pagination';
 import { usePagination } from '@/hooks/use-pagination';
 import { useAppStore } from '@/store';
 import {
-  AgeGroup,
-  Quality,
   Season,
-  Sex,
+  StorageGroup,
   StorageUnitDTO,
   Type,
 } from '../../types/storage-unit';
@@ -39,7 +37,7 @@ import StorageUnitForm from './storage-unit-form';
 const ALL = 'ALL';
 
 /**
- * Select de filtro por um atributo de triagem. Os cinco filtros são idênticos
+ * Select de filtro por um atributo de triagem. Os filtros são idênticos
  * tirando as opções e o tradutor, por isso ficam aqui em vez de repetidos.
  */
 function FilterSelect({
@@ -86,9 +84,7 @@ const escapeHtml = (value: string) =>
 export default function StorageUnit() {
   const t = useTranslations('storageUnit');
   const tCommon = useTranslations('common');
-  const tQuality = useTranslations('enums.quality');
-  const tSex = useTranslations('enums.sex');
-  const tAgeGroup = useTranslations('enums.ageGroup');
+  const tStorageGroup = useTranslations('enums.storageGroup');
   const tItemType = useTranslations('enums.itemType');
   const tSeason = useTranslations('enums.season');
   const tUnitStatus = useTranslations('enums.unitStatus');
@@ -96,19 +92,16 @@ export default function StorageUnit() {
   const [storageUnits, setStorageUnits] = useState<StorageUnitDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Filtros pelos cinco atributos de triagem — são eles que respondem à
-  // pergunta do operador: "onde ponho uma peça deste tipo?". Filtrados no
-  // cliente, sobre a lista já carregada, como no ecrã de utilizadores.
-  const [qualityFilter, setQualityFilter] = useState<Quality | typeof ALL>(ALL);
-  const [sexFilter, setSexFilter] = useState<Sex | typeof ALL>(ALL);
-  const [ageGroupFilter, setAgeGroupFilter] = useState<AgeGroup | typeof ALL>(ALL);
+  // Filtros pelos atributos que definem o lote (grupo × parte × estação) —
+  // são eles que respondem à pergunta do operador: "onde ponho uma peça deste
+  // tipo?". Filtrados no cliente, sobre a lista já carregada, como no ecrã de
+  // utilizadores.
+  const [groupFilter, setGroupFilter] = useState<StorageGroup | typeof ALL>(ALL);
   const [typeFilter, setTypeFilter] = useState<Type | typeof ALL>(ALL);
   const [seasonFilter, setSeasonFilter] = useState<Season | typeof ALL>(ALL);
 
   const hasFilters =
-    qualityFilter !== ALL ||
-    sexFilter !== ALL ||
-    ageGroupFilter !== ALL ||
+    groupFilter !== ALL ||
     typeFilter !== ALL ||
     seasonFilter !== ALL;
 
@@ -116,31 +109,20 @@ export default function StorageUnit() {
     () =>
       storageUnits.filter(
         (unit) =>
-          (qualityFilter === ALL || unit.quality === qualityFilter) &&
-          (sexFilter === ALL || unit.sex === sexFilter) &&
-          (ageGroupFilter === ALL || unit.ageGroup === ageGroupFilter) &&
+          (groupFilter === ALL || unit.group === groupFilter) &&
           (typeFilter === ALL || unit.type === typeFilter) &&
           (seasonFilter === ALL || unit.season === seasonFilter)
       ),
-    [
-      storageUnits,
-      qualityFilter,
-      sexFilter,
-      ageGroupFilter,
-      typeFilter,
-      seasonFilter,
-    ]
+    [storageUnits, groupFilter, typeFilter, seasonFilter]
   );
 
   const pagination = usePagination(
     filteredStorageUnits,
-    `${qualityFilter}|${sexFilter}|${ageGroupFilter}|${typeFilter}|${seasonFilter}`
+    `${groupFilter}|${typeFilter}|${seasonFilter}`
   );
 
   const clearFilters = useCallback(() => {
-    setQualityFilter(ALL);
-    setSexFilter(ALL);
-    setAgeGroupFilter(ALL);
+    setGroupFilter(ALL);
     setTypeFilter(ALL);
     setSeasonFilter(ALL);
   }, []);
@@ -191,11 +173,16 @@ export default function StorageUnit() {
 
     const unitId = escapeHtml(unit.id);
     const friendlyCode = escapeHtml(unit.friendlyCode ?? '-');
-    const quality = escapeHtml(tQuality(unit.quality));
-    const sex = escapeHtml(tSex(unit.sex));
-    const ageGroup = escapeHtml(tAgeGroup(unit.ageGroup));
-    const type = escapeHtml(tItemType(unit.type));
-    const season = escapeHtml(tSeason(unit.season));
+    const group = escapeHtml(tStorageGroup(unit.group));
+    // Parte / estação / localização só aparecem quando existem (o lote não
+    // reutilizável não tem parte nem estação).
+    const detailLine = (label: string, value: string) =>
+      `<p class="text"><strong>${label}</strong> ${escapeHtml(value)}</p>`;
+    const optionalLines = [
+      unit.type ? detailLine(t('partWithColon'), tItemType(unit.type)) : '',
+      unit.season ? detailLine(t('seasonWithColon'), tSeason(unit.season)) : '',
+      unit.location ? detailLine(t('locationWithColon'), unit.location) : '',
+    ].join('');
     const qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
       unit.id
     )}`;
@@ -257,11 +244,8 @@ export default function StorageUnit() {
               <h1 class="title">${t('itemLabel')}</h1>
               <p class="code">${friendlyCode}</p>
               <p class="text"><strong>${t('codeWithColon')}</strong> ${friendlyCode}</p>
-              <p class="text"><strong>${t('qualityWithColon')}</strong> ${quality}</p>
-              <p class="text"><strong>${t('sexWithColon')}</strong> ${sex}</p>
-              <p class="text"><strong>${t('ageGroupWithColon')}</strong> ${ageGroup}</p>
-              <p class="text"><strong>${t('partWithColon')}</strong> ${type}</p>
-              <p class="text"><strong>${t('seasonWithColon')}</strong> ${season}</p>
+              <p class="text"><strong>${t('groupWithColon')}</strong> ${group}</p>
+              ${optionalLines}
             </div>
           </div>
           <script>
@@ -292,7 +276,7 @@ export default function StorageUnit() {
       </html>
     `);
     printWindow.document.close();
-  }, []);
+  }, [t, tItemType, tSeason, tStorageGroup]);
 
   useEffect(() => {
     setPageTitle(t('pageTitle'));
@@ -317,28 +301,12 @@ export default function StorageUnit() {
       <div className="rounded-2xl border border-secondary/35 bg-white p-5 lg:p-6">
         <div className="flex flex-wrap items-center gap-2">
           <FilterSelect
-            label={tCommon('quality')}
+            label={tCommon('group')}
             allLabel={tCommon('all')}
-            value={qualityFilter}
-            onChange={(value) => setQualityFilter(value as Quality | typeof ALL)}
-            options={Object.values(Quality)}
-            translate={tQuality}
-          />
-          <FilterSelect
-            label={tCommon('sex')}
-            allLabel={tCommon('all')}
-            value={sexFilter}
-            onChange={(value) => setSexFilter(value as Sex | typeof ALL)}
-            options={Object.values(Sex)}
-            translate={tSex}
-          />
-          <FilterSelect
-            label={tCommon('ageGroup')}
-            allLabel={tCommon('all')}
-            value={ageGroupFilter}
-            onChange={(value) => setAgeGroupFilter(value as AgeGroup | typeof ALL)}
-            options={Object.values(AgeGroup)}
-            translate={tAgeGroup}
+            value={groupFilter}
+            onChange={(value) => setGroupFilter(value as StorageGroup | typeof ALL)}
+            options={Object.values(StorageGroup)}
+            translate={tStorageGroup}
           />
           <FilterSelect
             label={tCommon('part')}
@@ -368,11 +336,10 @@ export default function StorageUnit() {
             <TableHeader>
               <TableRow>
                 <TableHead>{tCommon('code')}</TableHead>
-                <TableHead>{tCommon('quality')}</TableHead>
-                <TableHead>{tCommon('sex')}</TableHead>
-                <TableHead>{tCommon('ageGroup')}</TableHead>
+                <TableHead>{tCommon('group')}</TableHead>
                 <TableHead>{tCommon('part')}</TableHead>
                 <TableHead>{tCommon('season')}</TableHead>
+                <TableHead>{tCommon('location')}</TableHead>
                 <TableHead>{t('weightKg')}</TableHead>
                 <TableHead>{t('itemCount')}</TableHead>
                 <TableHead>{tCommon('status')}</TableHead>
@@ -386,11 +353,14 @@ export default function StorageUnit() {
                     <TableCell className="font-medium">
                       {storageUnit.friendlyCode ?? '-'}
                     </TableCell>
-                    <TableCell>{tQuality(storageUnit.quality)}</TableCell>
-                    <TableCell>{tSex(storageUnit.sex)}</TableCell>
-                    <TableCell>{tAgeGroup(storageUnit.ageGroup)}</TableCell>
-                    <TableCell>{tItemType(storageUnit.type)}</TableCell>
-                    <TableCell>{tSeason(storageUnit.season)}</TableCell>
+                    <TableCell>{tStorageGroup(storageUnit.group)}</TableCell>
+                    <TableCell>
+                      {storageUnit.type ? tItemType(storageUnit.type) : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {storageUnit.season ? tSeason(storageUnit.season) : '-'}
+                    </TableCell>
+                    <TableCell>{storageUnit.location || '-'}</TableCell>
                     <TableCell>{Number(storageUnit.weight ?? 0).toFixed(2)}</TableCell>
                     <TableCell>{storageUnit.itemsCount ?? 0}</TableCell>
                     <TableCell>
@@ -438,7 +408,7 @@ export default function StorageUnit() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={10}
+                    colSpan={9}
                     className="text-center py-6 text-muted-foreground"
                   >
                     {tCommon('noRecords')}

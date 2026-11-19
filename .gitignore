@@ -50,6 +50,11 @@ test-output
 
 .env.local
 
+# Vercel — `vercel link`/`vercel env pull` escrevem aqui (projectId, orgId e,
+# no caso do pull, variáveis de ambiente com segredos).
+.vercel
+.env.vercel*
+
 # Playwright visual-check screenshots (geradas localmente)
 shots/
 

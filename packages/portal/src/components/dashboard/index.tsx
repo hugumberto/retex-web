@@ -1,6 +1,6 @@
 'use client';
 
-import { Quality } from '@/app/types/collection-request';
+import { Condition, Destination } from '@/app/types/triage';
 import {
   Card,
   CardContent,
@@ -17,10 +17,20 @@ import { useTranslations } from 'next-intl';
  * os dados, não a forma de os apresentar.
  */
 
-export const QUALITY_COLOR: Record<string, string> = {
-  [Quality.GOOD]: '#10b981',
-  [Quality.MEDIUM]: '#f59e0b',
-  [Quality.BAD]: '#dc2626',
+export const CONDITION_COLOR: Record<string, string> = {
+  [Condition.EXCELLENT]: '#10b981',
+  [Condition.GOOD]: '#84cc16',
+  [Condition.REGULAR]: '#f59e0b',
+};
+
+export const DESTINATION_COLOR: Record<string, string> = {
+  [Destination.REUSE]: '#10b981',
+  [Destination.VINTAGE]: '#8b5cf6',
+  [Destination.RECONDITIONING]: '#0ea5e9',
+  [Destination.UPCYCLING]: '#14b8a6',
+  [Destination.STOCK_RESERVE]: '#6366f1',
+  [Destination.NON_REUSABLE]: '#dc2626',
+  [Destination.ACCESSORY]: '#94a3b8',
 };
 
 const numberFmt = new Intl.NumberFormat('pt-PT');

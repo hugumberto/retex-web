@@ -101,6 +101,7 @@ export default function BrandCrud() {
               <TableRow>
                 <TableHead>{tCommon('name')}</TableHead>
                 <TableHead>{t('manual')}</TableHead>
+                <TableHead>{t('premium')}</TableHead>
                 <TableHead>{tCommon('action')}</TableHead>
               </TableRow>
             </TableHeader>
@@ -110,6 +111,7 @@ export default function BrandCrud() {
                   <TableRow key={brand.id}>
                     <TableCell>{brand.name}</TableCell>
                     <TableCell>{brand.manual ? tCommon('yes') : tCommon('no')}</TableCell>
+                    <TableCell>{brand.premium ? tCommon('yes') : tCommon('no')}</TableCell>
                     <TableCell className="space-x-2">
                       <BrandForm
                         brandId={brand.id}
@@ -135,7 +137,7 @@ export default function BrandCrud() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={3}
+                    colSpan={4}
                     className="text-center py-6 text-muted-foreground"
                   >
                     {tCommon('noRecords')}

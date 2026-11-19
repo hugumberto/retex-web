@@ -4,6 +4,7 @@ import { Bell, ChevronDown, Info, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import EnvBadge from './env-badge';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -242,6 +243,7 @@ export function RetexTopBar() {
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <SidebarTrigger className="-ml-1 md:hidden" />
         <Title>{pageTitle || t('home')}</Title>
+        <EnvBadge />
 
         <div className="ml-auto flex items-center gap-5">
           <LanguageSwitcher />
