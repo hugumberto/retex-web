@@ -163,7 +163,8 @@
       "OPS": "Operación",
       "DRIVER": "Conductor",
       "USER": "Cliente"
-    }
+    },
+    "vehicles": "Vehículos"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -738,7 +739,13 @@
         "footnote": "{count, plural, =0 {Las solicitudes pasan a \"Programada\" y cada cliente recibe un email para confirmar la franja.} one {La solicitud pasa a \"Programada\" y el cliente recibe un email para confirmar la franja.} other {Las # solicitudes pasan a \"Programada\" y cada cliente recibe un email para confirmar la franja.}}",
         "success": "{count, plural, one {Ruta creada; se avisó al cliente.} other {Ruta creada; se avisó a los # clientes.}}",
         "draftOnly": "La ruta se creó pero quedó en borrador: aún no se avisó a los clientes. Termínala en Rutas y conductores.",
-        "error": "No se pudo crear la ruta."
+        "error": "No se pudo crear la ruta.",
+        "vehicle": "Vehículo",
+        "vehiclePlaceholder": "Elegir vehículo (opcional)",
+        "vehicleOption": "{name} · {plate} ({capacity} bolsas)",
+        "occupancy": "Ocupación de la furgoneta",
+        "occupancyValue": "{bags} / {capacity} bolsas",
+        "overCapacity": "Las bolsas estimadas superan la capacidad de este vehículo."
       }
     }
   },
@@ -1245,5 +1252,40 @@
     "deleteBagDescription": "La bolsa se elimina y se actualiza el nº de bolsas recogidas de la solicitud. ¿Continuar?",
     "deleteBagSuccess": "Bolsa eliminada",
     "deleteBagError": "No se pudo eliminar la bolsa"
+  },
+  "vehicles": {
+    "pageTitle": "Vehículos",
+    "description": "Las furgonetas usadas en las rutas. La capacidad en bolsas sirve para ver la ocupación al montar una ruta.",
+    "add": "Nuevo vehículo",
+    "addTitle": "Nuevo vehículo",
+    "editTitle": "Editar vehículo",
+    "edit": "Editar {plate}",
+    "empty": "Aún no hay vehículos.",
+    "loadError": "No se pudieron cargar los vehículos.",
+    "saveError": "No se pudo guardar el vehículo.",
+    "created": "Vehículo creado.",
+    "updated": "Vehículo actualizado.",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "bags": "{count, plural, one {# bolsa} other {# bolsas}}",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "columns": {
+      "plate": "Matrícula",
+      "name": "Descripción",
+      "capacity": "Capacidad",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "fields": {
+      "plate": "Matrícula",
+      "name": "Descripción",
+      "namePlaceholder": "Furgoneta",
+      "capacity": "Capacidad (bolsas)",
+      "active": "Activo (se puede elegir en las rutas)"
+    }
   }
 }

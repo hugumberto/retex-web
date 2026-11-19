@@ -163,7 +163,8 @@
       "OPS": "Operação",
       "DRIVER": "Motorista",
       "USER": "Cliente"
-    }
+    },
+    "vehicles": "Veículos"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -738,7 +739,13 @@
         "footnote": "{count, plural, =0 {Os pedidos passam a \"Agendado\" e cada cliente recebe um email para confirmar a janela.} one {O pedido passa a \"Agendado\" e o cliente recebe um email para confirmar a janela.} other {Os # pedidos passam a \"Agendado\" e cada cliente recebe um email para confirmar a janela.}}",
         "success": "{count, plural, one {Rota criada; o cliente foi notificado.} other {Rota criada; os # clientes foram notificados.}}",
         "draftOnly": "A rota foi criada, mas ficou em rascunho: os clientes ainda não foram notificados. Termina em Rotas e motoristas.",
-        "error": "Não foi possível criar a rota."
+        "error": "Não foi possível criar a rota.",
+        "vehicle": "Veículo",
+        "vehiclePlaceholder": "Escolher veículo (opcional)",
+        "vehicleOption": "{name} · {plate} ({capacity} sacos)",
+        "occupancy": "Ocupação da carrinha",
+        "occupancyValue": "{bags} / {capacity} sacos",
+        "overCapacity": "Os sacos estimados passam a capacidade deste veículo."
       }
     }
   },
@@ -1245,5 +1252,40 @@
     "deleteBagDescription": "O saco é eliminado e o nº de sacos recolhidos da solicitação é atualizado. Continuar?",
     "deleteBagSuccess": "Saco eliminado",
     "deleteBagError": "Não foi possível eliminar o saco"
+  },
+  "vehicles": {
+    "pageTitle": "Veículos",
+    "description": "As carrinhas usadas nas rotas. A capacidade em sacos serve para ver a ocupação ao montar uma rota.",
+    "add": "Novo veículo",
+    "addTitle": "Novo veículo",
+    "editTitle": "Editar veículo",
+    "edit": "Editar {plate}",
+    "empty": "Ainda não há veículos.",
+    "loadError": "Não foi possível carregar os veículos.",
+    "saveError": "Não foi possível guardar o veículo.",
+    "created": "Veículo criado.",
+    "updated": "Veículo atualizado.",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "activate": "Ativar",
+    "deactivate": "Desativar",
+    "bags": "{count, plural, one {# saco} other {# sacos}}",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "A guardar…",
+    "columns": {
+      "plate": "Matrícula",
+      "name": "Descrição",
+      "capacity": "Capacidade",
+      "status": "Estado",
+      "actions": "Ações"
+    },
+    "fields": {
+      "plate": "Matrícula",
+      "name": "Descrição",
+      "namePlaceholder": "Carrinha",
+      "capacity": "Capacidade (sacos)",
+      "active": "Ativo (pode ser escolhido nas rotas)"
+    }
   }
 }

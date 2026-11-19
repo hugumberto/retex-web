@@ -10,6 +10,7 @@ import {
   PackageCollectionDTO,
 } from '@/app/types/package-collection';
 import { Role, UserDTO, UserStatus } from '@/app/types/user';
+import { VehicleDTO } from '@/app/types/vehicle';
 import ConfirmDialog from '@/components/custom/confirmation-dialog';
 import api from '@/lib/api';
 import { cn, isSuccessStatus } from '@/lib/utils';
@@ -544,6 +545,8 @@ function NewRoutePanel({
   const locale = useLocale();
   const [drivers, setDrivers] = useState<UserDTO[]>([]);
   const [driverId, setDriverId] = useState('');
+  const [vehicles, setVehicles] = useState<VehicleDTO[]>([]);
+  const [vehicleId, setVehicleId] = useState('');
   const [date, setDate] = useState('');
   const [interval, setInterval] = useState<CollectionInterval | ''>('');
   const [isSaving, setIsSaving] = useState(false);
@@ -561,9 +564,17 @@ function NewRoutePanel({
         )
       )
       .catch(() => setDrivers([]));
+    // Só os ativos se podem escolher; a API recusa os outros.
+    api
+      .get<VehicleDTO[]>('/vehicle')
+      .then(({ data }) => setVehicles((data ?? []).filter((v) => v.active)))
+      .catch(() => setVehicles([]));
   }, []);
 
   const totalBags = requests.reduce((acc, r) => acc + (r.estimatedBags ?? 0), 0);
+  const vehicle = vehicles.find((v) => v.id === vehicleId);
+  // Os sacos são a estimativa do cliente: passar a capacidade avisa, não bloqueia.
+  const overCapacity = !!vehicle && totalBags > vehicle.capacityBags;
   const canSchedule = requests.length > 0 && !!driverId && !!date && !!interval && !isSaving;
   const summary = date
     ? [
@@ -588,6 +599,7 @@ function NewRoutePanel({
         startDate,
         collectionInterval: interval,
         collectionRequestIds: requests.map((r) => r.id),
+        vehicleId: vehicleId || undefined,
         status: CollectionStatus.DRAFTING,
       });
       if (!isSuccessStatus(created.status) || !created.data?.id) throw new Error();
@@ -600,6 +612,7 @@ function NewRoutePanel({
         toast.success(t('success', { count: requests.length }));
       }
       setDriverId('');
+      setVehicleId('');
       setDate('');
       setInterval('');
       await onCreated();
@@ -690,10 +703,34 @@ function NewRoutePanel({
         </label>
       </div>
 
-      <div className="flex items-center justify-between rounded-lg bg-panel px-3 py-2.5 text-xs">
-        <span className="text-ink">{t('totalBags')}</span>
-        <span className="font-mono text-navy">{totalBags}</span>
+      <label className="flex flex-col gap-2">
+        <span className="text-[13px] font-medium text-navy">{t('vehicle')}</span>
+        <select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} className={field}>
+          <option value="">{t('vehiclePlaceholder')}</option>
+          {vehicles.map((v) => (
+            <option key={v.id} value={v.id}>
+              {t('vehicleOption', { name: v.name, plate: v.plate, capacity: v.capacityBags })}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <div
+        className={cn(
+          'flex items-center justify-between rounded-lg px-3 py-2.5 text-xs',
+          overCapacity ? 'bg-red-50' : 'bg-panel'
+        )}
+      >
+        <span className={overCapacity ? 'text-red-700' : 'text-ink'}>
+          {vehicle ? t('occupancy') : t('totalBags')}
+        </span>
+        <span className={cn('font-mono', overCapacity ? 'text-red-700' : 'text-navy')}>
+          {vehicle ? t('occupancyValue', { bags: totalBags, capacity: vehicle.capacityBags }) : totalBags}
+        </span>
       </div>
+      {overCapacity ? (
+        <p className="-mt-2 text-xs text-red-700">{t('overCapacity')}</p>
+      ) : null}
 
       <button
         type="button"

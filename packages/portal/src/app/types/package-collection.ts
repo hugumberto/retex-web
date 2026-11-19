@@ -1,6 +1,7 @@
 import { Entity } from "./helper";
 import { CollectionRequestDTO } from "./collection-request";
 import { UserDTO } from "./user";
+import { VehicleDTO } from "./vehicle";
 
     export interface PackageCollectionFormData {
     id?: string;
@@ -16,6 +17,7 @@ import { UserDTO } from "./user";
   friendlyCode?: string
   collectionInterval?: CollectionInterval
   driver: UserDTO
+  vehicle?: VehicleDTO | null
   collectionRequests: CollectionRequestDTO[]
   startDate: Date
   endDate?: Date
