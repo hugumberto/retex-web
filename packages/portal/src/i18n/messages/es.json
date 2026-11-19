@@ -119,6 +119,7 @@
     "cityDivisionPlaceholder": "Parque das Nações",
     "category": "Categoría",
     "condition": "Estado",
+    "careLabel": "Etiqueta",
     "destination": "Destino",
     "group": "Grupo",
     "location": "Ubicación",
@@ -261,6 +262,11 @@
       "EXCELLENT": "Excelente",
       "GOOD": "Bueno",
       "REGULAR": "Regular"
+    },
+    "careLabel": {
+      "LEGIBLE": "Legible",
+      "ILLEGIBLE": "Ilegible",
+      "MISSING": "Inexistente"
     },
     "destination": {
       "REUSE": "Reutilización",
@@ -851,6 +857,7 @@
     "denimLabel": "Denim",
     "denimHint": "(solo para vaqueros)",
     "conditionLabel": "Calidad / Estado *",
+    "careLabelLabel": "Etiqueta *",
     "destinationLabel": "Destino",
     "moreDetails": "Más detalles (opcional)",
     "materialLabel": "Material",

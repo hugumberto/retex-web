@@ -6,6 +6,7 @@ import { StorageUnitDTO } from "./storage-unit";
 import { UserDTO } from "./user"
 import {
   AgeGroup,
+  CareLabel,
   Category,
   Condition,
   Destination,
@@ -57,6 +58,7 @@ export interface CollectionRequestItemDTO extends Entity {
   // Indicadores informativos.
   category?: Category | null
   condition?: Condition | null
+  careLabel?: CareLabel | null
   brand?: Brand | null
   denim?: boolean | null
   material?: string | null

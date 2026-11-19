@@ -211,6 +211,7 @@ export default function Triage() {
         ageGroup: collectionRequestItem.ageGroup,
         category: collectionRequestItem.category,
         condition: collectionRequestItem.condition,
+        careLabel: collectionRequestItem.careLabel,
         brandId: collectionRequestItem.brand?.id ?? '',
         quantity: collectionRequestItem.quantity,
       })) as TriageListItem[];
@@ -356,6 +357,7 @@ export default function Triage() {
           ageGroup: itemForm.ageGroup,
           category: itemForm.category,
           condition: itemForm.condition,
+          careLabel: itemForm.careLabel,
           season: itemForm.season,
           denim: itemForm.denim,
           brandId: itemForm.brandId,

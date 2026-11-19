@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import { Brand } from '@/app/types/brand';
 import {
   AgeGroup,
+  CareLabel,
   Category,
   Condition,
   Destination,
@@ -40,6 +41,7 @@ export type ClassificationForm = {
   tileKey?: string;
   category?: Category;
   condition?: Condition;
+  careLabel: CareLabel;
   destination: Destination;
   season?: Season;
   denim?: boolean;
@@ -54,6 +56,9 @@ export type ClassificationForm = {
 // vem preenchido — poupa uma escrita por item num ecrã usado ao ritmo do scanner.
 export const EMPTY_CLASSIFICATION: ClassificationForm = {
   destination: Destination.REUSE,
+  // Pré-selecionada: a maioria das peças traz a etiqueta legível, e o operador
+  // só toca no campo quando não traz.
+  careLabel: CareLabel.LEGIBLE,
   brandId: '',
   quantity: '1',
   material: '',
@@ -200,6 +205,7 @@ export default function ClothingClassification({
   const tTiles = useTranslations('triage.tiles');
   const tCategory = useTranslations('enums.category');
   const tCondition = useTranslations('enums.condition');
+  const tCareLabel = useTranslations('enums.careLabel');
   const tDestination = useTranslations('enums.destination');
   const tSeason = useTranslations('enums.season');
   const tCommon = useTranslations('common');
@@ -549,6 +555,18 @@ export default function ClothingClassification({
             }))}
             selected={form.condition}
             onSelect={(condition) => onChange({ condition })}
+            disabled={disabled}
+          />
+        </FieldRow>
+
+        <FieldRow label={t('careLabelLabel')}>
+          <ChoiceButtons
+            options={Object.values(CareLabel).map((value) => ({
+              value,
+              label: tCareLabel(value),
+            }))}
+            selected={form.careLabel}
+            onSelect={(careLabel) => onChange({ careLabel })}
             disabled={disabled}
           />
         </FieldRow>

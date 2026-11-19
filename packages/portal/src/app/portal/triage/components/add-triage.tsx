@@ -3,6 +3,7 @@ import { Brand } from '@/app/types/brand';
 import { StorageUnitDTO } from '@/app/types/storage-unit';
 import {
   AgeGroup,
+  CareLabel,
   Category,
   Condition,
   Destination,
@@ -41,6 +42,7 @@ export type TriageListItem = {
   type?: Type | null;
   category?: Category | null;
   condition?: Condition | null;
+  careLabel?: CareLabel | null;
   brandId?: string;
   quantity: number;
 };
@@ -77,6 +79,7 @@ export function useItemColumns(brands: Brand[]) {
   const tCommon = useTranslations('common');
   const tCategory = useTranslations('enums.category');
   const tCondition = useTranslations('enums.condition');
+  const tCareLabel = useTranslations('enums.careLabel');
   const tDestination = useTranslations('enums.destination');
   const slotLabel = useSlotLabel();
   const t = useTranslations('triage');
@@ -85,6 +88,7 @@ export function useItemColumns(brands: Brand[]) {
     tCommon('category'),
     tCommon('storageSlot'),
     tCommon('condition'),
+    tCommon('careLabel'),
     tCommon('destination'),
     tCommon('brand'),
     tCommon('quantity'),
@@ -96,6 +100,7 @@ export function useItemColumns(brands: Brand[]) {
       item.category ? tCategory(item.category) : '-',
       slot ? slotLabel(slot) : t('noStorage'),
       item.condition ? tCondition(item.condition) : '-',
+      item.careLabel ? tCareLabel(item.careLabel) : '-',
       tDestination(item.destination),
       (brands.find((brand) => brand.id === item.brandId)?.name ?? item.brandId) ||
         '-',
