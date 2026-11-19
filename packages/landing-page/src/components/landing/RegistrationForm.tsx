@@ -1,8 +1,13 @@
 'use client';
 
+import { Link } from '@/i18n/navigation';
+import { getPortalLoginHref } from '@/lib/portal';
+import { cn } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Field, fieldClass } from '../home/HomeContactForm';
+import { buttonClass } from '../home/ui';
 import { firstAddressPart } from '../../utils/address';
 
 type FormValues = {
@@ -10,25 +15,44 @@ type FormValues = {
   lastName: string;
   email: string;
   contactPhone: string;
-  gender: string;
-  dateOfBirth: string;
   zipCode: string;
   street: string;
-  number: string;
-  complement: string;
   city: string;
   cityDivision: string;
   country: string;
   countryDivision: string;
   lat: string;
   long: string;
+  consent: boolean;
 };
 
-const portalLoginHref = (() => {
-  const base = process.env.NEXT_PUBLIC_PORTAL_URL?.trim() ?? '';
-  return base ? `${base.replace(/\/$/, '')}/auth/login` : '#';
-})();
+const EMPTY: FormValues = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  contactPhone: '',
+  zipCode: '',
+  street: '',
+  city: '',
+  cityDivision: '',
+  country: '',
+  countryDivision: '',
+  lat: '',
+  long: '',
+  consent: false,
+};
 
+const PRIVACY_URL = 'https://www.iubenda.com/privacy-policy/50808874';
+
+/**
+ * Registo de particulares (Figma "Portal" → 02-Registo). Empresas e municípios
+ * ainda não se registam sozinhos: os separadores levam ao contacto.
+ *
+ * Fica de fora do design, de propósito:
+ * - a palavra-passe: o fluxo atual envia um email para a definir e ativar a
+ *   conta, e mudar isso é outra decisão;
+ * - "Continuar com Google": a API ainda não tem login Google.
+ */
 export default function RegistrationForm() {
   const t = useTranslations('register');
   const tValidation = useTranslations('validation');
@@ -38,34 +62,17 @@ export default function RegistrationForm() {
     handleSubmit,
     setValue,
     reset,
-    formState: { errors },
-  } = useForm<FormValues>({
-    mode: 'onChange',
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      contactPhone: '',
-      gender: '',
-      dateOfBirth: '',
-      zipCode: '',
-      street: '',
-      number: '',
-      complement: '',
-      city: '',
-      cityDivision: '',
-      country: '',
-      countryDivision: '',
-      lat: '',
-      long: '',
-    },
-  });
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({ mode: 'onTouched', defaultValues: EMPTY });
+  const [feedback, setFeedback] = useState<{
+    tone: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
-  const [message, setMessage] = useState('');
-  const [messageTone, setMessageTone] = useState<'success' | 'error'>(
-    'success'
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Localidade e freguesia vêm do código postal (TomTom). Só aparecem depois
+  // dele, para o caso de a TomTom não as devolver e ser preciso escrevê-las.
+  const showLocality = watch('zipCode').trim().length > 0;
 
   const handleBlurZipCode = async (e: React.FocusEvent<HTMLInputElement>) => {
     const postalCode = e.target.value.trim();
@@ -78,7 +85,6 @@ export default function RegistrationForm() {
       const { results } = await res.json();
       if (!Array.isArray(results) || results.length === 0) return;
       const { address: addr, position } = results[0];
-      setValue('street', addr?.streetName ?? '', { shouldValidate: true });
       setValue('city', firstAddressPart(addr?.municipality));
       setValue('cityDivision', firstAddressPart(addr?.municipalitySubdivision));
       setValue(
@@ -91,13 +97,12 @@ export default function RegistrationForm() {
       setValue('lat', position?.lat ? String(position.lat) : '');
       setValue('long', position?.lon ? String(position.lon) : '');
     } catch {
-      // silent — user can fill manually
+      // silencioso — o utilizador pode preencher à mão
     }
   };
 
   const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-    setMessage('');
+    setFeedback(null);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}user/register`,
@@ -115,13 +120,9 @@ export default function RegistrationForm() {
             // Idioma em que o utilizador se registou: é o que a API usa para
             // lhe enviar emails daqui em diante.
             language: locale,
-            gender: data.gender || undefined,
-            dateOfBirth: data.dateOfBirth || undefined,
             address: {
               zipCode: data.zipCode,
               street: data.street,
-              number: data.number || undefined,
-              complement: data.complement || undefined,
               city: data.city || undefined,
               cityDivision: data.cityDivision || undefined,
               country: data.country || undefined,
@@ -133,307 +134,202 @@ export default function RegistrationForm() {
         }
       );
       if (res.status === 409) {
-        setMessageTone('error');
-        setMessage(t('feedback.duplicateEmail'));
+        setFeedback({ tone: 'error', text: t('feedback.duplicateEmail') });
         return;
       }
       if (!res.ok) throw new Error();
       const body = await res.json().catch(() => null);
-      setMessageTone('success');
-      setMessage(
-        body?.inServiceZone
+      setFeedback({
+        tone: 'success',
+        text: body?.inServiceZone
           ? t('feedback.successInZone')
-          : t('feedback.successOutOfZone')
-      );
-      reset();
+          : t('feedback.successOutOfZone'),
+      });
+      reset(EMPTY);
     } catch {
-      setMessageTone('error');
-      setMessage(t('feedback.error'));
-    } finally {
-      setIsSubmitting(false);
+      setFeedback({ tone: 'error', text: t('feedback.error') });
     }
   };
 
-  const req = { required: tValidation('required') };
+  const required = { required: tValidation('required') };
 
   return (
     <form
-      className="register-card"
       onSubmit={handleSubmit(onSubmit)}
       noValidate
+      className="flex w-full max-w-[520px] flex-col gap-[18px]"
     >
-      <h2 className="register-card-title">{t('title')}</h2>
-
-      {message ? (
-        <p
-          className={
-            messageTone === 'error'
-              ? 'landing-form-feedback landing-form-feedback--error'
-              : 'landing-form-feedback'
-          }
-        >
-          {message}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-[31px] font-semibold tracking-[-0.02em] text-navy">
+          {t('title')}
+        </h1>
+        <p className="text-[13px] text-ink">
+          {t('alreadyHaveAccount')}{' '}
+          <a
+            href={getPortalLoginHref()}
+            className="font-semibold text-teal underline underline-offset-2"
+          >
+            {t('login')}
+          </a>
         </p>
-      ) : null}
-
-      <div className="form-row">
-        <label>
-          <span className="form-label">
-            {t('fields.firstName')}
-            <span className="form-req">*</span>
-          </span>
-          <input
-            type="text"
-            autoComplete="given-name"
-            className={errors.firstName ? 'field-error' : undefined}
-            {...register('firstName', req)}
-          />
-          {errors.firstName ? (
-            <span className="form-field-error">{errors.firstName.message}</span>
-          ) : null}
-        </label>
-        <label>
-          <span className="form-label">
-            {t('fields.lastName')}
-            <span className="form-req">*</span>
-          </span>
-          <input
-            type="text"
-            autoComplete="family-name"
-            className={errors.lastName ? 'field-error' : undefined}
-            {...register('lastName', req)}
-          />
-          {errors.lastName ? (
-            <span className="form-field-error">{errors.lastName.message}</span>
-          ) : null}
-        </label>
       </div>
 
-      <label>
-        <span className="form-label">
-          {t('fields.email')}
-          <span className="form-req">*</span>
+      <div
+        role="tablist"
+        aria-label={t('accountType.label')}
+        className="flex rounded-xl bg-line p-[5px] text-[13px]"
+      >
+        <span
+          role="tab"
+          aria-selected="true"
+          className="flex h-10 flex-1 items-center justify-center rounded-[9px] bg-white font-semibold text-navy shadow-[0_1px_3px_rgba(1,51,100,0.08)]"
+        >
+          {t('accountType.individual')}
         </span>
+        {(['empresa', 'municipio'] as const).map((profile) => (
+          <Link
+            key={profile}
+            role="tab"
+            aria-selected="false"
+            href={`/?perfil=${profile}#contacto`}
+            className="flex h-10 flex-1 items-center justify-center rounded-[9px] text-ink hover:text-navy"
+          >
+            {t(`accountType.${profile}`)}
+          </Link>
+        ))}
+      </div>
+
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        <Field label={t('fields.firstName')} error={errors.firstName?.message}>
+          <input
+            autoComplete="given-name"
+            className={fieldClass(!!errors.firstName)}
+            aria-invalid={errors.firstName ? true : undefined}
+            {...register('firstName', required)}
+          />
+        </Field>
+        <Field label={t('fields.lastName')} error={errors.lastName?.message}>
+          <input
+            autoComplete="family-name"
+            className={fieldClass(!!errors.lastName)}
+            aria-invalid={errors.lastName ? true : undefined}
+            {...register('lastName', required)}
+          />
+        </Field>
+      </div>
+
+      <Field label={t('fields.email')} error={errors.email?.message}>
         <input
           type="email"
           autoComplete="email"
-          className={errors.email ? 'field-error' : undefined}
+          placeholder={t('fields.emailPlaceholder')}
+          className={fieldClass(!!errors.email)}
+          aria-invalid={errors.email ? true : undefined}
           {...register('email', {
-            ...req,
+            ...required,
             pattern: {
               value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
               message: tValidation('invalidEmail'),
             },
           })}
         />
-        {errors.email ? (
-          <span className="form-field-error">{errors.email.message}</span>
-        ) : null}
-      </label>
+      </Field>
 
-      <div className="form-row">
-        <label>
-          <span className="form-label">
-            {t('fields.phone')}
-            <span className="form-req">*</span>
-          </span>
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        <Field label={t('fields.phone')} error={errors.contactPhone?.message}>
           <input
             type="tel"
             autoComplete="tel"
-            className={errors.contactPhone ? 'field-error' : undefined}
-            {...register('contactPhone', req)}
+            placeholder="9XX XXX XXX"
+            className={fieldClass(!!errors.contactPhone)}
+            aria-invalid={errors.contactPhone ? true : undefined}
+            {...register('contactPhone', required)}
           />
-          {errors.contactPhone ? (
-            <span className="form-field-error">
-              {errors.contactPhone.message}
+        </Field>
+        <Field label={t('fields.zipCode')} error={errors.zipCode?.message}>
+          <input
+            autoComplete="postal-code"
+            placeholder={t('fields.zipCodePlaceholder')}
+            className={fieldClass(!!errors.zipCode)}
+            aria-invalid={errors.zipCode ? true : undefined}
+            {...register('zipCode', { ...required, onBlur: handleBlurZipCode })}
+          />
+        </Field>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Field label={t('fields.street')} error={errors.street?.message}>
+          <input
+            autoComplete="street-address"
+            placeholder={t('fields.streetPlaceholder')}
+            className={fieldClass(!!errors.street)}
+            aria-invalid={errors.street ? true : undefined}
+            {...register('street', required)}
+          />
+        </Field>
+        <p className="font-mono text-[11px] text-ink">{t('addressHint')}</p>
+      </div>
+
+      {showLocality ? (
+        <div className="grid gap-3.5 sm:grid-cols-2">
+          <Field label={t('fields.city')}>
+            <input className={fieldClass()} {...register('city')} />
+          </Field>
+          <Field label={t('fields.cityDivision')}>
+            <input className={fieldClass()} {...register('cityDivision')} />
+          </Field>
+        </div>
+      ) : null}
+
+      <label className="flex items-start gap-3 text-[13px] leading-5 text-ink">
+        <input
+          type="checkbox"
+          className="mt-0.5 size-[18px] shrink-0 accent-teal"
+          aria-invalid={errors.consent ? true : undefined}
+          {...register('consent', { required: tValidation('required') })}
+        />
+        <span>
+          {t.rich('consent', {
+            privacy: (chunks) => (
+              <a
+                href={PRIVACY_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="text-teal underline underline-offset-2"
+              >
+                {chunks}
+              </a>
+            ),
+          })}
+          {errors.consent ? (
+            <span className="block text-xs text-red-600">
+              {errors.consent.message}
             </span>
           ) : null}
-        </label>
-        <label>
-          <span className="form-label">
-            {t('fields.zipCode')}
-            <span className="form-req">*</span>
-          </span>
-          <input
-            type="text"
-            placeholder={t('fields.zipCodePlaceholder')}
-            autoComplete="postal-code"
-            className={errors.zipCode ? 'field-error' : undefined}
-            {...register('zipCode', req)}
-            onBlur={handleBlurZipCode}
-          />
-          {errors.zipCode ? (
-            <span className="form-field-error">{errors.zipCode.message}</span>
-          ) : null}
-        </label>
-      </div>
-
-      <label>
-        <span className="form-label">
-          {t('fields.street')}
-          <span className="form-req">*</span>
         </span>
-        <input
-          type="text"
-          autoComplete="street-address"
-          className={errors.street ? 'field-error' : undefined}
-          {...register('street', req)}
-        />
-        {errors.street ? (
-          <span className="form-field-error">{errors.street.message}</span>
-        ) : null}
       </label>
 
-      <div className="form-row">
-        <label>
-          <span className="form-label">
-            {t('fields.number')}
-            <span className="form-req">*</span>
-          </span>
-          <input
-            type="text"
-            autoComplete="address-line2"
-            className={errors.number ? 'field-error' : undefined}
-            {...register('number', req)}
-          />
-          {errors.number ? (
-            <span className="form-field-error">{errors.number.message}</span>
-          ) : null}
-        </label>
-        <label>
-          <span className="form-label">{t('fields.complement')}</span>
-          <input type="text" {...register('complement')} />
-        </label>
-      </div>
-      <div className="form-row">
-        <label>
-          <span className="form-label">
-            {t('fields.city')}
-            <span className="form-req">*</span>
-          </span>
-          <input
-            type="text"
-            autoComplete="address-level2"
-            {...register('city')}
-          />
-        </label>
-        <label>
-          <span className="form-label">
-            {t('fields.cityDivision')}
-            <span className="form-req">*</span>
-          </span>
-          <input type="text" {...register('cityDivision')} />
-        </label>
-      </div>
-      <div>
-        <span className="form-label">
-          {t('fields.gender')}
-          <span className="form-req">*</span>
-        </span>
-        <div
-          className="radio-group"
-          role="radiogroup"
-          aria-label={t('fields.gender')}
+      {feedback ? (
+        <p
+          role="status"
+          className={cn(
+            'rounded-[10px] px-4 py-3 text-sm',
+            feedback.tone === 'success'
+              ? 'bg-mint text-forest'
+              : 'bg-red-50 text-red-700'
+          )}
         >
-          {(
-            [
-              { value: 'MALE', label: t('gender.male') },
-              { value: 'FEMALE', label: t('gender.female') },
-              { value: 'PREFER_NOT_TO_SAY', label: t('gender.preferNotToSay') },
-            ] as const
-          ).map(({ value, label }) => (
-            <label key={value} className="radio-option">
-              <input type="radio" value={value} {...register('gender', req)} />
-              {label}
-            </label>
-          ))}
-        </div>
-        {errors.gender ? (
-          <span className="form-field-error">{errors.gender.message}</span>
-        ) : null}
-      </div>
+          {feedback.text}
+        </p>
+      ) : null}
 
-      <label>
-        <span className="form-label">
-          {t('fields.dateOfBirth')}
-          <span className="form-req">*</span>
-        </span>
-        <input
-          type="date"
-          className={errors.dateOfBirth ? 'field-error' : undefined}
-          {...register('dateOfBirth', req)}
-        />
-        {errors.dateOfBirth ? (
-          <span className="form-field-error">{errors.dateOfBirth.message}</span>
-        ) : null}
-      </label>
-
-      <input type="hidden" {...register('country')} />
-      <input type="hidden" {...register('countryDivision')} />
-      <input type="hidden" {...register('lat')} />
-      <input type="hidden" {...register('long')} />
-
-      <button type="submit" disabled={isSubmitting}>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className={cn('w-full', buttonClass('primary', 'lg'))}
+      >
         {isSubmitting ? t('submitting') : t('submit')}
       </button>
-
-      <p className="register-login-link">
-        {t('alreadyHaveAccount')}{' '}
-        <a href={portalLoginHref} target="_blank" rel="noopener noreferrer">
-          {t('login')}
-        </a>
-      </p>
-
-      <div className="register-social-row" aria-label={t('socialAria')}>
-        <span
-          className="register-social-icon"
-          aria-label="Facebook"
-          role="button"
-          tabIndex={0}
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
-          </svg>
-        </span>
-        <span
-          className="register-social-icon"
-          aria-label="Google"
-          role="button"
-          tabIndex={0}
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
-          </svg>
-        </span>
-        <span
-          className="register-social-icon"
-          aria-label="LinkedIn"
-          role="button"
-          tabIndex={0}
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-          </svg>
-        </span>
-      </div>
     </form>
   );
 }

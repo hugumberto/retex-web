@@ -1,5 +1,5 @@
-import { Header } from '@/components/landing/Header';
-import LandingFooter from '@/components/landing/LandingFooter';
+import SiteHeader from '@/components/home/SiteHeader';
+import SiteFooter from '@/components/home/SiteFooter';
 import { Link } from '@/i18n/navigation';
 import { localeHtmlLang, type Locale } from '@/i18n/routing';
 import {
@@ -104,7 +104,7 @@ export default async function BlogPostPage({
 
   return (
     <main className="landing-shell flex flex-col min-h-screen">
-      <Header />
+      <SiteHeader />
       <div className="flex-1 mt-[4rem]">
         <article className="blog-article">
           <header className="blog-article-head">
@@ -174,7 +174,7 @@ export default async function BlogPostPage({
           </div>
         </article>
       </div>
-      <LandingFooter />
+      <SiteFooter />
     </main>
   );
 }

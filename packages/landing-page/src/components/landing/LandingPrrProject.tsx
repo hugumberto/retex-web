@@ -1,4 +1,4 @@
-import { Header } from '@/components/landing/Header';
+import SiteHeader from '@/components/home/SiteHeader';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -40,8 +40,8 @@ export default function LandingPrrProject() {
 
   return (
     <>
+      <SiteHeader />
       <section className="prr-hero">
-        <Header />
         <Image
           src="/assets/new-layout/PARTICULARES.jpeg"
           alt=""

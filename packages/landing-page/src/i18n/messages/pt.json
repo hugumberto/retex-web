@@ -28,113 +28,8 @@
       "notFound": "Artigo não encontrado | RETEX"
     }
   },
-  "nav": {
-    "howItWorks": "Como funciona",
-    "services": "Serviços",
-    "blog": "Blog",
-    "faq": "FAQ's",
-    "cta": "Registo/Login",
-    "menuAria": "Menu",
-    "logoAlt": "RETEX"
-  },
   "languageSwitcher": {
     "label": "Idioma"
-  },
-  "hero": {
-    "tagline": "Ligamos Famílias, Empresas e Municípios numa missão: prolongar o ciclo de vida da roupa usada, contribuindo para um futuro mais sustentável."
-  },
-  "howItWorks": {
-    "title": "Como funciona?",
-    "steps": {
-      "register": {
-        "title": "Faz o teu registo",
-        "description": "Preenche a informação necessária para ficares registado."
-      },
-      "schedule": {
-        "title": "Agenda a tua recolha",
-        "description": "Menciona o local mais indicado para ti"
-      },
-      "rest": {
-        "title": "Agora é connosco",
-        "description": "Aguardar o contacto de um dos nossos transportadores."
-      }
-    }
-  },
-  "services": {
-    "companies": {
-      "title": "Empresas e Municípios",
-      "body": "A nossa solução permite a municípios e empresas reforçarem a gestão sustentável dos têxteis através de um sistema de recolha seletiva e economia circular. Os municípios beneficiam de maior desvio de resíduos têxteis de aterro, melhoria das taxas de reciclagem e acesso a dados de impacto ambiental através de dashboards digitais. As empresas, por sua vez, podem obter Créditos de Circularidade associados à recolha e valorização de têxteis, apoiando a compensação de emissões e o reporte de indicadores ESG de forma mais transparente e mensurável.",
-      "cta": "Entrar em contacto",
-      "imageAlt": "Têxteis e símbolo de reciclagem"
-    },
-    "individuals": {
-      "title": "Particulares",
-      "body": "Tem roupa que já não usa? Dê-lhe um novo propósito. Através do serviço de recolha seletiva de têxteis, a RETEX encaminha peças em bom estado para reutilização, contribuindo para a redução de resíduos e para a promoção da economia circular.",
-      "cta": "Agendar recolha",
-      "imageAlt": "Costura e reutilização têxtil"
-    }
-  },
-  "about": {
-    "title": "Quem somos?",
-    "body1": "Apresentamos a RETEX, uma <strong>plataforma que revoluciona a forma como lidamos com o desperdício têxtil</strong>. Tornamos a reutilização de têxtil mais simples, conveniente e eficiente, através de um modelo de recolha inovador e um compromisso real com a economia circular.",
-    "body2": "Conectamos consumidores, empresas e municípios para dar nova vida aos têxteis, reduzir o desperdício e gerar impacto ambiental e social positivo.",
-    "cta": "Saber mais",
-    "logoAlt": "RETEX"
-  },
-  "values": {
-    "kicker": "Descobre mais sobre",
-    "title": "Os nossos valores",
-    "items": {
-      "collection": {
-        "title": "Recolha Sustentável",
-        "text": "Em Portugal, são mais de 200 mil. O problema cresce, mas temos solução."
-      },
-      "waste": {
-        "title": "Redução do Desperdício Têxtil",
-        "text": "Damos nova vida a cada peça, evitando que toneladas acabem em aterros."
-      },
-      "impact": {
-        "title": "Impacto Social e Ambiental",
-        "text": "Apoiamos causas sociais e práticas sustentáveis para reduzir a pegada ecológica."
-      },
-      "circular": {
-        "title": "Economia Circular",
-        "text": "Transformamos resíduos em recursos, promovendo um consumo mais consciente."
-      }
-    }
-  },
-  "quote": {
-    "body": "Reciclar é reconhecer que tudo tem valor e merece uma segunda vida.",
-    "author": "- Jane Goodall"
-  },
-  "upcycling": {
-    "banner": "ESTA PEÇA FOI REINVENTADA COM MATERIAIS REUTILIZADOS",
-    "kicker": "UPCYCLING TÊXTIL",
-    "title": "Dar uma nova vida ao material",
-    "body": "Na RETEX, o upcycling é a forma mais criativa de prolongar a vida dos têxteis. Em vez de irem para o lixo, resíduos de produção, stock excedente e uniformes antigos são transformados em novos produtos com mais valor — acessórios, peças para o lar e brindes corporativos.",
-    "made": "Made in Portugal",
-    "sustainable": "Sustentável"
-  },
-  "partners": {
-    "title": "a RETEX tem o privilégio de colaborar com:",
-    "previous": "ANTERIOR",
-    "next": "PRÓXIMO"
-  },
-  "contact": {
-    "title": "Formulário",
-    "leadStrong": "Tem dúvidas? Estamos aqui para ajudar!",
-    "lead": "Preencha o formulário e entre em contacto connosco.",
-    "fields": {
-      "name": "Nome",
-      "phone": "Telemóvel",
-      "email": "Email",
-      "subject": "Título",
-      "message": "Mensagem"
-    },
-    "submit": "Submeter",
-    "submitting": "A enviar…",
-    "success": "Formulário enviado com sucesso!",
-    "error": "Erro ao enviar o formulário."
   },
   "validation": {
     "required": "Campo obrigatório",
@@ -148,30 +43,45 @@
       "email": "Email",
       "phone": "Telemóvel",
       "zipCode": "Código postal",
-      "zipCodePlaceholder": "0000-000",
-      "street": "Morada",
-      "number": "Nº de Porta",
-      "complement": "Complemento",
+      "zipCodePlaceholder": "4470-136",
+      "street": "Morada de recolha",
       "city": "Localidade",
       "cityDivision": "Freguesia",
-      "gender": "Sexo",
-      "dateOfBirth": "Data de Nascimento"
+      "emailPlaceholder": "nome@exemplo.pt",
+      "streetPlaceholder": "Rua, número, andar"
     },
-    "gender": {
-      "male": "Masculino",
-      "female": "Feminino",
-      "preferNotToSay": "Prefiro não dizer"
-    },
-    "submit": "Criar conta",
+    "submit": "Criar conta e agendar recolha",
     "submitting": "A registar…",
     "alreadyHaveAccount": "Já tens conta?",
-    "login": "Login",
-    "socialAria": "Entrar com conta social",
+    "login": "Entrar",
     "feedback": {
       "duplicateEmail": "Este email já está registado. Tente fazer login.",
       "successInZone": "Registo realizado! Enviámos um email para definir a sua password e ativar a conta. Verifique a sua caixa de entrada.",
       "successOutOfZone": "Registo realizado! O seu endereço está fora da zona de atuação — iremos notificá-lo por email assim que estiver disponível.",
       "error": "Erro ao realizar o registo. Tente novamente."
+    },
+    "addressHint": "A morada pode ser alterada ou acrescentada depois, no portal.",
+    "consent": "Aceito a <privacy>Política de Privacidade</privacy> e o tratamento dos meus dados para a recolha.",
+    "accountType": {
+      "label": "Tipo de conta",
+      "individual": "Particular",
+      "empresa": "Empresa",
+      "municipio": "Município"
+    },
+    "panel": {
+      "title": "A tua primeira recolha em 3 passos",
+      "steps": [
+        {
+          "title": "Cria a conta",
+          "note": "estás aqui"
+        },
+        {
+          "title": "Agenda local, sacos e janela horária"
+        },
+        {
+          "title": "Acompanha o pedido até ao armazém"
+        }
+      ]
     }
   },
   "blog": {
@@ -242,18 +152,194 @@
       "button": "Saber mais sobre a RETEX"
     }
   },
-  "footer": {
-    "tagline": "wear. care. share. repeat.",
+  "home": {
     "nav": {
-      "howItWorks": "COMO FUNCIONA",
-      "faq": "FAQ'S",
-      "blog": "BLOG",
-      "about": "SOBRE NÓS",
-      "prrProject": "PROJETO PRR"
+      "home": "Página inicial",
+      "howItWorks": "Como funciona",
+      "businesses": "Empresas e municípios",
+      "journey": "O que fazemos à roupa",
+      "faq": "FAQ",
+      "blog": "Blog",
+      "login": "Entrar",
+      "cta": "Agendar recolha",
+      "menu": "Abrir menu"
     },
-    "contactTitle": "Contacta-nos para saber mais",
-    "privacyPolicy": "Política de Privacidade",
-    "cookiePolicy": "Política de Cookies",
-    "complaintsBook": "Livro de Reclamações Online"
+    "hero": {
+      "kicker": "Recolha seletiva de têxteis · Portugal",
+      "description": "Ligamos famílias, empresas e municípios para prolongar a vida da roupa usada. Agendas, nós vamos buscar.",
+      "primaryCta": "Agendar recolha gratuita",
+      "secondaryCta": "Sou empresa ou município",
+      "photoAlt": "Pessoa a arrumar roupa usada num saco de pano",
+      "card": {
+        "status": "Agendado",
+        "title": "A tua recolha está marcada",
+        "dateLabel": "DATA",
+        "date": "12 nov · 14:00–16:00",
+        "placeLabel": "LOCAL",
+        "place": "Rua da Estação 190, Maia",
+        "bagsLabel": "SACOS",
+        "bags": "4 × têxteis lar e vestuário"
+      }
+    },
+    "profiles": {
+      "title": "Uma recolha, três formas de participar",
+      "description": "Escolhe o teu perfil. O registo e o acompanhamento são diferentes para cada um.",
+      "individuals": {
+        "kicker": "Particulares",
+        "title": "Tens roupa que já não usas?",
+        "description": "Agenda a recolha em casa. Encaminhamos as peças em bom estado para reutilização e as restantes para reciclagem.",
+        "items": [
+          "Recolha à porta, sem custos",
+          "Acompanhas o pedido no portal",
+          "Vês o impacto das tuas peças"
+        ],
+        "cta": "Agendar recolha"
+      },
+      "businesses": {
+        "kicker": "Empresas",
+        "title": "Créditos de Circularidade e reporte ESG",
+        "description": "Recolhemos e valorizamos têxteis da tua empresa: fardas, stock excedente, resíduos de produção. Cada quilo gera créditos para compensar emissões.",
+        "items": [
+          "Dashboard com indicadores ESG",
+          "Certificados por recolha",
+          "Upcycling para brindes corporativos"
+        ],
+        "cta": "Falar com a equipa"
+      },
+      "municipalities": {
+        "kicker": "Municípios",
+        "title": "Menos têxteis em aterro, com dados",
+        "description": "Recolha seletiva porta a porta para os municípios, com relatórios de desvio de aterro e taxas de reciclagem por freguesia.",
+        "items": [
+          "Página do município (ex.: inMaia)",
+          "Dashboard de impacto",
+          "Campanhas de sensibilização"
+        ],
+        "cta": "Pedir proposta"
+      }
+    },
+    "howItWorks": {
+      "title": "Como funciona",
+      "steps": [
+        {
+          "meta": "01 — 2 min",
+          "title": "Cria a tua conta",
+          "description": "Nome, email, morada. Só o necessário para irmos buscar."
+        },
+        {
+          "meta": "02 — escolhe a janela",
+          "title": "Agenda a recolha",
+          "description": "Indica o local, o número de sacos e uma janela horária que te dê jeito."
+        },
+        {
+          "meta": "03 — notificamos-te",
+          "title": "Nós tratamos do resto",
+          "description": "Recebes aviso quando o motorista sai e quando as peças chegam ao armazém."
+        }
+      ],
+      "cta": "Começar agora",
+      "photoAlt": "Tecido de linho sobre folhas de feto",
+      "caption": "Uma peça que volta a ser usada poupa a água, a terra e a energia de produzir uma nova."
+    },
+    "journey": {
+      "kicker": "O percurso de uma peça",
+      "title": "O que acontece à roupa que recolhemos",
+      "description": "Cada saco passa por triagem no nosso armazém. A peça segue para o destino onde tem mais valor.",
+      "photoAlt": [
+        "Fardos de têxteis separados por cor",
+        "Pessoa a costurar à máquina"
+      ],
+      "stages": {
+        "collection": {
+          "step": "1 · Recolha",
+          "title": "Porta a porta",
+          "description": "Rota otimizada por freguesia"
+        },
+        "sorting": {
+          "step": "2 · Triagem",
+          "title": "Peça a peça",
+          "description": "Estado, tipo e marca registados"
+        },
+        "reuse": {
+          "step": "3A · Reutilização",
+          "title": "Segunda vida",
+          "description": "Revenda e doação social"
+        },
+        "upcycling": {
+          "step": "3B · Upcycling",
+          "title": "Novo produto",
+          "description": "Acessórios e brindes, Made in Portugal"
+        },
+        "recycling": {
+          "step": "3C · Reciclagem",
+          "title": "Nova fibra",
+          "description": "O que não se usa, volta a ser matéria"
+        }
+      }
+    },
+    "whyItMatters": {
+      "kicker": "Porque importa",
+      "title": "Mais de 200 mil toneladas de têxteis vão para o lixo em Portugal, todos os anos.",
+      "description": "Cada peça que volta a circular é menos matéria-prima tirada à natureza e menos resíduos em aterro."
+    },
+    "impact": {
+      "title": "Até agora",
+      "updatedAt": "Atualizado a {date}",
+      "collected": "de têxteis recolhidos",
+      "cities": "concelhos com recolhas",
+      "reused": "das peças reutilizadas",
+      "co2": "de CO₂ evitado"
+    },
+    "upcycling": {
+      "kicker": "Upcycling têxtil",
+      "title": "Fardas antigas, stock excedente, novos produtos",
+      "description": "Transformamos resíduos de produção e uniformes descontinuados em acessórios, peças para o lar e brindes corporativos com a marca da tua empresa.",
+      "cta": "Pedir orçamento de upcycling",
+      "photoAlt": "Sacos e acessórios feitos de ganga reaproveitada numa bancada"
+    },
+    "partners": {
+      "label": "Trabalhamos com"
+    },
+    "faq": {
+      "title": "Perguntas frequentes",
+      "seeAll": "Ver todas as perguntas →"
+    },
+    "contact": {
+      "title": "Fala connosco",
+      "description": "Empresas, municípios ou dúvidas gerais. Respondemos em 2 dias úteis.",
+      "fields": {
+        "name": "Nome",
+        "phone": "Telemóvel",
+        "email": "Email",
+        "profile": "Sou",
+        "message": "Mensagem"
+      },
+      "profiles": {
+        "particular": "Particular",
+        "empresa": "Empresa",
+        "municipio": "Município",
+        "outro": "Outro"
+      },
+      "subject": "Contacto pelo site · {profile}",
+      "submit": "Enviar mensagem",
+      "submitting": "A enviar…",
+      "success": "Mensagem enviada. Respondemos em 2 dias úteis.",
+      "error": "Não foi possível enviar a mensagem. Tenta novamente."
+    },
+    "footer": {
+      "howItWorks": "Como funciona",
+      "about": "Sobre nós",
+      "blog": "Blog",
+      "faq": "FAQ",
+      "solutions": "Soluções",
+      "businesses": "Empresas",
+      "municipalities": "Municípios",
+      "upcycling": "Upcycling",
+      "prr": "Projeto PRR",
+      "contact": "Contacto",
+      "privacy": "Política de Privacidade",
+      "cookies": "Política de Cookies",
+      "complaints": "Livro de Reclamações"
+    }
   }
 }

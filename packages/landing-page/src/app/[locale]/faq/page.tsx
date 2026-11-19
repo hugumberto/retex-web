@@ -1,6 +1,6 @@
 import LandingFaq from '@/components/landing/LandingFaq';
-import LandingFooter from '@/components/landing/LandingFooter';
-import { Header } from '@/components/landing/Header';
+import SiteFooter from '@/components/home/SiteFooter';
+import SiteHeader from '@/components/home/SiteHeader';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
@@ -25,11 +25,11 @@ export default async function FaqPage({
 
   return (
     <main className="landing-shell flex flex-col min-h-screen">
-      <Header />
+      <SiteHeader />
       <div className="flex-1 mt-[4rem]">
         <LandingFaq />
       </div>
-      <LandingFooter />
+      <SiteFooter />
     </main>
   );
 }

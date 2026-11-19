@@ -1,4 +1,4 @@
-import LandingFooter from '@/components/landing/LandingFooter';
+import SiteFooter from '@/components/home/SiteFooter';
 import LandingPrrProject from '@/components/landing/LandingPrrProject';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -25,7 +25,7 @@ export default async function ProjetoPrrPage({
   return (
     <main className="landing-shell">
       <LandingPrrProject />
-      <LandingFooter />
+      <SiteFooter />
     </main>
   );
 }

@@ -2,7 +2,7 @@ import { locales, localeHtmlLang, routing, type Locale } from '@/i18n/routing';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata, Viewport } from 'next';
-import { Montserrat, Playfair_Display } from 'next/font/google';
+import { DM_Mono, Poppins } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import '../global.css';
@@ -12,17 +12,19 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const montserrat = Montserrat({
+// Tipografia da marca: Poppins no texto e títulos, DM Mono nos rótulos
+// técnicos (kickers, códigos, legendas).
+const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-montserrat',
+  variable: '--font-poppins',
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
+const dmMono = DM_Mono({
   subsets: ['latin'],
-  weight: ['500', '600'],
-  variable: '--font-playfair',
+  weight: ['400'],
+  variable: '--font-dm-mono',
   display: 'swap',
 });
 
@@ -105,7 +107,7 @@ export default async function RootLayout({
   return (
     <html
       lang={localeHtmlLang[locale]}
-      className={`${montserrat.variable} ${playfair.variable}`}
+      className={`${poppins.variable} ${dmMono.variable}`}
     >
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-X2G04J7NPJ"
@@ -119,7 +121,7 @@ export default async function RootLayout({
             gtag('config', 'G-X2G04J7NPJ');
           `}
       </Script>
-      <body className={montserrat.className}>
+      <body className={poppins.className}>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

@@ -28,113 +28,8 @@
       "notFound": "Article introuvable | RETEX"
     }
   },
-  "nav": {
-    "howItWorks": "Comment ça marche",
-    "services": "Services",
-    "blog": "Blog",
-    "faq": "FAQ",
-    "cta": "Inscription/Connexion",
-    "menuAria": "Menu",
-    "logoAlt": "RETEX"
-  },
   "languageSwitcher": {
     "label": "Langue"
-  },
-  "hero": {
-    "tagline": "Nous relions les familles, les entreprises et les municipalités autour d'une mission : prolonger le cycle de vie des vêtements usagés pour un avenir plus durable."
-  },
-  "howItWorks": {
-    "title": "Comment ça marche ?",
-    "steps": {
-      "register": {
-        "title": "Inscrivez-vous",
-        "description": "Renseignez les informations nécessaires pour finaliser votre inscription."
-      },
-      "schedule": {
-        "title": "Planifiez votre collecte",
-        "description": "Indiquez-nous le lieu le plus pratique pour vous"
-      },
-      "rest": {
-        "title": "On s'occupe du reste",
-        "description": "Attendez qu'un de nos transporteurs vous contacte."
-      }
-    }
-  },
-  "services": {
-    "companies": {
-      "title": "Entreprises et Municipalités",
-      "body": "Notre solution permet aux municipalités et aux entreprises de renforcer la gestion durable des textiles grâce à un système de collecte sélective et d'économie circulaire. Les municipalités bénéficient d'un meilleur détournement des déchets textiles de l'enfouissement, de taux de recyclage améliorés et d'un accès aux données d'impact environnemental via des tableaux de bord numériques. Les entreprises, quant à elles, peuvent obtenir des Crédits de Circularité liés à la collecte et à la valorisation des textiles, soutenant la compensation des émissions et un reporting ESG plus transparent et mesurable.",
-      "cta": "Nous contacter",
-      "imageAlt": "Textiles et symbole du recyclage"
-    },
-    "individuals": {
-      "title": "Particuliers",
-      "body": "Vous avez des vêtements que vous ne portez plus ? Donnez-leur une nouvelle utilité. Grâce à son service de collecte sélective de textiles, RETEX oriente les pièces en bon état vers la réutilisation, contribuant à réduire les déchets et à promouvoir l'économie circulaire.",
-      "cta": "Planifier une collecte",
-      "imageAlt": "Couture et réutilisation textile"
-    }
-  },
-  "about": {
-    "title": "Qui sommes-nous ?",
-    "body1": "Voici RETEX, une <strong>plateforme qui révolutionne notre façon de gérer les déchets textiles</strong>. Nous rendons la réutilisation des textiles plus simple, plus pratique et plus efficace, grâce à un modèle de collecte innovant et à un engagement réel envers l'économie circulaire.",
-    "body2": "Nous connectons consommateurs, entreprises et municipalités pour donner une nouvelle vie aux textiles, réduire le gaspillage et générer un impact environnemental et social positif.",
-    "cta": "En savoir plus",
-    "logoAlt": "RETEX"
-  },
-  "values": {
-    "kicker": "Découvrez-en plus sur",
-    "title": "Nos valeurs",
-    "items": {
-      "collection": {
-        "title": "Collecte Durable",
-        "text": "Au Portugal, il y en a plus de 200 mille tonnes. Le problème grandit, mais nous avons une solution."
-      },
-      "waste": {
-        "title": "Réduction des Déchets Textiles",
-        "text": "Nous donnons une nouvelle vie à chaque pièce, évitant que des tonnes finissent en décharge."
-      },
-      "impact": {
-        "title": "Impact Social et Environnemental",
-        "text": "Nous soutenons des causes sociales et des pratiques durables pour réduire l'empreinte écologique."
-      },
-      "circular": {
-        "title": "Économie Circulaire",
-        "text": "Nous transformons les déchets en ressources, en encourageant une consommation plus responsable."
-      }
-    }
-  },
-  "quote": {
-    "body": "Recycler, c'est reconnaître que tout a de la valeur et mérite une seconde vie.",
-    "author": "- Jane Goodall"
-  },
-  "upcycling": {
-    "banner": "CETTE PIÈCE A ÉTÉ RÉINVENTÉE À PARTIR DE MATÉRIAUX RÉUTILISÉS",
-    "kicker": "UPCYCLING TEXTILE",
-    "title": "Donner une nouvelle vie à la matière",
-    "body": "Chez RETEX, l'upcycling est la façon la plus créative de prolonger la vie des textiles. Au lieu de partir à la poubelle, les chutes de production, les stocks excédentaires et les anciens uniformes sont transformés en nouveaux produits à plus forte valeur — accessoires, articles pour la maison et cadeaux d'entreprise.",
-    "made": "Made in Portugal",
-    "sustainable": "Durable"
-  },
-  "partners": {
-    "title": "RETEX a le privilège de collaborer avec :",
-    "previous": "PRÉCÉDENT",
-    "next": "SUIVANT"
-  },
-  "contact": {
-    "title": "Formulaire",
-    "leadStrong": "Des questions ? Nous sommes là pour vous aider !",
-    "lead": "Remplissez le formulaire et contactez-nous.",
-    "fields": {
-      "name": "Nom",
-      "phone": "Téléphone portable",
-      "email": "E-mail",
-      "subject": "Objet",
-      "message": "Message"
-    },
-    "submit": "Envoyer",
-    "submitting": "Envoi en cours…",
-    "success": "Formulaire envoyé avec succès !",
-    "error": "Erreur lors de l'envoi du formulaire."
   },
   "validation": {
     "required": "Champ obligatoire",
@@ -148,30 +43,45 @@
       "email": "E-mail",
       "phone": "Téléphone portable",
       "zipCode": "Code postal",
-      "zipCodePlaceholder": "0000-000",
-      "street": "Adresse",
-      "number": "Numéro",
-      "complement": "Complément d'adresse",
+      "zipCodePlaceholder": "4470-136",
+      "street": "Adresse de collecte",
       "city": "Localité",
       "cityDivision": "Commune",
-      "gender": "Sexe",
-      "dateOfBirth": "Date de naissance"
+      "emailPlaceholder": "nom@exemple.fr",
+      "streetPlaceholder": "Rue, numéro, étage"
     },
-    "gender": {
-      "male": "Masculin",
-      "female": "Féminin",
-      "preferNotToSay": "Je préfère ne pas répondre"
-    },
-    "submit": "Créer un compte",
+    "submit": "Créer le compte et planifier une collecte",
     "submitting": "Inscription en cours…",
     "alreadyHaveAccount": "Vous avez déjà un compte ?",
-    "login": "Connexion",
-    "socialAria": "Se connecter avec un compte social",
+    "login": "Se connecter",
     "feedback": {
       "duplicateEmail": "Cet e-mail est déjà enregistré. Essayez de vous connecter.",
       "successInZone": "Inscription réussie ! Nous vous avons envoyé un e-mail pour définir votre mot de passe et activer votre compte. Vérifiez votre boîte de réception.",
       "successOutOfZone": "Inscription réussie ! Votre adresse se situe hors de notre zone de service — nous vous préviendrons par e-mail dès qu'elle sera couverte.",
       "error": "Erreur lors de l'inscription. Veuillez réessayer."
+    },
+    "addressHint": "Vous pourrez modifier ou ajouter des adresses plus tard, sur le portail.",
+    "consent": "J'accepte la <privacy>Politique de confidentialité</privacy> et le traitement de mes données pour la collecte.",
+    "accountType": {
+      "label": "Type de compte",
+      "individual": "Particulier",
+      "empresa": "Entreprise",
+      "municipio": "Commune"
+    },
+    "panel": {
+      "title": "Votre première collecte en 3 étapes",
+      "steps": [
+        {
+          "title": "Créez le compte",
+          "note": "vous êtes ici"
+        },
+        {
+          "title": "Planifiez lieu, sacs et créneau"
+        },
+        {
+          "title": "Suivez la demande jusqu'à l'entrepôt"
+        }
+      ]
     }
   },
   "blog": {
@@ -242,18 +152,194 @@
       "button": "En savoir plus sur RETEX"
     }
   },
-  "footer": {
-    "tagline": "wear. care. share. repeat.",
+  "home": {
     "nav": {
-      "howItWorks": "COMMENT ÇA MARCHE",
+      "home": "Page d'accueil",
+      "howItWorks": "Comment ça marche",
+      "businesses": "Entreprises et communes",
+      "journey": "Ce que nous faisons des vêtements",
       "faq": "FAQ",
-      "blog": "BLOG",
-      "about": "À PROPOS",
-      "prrProject": "PROJET PRR"
+      "blog": "Blog",
+      "login": "Se connecter",
+      "cta": "Planifier une collecte",
+      "menu": "Ouvrir le menu"
     },
-    "contactTitle": "Contactez-nous pour en savoir plus",
-    "privacyPolicy": "Politique de Confidentialité",
-    "cookiePolicy": "Politique de Cookies",
-    "complaintsBook": "Livre de Réclamations en ligne"
+    "hero": {
+      "kicker": "Collecte sélective de textiles · Portugal",
+      "description": "Nous réunissons familles, entreprises et communes pour prolonger la vie des vêtements usagés. Vous planifiez, nous venons les chercher.",
+      "primaryCta": "Planifier une collecte gratuite",
+      "secondaryCta": "Je suis une entreprise ou une commune",
+      "photoAlt": "Personne rangeant des vêtements usagés dans un sac en tissu",
+      "card": {
+        "status": "Planifiée",
+        "title": "Votre collecte est planifiée",
+        "dateLabel": "DATE",
+        "date": "12 nov. · 14:00–16:00",
+        "placeLabel": "LIEU",
+        "place": "Rua da Estação 190, Maia",
+        "bagsLabel": "SACS",
+        "bags": "4 × linge de maison et vêtements"
+      }
+    },
+    "profiles": {
+      "title": "Une collecte, trois façons de participer",
+      "description": "Choisissez votre profil. L'inscription et le suivi sont différents pour chacun.",
+      "individuals": {
+        "kicker": "Particuliers",
+        "title": "Des vêtements que vous ne portez plus ?",
+        "description": "Planifiez la collecte à domicile. Les pièces en bon état partent au réemploi et les autres au recyclage.",
+        "items": [
+          "Collecte à domicile, gratuite",
+          "Suivez votre demande sur le portail",
+          "Voyez l'impact de vos pièces"
+        ],
+        "cta": "Planifier une collecte"
+      },
+      "businesses": {
+        "kicker": "Entreprises",
+        "title": "Crédits de Circularité et reporting ESG",
+        "description": "Nous collectons et valorisons les textiles de votre entreprise : uniformes, surplus de stock, déchets de production. Chaque kilo génère des crédits pour compenser les émissions.",
+        "items": [
+          "Tableau de bord avec indicateurs ESG",
+          "Certificat pour chaque collecte",
+          "Upcycling en cadeaux d'entreprise"
+        ],
+        "cta": "Parler à l'équipe"
+      },
+      "municipalities": {
+        "kicker": "Communes",
+        "title": "Moins de textiles en décharge, avec des données",
+        "description": "Collecte sélective en porte-à-porte pour les communes, avec rapports de détournement de décharge et taux de recyclage par paroisse.",
+        "items": [
+          "Page de la commune (ex. : inMaia)",
+          "Tableau de bord d'impact",
+          "Campagnes de sensibilisation"
+        ],
+        "cta": "Demander une proposition"
+      }
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "steps": [
+        {
+          "meta": "01 — 2 min",
+          "title": "Créez votre compte",
+          "description": "Nom, email, adresse. Seulement le nécessaire pour venir les chercher."
+        },
+        {
+          "meta": "02 — choisissez le créneau",
+          "title": "Planifiez la collecte",
+          "description": "Indiquez le lieu, le nombre de sacs et un créneau horaire qui vous convient."
+        },
+        {
+          "meta": "03 — nous vous prévenons",
+          "title": "Nous nous occupons du reste",
+          "description": "Vous êtes prévenu quand le chauffeur part et quand les pièces arrivent à l'entrepôt."
+        }
+      ],
+      "cta": "Commencer",
+      "photoAlt": "Tissu de lin posé sur des feuilles de fougère",
+      "caption": "Une pièce qui est portée à nouveau économise l'eau, la terre et l'énergie nécessaires pour en produire une neuve."
+    },
+    "journey": {
+      "kicker": "Le parcours d'une pièce",
+      "title": "Ce que deviennent les vêtements collectés",
+      "description": "Chaque sac est trié dans notre entrepôt. La pièce part vers la destination où elle a le plus de valeur.",
+      "photoAlt": [
+        "Balles de textiles triées par couleur",
+        "Personne cousant à la machine"
+      ],
+      "stages": {
+        "collection": {
+          "step": "1 · Collecte",
+          "title": "Porte-à-porte",
+          "description": "Itinéraire optimisé par paroisse"
+        },
+        "sorting": {
+          "step": "2 · Tri",
+          "title": "Pièce par pièce",
+          "description": "État, type et marque enregistrés"
+        },
+        "reuse": {
+          "step": "3A · Réemploi",
+          "title": "Seconde vie",
+          "description": "Revente et don solidaire"
+        },
+        "upcycling": {
+          "step": "3B · Upcycling",
+          "title": "Nouveau produit",
+          "description": "Accessoires et cadeaux, Made in Portugal"
+        },
+        "recycling": {
+          "step": "3C · Recyclage",
+          "title": "Nouvelle fibre",
+          "description": "Ce qui ne se porte plus redevient matière"
+        }
+      }
+    },
+    "whyItMatters": {
+      "kicker": "Pourquoi c'est important",
+      "title": "Plus de 200 000 tonnes de textiles finissent à la poubelle au Portugal chaque année.",
+      "description": "Chaque pièce qui circule à nouveau, c'est moins de matières premières prélevées sur la nature et moins de déchets en décharge."
+    },
+    "impact": {
+      "title": "Jusqu'à présent",
+      "updatedAt": "Mis à jour le {date}",
+      "collected": "de textiles collectés",
+      "cities": "communes avec des collectes",
+      "reused": "des pièces réemployées",
+      "co2": "de CO₂ évité"
+    },
+    "upcycling": {
+      "kicker": "Upcycling textile",
+      "title": "Anciens uniformes, surplus de stock, nouveaux produits",
+      "description": "Nous transformons les déchets de production et les uniformes abandonnés en accessoires, objets pour la maison et cadeaux d'entreprise à la marque de votre société.",
+      "cta": "Demander un devis d'upcycling",
+      "photoAlt": "Sacs et accessoires en denim récupéré sur un établi"
+    },
+    "partners": {
+      "label": "Nous travaillons avec"
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "seeAll": "Voir toutes les questions →"
+    },
+    "contact": {
+      "title": "Contactez-nous",
+      "description": "Entreprises, communes ou questions générales. Nous répondons sous 2 jours ouvrés.",
+      "fields": {
+        "name": "Nom",
+        "phone": "Mobile",
+        "email": "Email",
+        "profile": "Je suis",
+        "message": "Message"
+      },
+      "profiles": {
+        "particular": "Un particulier",
+        "empresa": "Une entreprise",
+        "municipio": "Une commune",
+        "outro": "Autre"
+      },
+      "subject": "Contact via le site · {profile}",
+      "submit": "Envoyer le message",
+      "submitting": "Envoi…",
+      "success": "Message envoyé. Nous répondons sous 2 jours ouvrés.",
+      "error": "Impossible d'envoyer le message. Veuillez réessayer."
+    },
+    "footer": {
+      "howItWorks": "Comment ça marche",
+      "about": "À propos",
+      "blog": "Blog",
+      "faq": "FAQ",
+      "solutions": "Solutions",
+      "businesses": "Entreprises",
+      "municipalities": "Communes",
+      "upcycling": "Upcycling",
+      "prr": "Projet PRR",
+      "contact": "Contact",
+      "privacy": "Politique de confidentialité",
+      "cookies": "Politique de cookies",
+      "complaints": "Livre de réclamations"
+    }
   }
 }
