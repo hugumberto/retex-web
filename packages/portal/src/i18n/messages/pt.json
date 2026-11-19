@@ -982,7 +982,7 @@
     "requestLoaded": "Solicitação carregada com sucesso",
     "lookupError": "Erro ao consultar",
     "blockedTitle": "Este pacote não pode ser triado",
-    "blockedDescription": "A solicitação está em «{status}» e só é possível triar pacotes em «{collected}» ou «{screening}». Confirma o código ou avança para a próxima consulta.",
+    "blockedDescription": "A solicitação está em «{status}» e só é possível triar pacotes em «{collected}», «{inHouse}» ou «{screening}». Confirma o código ou avança para a próxima consulta.",
     "stockedTitle": "Triagem já concluída",
     "stockedDescription": "Esta solicitação já foi finalizada e está disponível apenas para consulta.",
     "inProgress": "Em processamento",
@@ -1187,7 +1187,16 @@
     "stopMinutesPerBagLabel": "Minutos por saco",
     "maxStopBase": "Máximo 120 minutos",
     "maxPerBag": "Máximo 30 minutos",
-    "stopTimeHelp": "Ex.: 5 + 1 por saco → uma recolha de 4 sacos conta 9 minutos."
+    "stopTimeHelp": "Ex.: 5 + 1 por saco → uma recolha de 4 sacos conta 9 minutos.",
+    "zoneCapacity": {
+      "title": "Capacidade das zonas do armazém",
+      "help": "Em kg. Serve para mostrar a ocupação de cada zona em Receção e armazém.",
+      "zoneSortingCapacityKg": "A · Por triar (kg)",
+      "zoneReuseCapacityKg": "B · Reutilização (kg)",
+      "zoneUpcyclingCapacityKg": "C · Upcycling (kg)",
+      "zoneRecyclingCapacityKg": "D · Fardos reciclagem (kg)",
+      "min": "Tem de ser pelo menos 1."
+    }
   },
   "dashboard": {
     "pageTitle": "Dashboard",
@@ -1457,6 +1466,90 @@
       "namePlaceholder": "Carrinha",
       "capacity": "Capacidade (sacos)",
       "active": "Ativo (pode ser escolhido nas rotas)"
+    }
+  },
+  "warehouse": {
+    "title": "Receção e armazém",
+    "tabs": {
+      "warehouse": "Armazém",
+      "lots": "Lotes"
+    },
+    "loadError": "Não foi possível carregar o armazém.",
+    "totalOccupancy": "Ocupação total {percent}% · {weight} de {capacity} kg",
+    "reception": {
+      "title": "Dar entrada de sacos",
+      "body": "Lê a etiqueta do saco ou escreve o código do pedido. Escreve o peso bruto lido na balança.",
+      "code": "Código do saco ou do pedido",
+      "codePlaceholder": "Código do saco ou do pedido",
+      "weight": "Peso bruto em kg",
+      "submit": "Registar entrada",
+      "invalidWeight": "Indica o peso em kg.",
+      "error": "Não foi possível registar a entrada.",
+      "complete": "{code}: {count, plural, one {o saco entrou} other {os # sacos entraram}}. Aguarda triagem.",
+      "partial": "{code}: {received} de {total} sacos recebidos."
+    },
+    "zones": {
+      "label": "Zona do armazém",
+      "auto": "Automática (pelo grupo)",
+      "names": {
+        "SORTING": "Por triar",
+        "REUSE": "Reutilização",
+        "UPCYCLING": "Upcycling",
+        "RECYCLING": "Fardos reciclagem"
+      },
+      "bags": "{count, plural, one {# saco} other {# sacos}}",
+      "pieces": "{count, plural, one {# peça} other {# peças}}",
+      "shipNow": "expedir já"
+    },
+    "today": {
+      "title": "Entradas de hoje",
+      "summary": "{count, plural, one {# saco} other {# sacos}} · {weight} kg",
+      "empty": "Ainda não entrou nenhum saco hoje.",
+      "columns": {
+        "time": "Hora",
+        "request": "Pedido",
+        "route": "Rota",
+        "bags": "Sacos",
+        "weight": "Peso bruto",
+        "zone": "Zona",
+        "status": "Estado"
+      },
+      "waiting": "Aguarda triagem",
+      "missing": "Diferença de sacos: {count} de {total} lidos"
+    },
+    "outbound": {
+      "title": "Saídas programadas",
+      "empty": "Não há saídas programadas.",
+      "new": "Programar saída",
+      "newTitle": "Programar saída",
+      "editTitle": "Saída programada",
+      "formHint": "Escolhe os lotes que saem, ou indica o peso ou as peças. Quando marcares a saída como feita, os lotes ficam inativos e deixam de contar na zona.",
+      "type": "Tipo",
+      "types": {
+        "RECYCLING": "Reciclagem",
+        "DONATION": "Doação",
+        "UPCYCLING": "Upcycling",
+        "SALE": "Venda"
+      },
+      "destination": "Destino",
+      "destinationPlaceholder": "Parceiro ou local (ex.: Loja social · Maia)",
+      "destinationRequired": "Indica o destino.",
+      "date": "Dia",
+      "units": "Lotes da zona {zone}",
+      "noUnits": "Não há lotes ativos livres nesta zona.",
+      "unitDetail": "{pieces} peças · {weight} kg",
+      "weight": "Peso (kg)",
+      "piecesLabel": "Peças",
+      "notes": "Notas",
+      "save": "Guardar",
+      "markDone": "Marcar como feita",
+      "cancel": "Cancelar saída",
+      "saved": "Saída guardada.",
+      "done": "Saída feita: os lotes saíram do armazém.",
+      "cancelled": "Saída cancelada.",
+      "saveError": "Não foi possível guardar a saída.",
+      "pieces": "{count, plural, one {# peça} other {# peças}}",
+      "lots": "{count, plural, one {# lote} other {# lotes}}"
     }
   }
 }

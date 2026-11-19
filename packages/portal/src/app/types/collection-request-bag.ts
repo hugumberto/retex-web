@@ -8,6 +8,9 @@ export interface CollectionRequestBagDTO {
   collectionRequestId?: string | null;
   routeId?: string | null;
   usedAt?: string | null;
+  /** Receção no armazém: hora e peso bruto lido à chegada. */
+  receivedAt?: string | null;
+  receivedWeight?: number | string | null;
   weight?: number | null;
   processedAt?: string | null;
 }

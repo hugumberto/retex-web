@@ -19,6 +19,10 @@ export type StorageUnitDTO = {
   status: Status;
   weight: number;
   itemsCount?: number;
+  /** Zona do armazém; nula = a do grupo (não reutilizável → reciclagem). */
+  zone?: 'REUSE' | 'UPCYCLING' | 'RECYCLING' | null;
+  /** Saída programada que leva o lote. */
+  outboundId?: string | null;
 };
 
 export type StorageUnitFormData = {
@@ -28,4 +32,6 @@ export type StorageUnitFormData = {
   location: string;
   state: Status;
   weight: number;
+  /** 'AUTO' = a zona do grupo. */
+  zone: 'AUTO' | 'REUSE' | 'UPCYCLING' | 'RECYCLING';
 };
