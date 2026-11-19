@@ -20,7 +20,7 @@ import {
   useSystemParameters,
   warehouseOf,
 } from '../collection-request/use-route-plan';
-import DistrictMap, { BUCKETS, CityInfo, normalizeCity } from './components/district-map';
+import AreaMap, { BUCKETS, MapItem } from './components/area-map';
 
 type DayRoute = PackageCollectionDTO & {
   collectionRequestsCount?: number;
@@ -216,26 +216,26 @@ export default function RoutesDay() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestionKey, params]);
 
-  const byCity = useMemo(() => {
-    const map = new Map<string, CityInfo>();
-    const entry = (city?: string | null) => {
-      const key = normalizeCity(city);
-      if (!map.has(key)) map.set(key, { pending: 0, stale: false, routes: [] });
-      return map.get(key) as CityInfo;
-    };
-    pending.forEach((r) => {
-      const info = entry(r.address?.city);
-      info.pending += 1;
-      if (r.createdAt && Date.now() - new Date(r.createdAt).getTime() > HOURS_48) info.stale = true;
+  // Pedidos pendentes e paragens das rotas do dia, para o mapa.
+  const mapItems = useMemo<MapItem[]>(() => {
+    const items: MapItem[] = pending.map((r) => ({
+      city: r.address?.city,
+      parish: r.address?.cityDivision,
+      pending: true,
+      stale: !!r.createdAt && Date.now() - new Date(r.createdAt).getTime() > HOURS_48,
+    }));
+    routes.forEach((route, index) => {
+      (route.collectionRequests ?? []).forEach((r) =>
+        items.push({
+          city: r.address?.city,
+          parish: r.address?.cityDivision,
+          pending: false,
+          stale: false,
+          route: `R${index + 1}`,
+        })
+      );
     });
-    labelled.forEach(({ label, stops }) => {
-      stops.forEach((r) => {
-        const info = entry(r.address?.city);
-        if (!info.routes.includes(label)) info.routes.push(label);
-      });
-    });
-    return map;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return items;
   }, [pending, routes]);
 
   const totalStops = labelled.reduce((acc, r) => acc + r.stops.length, 0);
@@ -322,7 +322,7 @@ export default function RoutesDay() {
             <h2 className="text-base font-bold text-navy">{t('map.title')}</h2>
             <span className="font-mono text-[10px] text-ink">{t('map.source')}</span>
           </div>
-          <DistrictMap byCity={byCity} warehouse={warehouse} />
+          <AreaMap items={mapItems} warehouse={warehouse} />
           <ul className="flex flex-wrap items-center gap-x-3.5 gap-y-2.5 text-xs text-ink">
             {BUCKETS.map((b, i) => (
               <li key={b.min} className="flex items-center gap-1.5">

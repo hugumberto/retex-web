@@ -879,8 +879,8 @@
         "occupancy": "Remplissage moyen"
       },
       "map": {
-        "title": "Demandes en attente par commune",
-        "source": "district de Porto · CAOP2025 (DGT)",
+        "title": "Demandes en attente sur la carte",
+        "source": "limites CAOP2025 (DGT)",
         "legend": {
           "0": "aucune demande",
           "1": "1–2",
@@ -890,7 +890,17 @@
         },
         "stale": "plus de 48 h",
         "route": "tournée du jour",
-        "warehouse": "entrepôt"
+        "warehouse": "entrepôt",
+        "country": "Portugal continental",
+        "levels": "Niveaux de la carte",
+        "hintDistricts": "Cliquez sur un district pour voir les communes",
+        "hintMunicipalities": "Cliquez sur une commune pour voir les paroisses",
+        "aria": {
+          "districts": "Demandes en attente par district",
+          "municipalities": "Demandes en attente par commune",
+          "parishes": "Demandes en attente par paroisse"
+        },
+        "unplaced": "{count, plural, one {# demande sans paroisse reconnue} other {# demandes sans paroisse reconnue}} dans cette commune"
       },
       "status": {
         "DRAFTING": "Brouillon",
