@@ -879,8 +879,8 @@
         "occupancy": "Average occupancy"
       },
       "map": {
-        "title": "Pending requests by municipality",
-        "source": "Porto district · CAOP2025 (DGT)",
+        "title": "Pending requests on the map",
+        "source": "CAOP2025 boundaries (DGT)",
         "legend": {
           "0": "no requests",
           "1": "1–2",
@@ -890,7 +890,17 @@
         },
         "stale": "over 48 h",
         "route": "route of the day",
-        "warehouse": "warehouse"
+        "warehouse": "warehouse",
+        "country": "Mainland Portugal",
+        "levels": "Map levels",
+        "hintDistricts": "Click a district to see its municipalities",
+        "hintMunicipalities": "Click a municipality to see its parishes",
+        "aria": {
+          "districts": "Pending requests by district",
+          "municipalities": "Pending requests by municipality",
+          "parishes": "Pending requests by parish"
+        },
+        "unplaced": "{count, plural, one {# request without a recognised parish} other {# requests without a recognised parish}} in this municipality"
       },
       "status": {
         "DRAFTING": "Draft",

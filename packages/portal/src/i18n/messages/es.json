@@ -879,8 +879,8 @@
         "occupancy": "Ocupación media"
       },
       "map": {
-        "title": "Solicitudes pendientes por municipio",
-        "source": "distrito de Oporto · CAOP2025 (DGT)",
+        "title": "Solicitudes pendientes en el mapa",
+        "source": "límites CAOP2025 (DGT)",
         "legend": {
           "0": "sin solicitudes",
           "1": "1–2",
@@ -890,7 +890,17 @@
         },
         "stale": "más de 48 h",
         "route": "ruta del día",
-        "warehouse": "almacén"
+        "warehouse": "almacén",
+        "country": "Portugal continental",
+        "levels": "Niveles del mapa",
+        "hintDistricts": "Haz clic en un distrito para ver los municipios",
+        "hintMunicipalities": "Haz clic en un municipio para ver las parroquias",
+        "aria": {
+          "districts": "Solicitudes pendientes por distrito",
+          "municipalities": "Solicitudes pendientes por municipio",
+          "parishes": "Solicitudes pendientes por parroquia"
+        },
+        "unplaced": "{count, plural, one {# solicitud sin parroquia reconocida} other {# solicitudes sin parroquia reconocida}} en este municipio"
       },
       "status": {
         "DRAFTING": "Borrador",

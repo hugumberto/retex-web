@@ -879,8 +879,8 @@
         "occupancy": "Ocupação média"
       },
       "map": {
-        "title": "Pedidos pendentes por concelho",
-        "source": "distrito do Porto · CAOP2025 (DGT)",
+        "title": "Pedidos pendentes no mapa",
+        "source": "limites CAOP2025 (DGT)",
         "legend": {
           "0": "sem pedidos",
           "1": "1–2",
@@ -890,7 +890,17 @@
         },
         "stale": "há mais de 48 h",
         "route": "rota do dia",
-        "warehouse": "armazém"
+        "warehouse": "armazém",
+        "country": "Portugal continental",
+        "levels": "Níveis do mapa",
+        "hintDistricts": "Clique num distrito para ver os concelhos",
+        "hintMunicipalities": "Clique num concelho para ver as freguesias",
+        "aria": {
+          "districts": "Pedidos pendentes por distrito",
+          "municipalities": "Pedidos pendentes por concelho",
+          "parishes": "Pedidos pendentes por freguesia"
+        },
+        "unplaced": "{count, plural, one {# pedido sem freguesia reconhecida} other {# pedidos sem freguesia reconhecida}} neste concelho"
       },
       "status": {
         "DRAFTING": "Rascunho",
