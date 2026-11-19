@@ -163,7 +163,8 @@
       "OPS": "Operations",
       "DRIVER": "Driver",
       "USER": "Customer"
-    }
+    },
+    "vehicles": "Vehicles"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -738,7 +739,13 @@
         "footnote": "{count, plural, =0 {Requests become \"Scheduled\" and each customer gets an email to confirm the time slot.} one {The request becomes \"Scheduled\" and the customer gets an email to confirm the time slot.} other {The # requests become \"Scheduled\" and each customer gets an email to confirm the time slot.}}",
         "success": "{count, plural, one {Route created; the customer was notified.} other {Route created; # customers were notified.}}",
         "draftOnly": "The route was created but is still a draft: customers have not been notified yet. Finish it in Routes and drivers.",
-        "error": "Could not create the route."
+        "error": "Could not create the route.",
+        "vehicle": "Vehicle",
+        "vehiclePlaceholder": "Choose vehicle (optional)",
+        "vehicleOption": "{name} · {plate} ({capacity} bags)",
+        "occupancy": "Van occupancy",
+        "occupancyValue": "{bags} / {capacity} bags",
+        "overCapacity": "The estimated bags exceed this vehicle's capacity."
       }
     }
   },
@@ -1245,5 +1252,40 @@
     "deleteBagDescription": "The bag is deleted and the request's collected bag count is updated. Continue?",
     "deleteBagSuccess": "Bag deleted",
     "deleteBagError": "Could not delete the bag"
+  },
+  "vehicles": {
+    "pageTitle": "Vehicles",
+    "description": "The vans used on routes. Capacity in bags shows the occupancy when building a route.",
+    "add": "New vehicle",
+    "addTitle": "New vehicle",
+    "editTitle": "Edit vehicle",
+    "edit": "Edit {plate}",
+    "empty": "No vehicles yet.",
+    "loadError": "Could not load vehicles.",
+    "saveError": "Could not save the vehicle.",
+    "created": "Vehicle created.",
+    "updated": "Vehicle updated.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "bags": "{count, plural, one {# bag} other {# bags}}",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "columns": {
+      "plate": "Licence plate",
+      "name": "Description",
+      "capacity": "Capacity",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "fields": {
+      "plate": "Licence plate",
+      "name": "Description",
+      "namePlaceholder": "Van",
+      "capacity": "Capacity (bags)",
+      "active": "Active (can be chosen for routes)"
+    }
   }
 }

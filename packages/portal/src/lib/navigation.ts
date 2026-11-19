@@ -126,6 +126,7 @@ export const NAV_SECTIONS: NavSection[] = [
         labelKey: 'resetPassword',
         roles: [Role.ADMIN],
       },
+      { href: '/portal/vehicles', labelKey: 'vehicles', roles: [Role.ADMIN] },
       { href: '/portal/bags', labelKey: 'packageBags', roles: [Role.ADMIN] },
       {
         href: '/portal/gestao-recolha',

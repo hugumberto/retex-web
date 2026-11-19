@@ -163,7 +163,8 @@
       "OPS": "Opérations",
       "DRIVER": "Chauffeur",
       "USER": "Client"
-    }
+    },
+    "vehicles": "Véhicules"
   },
   "enums": {
     "collectionRequestStatus": {
@@ -738,7 +739,13 @@
         "footnote": "{count, plural, =0 {Les demandes passent à \"Planifiée\" et chaque client reçoit un email pour confirmer le créneau.} one {La demande passe à \"Planifiée\" et le client reçoit un email pour confirmer le créneau.} other {Les # demandes passent à \"Planifiée\" et chaque client reçoit un email pour confirmer le créneau.}}",
         "success": "{count, plural, one {Tournée créée ; le client a été prévenu.} other {Tournée créée ; les # clients ont été prévenus.}}",
         "draftOnly": "La tournée a été créée mais reste en brouillon : les clients n'ont pas encore été prévenus. Terminez-la dans Tournées et chauffeurs.",
-        "error": "Impossible de créer la tournée."
+        "error": "Impossible de créer la tournée.",
+        "vehicle": "Véhicule",
+        "vehiclePlaceholder": "Choisir un véhicule (facultatif)",
+        "vehicleOption": "{name} · {plate} ({capacity} sacs)",
+        "occupancy": "Remplissage de la camionnette",
+        "occupancyValue": "{bags} / {capacity} sacs",
+        "overCapacity": "Les sacs estimés dépassent la capacité de ce véhicule."
       }
     }
   },
@@ -1245,5 +1252,40 @@
     "deleteBagDescription": "Le sac est supprimé et le nombre de sacs collectés de la demande est mis à jour. Continuer ?",
     "deleteBagSuccess": "Sac supprimé",
     "deleteBagError": "Impossible de supprimer le sac"
+  },
+  "vehicles": {
+    "pageTitle": "Véhicules",
+    "description": "Les camionnettes utilisées pour les tournées. La capacité en sacs permet de voir le remplissage lors de la création d'une tournée.",
+    "add": "Nouveau véhicule",
+    "addTitle": "Nouveau véhicule",
+    "editTitle": "Modifier le véhicule",
+    "edit": "Modifier {plate}",
+    "empty": "Aucun véhicule pour l'instant.",
+    "loadError": "Impossible de charger les véhicules.",
+    "saveError": "Impossible d'enregistrer le véhicule.",
+    "created": "Véhicule créé.",
+    "updated": "Véhicule mis à jour.",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "activate": "Activer",
+    "deactivate": "Désactiver",
+    "bags": "{count, plural, one {# sac} other {# sacs}}",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "columns": {
+      "plate": "Immatriculation",
+      "name": "Description",
+      "capacity": "Capacité",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "fields": {
+      "plate": "Immatriculation",
+      "name": "Description",
+      "namePlaceholder": "Camionnette",
+      "capacity": "Capacité (sacs)",
+      "active": "Actif (peut être choisi pour les tournées)"
+    }
   }
 }
