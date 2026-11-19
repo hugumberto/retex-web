@@ -119,6 +119,7 @@
     "cityDivisionPlaceholder": "Parque das Nações",
     "category": "Category",
     "condition": "Condition",
+    "careLabel": "Label",
     "destination": "Destination",
     "group": "Group",
     "location": "Location",
@@ -261,6 +262,11 @@
       "EXCELLENT": "Excellent",
       "GOOD": "Good",
       "REGULAR": "Fair"
+    },
+    "careLabel": {
+      "LEGIBLE": "Legible",
+      "ILLEGIBLE": "Illegible",
+      "MISSING": "Missing"
     },
     "destination": {
       "REUSE": "Reuse",
@@ -851,6 +857,7 @@
     "denimLabel": "Denim",
     "denimHint": "(jeans only)",
     "conditionLabel": "Quality / Condition *",
+    "careLabelLabel": "Label *",
     "destinationLabel": "Destination",
     "moreDetails": "More details (optional)",
     "materialLabel": "Material",

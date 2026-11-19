@@ -27,6 +27,13 @@ export enum Season {
   WINTER = 'WINTER',
 }
 
+// Estado da etiqueta de composição/cuidados da peça.
+export enum CareLabel {
+  LEGIBLE = 'LEGIBLE',
+  ILLEGIBLE = 'ILLEGIBLE',
+  MISSING = 'MISSING',
+}
+
 export enum Condition {
   EXCELLENT = 'EXCELLENT',
   GOOD = 'GOOD',
