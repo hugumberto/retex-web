@@ -1783,5 +1783,90 @@
       "sent": "Invitación enviada a {email}.",
       "error": "No se pudo enviar la invitación."
     }
+  },
+  "driver": {
+    "badge": "Conductor",
+    "titles": {
+      "route": "Ruta de hoy",
+      "stops": "Solicitudes",
+      "vehicle": "Vehículo",
+      "profile": "Perfil",
+      "routeOn": "Ruta del {date}"
+    },
+    "progress": "{done} de {total} hechas",
+    "loading": "Cargando…",
+    "loadError": "No se pudo cargar la ruta.",
+    "noRoute": "Hoy no tienes ruta.",
+    "noRouteHint": "Cuando te asignen una ruta, aparecerá aquí.",
+    "notStarted": "Salida a las {time} · {count, plural, one {# parada} other {# paradas}}.",
+    "start": "Iniciar ruta",
+    "started": "Ruta iniciada. ¡Buena recogida!",
+    "startError": "No se pudo iniciar la ruta.",
+    "notConfirmed": "Esta ruta aún se está preparando.",
+    "stop": {
+      "next": "Parada {n} · siguiente",
+      "bags": "bolsas",
+      "navigate": "Navegar",
+      "call": "Llamar",
+      "collect": "Marcar como recogido",
+      "fail": "No pude recoger",
+      "bagsCount": "{count, plural, one {# bolsa} other {# bolsas}}"
+    },
+    "allDone": "Todas las paradas hechas",
+    "backToWarehouse": "Vuelve al almacén con {count, plural, one {# bolsa} other {# bolsas}}.",
+    "finished": "Ruta concluida.",
+    "upcoming": "Próximas paradas",
+    "noStops": "Esta ruta no tiene paradas.",
+    "stops": {
+      "collected": "Recogido",
+      "cancelled": "Cancelado",
+      "todo": "Por recoger"
+    },
+    "vehicle": {
+      "load": "{bags} de {capacity} bolsas en la furgoneta",
+      "remaining": "Faltan unas {count} bolsas por recoger.",
+      "none": "Esta ruta no tiene vehículo asignado.",
+      "routeCode": "Código de la ruta"
+    },
+    "profile": {
+      "account": "Mi cuenta",
+      "manual": "Recogida por código",
+      "manualHint": "Leer una solicitud o una ruta a mano.",
+      "portal": "Ir al portal"
+    },
+    "tabs": {
+      "route": "Ruta",
+      "stops": "Solicitudes",
+      "vehicle": "Vehículo",
+      "profile": "Perfil"
+    },
+    "close": "Cerrar",
+    "collect": {
+      "hint": "Lee la etiqueta de cada bolsa. El cliente indicó {count, plural, one {# bolsa} other {# bolsas}}.",
+      "placeholder": "Código de la bolsa",
+      "scan": "Leer bolsa",
+      "bagRead": "Bolsa {code} leída.",
+      "bagError": "No se pudo leer esta bolsa.",
+      "none": "Aún no has leído ninguna bolsa.",
+      "finish": "Concluir recogida · {count, plural, one {# bolsa} other {# bolsas}}",
+      "readFirst": "Lee al menos una bolsa",
+      "done": "Recogida de {name} concluida.",
+      "finishError": "No se pudo concluir la recogida."
+    },
+    "fail": {
+      "title": "¿No pudiste recoger?",
+      "body": "Indica el motivo. La solicitud de {name} quedará cancelada.",
+      "reasons": {
+        "absent": "Cliente ausente",
+        "wrongAddress": "Dirección errónea",
+        "noAccess": "Sin acceso al lugar",
+        "refused": "El cliente desistió"
+      },
+      "placeholder": "Motivo",
+      "warning": "Se avisa al cliente por email y la solicitud ya no se podrá recoger.",
+      "confirm": "Cancelar recogida",
+      "done": "Recogida cancelada.",
+      "error": "No se pudo cancelar la recogida."
+    }
   }
 }

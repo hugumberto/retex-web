@@ -1783,5 +1783,90 @@
       "sent": "Invite sent to {email}.",
       "error": "Couldn't send the invite."
     }
+  },
+  "driver": {
+    "badge": "Driver",
+    "titles": {
+      "route": "Today's route",
+      "stops": "Requests",
+      "vehicle": "Vehicle",
+      "profile": "Profile",
+      "routeOn": "Route on {date}"
+    },
+    "progress": "{done} of {total} done",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the route.",
+    "noRoute": "You have no route today.",
+    "noRouteHint": "When a route is assigned to you, it shows up here.",
+    "notStarted": "Departure at {time} · {count, plural, one {# stop} other {# stops}}.",
+    "start": "Start route",
+    "started": "Route started. Have a good round!",
+    "startError": "Couldn't start the route.",
+    "notConfirmed": "This route is still being prepared.",
+    "stop": {
+      "next": "Stop {n} · next",
+      "bags": "bags",
+      "navigate": "Navigate",
+      "call": "Call",
+      "collect": "Mark as collected",
+      "fail": "Couldn't collect",
+      "bagsCount": "{count, plural, one {# bag} other {# bags}}"
+    },
+    "allDone": "All stops done",
+    "backToWarehouse": "Head back to the warehouse with {count, plural, one {# bag} other {# bags}}.",
+    "finished": "Route completed.",
+    "upcoming": "Next stops",
+    "noStops": "This route has no stops.",
+    "stops": {
+      "collected": "Collected",
+      "cancelled": "Cancelled",
+      "todo": "To collect"
+    },
+    "vehicle": {
+      "load": "{bags} of {capacity} bags in the van",
+      "remaining": "About {count} bags still to collect.",
+      "none": "This route has no vehicle assigned.",
+      "routeCode": "Route code"
+    },
+    "profile": {
+      "account": "My account",
+      "manual": "Collect by code",
+      "manualHint": "Scan a request or route by hand.",
+      "portal": "Go to the portal"
+    },
+    "tabs": {
+      "route": "Route",
+      "stops": "Requests",
+      "vehicle": "Vehicle",
+      "profile": "Profile"
+    },
+    "close": "Close",
+    "collect": {
+      "hint": "Scan each bag's label. The client said {count, plural, one {# bag} other {# bags}}.",
+      "placeholder": "Bag code",
+      "scan": "Scan bag",
+      "bagRead": "Bag {code} scanned.",
+      "bagError": "Couldn't read this bag.",
+      "none": "No bags scanned yet.",
+      "finish": "Finish collection · {count, plural, one {# bag} other {# bags}}",
+      "readFirst": "Scan at least one bag",
+      "done": "Collection for {name} completed.",
+      "finishError": "Couldn't finish the collection."
+    },
+    "fail": {
+      "title": "Couldn't collect?",
+      "body": "Give the reason. {name}'s request will be cancelled.",
+      "reasons": {
+        "absent": "Client not there",
+        "wrongAddress": "Wrong address",
+        "noAccess": "No access",
+        "refused": "Client gave up"
+      },
+      "placeholder": "Reason",
+      "warning": "The client is notified by email and the request can no longer be collected.",
+      "confirm": "Cancel collection",
+      "done": "Collection cancelled.",
+      "error": "Couldn't cancel the collection."
+    }
   }
 }

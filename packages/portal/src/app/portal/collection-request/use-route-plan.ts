@@ -12,6 +12,9 @@ export type PlannedStop = {
   request: CollectionRequestDTO;
   /** Minutos desde a saída do armazém até chegar a esta paragem. */
   arrivalMinutes: number | null;
+  /** Troço desde a paragem anterior (ou do armazém): km e minutos de condução. */
+  legKm?: number | null;
+  legMinutes?: number | null;
 };
 
 export type PlanResult = {
@@ -29,7 +32,7 @@ export type RoutePlan = PlanResult & {
   isLoading: boolean;
 };
 
-type Leg = { summary: { travelTimeInSeconds: number } };
+type Leg = { summary: { travelTimeInSeconds: number; lengthInMeters?: number } };
 type RouteResponse = {
   routes?: { summary: { lengthInMeters: number }; legs: Leg[] }[];
   optimizedWaypoints?: { providedIndex: number; optimizedIndex: number }[];
@@ -114,10 +117,16 @@ export async function calculatePlan(
     const perBag = params?.stopMinutesPerBag ?? 1;
     let minutes = 0;
     const stops: PlannedStop[] = order.map((request, index) => {
-      minutes += route.legs[index].summary.travelTimeInSeconds / 60;
+      const leg = route.legs[index].summary;
+      minutes += leg.travelTimeInSeconds / 60;
       const arrivalMinutes = Math.round(minutes);
       minutes += base + perBag * (request.estimatedBags ?? 0);
-      return { request, arrivalMinutes };
+      return {
+        request,
+        arrivalMinutes,
+        legKm: leg.lengthInMeters != null ? leg.lengthInMeters / 1000 : null,
+        legMinutes: Math.round(leg.travelTimeInSeconds / 60),
+      };
     });
     minutes += route.legs[order.length].summary.travelTimeInSeconds / 60;
 

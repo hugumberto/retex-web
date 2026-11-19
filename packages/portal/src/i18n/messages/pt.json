@@ -1783,5 +1783,90 @@
       "sent": "Convite enviado para {email}.",
       "error": "Não foi possível enviar o convite."
     }
+  },
+  "driver": {
+    "badge": "Motorista",
+    "titles": {
+      "route": "Rota de hoje",
+      "stops": "Pedidos",
+      "vehicle": "Veículo",
+      "profile": "Perfil",
+      "routeOn": "Rota de {date}"
+    },
+    "progress": "{done} de {total} feitas",
+    "loading": "A carregar…",
+    "loadError": "Não foi possível carregar a rota.",
+    "noRoute": "Hoje não tens rota.",
+    "noRouteHint": "Quando te atribuírem uma rota, aparece aqui.",
+    "notStarted": "Saída às {time} · {count, plural, one {# paragem} other {# paragens}}.",
+    "start": "Iniciar rota",
+    "started": "Rota iniciada. Boa recolha!",
+    "startError": "Não foi possível iniciar a rota.",
+    "notConfirmed": "Esta rota ainda está a ser preparada.",
+    "stop": {
+      "next": "Paragem {n} · a seguir",
+      "bags": "sacos",
+      "navigate": "Navegar",
+      "call": "Ligar",
+      "collect": "Marcar como recolhido",
+      "fail": "Não consegui recolher",
+      "bagsCount": "{count, plural, one {# saco} other {# sacos}}"
+    },
+    "allDone": "Todas as paragens feitas",
+    "backToWarehouse": "Regressa ao armazém com {count, plural, one {# saco} other {# sacos}}.",
+    "finished": "Rota concluída.",
+    "upcoming": "Próximas paragens",
+    "noStops": "Esta rota não tem paragens.",
+    "stops": {
+      "collected": "Recolhido",
+      "cancelled": "Cancelado",
+      "todo": "Por recolher"
+    },
+    "vehicle": {
+      "load": "{bags} de {capacity} sacos na carrinha",
+      "remaining": "Faltam cerca de {count} sacos por recolher.",
+      "none": "Esta rota não tem veículo atribuído.",
+      "routeCode": "Código da rota"
+    },
+    "profile": {
+      "account": "A minha conta",
+      "manual": "Recolha por código",
+      "manualHint": "Ler um pedido ou uma rota à mão.",
+      "portal": "Ir para o portal"
+    },
+    "tabs": {
+      "route": "Rota",
+      "stops": "Pedidos",
+      "vehicle": "Veículo",
+      "profile": "Perfil"
+    },
+    "close": "Fechar",
+    "collect": {
+      "hint": "Lê a etiqueta de cada saco. O cliente indicou {count, plural, one {# saco} other {# sacos}}.",
+      "placeholder": "Código do saco",
+      "scan": "Ler saco",
+      "bagRead": "Saco {code} lido.",
+      "bagError": "Não foi possível ler este saco.",
+      "none": "Ainda não leste nenhum saco.",
+      "finish": "Concluir recolha · {count, plural, one {# saco} other {# sacos}}",
+      "readFirst": "Lê pelo menos um saco",
+      "done": "Recolha de {name} concluída.",
+      "finishError": "Não foi possível concluir a recolha."
+    },
+    "fail": {
+      "title": "Não conseguiste recolher?",
+      "body": "Indica o motivo. O pedido de {name} fica cancelado.",
+      "reasons": {
+        "absent": "Cliente ausente",
+        "wrongAddress": "Morada errada",
+        "noAccess": "Sem acesso ao local",
+        "refused": "Cliente desistiu"
+      },
+      "placeholder": "Motivo",
+      "warning": "O cliente é avisado por email e o pedido deixa de poder ser recolhido.",
+      "confirm": "Cancelar recolha",
+      "done": "Recolha cancelada.",
+      "error": "Não foi possível cancelar a recolha."
+    }
   }
 }
