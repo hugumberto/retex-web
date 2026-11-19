@@ -675,7 +675,7 @@
         "request": "Solicitud",
         "client": "Cliente",
         "place": "Lugar",
-        "window": "Franja",
+        "window": "Franja solicitada",
         "bags": "Bolsas",
         "status": "Estado",
         "actions": "Acciones"
@@ -719,7 +719,7 @@
         "city": "Municipio",
         "street": "Dirección",
         "bags": "Bolsas",
-        "window": "Franja",
+        "window": "Franja solicitada",
         "status": "Estado",
         "createdAt": "Creada el"
       },
@@ -747,7 +747,16 @@
         "occupancyValue": "{bags} / {capacity} bolsas",
         "overCapacity": "Las bolsas estimadas superan la capacidad de este vehículo."
       }
-    }
+    },
+    "window": {
+      "label": "¿Cuándo prefiere la recogida?",
+      "labelOptional": "¿Cuándo prefiere la recogida? (opcional)",
+      "date": "Día",
+      "interval": "Franja",
+      "intervalPlaceholder": "Elegir franja",
+      "hint": "Es una preferencia: confirmamos el día y la hora por email cuando se programe la ruta."
+    },
+    "preferredWindow": "Franja solicitada"
   },
   "packageCollection": {
     "pageTitle": "Gestionar recogida",

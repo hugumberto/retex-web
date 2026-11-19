@@ -675,7 +675,7 @@
         "request": "Request",
         "client": "Customer",
         "place": "Place",
-        "window": "Window",
+        "window": "Requested window",
         "bags": "Bags",
         "status": "Status",
         "actions": "Actions"
@@ -719,7 +719,7 @@
         "city": "Municipality",
         "street": "Address",
         "bags": "Bags",
-        "window": "Window",
+        "window": "Requested window",
         "status": "Status",
         "createdAt": "Created at"
       },
@@ -747,7 +747,16 @@
         "occupancyValue": "{bags} / {capacity} bags",
         "overCapacity": "The estimated bags exceed this vehicle's capacity."
       }
-    }
+    },
+    "window": {
+      "label": "When would you like the pickup?",
+      "labelOptional": "When would you like the pickup? (optional)",
+      "date": "Day",
+      "interval": "Time slot",
+      "intervalPlaceholder": "Choose time slot",
+      "hint": "This is a preference: we confirm the day and time by email once the route is set."
+    },
+    "preferredWindow": "Requested window"
   },
   "packageCollection": {
     "pageTitle": "Manage collection",

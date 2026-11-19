@@ -108,14 +108,18 @@ export default function AdminRequests({
   );
   const weightLabel = (kg: number) =>
     kg >= 1000 ? `${number(kg / 1000, 1)} t` : `${number(kg)} kg`;
+  // A janela pedida pelo cliente; sem ela (pedidos antigos), a da rota.
   const windowLabel = (request: CollectionRequestDTO) => {
+    const day = (date: Date) =>
+      new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(date);
+    if (request.preferredDate) {
+      const label = day(new Date(`${request.preferredDate.slice(0, 10)}T12:00:00`));
+      return request.preferredInterval ? `${label} · ${request.preferredInterval}` : label;
+    }
     const route = request.route;
     if (!route?.startDate) return '—';
-    const day = new Intl.DateTimeFormat(locale, {
-      day: 'numeric',
-      month: 'short',
-    }).format(new Date(route.startDate));
-    return route.collectionInterval ? `${day} · ${route.collectionInterval}` : day;
+    const label = day(new Date(route.startDate));
+    return route.collectionInterval ? `${label} · ${route.collectionInterval}` : label;
   };
 
   // Só para "N motoristas na rua": a listagem de pedidos não traz o motorista.
@@ -570,6 +574,18 @@ function NewRoutePanel({
       .then(({ data }) => setVehicles((data ?? []).filter((v) => v.active)))
       .catch(() => setVehicles([]));
   }, []);
+
+  // Ao começar uma rota, propõe a janela pedida pelo primeiro pedido escolhido.
+  const first = requests[0];
+  useEffect(() => {
+    if (!first) return;
+    setDate((current) =>
+      current || (first.preferredDate ? first.preferredDate.slice(0, 10) : current)
+    );
+    setInterval((current) =>
+      current || ((first.preferredInterval as CollectionInterval | null) ?? current)
+    );
+  }, [first]);
 
   const totalBags = requests.reduce((acc, r) => acc + (r.estimatedBags ?? 0), 0);
   const vehicle = vehicles.find((v) => v.id === vehicleId);

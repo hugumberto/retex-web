@@ -27,6 +27,10 @@ import { getUserRoles } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
 import { firstAddressPart } from '@/utils/address';
 import AdminRequests from './admin-requests';
+import PreferredWindowFields, {
+  PreferredWindowValues,
+  preferredWindowPayload,
+} from './preferred-window-fields';
 import RequestDetailsDialog from './request-details-dialog';
 import TablePagination from '@/components/custom/table-pagination';
 import { usePagination } from '@/hooks/use-pagination';
@@ -38,7 +42,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-interface AdminFormData {
+interface AdminFormData extends PreferredWindowValues {
   firstName: string;
   lastName: string;
   email: string;
@@ -58,7 +62,7 @@ interface AdminFormData {
   };
 }
 
-interface UserFormData {
+interface UserFormData extends PreferredWindowValues {
   addressId: string;
   estimatedBags: string;
 }
@@ -136,7 +140,12 @@ export default function CollectionRequest() {
 
   const [userFormOpen, setUserFormOpen] = useState(false);
   const userForm = useForm<UserFormData>({
-    defaultValues: { addressId: '', estimatedBags: '' },
+    defaultValues: {
+      addressId: '',
+      estimatedBags: '',
+      preferredDate: '',
+      preferredInterval: '',
+    },
   });
   const adminForm = useForm<AdminFormData>({
     defaultValues: {
@@ -145,6 +154,8 @@ export default function CollectionRequest() {
       email: '',
       contactPhone: '',
       estimatedBags: '',
+      preferredDate: '',
+      preferredInterval: '',
       address: {
         street: '',
         number: '',
@@ -237,6 +248,7 @@ export default function CollectionRequest() {
         userId: user!.id,
         addressId: data.addressId,
         estimatedBags: Number(data.estimatedBags),
+        ...preferredWindowPayload(data),
       });
       if (!isSuccessStatus(response.status) && response.status !== 409)
         throw new Error();
@@ -257,6 +269,7 @@ export default function CollectionRequest() {
       async () => {
         const response = await api.post('/collection-request', {
           ...data,
+          ...preferredWindowPayload(data),
           estimatedBags: Number(data.estimatedBags),
           address: {
             street: data.address.street,
@@ -495,6 +508,10 @@ export default function CollectionRequest() {
             min: { value: 1, message: t('minOneBag') },
           })}
         />
+        {/* Ao balcão a janela é opcional: o cliente pode não a saber ao telefone. */}
+        <div className="col-span-full">
+          <PreferredWindowFields form={adminForm} required={false} />
+        </div>
       </div>
     </DialogForm>
   );
@@ -613,6 +630,7 @@ export default function CollectionRequest() {
                     </p>
                   )}
                 </div>
+                <PreferredWindowFields form={userForm} required />
               </div>
             </DialogForm>
           ) : (

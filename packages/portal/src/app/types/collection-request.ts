@@ -41,6 +41,9 @@ export interface CollectionRequestDTO extends Entity {
   route?: PackageCollectionDTO
   weight?: number
   estimatedBags?: number
+  // Janela pedida pelo cliente (dia `YYYY-MM-DD` e período).
+  preferredDate?: string | null
+  preferredInterval?: string | null
   address: Address
   items?: CollectionRequestItemDTO[]
 }

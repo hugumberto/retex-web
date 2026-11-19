@@ -72,6 +72,21 @@ export default function RequestDetailsDialog({ request }: Props) {
                 label={t('estimatedBags')}
                 value={request.estimatedBags}
               />
+              <Field
+                label={t('preferredWindow')}
+                value={
+                  request.preferredDate
+                    ? [
+                        new Date(
+                          `${request.preferredDate.slice(0, 10)}T12:00:00`
+                        ).toLocaleDateString('pt-PT'),
+                        request.preferredInterval,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')
+                    : undefined
+                }
+              />
               <Field label={tCommon('weightKg')} value={request.weight} />
               <Field
                 label={tCommon('createdAt')}

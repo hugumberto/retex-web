@@ -675,7 +675,7 @@
         "request": "Pedido",
         "client": "Cliente",
         "place": "Local",
-        "window": "Janela",
+        "window": "Janela pedida",
         "bags": "Sacos",
         "status": "Estado",
         "actions": "Ações"
@@ -719,7 +719,7 @@
         "city": "Concelho",
         "street": "Morada",
         "bags": "Sacos",
-        "window": "Janela",
+        "window": "Janela pedida",
         "status": "Estado",
         "createdAt": "Criado em"
       },
@@ -747,7 +747,16 @@
         "occupancyValue": "{bags} / {capacity} sacos",
         "overCapacity": "Os sacos estimados passam a capacidade deste veículo."
       }
-    }
+    },
+    "window": {
+      "label": "Quando prefere a recolha?",
+      "labelOptional": "Quando prefere a recolha? (opcional)",
+      "date": "Dia",
+      "interval": "Período",
+      "intervalPlaceholder": "Escolher período",
+      "hint": "É uma preferência: confirmamos o dia e a hora por email quando a rota for marcada."
+    },
+    "preferredWindow": "Janela pedida"
   },
   "packageCollection": {
     "pageTitle": "Gerir Recolha",
