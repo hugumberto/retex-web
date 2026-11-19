@@ -1,7 +1,7 @@
-import User from "./user";
+'use client';
 
-export default function Index() {
-  return (
-        <User />
-  );
+import UsersDirectory from './users-directory';
+
+export default function UserPage() {
+  return <UsersDirectory />;
 }

@@ -295,6 +295,12 @@
       "WOMEN": "Femme",
       "CHILDREN": "Enfant",
       "NON_REUSABLE": "Non réutilisable"
+    },
+    "companyKind": {
+      "COMPANY": "Entreprise",
+      "MUNICIPALITY": "Municipalité",
+      "SCHOOL": "École",
+      "ASSOCIATION": "Association / ONG"
     }
   },
   "validation": {
@@ -1370,7 +1376,8 @@
     "addressCreateError": "Erreur lors de la création du lieu de collecte",
     "addressDuplicate": "Ce lieu de collecte est déjà enregistré",
     "addressLoadError": "Erreur lors du chargement des lieux de collecte",
-    "cityDivision": "Commune"
+    "cityDivision": "Commune",
+    "kind": "Type d'entité"
   },
   "impersonation": {
     "banner": "Portail affiché en tant que {name} — lecture seule",
@@ -1705,6 +1712,76 @@
       "backToQueue": "Retour aux demandes",
       "next": "Demande suivante",
       "clientSees": "Le client voit désormais le résultat du tri sur le portail."
+    }
+  },
+  "usersDirectory": {
+    "title": "Utilisateurs",
+    "search": "Nom, email, NIF ou code postal",
+    "loading": "Chargement…",
+    "empty": "Aucun utilisateur trouvé.",
+    "open": "Ouvrir",
+    "manage": "Gérer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "showing": "{shown} sur {total} affichés",
+    "privacy": "Les données personnelles ne sont visibles que par les comptes ADMIN et MASTER.",
+    "taxId": "NIF {taxId}",
+    "locations": "{count, plural, one {# site} other {# sites}}",
+    "vehicle": "camionnette {plate}",
+    "tabs": {
+      "ALL": "Tous",
+      "PERSON": "Particuliers",
+      "COMPANY": "Entreprises",
+      "MUNICIPALITY": "Municipalités",
+      "DRIVER": "Chauffeurs",
+      "TEAM": "Équipe RETEX"
+    },
+    "kinds": {
+      "PERSON": "Particulier",
+      "COMPANY": "Entreprise",
+      "MUNICIPALITY": "Municipalité",
+      "DRIVER": "Chauffeur",
+      "TEAM": "Équipe"
+    },
+    "columns": {
+      "name": "Nom",
+      "type": "Type",
+      "city": "Commune",
+      "collections": "Collectes",
+      "kg": "Kg livrés",
+      "activity": "Dernière activité",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "activity": {
+      "today": "aujourd'hui",
+      "yesterday": "hier",
+      "inRoute": "en tournée"
+    },
+    "status": {
+      "ACTIVE": "Actif",
+      "INACTIVE": "Inactif",
+      "PENDING_EMAIL": "Email non confirmé"
+    },
+    "actions": {
+      "edit": "Modifier les données et rôles",
+      "password": "Réinitialiser le mot de passe",
+      "deactivate": "Désactiver le compte",
+      "masterOnly": "Seul un MASTER peut réinitialiser le mot de passe ou désactiver des comptes ADMIN/MASTER."
+    },
+    "invite": {
+      "button": "Inviter",
+      "title": "Inviter un utilisateur",
+      "body": "La personne reçoit un email pour activer le compte et définir son mot de passe. D'ici là, elle apparaît comme « Email non confirmé ».",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone (facultatif)",
+      "role": "Rôle",
+      "send": "Envoyer l'invitation",
+      "sending": "Envoi…",
+      "sent": "Invitation envoyée à {email}.",
+      "error": "Impossible d'envoyer l'invitation."
     }
   }
 }
