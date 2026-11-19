@@ -6,7 +6,12 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useTransition } from 'react';
 
-export default function LanguageSwitcher() {
+// `compact`: o seletor do novo cabeçalho ("PT ⌄"), só com o código do idioma.
+export default function LanguageSwitcher({
+  variant = 'default',
+}: {
+  variant?: 'default' | 'compact';
+}) {
   const t = useTranslations('languageSwitcher');
   const locale = useLocale();
   const router = useRouter();
@@ -27,20 +32,38 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <label className="landing-lang-switcher">
+    <label
+      className={
+        variant === 'compact'
+          ? 'relative inline-flex items-center text-sm font-medium text-navy'
+          : 'landing-lang-switcher'
+      }
+    >
       <span className="sr-only">{t('label')}</span>
       <select
         value={locale}
         disabled={isPending}
         aria-label={t('label')}
         onChange={(event) => onChange(event.target.value)}
+        className={
+          variant === 'compact'
+            ? 'cursor-pointer appearance-none bg-transparent pr-4 font-medium text-navy focus:outline-none'
+            : undefined
+        }
       >
         {locales.map((option) => (
           <option key={option} value={option}>
-            {localeLabels[option]}
+            {variant === 'compact'
+              ? option.toUpperCase()
+              : localeLabels[option]}
           </option>
         ))}
       </select>
+      {variant === 'compact' ? (
+        <span aria-hidden className="pointer-events-none absolute right-0 text-xs">
+          ⌄
+        </span>
+      ) : null}
     </label>
   );
 }

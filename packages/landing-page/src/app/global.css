@@ -67,6 +67,31 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Paleta da marca (Figma "Portal", 2026). */
+  --color-navy: #013364;
+  --color-teal: #02748e;
+  --color-ink: #4a6070;
+  --color-mist: #f6f9f9;
+  --color-line: #e4eef0;
+  --color-line-soft: #dce7ea;
+  --color-field: #c3d5da;
+  --color-sky: #cce3e8;
+  --color-mint: #ddf0e6;
+  --color-forest: #2d5a4e;
+  --color-panel: #f1f5f6;
+  --color-slate: #8fb0c4;
+
+  --font-display: var(--font-poppins), system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+}
+
+/* Gradiente da marca: botões primários, hero, rodapé. */
+.bg-brand {
+  background-image: linear-gradient(to right, #013364, #02748e);
+}
+.bg-brand-diagonal {
+  background-image: linear-gradient(123deg, #013364 0%, #02748e 100%);
 }
 
 :root {
@@ -161,7 +186,7 @@ body {
   margin: 0 auto;
   padding: 0 12px;
   background: #ffffff;
-  font-family: var(--font-montserrat), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
   color: #023b66;
 }
 
@@ -901,7 +926,7 @@ a.nav-cta-btn:hover {
   color: #02748e;
   font-size: 14px;
   font-weight: 500;
-  font-family: var(--font-montserrat), system-ui, sans-serif;
+  font-family: var(--font-poppins), system-ui, sans-serif;
 }
 
 .upcycling-strip {
@@ -1941,7 +1966,7 @@ a.nav-cta-btn:hover {
   gap: 14px;
   color: #0f3558;
   box-shadow: 0 8px 40px rgba(1, 51, 100, 0.2);
-  font-family: var(--font-montserrat), system-ui, sans-serif;
+  font-family: var(--font-poppins), system-ui, sans-serif;
 }
 
 .register-card-title {
@@ -2159,7 +2184,7 @@ a.nav-cta-btn:hover {
   max-width: 1440px;
   margin: 0 auto;
   padding: clamp(32px, 5vw, 52px) clamp(20px, 5vw, 56px) clamp(48px, 6vw, 72px);
-  font-family: var(--font-montserrat), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
   color: #184e62;
 }
 

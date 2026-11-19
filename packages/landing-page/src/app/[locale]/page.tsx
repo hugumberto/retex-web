@@ -1,14 +1,18 @@
-import LandingAbout from '@/components/landing/LandingAbout';
-import LandingBlog from '@/components/landing/LandingBlog';
-import LandingContactSection from '@/components/landing/LandingContactSection';
-import LandingFooter from '@/components/landing/LandingFooter';
-import LandingHero from '@/components/landing/LandingHero';
-import LandingHowItWorks from '@/components/landing/LandingHowItWorks';
-import LandingQuote from '@/components/landing/LandingQuote';
-import LandingServices from '@/components/landing/LandingServices';
-import LandingUpcycling from '@/components/landing/LandingUpcycling';
-import LandingValues from '@/components/landing/LandingValues';
+import HomeContactForm from '@/components/home/HomeContactForm';
+import HomeFaq from '@/components/home/HomeFaq';
+import HomeHero from '@/components/home/HomeHero';
+import HomeHowItWorks from '@/components/home/HomeHowItWorks';
+import HomeImpactStats from '@/components/home/HomeImpactStats';
+import HomeJourney from '@/components/home/HomeJourney';
+import HomePartners from '@/components/home/HomePartners';
+import HomeProfiles from '@/components/home/HomeProfiles';
+import HomeUpcycling from '@/components/home/HomeUpcycling';
+import HomeWhyItMatters from '@/components/home/HomeWhyItMatters';
+import SiteFooter from '@/components/home/SiteFooter';
+import SiteHeader from '@/components/home/SiteHeader';
+import { Section } from '@/components/home/ui';
 import { setRequestLocale } from 'next-intl/server';
+import { Suspense } from 'react';
 
 export default async function Home({
   params,
@@ -19,20 +23,31 @@ export default async function Home({
   setRequestLocale(locale);
 
   return (
-    <main className="landing-shell">
-      <LandingHero />
-      <div className="landing-page">
-        <LandingHowItWorks />
-        <LandingServices />
-        <LandingAbout />
-        <LandingValues />
-        <LandingQuote />
-        <LandingUpcycling />
-        {/* <LandingPartners /> */}
-        <LandingContactSection />
-        <LandingBlog />
-      </div>
-      <LandingFooter />
-    </main>
+    <div className="bg-mist font-display text-navy antialiased">
+      <SiteHeader />
+      <main>
+        <HomeHero />
+        <HomeProfiles />
+        <HomeHowItWorks />
+        <HomeJourney />
+        <HomeWhyItMatters />
+        <HomeImpactStats />
+        <HomeUpcycling />
+        <HomePartners />
+        <Section
+          id="contacto"
+          className="border-t border-line bg-white py-20"
+          innerClassName="flex flex-col gap-14 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <HomeFaq />
+          {/* useSearchParams (perfil pré-escolhido) exige um Suspense numa
+              página estática. */}
+          <Suspense>
+            <HomeContactForm />
+          </Suspense>
+        </Section>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

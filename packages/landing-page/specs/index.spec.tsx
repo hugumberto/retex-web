@@ -31,6 +31,14 @@ jest.mock('@/i18n/navigation', () => ({
 
 jest.mock('next/navigation', () => ({
   useParams: () => ({ locale: 'pt' }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// "Até agora" é um server component assíncrono que vai à API; tem testes de
+// formatação próprios do lado da API e aqui só atrapalharia o smoke test.
+jest.mock('../src/components/home/HomeImpactStats', () => ({
+  __esModule: true,
+  default: () => null,
 }));
 
 describe('Page', () => {
@@ -45,5 +53,8 @@ describe('Page', () => {
       </NextIntlClientProvider>
     );
     expect(baseElement).toBeTruthy();
+    expect(
+      baseElement.querySelector('#como-funciona, #perfis, #contacto')
+    ).not.toBeNull();
   });
 });

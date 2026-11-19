@@ -1,5 +1,5 @@
-import { Header } from '@/components/landing/Header';
-import LandingFooter from '@/components/landing/LandingFooter';
+import SiteHeader from '@/components/home/SiteHeader';
+import SiteFooter from '@/components/home/SiteFooter';
 import { Link } from '@/i18n/navigation';
 import {
   apiUrl,
@@ -57,7 +57,7 @@ export default async function BlogIndexPage({
 
   return (
     <main className="landing-shell flex flex-col min-h-screen">
-      <Header />
+      <SiteHeader />
       <div className="flex-1 mt-[4rem]">
         <section className="landing-section blog-index">
           <header className="blog-index-head">
@@ -136,7 +136,7 @@ export default async function BlogIndexPage({
           )}
         </section>
       </div>
-      <LandingFooter />
+      <SiteFooter />
     </main>
   );
 }

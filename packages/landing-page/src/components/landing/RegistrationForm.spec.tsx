@@ -48,7 +48,7 @@ describe('RegistrationForm — normalização do endereço TomTom', () => {
     fetchMock.mock.calls.find((c) => String(c[0]).includes('user/register'));
 
   const fillRequiredFields = () => {
-    fireEvent.change(screen.getByRole('textbox', { name: /nome/i }), {
+    fireEvent.change(screen.getByRole('textbox', { name: /^nome$/i }), {
       target: { value: 'José' },
     });
     fireEvent.change(screen.getByRole('textbox', { name: /apelido/i }), {
@@ -61,15 +61,9 @@ describe('RegistrationForm — normalização do endereço TomTom', () => {
       target: { value: '911133133' },
     });
     fireEvent.change(screen.getByRole('textbox', { name: /morada/i }), {
-      target: { value: 'Vereda do Alto de Vilar' },
+      target: { value: 'Vereda do Alto de Vilar 35' },
     });
-    fireEvent.change(screen.getByRole('textbox', { name: /porta/i }), {
-      target: { value: '35' },
-    });
-    fireEvent.click(screen.getByRole('radio', { name: /masculino/i }));
-    fireEvent.change(screen.getByLabelText(/data de nascimento/i), {
-      target: { value: '1989-08-25' },
-    });
+    fireEvent.click(screen.getByRole('checkbox', { name: /política de privacidade/i }));
   };
 
   const triggerZipLookup = (value = '4475-390') => {
@@ -110,12 +104,32 @@ describe('RegistrationForm — normalização do endereço TomTom', () => {
     expect(body.address.cityDivision.length).toBeLessThanOrEqual(255);
 
     // Após sucesso, o formulário é limpo.
+    // Após sucesso, o formulário é limpo (e localidade/freguesia escondem-se
+    // outra vez, por o código postal ter ficado vazio).
     const nomeInput = screen.getByRole('textbox', {
-      name: /nome/i,
+      name: /^nome$/i,
     }) as HTMLInputElement;
     await waitFor(() => expect(nomeInput.value).toBe(''));
-    expect(cityInput.value).toBe('');
-    expect(divisionInput.value).toBe('');
+    expect(screen.queryByRole('textbox', { name: /freguesia/i })).toBeNull();
+  });
+
+  it('não regista sem aceitar a Política de Privacidade', async () => {
+    fetchMock.mockImplementation((url: RequestInfo | URL) =>
+      String(url).includes('tomtom')
+        ? Promise.resolve(tomtomResponse())
+        : Promise.resolve(registerResponse)
+    );
+
+    renderWithIntl(<RegistrationForm />);
+    fillRequiredFields();
+    // Desmarca o consentimento que fillRequiredFields marcou.
+    fireEvent.click(screen.getByRole('checkbox', { name: /política de privacidade/i }));
+    triggerZipLookup();
+
+    fireEvent.click(screen.getByRole('button', { name: /criar conta/i }));
+
+    await screen.findByText(/campo obrigatório/i);
+    expect(registerCall()).toBeUndefined();
   });
 
   it('permite preencher a freguesia à mão quando a TomTom não a devolve', async () => {
