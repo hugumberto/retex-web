@@ -159,11 +159,13 @@ export default function Triage() {
   );
 
   // Espelha a validação do backend (process-triage-qr-use-case): só se tria em
-  // COLLECTED ou SCREENING. STOCKED abre em consulta; o resto fica bloqueado.
+  // COLLECTED, IN_HOUSE (recebido no armazém) ou SCREENING. STOCKED abre em
+  // consulta; o resto fica bloqueado.
   const requestStatus = selectedCollectionRequest?.status;
   const isViewMode = requestStatus === CollectionRequestStatus.STOCKED;
   const canTriage =
     requestStatus === CollectionRequestStatus.COLLECTED ||
+    requestStatus === CollectionRequestStatus.IN_HOUSE ||
     requestStatus === CollectionRequestStatus.SCREENING;
   const isBlocked = !!selectedCollectionRequest && !canTriage && !isViewMode;
   const allProcessed =
@@ -233,6 +235,7 @@ export default function Triage() {
       const loadedStatus = data.collectionRequest.status;
       const isTriageable =
         loadedStatus === CollectionRequestStatus.COLLECTED ||
+        loadedStatus === CollectionRequestStatus.IN_HOUSE ||
         loadedStatus === CollectionRequestStatus.SCREENING;
 
       if (isTriageable) {
@@ -305,9 +308,10 @@ export default function Triage() {
     }
 
     setActiveBagId(bag.id);
-    // Retoma o peso já gravado por um "Guardar progresso" anterior (o decimal
-    // do Postgres chega como string).
-    setBagWeight(bag.weight != null ? String(bag.weight) : '');
+    // Retoma o peso já gravado por um "Guardar progresso" anterior; sem ele,
+    // sugere o peso lido na receção (o decimal do Postgres chega como string).
+    const knownWeight = bag.weight ?? bag.receivedWeight;
+    setBagWeight(knownWeight != null ? String(Number(knownWeight)) : '');
     clearItemForm();
     setBagCode('');
     requestAnimationFrame(() => weightInputRef.current?.focus());
@@ -744,6 +748,7 @@ export default function Triage() {
               {t('blockedDescription', {
                 status: tStatus(selectedCollectionRequest.status),
                 collected: tStatus(CollectionRequestStatus.COLLECTED),
+                inHouse: tStatus(CollectionRequestStatus.IN_HOUSE),
                 screening: tStatus(CollectionRequestStatus.SCREENING),
               })}
             </AlertDescription>

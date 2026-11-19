@@ -982,7 +982,7 @@
     "requestLoaded": "Solicitud cargada con éxito",
     "lookupError": "Error al consultar",
     "blockedTitle": "Este paquete no se puede triar",
-    "blockedDescription": "La solicitud está en «{status}» y solo se pueden triar paquetes en «{collected}» o «{screening}». Comprueba el código o pasa a la siguiente consulta.",
+    "blockedDescription": "La solicitud está en «{status}» y solo se pueden triar paquetes en «{collected}», «{inHouse}» o «{screening}». Comprueba el código o pasa a la siguiente consulta.",
     "stockedTitle": "Triaje ya finalizado",
     "stockedDescription": "Esta solicitud ya se ha finalizado y solo está disponible para consulta.",
     "inProgress": "En proceso",
@@ -1187,7 +1187,16 @@
     "stopMinutesPerBagLabel": "Minutos por bolsa",
     "maxStopBase": "Máximo 120 minutos",
     "maxPerBag": "Máximo 30 minutos",
-    "stopTimeHelp": "Ej.: 5 + 1 por bolsa → una recogida de 4 bolsas cuenta 9 minutos."
+    "stopTimeHelp": "Ej.: 5 + 1 por bolsa → una recogida de 4 bolsas cuenta 9 minutos.",
+    "zoneCapacity": {
+      "title": "Capacidad de las zonas del almacén",
+      "help": "En kg. Sirve para mostrar la ocupación de cada zona en Recepción y almacén.",
+      "zoneSortingCapacityKg": "A · Por triar (kg)",
+      "zoneReuseCapacityKg": "B · Reutilización (kg)",
+      "zoneUpcyclingCapacityKg": "C · Upcycling (kg)",
+      "zoneRecyclingCapacityKg": "D · Fardos de reciclaje (kg)",
+      "min": "Debe ser al menos 1."
+    }
   },
   "dashboard": {
     "pageTitle": "Dashboard",
@@ -1457,6 +1466,90 @@
       "namePlaceholder": "Furgoneta",
       "capacity": "Capacidad (bolsas)",
       "active": "Activo (se puede elegir en las rutas)"
+    }
+  },
+  "warehouse": {
+    "title": "Recepción y almacén",
+    "tabs": {
+      "warehouse": "Almacén",
+      "lots": "Lotes"
+    },
+    "loadError": "No se pudo cargar el almacén.",
+    "totalOccupancy": "Ocupación total {percent}% · {weight} de {capacity} kg",
+    "reception": {
+      "title": "Dar entrada de bolsas",
+      "body": "Lee la etiqueta de la bolsa o escribe el código de la solicitud. Escribe el peso bruto de la báscula.",
+      "code": "Código de bolsa o solicitud",
+      "codePlaceholder": "Código de bolsa o solicitud",
+      "weight": "Peso bruto en kg",
+      "submit": "Registrar entrada",
+      "invalidWeight": "Indica el peso en kg.",
+      "error": "No se pudo registrar la entrada.",
+      "complete": "{code}: {count, plural, one {la bolsa entró} other {entraron las # bolsas}}. Espera triaje.",
+      "partial": "{code}: {received} de {total} bolsas recibidas."
+    },
+    "zones": {
+      "label": "Zona del almacén",
+      "auto": "Automática (por grupo)",
+      "names": {
+        "SORTING": "Por triar",
+        "REUSE": "Reutilización",
+        "UPCYCLING": "Upcycling",
+        "RECYCLING": "Fardos de reciclaje"
+      },
+      "bags": "{count, plural, one {# bolsa} other {# bolsas}}",
+      "pieces": "{count, plural, one {# prenda} other {# prendas}}",
+      "shipNow": "expedir ya"
+    },
+    "today": {
+      "title": "Entradas de hoy",
+      "summary": "{count, plural, one {# bolsa} other {# bolsas}} · {weight} kg",
+      "empty": "Hoy aún no ha entrado ninguna bolsa.",
+      "columns": {
+        "time": "Hora",
+        "request": "Solicitud",
+        "route": "Ruta",
+        "bags": "Bolsas",
+        "weight": "Peso bruto",
+        "zone": "Zona",
+        "status": "Estado"
+      },
+      "waiting": "Espera triaje",
+      "missing": "Diferencia de bolsas: {count} de {total} leídas"
+    },
+    "outbound": {
+      "title": "Salidas programadas",
+      "empty": "No hay salidas programadas.",
+      "new": "Programar salida",
+      "newTitle": "Programar salida",
+      "editTitle": "Salida programada",
+      "formHint": "Elige los lotes que salen, o indica el peso o las prendas. Al marcarla como hecha, los lotes quedan inactivos y dejan de contar en la zona.",
+      "type": "Tipo",
+      "types": {
+        "RECYCLING": "Reciclaje",
+        "DONATION": "Donación",
+        "UPCYCLING": "Upcycling",
+        "SALE": "Venta"
+      },
+      "destination": "Destino",
+      "destinationPlaceholder": "Socio o lugar (ej.: Tienda social · Maia)",
+      "destinationRequired": "Indica el destino.",
+      "date": "Día",
+      "units": "Lotes de la zona {zone}",
+      "noUnits": "No hay lotes activos libres en esta zona.",
+      "unitDetail": "{pieces} prendas · {weight} kg",
+      "weight": "Peso (kg)",
+      "piecesLabel": "Prendas",
+      "notes": "Notas",
+      "save": "Guardar",
+      "markDone": "Marcar como hecha",
+      "cancel": "Cancelar salida",
+      "saved": "Salida guardada.",
+      "done": "Salida hecha: los lotes salieron del almacén.",
+      "cancelled": "Salida cancelada.",
+      "saveError": "No se pudo guardar la salida.",
+      "pieces": "{count, plural, one {# prenda} other {# prendas}}",
+      "lots": "{count, plural, one {# lote} other {# lotes}}"
     }
   }
 }

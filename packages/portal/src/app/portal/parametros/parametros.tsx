@@ -29,6 +29,10 @@ interface ParametrosFormData {
   warehouseLong: string;
   stopBaseMinutes: number;
   stopMinutesPerBag: number;
+  zoneSortingCapacityKg: number;
+  zoneReuseCapacityKg: number;
+  zoneUpcyclingCapacityKg: number;
+  zoneRecyclingCapacityKg: number;
 }
 
 export default function Parametros() {
@@ -57,6 +61,10 @@ export default function Parametros() {
       warehouseLong: '',
       stopBaseMinutes: 5,
       stopMinutesPerBag: 1,
+      zoneSortingCapacityKg: 3000,
+      zoneReuseCapacityKg: 1500,
+      zoneUpcyclingCapacityKg: 500,
+      zoneRecyclingCapacityKg: 2000,
     },
   });
   const warehouseLat = watch('warehouseLat');
@@ -78,6 +86,10 @@ export default function Parametros() {
         warehouseLong: data.warehouseLong != null ? String(data.warehouseLong) : '',
         stopBaseMinutes: data.stopBaseMinutes ?? 5,
         stopMinutesPerBag: data.stopMinutesPerBag ?? 1,
+        zoneSortingCapacityKg: data.zoneSortingCapacityKg ?? 3000,
+        zoneReuseCapacityKg: data.zoneReuseCapacityKg ?? 1500,
+        zoneUpcyclingCapacityKg: data.zoneUpcyclingCapacityKg ?? 500,
+        zoneRecyclingCapacityKg: data.zoneRecyclingCapacityKg ?? 2000,
       });
     } catch (error) {
       console.error('Erro ao buscar parâmetros:', error);
@@ -111,6 +123,10 @@ export default function Parametros() {
         warehouseLong: data.warehouseLong === '' ? null : Number(data.warehouseLong),
         stopBaseMinutes: Number(data.stopBaseMinutes),
         stopMinutesPerBag: Number(data.stopMinutesPerBag),
+        zoneSortingCapacityKg: Number(data.zoneSortingCapacityKg),
+        zoneReuseCapacityKg: Number(data.zoneReuseCapacityKg),
+        zoneUpcyclingCapacityKg: Number(data.zoneUpcyclingCapacityKg),
+        zoneRecyclingCapacityKg: Number(data.zoneRecyclingCapacityKg),
       });
       if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
       toast.success(t('saveSuccess'));
@@ -323,6 +339,63 @@ export default function Parametros() {
             />
           </div>
           <p className="text-xs text-muted-foreground">{t('stopTimeHelp')}</p>
+        </div>
+
+        <div className="space-y-4 border-t border-secondary/20 pt-6">
+          <div>
+            <h2 className="text-sm font-semibold text-secondary">
+              {t('zoneCapacity.title')}
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('zoneCapacity.help')}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <InputForm
+              label={t('zoneCapacity.zoneSortingCapacityKg')}
+              name="zoneSortingCapacityKg"
+              type="number"
+              control={control}
+              rules={{
+                required: t('measureRequired'),
+                min: { value: 1, message: t('zoneCapacity.min') },
+              }}
+              errors={errors}
+            />
+            <InputForm
+              label={t('zoneCapacity.zoneReuseCapacityKg')}
+              name="zoneReuseCapacityKg"
+              type="number"
+              control={control}
+              rules={{
+                required: t('measureRequired'),
+                min: { value: 1, message: t('zoneCapacity.min') },
+              }}
+              errors={errors}
+            />
+            <InputForm
+              label={t('zoneCapacity.zoneUpcyclingCapacityKg')}
+              name="zoneUpcyclingCapacityKg"
+              type="number"
+              control={control}
+              rules={{
+                required: t('measureRequired'),
+                min: { value: 1, message: t('zoneCapacity.min') },
+              }}
+              errors={errors}
+            />
+            <InputForm
+              label={t('zoneCapacity.zoneRecyclingCapacityKg')}
+              name="zoneRecyclingCapacityKg"
+              type="number"
+              control={control}
+              rules={{
+                required: t('measureRequired'),
+                min: { value: 1, message: t('zoneCapacity.min') },
+              }}
+              errors={errors}
+            />
+          </div>
         </div>
 
         <Button type="submit" variant="secondary" disabled={isSubmitting}>

@@ -16,6 +16,11 @@ export interface SystemParameterDTO {
   /** Tempo de cada recolha: parte fixa + minutos por saco estimado. */
   stopBaseMinutes: number;
   stopMinutesPerBag: number;
+  /** Capacidade das zonas do armazém, em kg (A por triar, B reutilização, C upcycling, D reciclagem). */
+  zoneSortingCapacityKg?: number;
+  zoneReuseCapacityKg?: number;
+  zoneUpcyclingCapacityKg?: number;
+  zoneRecyclingCapacityKg?: number;
 }
 
 /** As únicas rotações que enquadram o conteúdo na etiqueta. */

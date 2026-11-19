@@ -982,7 +982,7 @@
     "requestLoaded": "Demande chargée avec succès",
     "lookupError": "Erreur lors de la recherche",
     "blockedTitle": "Ce colis ne peut pas être trié",
-    "blockedDescription": "La demande est en « {status} » et seules les demandes en « {collected} » ou « {screening} » peuvent être triées. Vérifie le code ou passe à la recherche suivante.",
+    "blockedDescription": "La demande est en « {status} » et seules les demandes en « {collected} », « {inHouse} » ou « {screening} » peuvent être triées. Vérifie le code ou passe à la recherche suivante.",
     "stockedTitle": "Tri déjà terminé",
     "stockedDescription": "Cette demande a été finalisée et est disponible en consultation uniquement.",
     "inProgress": "En cours de traitement",
@@ -1187,7 +1187,16 @@
     "stopMinutesPerBagLabel": "Minutes par sac",
     "maxStopBase": "Maximum 120 minutes",
     "maxPerBag": "Maximum 30 minutes",
-    "stopTimeHelp": "Ex. : 5 + 1 par sac → une collecte de 4 sacs compte 9 minutes."
+    "stopTimeHelp": "Ex. : 5 + 1 par sac → une collecte de 4 sacs compte 9 minutes.",
+    "zoneCapacity": {
+      "title": "Capacité des zones de l'entrepôt",
+      "help": "En kg. Sert à afficher l'occupation de chaque zone dans Réception et entrepôt.",
+      "zoneSortingCapacityKg": "A · À trier (kg)",
+      "zoneReuseCapacityKg": "B · Réemploi (kg)",
+      "zoneUpcyclingCapacityKg": "C · Upcycling (kg)",
+      "zoneRecyclingCapacityKg": "D · Balles de recyclage (kg)",
+      "min": "Doit être au moins 1."
+    }
   },
   "dashboard": {
     "pageTitle": "Tableau de bord",
@@ -1457,6 +1466,90 @@
       "namePlaceholder": "Camionnette",
       "capacity": "Capacité (sacs)",
       "active": "Actif (peut être choisi pour les tournées)"
+    }
+  },
+  "warehouse": {
+    "title": "Réception et entrepôt",
+    "tabs": {
+      "warehouse": "Entrepôt",
+      "lots": "Lots"
+    },
+    "loadError": "Impossible de charger l'entrepôt.",
+    "totalOccupancy": "Occupation totale {percent}% · {weight} sur {capacity} kg",
+    "reception": {
+      "title": "Réceptionner des sacs",
+      "body": "Scannez l'étiquette du sac ou saisissez le code de la demande. Indiquez le poids brut lu sur la balance.",
+      "code": "Code du sac ou de la demande",
+      "codePlaceholder": "Code du sac ou de la demande",
+      "weight": "Poids brut en kg",
+      "submit": "Enregistrer l'entrée",
+      "invalidWeight": "Indiquez le poids en kg.",
+      "error": "Impossible d'enregistrer l'entrée.",
+      "complete": "{code} : {count, plural, one {le sac est entré} other {les # sacs sont entrés}}. En attente de tri.",
+      "partial": "{code} : {received} sur {total} sacs reçus."
+    },
+    "zones": {
+      "label": "Zone de l'entrepôt",
+      "auto": "Automatique (selon le groupe)",
+      "names": {
+        "SORTING": "À trier",
+        "REUSE": "Réemploi",
+        "UPCYCLING": "Upcycling",
+        "RECYCLING": "Balles de recyclage"
+      },
+      "bags": "{count, plural, one {# sac} other {# sacs}}",
+      "pieces": "{count, plural, one {# pièce} other {# pièces}}",
+      "shipNow": "à expédier"
+    },
+    "today": {
+      "title": "Entrées du jour",
+      "summary": "{count, plural, one {# sac} other {# sacs}} · {weight} kg",
+      "empty": "Aucun sac reçu aujourd'hui.",
+      "columns": {
+        "time": "Heure",
+        "request": "Demande",
+        "route": "Tournée",
+        "bags": "Sacs",
+        "weight": "Poids brut",
+        "zone": "Zone",
+        "status": "Statut"
+      },
+      "waiting": "En attente de tri",
+      "missing": "Écart de sacs : {count} sur {total} lus"
+    },
+    "outbound": {
+      "title": "Sorties programmées",
+      "empty": "Aucune sortie programmée.",
+      "new": "Programmer une sortie",
+      "newTitle": "Programmer une sortie",
+      "editTitle": "Sortie programmée",
+      "formHint": "Choisissez les lots qui sortent, ou indiquez le poids ou les pièces. Une fois la sortie marquée comme faite, les lots deviennent inactifs et ne comptent plus dans la zone.",
+      "type": "Type",
+      "types": {
+        "RECYCLING": "Recyclage",
+        "DONATION": "Don",
+        "UPCYCLING": "Upcycling",
+        "SALE": "Vente"
+      },
+      "destination": "Destination",
+      "destinationPlaceholder": "Partenaire ou lieu (ex. : Boutique solidaire · Maia)",
+      "destinationRequired": "Indiquez la destination.",
+      "date": "Jour",
+      "units": "Lots de la zone {zone}",
+      "noUnits": "Aucun lot actif libre dans cette zone.",
+      "unitDetail": "{pieces} pièces · {weight} kg",
+      "weight": "Poids (kg)",
+      "piecesLabel": "Pièces",
+      "notes": "Notes",
+      "save": "Enregistrer",
+      "markDone": "Marquer comme faite",
+      "cancel": "Annuler la sortie",
+      "saved": "Sortie enregistrée.",
+      "done": "Sortie faite : les lots ont quitté l'entrepôt.",
+      "cancelled": "Sortie annulée.",
+      "saveError": "Impossible d'enregistrer la sortie.",
+      "pieces": "{count, plural, one {# pièce} other {# pièces}}",
+      "lots": "{count, plural, one {# lot} other {# lots}}"
     }
   }
 }

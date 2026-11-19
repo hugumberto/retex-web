@@ -982,7 +982,7 @@
     "requestLoaded": "Request loaded successfully",
     "lookupError": "Lookup error",
     "blockedTitle": "This package cannot be triaged",
-    "blockedDescription": "The request is in “{status}” and only requests in “{collected}” or “{screening}” can be triaged. Check the code or move on to the next lookup.",
+    "blockedDescription": "The request is in “{status}” and only requests in “{collected}”, “{inHouse}” or “{screening}” can be triaged. Check the code or move on to the next lookup.",
     "stockedTitle": "Triage already completed",
     "stockedDescription": "This request has been finalised and is available for viewing only.",
     "inProgress": "In progress",
@@ -1187,7 +1187,16 @@
     "stopMinutesPerBagLabel": "Minutes per bag",
     "maxStopBase": "Maximum 120 minutes",
     "maxPerBag": "Maximum 30 minutes",
-    "stopTimeHelp": "E.g. 5 + 1 per bag → a 4-bag pickup counts 9 minutes."
+    "stopTimeHelp": "E.g. 5 + 1 per bag → a 4-bag pickup counts 9 minutes.",
+    "zoneCapacity": {
+      "title": "Warehouse zone capacity",
+      "help": "In kg. Used to show how full each zone is in Intake and warehouse.",
+      "zoneSortingCapacityKg": "A · To sort (kg)",
+      "zoneReuseCapacityKg": "B · Reuse (kg)",
+      "zoneUpcyclingCapacityKg": "C · Upcycling (kg)",
+      "zoneRecyclingCapacityKg": "D · Recycling bales (kg)",
+      "min": "Must be at least 1."
+    }
   },
   "dashboard": {
     "pageTitle": "Dashboard",
@@ -1457,6 +1466,90 @@
       "namePlaceholder": "Van",
       "capacity": "Capacity (bags)",
       "active": "Active (can be chosen for routes)"
+    }
+  },
+  "warehouse": {
+    "title": "Intake and warehouse",
+    "tabs": {
+      "warehouse": "Warehouse",
+      "lots": "Lots"
+    },
+    "loadError": "Couldn't load the warehouse.",
+    "totalOccupancy": "Total occupancy {percent}% · {weight} of {capacity} kg",
+    "reception": {
+      "title": "Receive bags",
+      "body": "Scan the bag label or type the request code. Enter the gross weight shown on the scale.",
+      "code": "Bag or request code",
+      "codePlaceholder": "Bag or request code",
+      "weight": "Gross weight in kg",
+      "submit": "Record intake",
+      "invalidWeight": "Enter the weight in kg.",
+      "error": "Couldn't record the intake.",
+      "complete": "{code}: {count, plural, one {the bag is in} other {all # bags are in}}. Waiting for sorting.",
+      "partial": "{code}: {received} of {total} bags received."
+    },
+    "zones": {
+      "label": "Warehouse zone",
+      "auto": "Automatic (by group)",
+      "names": {
+        "SORTING": "To sort",
+        "REUSE": "Reuse",
+        "UPCYCLING": "Upcycling",
+        "RECYCLING": "Recycling bales"
+      },
+      "bags": "{count, plural, one {# bag} other {# bags}}",
+      "pieces": "{count, plural, one {# piece} other {# pieces}}",
+      "shipNow": "ship now"
+    },
+    "today": {
+      "title": "Today's intake",
+      "summary": "{count, plural, one {# bag} other {# bags}} · {weight} kg",
+      "empty": "No bags received today yet.",
+      "columns": {
+        "time": "Time",
+        "request": "Request",
+        "route": "Route",
+        "bags": "Bags",
+        "weight": "Gross weight",
+        "zone": "Zone",
+        "status": "Status"
+      },
+      "waiting": "Waiting for sorting",
+      "missing": "Bag mismatch: {count} of {total} scanned"
+    },
+    "outbound": {
+      "title": "Scheduled outbounds",
+      "empty": "No scheduled outbounds.",
+      "new": "Schedule outbound",
+      "newTitle": "Schedule outbound",
+      "editTitle": "Scheduled outbound",
+      "formHint": "Pick the lots that leave, or enter the weight or pieces. When you mark it done, the lots become inactive and stop counting in the zone.",
+      "type": "Type",
+      "types": {
+        "RECYCLING": "Recycling",
+        "DONATION": "Donation",
+        "UPCYCLING": "Upcycling",
+        "SALE": "Sale"
+      },
+      "destination": "Destination",
+      "destinationPlaceholder": "Partner or place (e.g. Social shop · Maia)",
+      "destinationRequired": "Enter the destination.",
+      "date": "Day",
+      "units": "Lots in zone {zone}",
+      "noUnits": "No free active lots in this zone.",
+      "unitDetail": "{pieces} pieces · {weight} kg",
+      "weight": "Weight (kg)",
+      "piecesLabel": "Pieces",
+      "notes": "Notes",
+      "save": "Save",
+      "markDone": "Mark as done",
+      "cancel": "Cancel outbound",
+      "saved": "Outbound saved.",
+      "done": "Outbound done: the lots left the warehouse.",
+      "cancelled": "Outbound cancelled.",
+      "saveError": "Couldn't save the outbound.",
+      "pieces": "{count, plural, one {# piece} other {# pieces}}",
+      "lots": "{count, plural, one {# lot} other {# lots}}"
     }
   }
 }

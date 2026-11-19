@@ -45,6 +45,11 @@ export default function StorageUnitForm({
   const typeOptions = [Type.UPPER_PART, Type.UNDER_PART].map((value) => ({ value, label: tItemType(value) }));
   const seasonOptions = [Season.SUMMER, Season.WINTER].map((value) => ({ value, label: tSeason(value) }));
   const statusOptions = [Status.ATIVO, Status.INATIVO].map((value) => ({ value, label: tUnitStatus(value) }));
+  const tZone = useTranslations('warehouse.zones');
+  const zoneOptions = (['AUTO', 'REUSE', 'UPCYCLING', 'RECYCLING'] as const).map((value) => ({
+    value,
+    label: value === 'AUTO' ? tZone('auto') : tZone(`names.${value}`),
+  }));
   const isEditing = useMemo(() => !!storageUnitId, [storageUnitId]);
   const [, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,6 +63,7 @@ export default function StorageUnitForm({
           location: initialData.location ?? '',
           state: initialData.status,
           weight: initialData.weight,
+          zone: initialData.zone ?? 'AUTO',
         }
       : {
           group: StorageGroup.MEN,
@@ -66,6 +72,7 @@ export default function StorageUnitForm({
           location: '',
           state: Status.ATIVO,
           weight: 0,
+          zone: 'AUTO',
         },
   });
 
@@ -103,6 +110,7 @@ export default function StorageUnitForm({
         async () => {
           const nonReusable = data.group === StorageGroup.NON_REUSABLE;
           const location = data.location?.trim() ?? '';
+          const zone = data.zone === 'AUTO' ? null : data.zone;
           if (isEditing) {
             // Na edição o null limpa explicitamente a parte / estação.
             const res = await api.put(`/storage-unit/${storageUnitId}`, {
@@ -110,6 +118,7 @@ export default function StorageUnitForm({
               type: nonReusable ? null : data.type || null,
               season: nonReusable ? null : data.season || null,
               location: location || null,
+              zone,
               status: data.state,
               weight: Number.parseFloat(data.weight.toString()),
             });
@@ -122,6 +131,7 @@ export default function StorageUnitForm({
                 ? {}
                 : { type: data.type, season: data.season }),
               ...(location ? { location } : {}),
+              ...(zone ? { zone } : {}),
             });
             if (!isSuccessStatus(res.status))
               throw new Error('Erro na requisição');
@@ -222,6 +232,15 @@ export default function StorageUnitForm({
             </div>
           </>
         )}
+        <div className="md:col-span-2">
+          <SelectForm
+            label={tZone('label')}
+            name="zone"
+            control={control}
+            options={zoneOptions}
+            errors={errors}
+          />
+        </div>
         <div className="md:col-span-2">
           <InputForm
             label={tCommon('location')}
