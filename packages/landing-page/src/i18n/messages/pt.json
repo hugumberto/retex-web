@@ -55,10 +55,10 @@
     "alreadyHaveAccount": "Já tens conta?",
     "login": "Entrar",
     "feedback": {
-      "duplicateEmail": "Este email já está registado. Tente fazer login.",
-      "successInZone": "Registo realizado! Enviámos um email para definir a sua password e ativar a conta. Verifique a sua caixa de entrada.",
-      "successOutOfZone": "Registo realizado! O seu endereço está fora da zona de atuação — iremos notificá-lo por email assim que estiver disponível.",
-      "error": "Erro ao realizar o registo. Tente novamente."
+      "duplicateEmail": "Este email já está registado. Experimenta entrar no portal.",
+      "successInZone": "Registo feito! Enviámos-te um email para definires a palavra-passe e ativares a conta. Vê a tua caixa de entrada.",
+      "successOutOfZone": "Registo feito! A tua morada ainda está fora da zona de recolha. Avisamos-te por email quando chegarmos lá.",
+      "error": "Não foi possível fazer o registo. Tenta outra vez."
     },
     "addressHint": "A morada pode ser alterada ou acrescentada depois, no portal.",
     "consent": "Aceito a <privacy>Política de Privacidade</privacy> e o tratamento dos meus dados para a recolha.",

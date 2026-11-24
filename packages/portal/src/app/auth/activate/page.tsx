@@ -1,10 +1,8 @@
 'use client';
 
-import Title from '@/components/custom/title';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { activateUser } from '@/service/auth';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -64,12 +62,12 @@ function ActivateForm() {
 
   if (!token) {
     return (
-      <div className="w-full max-w-sm space-y-4 rounded-xl border bg-white p-6 shadow-md text-center">
-        <Title>{t('invalidLinkTitle')}</Title>
-        <p className="text-sm text-muted-foreground">
+      <div className="w-full max-w-[400px] space-y-5 rounded-2xl bg-white p-8 shadow-[0_1px_2px_rgba(1,51,100,0.06)]">
+        <h1 className="text-left text-[26px] font-bold leading-tight text-navy">{t('invalidLinkTitle')}</h1>
+        <p className="text-sm text-ink">
           {t('invalidLinkDescription')}
         </p>
-        <Button asChild variant="secondary" className="w-full">
+        <Button asChild className="h-11 w-full rounded-full bg-navy text-white hover:bg-navy/90">
           <Link href="/auth/login">{t('goToLogin')}</Link>
         </Button>
       </div>
@@ -79,21 +77,10 @@ function ActivateForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-sm space-y-4 rounded-xl border bg-white p-6 shadow-md"
+      className="w-full max-w-[400px] space-y-5 rounded-2xl bg-white p-8 shadow-[0_1px_2px_rgba(1,51,100,0.06)]"
     >
-      <div className="flex justify-center">
-        <Image
-          src="/assets/logo.png"
-          alt="retex"
-          height={28}
-          width={207}
-          className="h-12 opacity-90"
-          style={{ width: 'auto' }}
-          priority
-        />
-      </div>
-      <Title>{t('title')}</Title>
-      <p className="text-sm text-muted-foreground">{t('description')}</p>
+      <h1 className="text-left text-[26px] font-bold leading-tight text-navy">{t('title')}</h1>
+      <p className="text-sm text-ink">{t('description')}</p>
 
       <div>
         <label className="block text-sm font-medium text-secondary">
@@ -143,8 +130,7 @@ function ActivateForm() {
 
       <Button
         type="submit"
-        variant="secondary"
-        className="w-full"
+        className="h-11 w-full rounded-full bg-navy text-white hover:bg-navy/90"
         disabled={isSubmitting}
       >
         {isSubmitting ? t('submitting') : t('submit')}
@@ -155,7 +141,7 @@ function ActivateForm() {
 
 export default function ActivatePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+    <div className="flex w-full flex-col items-center">
       <Suspense fallback={null}>
         <ActivateForm />
       </Suspense>

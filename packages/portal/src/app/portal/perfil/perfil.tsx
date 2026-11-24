@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import AddressForm from './address-form';
+import { formatZip } from '@/lib/address';
 
 interface ContactFormData {
   contactPhone: string;
@@ -286,7 +287,7 @@ export default function Perfil() {
                     {addr.complement ? ` — ${addr.complement}` : ''}
                   </p>
                   <p className="text-muted-foreground">
-                    {[addr.zipCode, addr.city].filter(Boolean).join(' · ')}
+                    {[formatZip(addr.zipCode), addr.city].filter(Boolean).join(' · ')}
                   </p>
                   <p className="text-muted-foreground">{addr.country}</p>
                 </div>

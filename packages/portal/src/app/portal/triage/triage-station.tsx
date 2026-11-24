@@ -33,6 +33,9 @@ import { toast } from 'sonner';
 import { itemSlotKey, TriageListItem, unitSlotKey, useSlotLabel } from './components/add-triage';
 import { ClassificationForm, EMPTY_CLASSIFICATION } from './components/clothing-classification';
 
+// Botão desativado legível (texto escuro sobre cinzento, contraste ≥ 4,5:1).
+const DISABLED = 'bg-[#dde6e9] text-[#4f6573] [&_*]:text-[#4f6573]';
+
 type QueueEntry = {
   id: string;
   code: string | null;
@@ -146,6 +149,8 @@ function Choice({
       aria-pressed={active}
       className={cn(
         'relative flex h-[52px] items-center justify-center rounded-xl border-[1.5px] px-3 text-[15px] font-medium transition-colors',
+        // Espaço para a letra do atalho, que fica no canto superior esquerdo.
+        hotkey && 'pl-7',
         active ? 'border-navy bg-navy text-white' : 'border-line bg-white text-navy hover:bg-panel',
         className
       )}
@@ -220,6 +225,7 @@ export default function TriageStation() {
   const weightRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLInputElement>(null);
   const otherCategoryRef = useRef<HTMLSelectElement>(null);
+  const brandRef = useRef<HTMLDivElement>(null);
 
   // Posto guardado neste computador.
   useEffect(() => {
@@ -712,7 +718,8 @@ export default function TriageStation() {
         items.filter((it) => pred(it.destination)).reduce((s, it) => s + (it.quantity ?? 0), 0);
       setSummary({
         code: request.friendlyCode ?? '',
-        pieces: totalPieces,
+        // Como na supervisão: os acessórios contam à parte.
+        pieces: totalPieces - sumOf((d) => d === Destination.ACCESSORY),
         weight: totalWeight,
         bags: bags.length,
         lots: units.length,
@@ -831,6 +838,11 @@ export default function TriageStation() {
         otherCategoryRef.current?.focus();
         return;
       }
+      if (key === 'm') {
+        event.preventDefault();
+        brandRef.current?.querySelector('input')?.focus();
+        return;
+      }
       if (key === 'e') return set({ condition: Condition.EXCELLENT });
       if (key === 'b') return set({ condition: Condition.GOOD });
       if (key === 'r') return set({ condition: Condition.REGULAR });
@@ -939,7 +951,7 @@ export default function TriageStation() {
         </div>
       </header>
 
-      <main className="flex flex-1 gap-5 p-5">
+      <div className="flex flex-1 gap-5 p-5">
         {/* 1 · Fila */}
         {step === 'queue' ? (
           <>
@@ -1202,7 +1214,7 @@ export default function TriageStation() {
                 onClick={openBag}
                 className={cn(
                   'mt-auto flex h-[64px] flex-col items-center justify-center rounded-xl',
-                  candidateBag ? primaryGradient : 'bg-mist text-white'
+                  candidateBag ? primaryGradient : DISABLED
                 )}
               >
                 <span className="flex items-center gap-2 text-[17px] font-semibold">
@@ -1286,8 +1298,8 @@ export default function TriageStation() {
                 </div>
               </Row>
 
-              <Row n={3} label={t('items.brand')}>
-                <div className="flex flex-1 flex-col gap-2">
+              <Row n={3} label={`${t('items.brand')} *`}>
+                <div ref={brandRef} className="flex flex-1 flex-col gap-2">
                   <Autocomplete
                     options={brands.map((b) => ({ value: b.id, label: b.name }))}
                     value={form.brandId}
@@ -1428,7 +1440,7 @@ export default function TriageStation() {
                       onClick={() => setForm({ ...form, destination })}
                       aria-pressed={form.destination === destination}
                       className={cn(
-                        'relative flex h-[60px] flex-col items-center justify-center rounded-xl px-2 text-center text-[13px] font-semibold',
+                        'relative flex h-[60px] flex-col items-center justify-center rounded-xl px-2 pt-3 text-center text-[13px] font-semibold',
                         form.destination === destination
                           ? 'bg-teal text-white'
                           : destination === Destination.UPCYCLING
@@ -1651,7 +1663,7 @@ export default function TriageStation() {
                 onClick={finish}
                 className={cn(
                   'mt-auto flex h-[64px] flex-col items-center justify-center rounded-xl text-white',
-                  ready ? primaryGradient : 'bg-mist'
+                  ready ? primaryGradient : DISABLED
                 )}
               >
                 <span className="text-[17px] font-semibold">{t('boxes.finish')}</span>
@@ -1747,7 +1759,7 @@ export default function TriageStation() {
             <p className="text-xs text-ink">{t('done.clientSees')}</p>
           </section>
         ) : null}
-      </main>
+      </div>
 
       {/* 4 · Confirmar saco vazio */}
       {confirmEmpty && activeBag ? (
@@ -1802,7 +1814,7 @@ export default function TriageStation() {
                 type="button"
                 disabled={!emptyConfirmed || isBusy}
                 onClick={closeBag}
-                className={cn('flex h-[52px] items-center justify-center gap-2 rounded-full text-[15px] font-semibold', emptyConfirmed ? primaryGradient : 'bg-mist text-white')}
+                className={cn('flex h-[52px] items-center justify-center gap-2 rounded-full text-[15px] font-semibold', emptyConfirmed ? primaryGradient : DISABLED)}
               >
                 {t('close.save')} <Kbd light>Enter</Kbd>
               </button>

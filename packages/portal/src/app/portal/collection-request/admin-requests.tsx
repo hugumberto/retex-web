@@ -23,6 +23,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import RequestDetailsDialog from './request-details-dialog';
 import { clockAfter, useRoutePlan } from './use-route-plan';
+import { formatZip } from '@/lib/address';
 
 // O SDK de mapas da TomTom mexe no `window`: só no browser.
 const RoutePreviewMap = dynamic(() => import('./route-preview-map'), { ssr: false });
@@ -488,7 +489,7 @@ export default function AdminRequests({
                           {r.company?.name ?? clientName(r)}
                         </td>
                         <td className="whitespace-nowrap pr-3">
-                          {[r.address?.zipCode, r.address?.city].filter(Boolean).join(' ') || '—'}
+                          {[formatZip(r.address?.zipCode), r.address?.city].filter(Boolean).join(' ') || '—'}
                         </td>
                         <td className="whitespace-nowrap pr-3">{windowLabel(r)}</td>
                         <td>{r.estimatedBags ?? '—'}</td>
@@ -760,7 +761,7 @@ function NewRoutePanel({
                   >
                     {eta ?? (arrivalMinutes === null && plan.distanceKm !== null
                       ? t('map.noCoords')
-                      : r.address?.zipCode)}
+                      : formatZip(r.address?.zipCode))}
                   </span>
                 </li>
               );

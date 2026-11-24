@@ -37,6 +37,7 @@ import { useAppStore } from '@/store';
 import { Link2Off, PlusIcon, TrashIcon } from 'lucide-react';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { formatZip, streetLine } from '@/lib/address';
 
 // Mesmo limite da listagem de rotas: chega para o histórico recente sem
 // carregar a tabela inteira.
@@ -269,7 +270,7 @@ export default function GestaoRecolha() {
               <Info label={t('email')}>{request.user?.email ?? '-'}</Info>
               <Info label={t('address')}>
                 {address
-                  ? `${address.street} ${address.number}, ${address.zipCode} ${address.city}`
+                  ? `${streetLine(address.street, address.number)}, ${formatZip(address.zipCode)} ${address.city}`
                   : '-'}
               </Info>
               <Info label={t('createdAt')}>{formatDate(request.createdAt)}</Info>

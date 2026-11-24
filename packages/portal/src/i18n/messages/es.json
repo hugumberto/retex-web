@@ -314,7 +314,7 @@
   },
   "auth": {
     "login": {
-      "title": "Acceder",
+      "title": "Iniciar sesión",
       "email": "Email",
       "password": "Contraseña",
       "emailPlaceholder": "Indica tu email",
@@ -374,7 +374,16 @@
     "errorDeadlineExpired": "El plazo para confirmar la recogida ha caducado.",
     "errorRejectFailed": "No se ha podido procesar la solicitud.",
     "errorConfirmGeneric": "No se ha podido confirmar la recogida. Inténtalo de nuevo.",
-    "errorRejectGeneric": "No se ha podido rechazar la recogida. Inténtalo de nuevo."
+    "errorRejectGeneric": "No se ha podido rechazar la recogida. Inténtalo de nuevo.",
+    "loadingInfo": "Cargando…",
+    "askTitle": "Hola {name}, ¿confirmas la recogida?",
+    "askBody": "Nuestro conductor pasará por tu dirección este día y a esta hora.",
+    "day": "Día",
+    "hours": "Hora",
+    "where": "Dirección",
+    "bags": "{count, plural, one {# bolsa} other {# bolsas}}",
+    "confirmButton": "Confirmar recogida",
+    "rejectButton": "No puedo ese día"
   },
   "portalHome": {
     "greeting": "¡Hola!",
@@ -382,7 +391,34 @@
     "welcome": "Bienvenido al portal Retex.",
     "myRequests": "Mis solicitudes",
     "empty": "No tienes solicitudes de recogida.",
-    "loadError": "No se han podido cargar las solicitudes"
+    "loadError": "No se han podido cargar las solicitudes",
+    "newRequest": "Nuevo pedido",
+    "activeLabel": "Pedido en curso",
+    "seeAll": "Ver todos",
+    "loading": "Cargando…",
+    "bags": "{count, plural, one {# bolsa} other {# bolsas}}",
+    "preferred": "preferencia: {date} · {window}",
+    "steps": {
+      "requested": "Pedido",
+      "scheduled": "Programado",
+      "collected": "Recogido",
+      "sorting": "En clasificación",
+      "done": "Terminado"
+    },
+    "hint": {
+      "requested": "Estamos preparando la ruta. Recibirás un email para confirmar el día.",
+      "scheduled": "El conductor pasará el día acordado.",
+      "collected": "Las bolsas van camino del almacén.",
+      "sorting": "Las piezas se están clasificando.",
+      "done": "Clasificación terminada."
+    },
+    "columns": {
+      "code": "Pedido",
+      "address": "Dirección",
+      "bags": "Bolsas",
+      "created": "Creado",
+      "status": "Estado"
+    }
   },
   "imageUpload": {
     "remove": "Eliminar",
@@ -771,7 +807,9 @@
       "intervalPlaceholder": "Elegir franja",
       "hint": "Es una preferencia: confirmamos el día y la hora por email cuando se programe la ruta."
     },
-    "preferredWindow": "Franja solicitada"
+    "preferredWindow": "Franja solicitada",
+    "detailsHeading": "Pedido {code}",
+    "clientSection": "Cliente"
   },
   "packageCollection": {
     "pageTitle": "Gestionar recogida",
@@ -1640,7 +1678,7 @@
       "category": "Categoría",
       "other": "Otra…",
       "brand": "Marca",
-      "brandPlaceholder": "escribe o elige",
+      "brandPlaceholder": "escribe o elige · tecla M",
       "details": "Detalles",
       "less": "Una menos",
       "more": "Una más",
@@ -1876,7 +1914,8 @@
       "confirm": "Cancelar recogida",
       "done": "Recogida cancelada.",
       "error": "No se pudo cancelar la recogida."
-    }
+    },
+    "noRouteOn": "No tienes ruta el {date}."
   },
   "triageOverview": {
     "title": "Clasificación",

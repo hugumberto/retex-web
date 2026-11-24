@@ -1,17 +1,25 @@
 'use client';
 
-import Title from '@/components/custom/title';
 import api from '@/lib/api';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-type ConfirmState = 'loading' | 'success' | 'error' | 'invalid';
+type Info = {
+  code: string | null;
+  firstName: string | null;
+  start: string | null;
+  interval: string | null;
+  estimatedBags: number | null;
+  street: string | null;
+  city: string | null;
+};
 
-function errorKeyForStatus(
-  status: number | undefined,
-  isReject: boolean
-): string {
+type State = 'loading' | 'ready' | 'busy' | 'confirmed' | 'rejected' | 'error';
+
+function errorKeyForStatus(status: number | undefined, isReject: boolean): string {
   switch (status) {
     case 404:
       return 'errorInvalidLink';
@@ -22,61 +30,113 @@ function errorKeyForStatus(
   }
 }
 
+/**
+ * Link do email "confirma a tua recolha". Abrir a página só mostra o dia;
+ * confirma-se (ou recusa-se) com um botão. Assim, os leitores de email que
+ * abrem os links para os verificar já não confirmam recolhas sozinhos.
+ */
 function ConfirmContent() {
   const t = useTranslations('collectionConfirmation');
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const isReject = searchParams.get('action') === 'reject';
-  const [state, setState] = useState<ConfirmState>('loading');
-  const [errorKey, setErrorKey] = useState('errorConfirmGeneric');
+  const wantsReject = searchParams.get('action') === 'reject';
+  const [state, setState] = useState<State>('loading');
+  const [info, setInfo] = useState<Info | null>(null);
+  const [errorKey, setErrorKey] = useState('errorInvalidLink');
 
   useEffect(() => {
     if (!token) {
-      setState('invalid');
+      setState('error');
       return;
     }
-    let cancelled = false;
-    (async () => {
-      try {
-        await api.post(
-          isReject
-            ? '/collection-request/reject-collection'
-            : '/collection-request/confirm-collection',
-          { token }
-        );
-        if (!cancelled) setState('success');
-      } catch (err) {
-        if (cancelled) return;
-        const status = (err as { response?: { status?: number } })?.response
-          ?.status;
-        setErrorKey(errorKeyForStatus(status, isReject));
+    api
+      .get<Info>('/collection-request/confirmation', { params: { token } })
+      .then(({ data }) => {
+        setInfo(data);
+        setState('ready');
+      })
+      .catch((err) => {
+        setErrorKey(errorKeyForStatus((err as { response?: { status?: number } })?.response?.status, false));
         setState('error');
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [token, isReject]);
+      });
+  }, [token]);
+
+  const act = async (reject: boolean) => {
+    setState('busy');
+    try {
+      await api.post(reject ? '/collection-request/reject-collection' : '/collection-request/confirm-collection', {
+        token,
+      });
+      setState(reject ? 'rejected' : 'confirmed');
+    } catch (err) {
+      setErrorKey(errorKeyForStatus((err as { response?: { status?: number } })?.response?.status, reject));
+      setState('error');
+    }
+  };
+
+  const day = info?.start ? format(new Date(info.start), 'dd/MM/yyyy') : null;
+  const hours = info?.interval ? info.interval.replace(' - ', '–') : null;
+
+  const primary = 'h-12 rounded-full px-6 text-[15px] font-semibold disabled:opacity-60';
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary-muted/10 p-6">
-      <div className="w-full max-w-md rounded-2xl border border-secondary/25 bg-white p-8 text-center shadow-sm">
-        <Title as="h1">{isReject ? t('rejectTitle') : t('confirmTitle')}</Title>
-        <div className="mt-4 text-sm text-secondary">
-          {state === 'loading' && (
-            <p>{isReject ? t('rejectLoading') : t('confirmLoading')}</p>
-          )}
-          {state === 'success' && !isReject && (
-            <p className="text-green-700">{t('confirmSuccess')}</p>
-          )}
-          {state === 'success' && isReject && (
-            <p className="text-green-700">{t('rejectSuccess')}</p>
-          )}
-          {state === 'invalid' && (
-            <p className="text-red-600">{t('invalidLink')}</p>
-          )}
-          {state === 'error' && <p className="text-red-600">{t(errorKey)}</p>}
-        </div>
+    <div className="flex min-h-dvh items-center justify-center bg-canvas p-4">
+      <div className="flex w-full max-w-[440px] flex-col gap-5 rounded-2xl bg-white p-7 text-navy shadow-[0_1px_2px_rgba(1,51,100,0.06)]">
+        <span className="text-[22px] font-bold">ReTeX:ID</span>
+        {state === 'loading' ? <p className="text-sm text-ink">{t('loadingInfo')}</p> : null}
+
+        {(state === 'ready' || state === 'busy') && info ? (
+          <>
+            <div>
+              <h1 className="text-left text-[26px] font-bold leading-tight">
+                {t('askTitle', { name: info.firstName ?? '' })}
+              </h1>
+              <p className="mt-1.5 text-[15px] text-ink">{t('askBody')}</p>
+            </div>
+            <dl className="grid grid-cols-2 gap-3 rounded-xl bg-canvas p-4 text-sm">
+              <div>
+                <dt className="font-mono text-[10px] uppercase tracking-[0.06em] text-ink">{t('day')}</dt>
+                <dd className="text-[17px] font-semibold">{day ?? '—'}</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[10px] uppercase tracking-[0.06em] text-ink">{t('hours')}</dt>
+                <dd className="text-[17px] font-semibold">{hours ?? '—'}</dd>
+              </div>
+              <div className="col-span-2">
+                <dt className="font-mono text-[10px] uppercase tracking-[0.06em] text-ink">{t('where')}</dt>
+                <dd className="font-semibold">{[info.street, info.city].filter(Boolean).join(', ') || '—'}</dd>
+              </div>
+              <div className="col-span-2 font-mono text-[11px] text-ink">
+                {[info.code, info.estimatedBags ? t('bags', { count: info.estimatedBags }) : null].filter(Boolean).join(' · ')}
+              </div>
+            </dl>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                disabled={state === 'busy'}
+                onClick={() => act(false)}
+                className={cn(primary, wantsReject ? 'border-[1.5px] border-navy bg-white text-navy' : 'bg-navy text-white')}
+              >
+                {t('confirmButton')}
+              </button>
+              <button
+                type="button"
+                disabled={state === 'busy'}
+                onClick={() => act(true)}
+                className={cn(
+                  primary,
+                  wantsReject ? 'bg-[#a12a1e] text-white' : 'text-[#a12a1e] underline underline-offset-2'
+                )}
+              >
+                {t('rejectButton')}
+              </button>
+            </div>
+          </>
+        ) : null}
+
+        {state === 'confirmed' ? <p className="text-[15px] font-semibold text-forest">{t('confirmSuccess')}</p> : null}
+        {state === 'rejected' ? <p className="text-[15px] font-semibold text-forest">{t('rejectSuccess')}</p> : null}
+        {state === 'error' ? <p className="text-[15px] text-[#a12a1e]">{t(errorKey)}</p> : null}
       </div>
     </div>
   );

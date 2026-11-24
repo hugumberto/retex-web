@@ -7,8 +7,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { InputForm } from '@/components/form/input-form';
-import Title from '@/components/custom/title';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -81,21 +79,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-sm space-y-4 rounded-xl border bg-white p-6 shadow-md">
+    <div className="flex w-full flex-col items-center">
+      <div className="w-full max-w-[400px] space-y-5 rounded-2xl bg-white p-8 shadow-[0_1px_2px_rgba(1,51,100,0.06)]">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="flex justify-center">
-            <Image
-              src="/assets/logo.png"
-              alt="retex"
-              height={28}
-              width={207}
-              className="h-12 opacity-90"
-              style={{ width: 'auto' }}
-              priority
-            />
-          </div>
-          <Title>{t('title')}</Title>
+          <h1 className="text-left text-[26px] font-bold leading-tight text-navy">{t('title')}</h1>
 
           <InputForm
             name="email"
@@ -130,8 +117,7 @@ export default function LoginPage() {
 
           <Button
             type="submit"
-            variant="secondary"
-            className="w-full"
+            className="h-11 w-full rounded-full bg-navy text-white hover:bg-navy/90"
             disabled={isSubmitting}
           >
             {isSubmitting ? t('submitting') : t('submit')}

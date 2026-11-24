@@ -11,6 +11,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { SearchIcon } from 'lucide-react';
+import { Role } from '@/app/types/user';
+import { getUserRoles } from '@/lib/access-control';
+import { formatZip, streetLine } from '@/lib/address';
+import { useAppStore } from '@/store';
+import { STATUS_CLASS } from '@/lib/collection-request-status';
 
 type Props = {
   request: CollectionRequestDTO;
@@ -19,8 +24,8 @@ type Props = {
 function Field({ label, value }: { label: string; value?: React.ReactNode }) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <span className="text-sm text-secondary break-words">
+      <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-ink">{label}</span>
+      <span className="break-words text-sm font-medium text-navy">
         {value !== undefined && value !== null && value !== '' ? value : '—'}
       </span>
     </div>
@@ -34,6 +39,12 @@ export default function RequestDetailsDialog({ request }: Props) {
   const user = request.user;
   const address = request.address;
   const fullName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
+  // Coordenadas só interessam à equipa (rotas); o cliente não precisa de as ver.
+  const { user: viewer } = useAppStore();
+  const isTeam = getUserRoles(viewer).some((r) => r === Role.ADMIN || r === Role.OPS);
+  const weight = request.weight != null && Number(request.weight) > 0
+    ? `${Number(request.weight).toLocaleString('pt-PT', { maximumFractionDigits: 1 })}`
+    : undefined;
 
   return (
     <Dialog>
@@ -52,14 +63,17 @@ export default function RequestDetailsDialog({ request }: Props) {
         aria-describedby={undefined}
       >
         <DialogHeader>
-          <DialogTitle className="text-secondary">
-            Solicitação {request.friendlyCode ?? ''}
+          <DialogTitle className="flex items-center gap-3 text-left text-[22px] font-bold text-navy">
+            {t('detailsHeading', { code: request.friendlyCode ?? '' })}
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_CLASS[request.status] ?? ''}`}>
+              {tStatus(request.status)}
+            </span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5">
           <section>
-            <h3 className="mb-2 text-sm font-semibold text-secondary">
+            <h3 className="mb-2.5 border-b border-line-soft pb-2 text-left text-[15px] font-semibold text-navy">
               {t('detailsTitle')}
             </h3>
             <div className="grid grid-cols-2 gap-3">
@@ -87,7 +101,7 @@ export default function RequestDetailsDialog({ request }: Props) {
                     : undefined
                 }
               />
-              <Field label={tCommon('weightKg')} value={request.weight} />
+              <Field label={tCommon('weightKg')} value={weight} />
               <Field
                 label={tCommon('createdAt')}
                 value={
@@ -101,8 +115,8 @@ export default function RequestDetailsDialog({ request }: Props) {
           </section>
 
           <section>
-            <h3 className="mb-2 text-sm font-semibold text-secondary">
-              Cliente
+            <h3 className="mb-2.5 border-b border-line-soft pb-2 text-left text-[15px] font-semibold text-navy">
+              {t('clientSection')}
             </h3>
             <div className="grid grid-cols-2 gap-3">
               <Field label={tCommon('name')} value={fullName} />
@@ -115,17 +129,16 @@ export default function RequestDetailsDialog({ request }: Props) {
           </section>
 
           <section>
-            <h3 className="mb-2 text-sm font-semibold text-secondary">{tCommon('address')}</h3>
+            <h3 className="mb-2.5 border-b border-line-soft pb-2 text-left text-[15px] font-semibold text-navy">{tCommon('address')}</h3>
             <div className="grid grid-cols-2 gap-3">
-              <Field label={t('street')} value={address?.street} />
-              <Field label={t('number')} value={address?.number} />
+              <Field label={t('street')} value={streetLine(address?.street, address?.number) || undefined} />
               <Field label={t('complement')} value={address?.complement} />
-              <Field label={t('zipCode')} value={address?.zipCode} />
+              <Field label={t('zipCode')} value={formatZip(address?.zipCode) || undefined} />
               <Field label={tCommon('city')} value={address?.city} />
               <Field label={t('cityDivision')} value={address?.cityDivision} />
               <Field label={t('countryDivision')} value={address?.countryDivision} />
               <Field label={t('country')} value={address?.country} />
-              {(address?.lat != null || address?.long != null) && (
+              {isTeam && (address?.lat != null || address?.long != null) && (
                 <Field
                   label={t('coordinates')}
                   value={

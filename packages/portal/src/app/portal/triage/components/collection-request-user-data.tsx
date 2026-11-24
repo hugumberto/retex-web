@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { Address } from '@/app/types/collection-request';
 import { UserDTO } from '@/app/types/user';
+import { formatZip } from '@/lib/address';
 
 type CollectionRequestUserDataProps = {
   user?: UserDTO;
@@ -19,7 +20,7 @@ export default function CollectionRequestUserData({
     ? [
         `${address.street ?? ''} ${address.number ?? ''}`.trim(),
         address.complement,
-        [address.zipCode, address.city].filter(Boolean).join(' '),
+        [formatZip(address.zipCode), address.city].filter(Boolean).join(' '),
         address.country,
       ]
         .filter(Boolean)

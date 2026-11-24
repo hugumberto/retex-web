@@ -399,7 +399,7 @@ export default function Warehouse() {
                         <td className="px-4 py-3 font-mono">
                           {format(new Date(row.receivedAt), 'HH:mm')}
                         </td>
-                        <td className="px-4 py-3 font-mono text-xs">{row.code ?? '—'}</td>
+                        <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{row.code ?? '—'}</td>
                         <td className="px-4 py-3">
                           {[row.routeCode, row.city].filter(Boolean).join(' · ') || '—'}
                         </td>
