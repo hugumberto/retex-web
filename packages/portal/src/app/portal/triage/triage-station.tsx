@@ -23,6 +23,8 @@ import ScanInput from '@/components/custom/scan-input';
 import api from '@/lib/api';
 import { cn, normalizeFriendlyCode } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { Role } from '@/app/types/user';
+import { getUserRoles } from '@/lib/access-control';
 import { Check, Minus, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -39,6 +41,8 @@ type QueueEntry = {
   bags: number;
   bagsProcessed: number;
   collectedAt: string | null;
+  assignedStation?: number | null;
+  openStation?: number | null;
 };
 type QueueResponse = {
   today: { pieces: number; requests: number };
@@ -207,6 +211,9 @@ export default function TriageStation() {
   const [emptyConfirmed, setEmptyConfirmed] = useState(false);
   const [boxCode, setBoxCode] = useState('');
   const [summary, setSummary] = useState<Summary | null>(null);
+  // Pedido deixado em pausa neste posto (a supervisão vê "Em pausa").
+  const [paused, setPaused] = useState<{ id: string; code: string | null } | null>(null);
+  const isAdmin = getUserRoles(user).includes(Role.ADMIN);
 
   const codeRef = useRef<HTMLInputElement>(null);
   const bagRef = useRef<HTMLInputElement>(null);
@@ -237,22 +244,32 @@ export default function TriageStation() {
 
   const loadQueue = useCallback(async () => {
     try {
-      const { data } = await api.get<QueueResponse>('/triage/queue');
+      const { data } = await api.get<QueueResponse>('/triage/queue', { params: station ? { station } : {} });
       setQueue(data);
       return data;
     } catch {
       toast.error(t('queue.loadError'));
       return null;
     }
-  }, [t]);
+  }, [t, station]);
 
   useEffect(() => {
     loadQueue();
+  }, [loadQueue]);
+
+  useEffect(() => {
     api
       .get<Brand[]>('/brand')
       .then(({ data }) => setBrands(sortBrands(data)))
       .catch(() => toast.error(tTriage('brandsLoadError')));
-  }, [loadQueue, tTriage]);
+  }, [tTriage]);
+
+  // Na fila, volta a pedir de vez em quando (a supervisão pode atribuir pedidos a este posto).
+  useEffect(() => {
+    if (step !== 'queue') return;
+    const id = window.setInterval(loadQueue, 30_000);
+    return () => window.clearInterval(id);
+  }, [step, loadQueue]);
 
   const resetRequest = () => {
     setRequest(null);
@@ -294,6 +311,7 @@ export default function TriageStation() {
         return;
       }
       resetRequest();
+      setPaused(null);
       setRequest(r);
       const loadedBags = data.bags ?? [];
       setBags(loadedBags);
@@ -372,9 +390,24 @@ export default function TriageStation() {
         otherCode: data.collectionRequest.friendlyCode,
         otherClient: clientOf(data.collectionRequest),
       });
+      reportWrongBag(lookup, data.collectionRequest.friendlyCode);
     } catch {
       setWrongBag({ code: lookup.toUpperCase() });
+      reportWrongBag(lookup, null);
     }
+  };
+
+  // Fica nos alertas da supervisão.
+  const reportWrongBag = (bagCode: string, otherRequestCode: string | null | undefined) => {
+    if (!station) return;
+    api
+      .post(`/triage/station/${station}/event`, {
+        type: 'WRONG_BAG',
+        code: bagCode,
+        requestCode: request?.friendlyCode ?? null,
+        otherRequestCode: otherRequestCode ?? null,
+      })
+      .catch(() => undefined);
   };
 
   const openBag = async () => {
@@ -458,6 +491,7 @@ export default function TriageStation() {
           material: form.material.trim() || undefined,
           color: form.color.trim() || undefined,
           size: form.size.trim() || undefined,
+          station: station ?? undefined,
         }
       : {
           collectionRequestId: request.id,
@@ -465,6 +499,7 @@ export default function TriageStation() {
           destination,
           brandId: form.brandId || undefined,
           quantity,
+          station: station ?? undefined,
         };
 
     setIsBusy(true);
@@ -561,7 +596,9 @@ export default function TriageStation() {
       }
       await api.patch(`/collection-request/${request.id}`, { status: CollectionRequestStatus.SCREENING });
       toast.success(tTriage('progressSaved'));
+      const pausedRequest = { id: request.id, code: request.friendlyCode ?? null };
       await backToQueue();
+      setPaused(pausedRequest);
     } catch (error) {
       toast.error(apiMessage(error, tTriage('progressSaveError')));
     } finally {
@@ -696,6 +733,55 @@ export default function TriageStation() {
     }
   };
 
+  // ── Sinal para a supervisão ────────────────────────────────────────────────
+  // O que o posto está a fazer; vai para a API quando muda e a cada minuto.
+  const signal = station
+    ? request
+      ? {
+          status: 'SORTING',
+          collectionRequestId: request.id,
+          pendingLots:
+            step === 'boxes'
+              ? lots.filter((lot) => !unitFor(lot.key)).map((lot) => ({ label: slotLabel(lot.slot), pieces: lot.pieces }))
+              : [],
+        }
+      : paused
+        ? { status: 'PAUSED', collectionRequestId: paused.id }
+        : { status: 'FREE', collectionRequestId: null }
+    : null;
+  const signalKey = signal ? JSON.stringify(signal) : '';
+
+  useEffect(() => {
+    if (!station || !signalKey) return;
+    const send = () => api.put(`/triage/station/${station}`, JSON.parse(signalKey)).catch(() => undefined);
+    send();
+    const id = window.setInterval(send, 60_000);
+    return () => window.clearInterval(id);
+  }, [station, signalKey]);
+
+  // Ao sair do posto (outra página, fechar o separador) o posto fica livre.
+  useEffect(() => {
+    if (!station) return;
+    const body = JSON.stringify({ status: 'FREE', release: true });
+    const onHide = () => {
+      const { accessToken } = useAppStore.getState();
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/triage/station/${station}`, {
+        method: 'PUT',
+        keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body,
+      }).catch(() => undefined);
+    };
+    window.addEventListener('pagehide', onHide);
+    return () => {
+      window.removeEventListener('pagehide', onHide);
+      api.put(`/triage/station/${station}`, JSON.parse(body)).catch(() => undefined);
+    };
+  }, [station]);
+
   // ── Atalhos de teclado ─────────────────────────────────────────────────────
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -827,7 +913,7 @@ export default function TriageStation() {
         {header}
         <div className="flex gap-2">
           {step === 'queue' || step === 'done' ? (
-            <Link href="/portal" className={cn(lightButton, 'flex items-center')}>
+            <Link href={isAdmin ? '/portal/triage' : '/portal'} className={cn(lightButton, 'flex items-center')}>
               {t('bar.leave')}
             </Link>
           ) : step === 'bag' ? (
@@ -866,6 +952,27 @@ export default function TriageStation() {
                   ))}
                 </svg>
               </div>
+              {paused ? (
+                <div className="flex w-full max-w-[580px] items-center gap-3 rounded-xl bg-[#fdf1dc] px-4 py-3 text-left">
+                  <p className="flex-1 text-sm text-[#8a5a12]">
+                    {t('queue.paused', { code: paused.code ?? '' })}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => paused.code && openRequest(paused.code)}
+                    className="h-9 rounded-full bg-navy px-4 text-[13px] font-semibold text-white"
+                  >
+                    {t('queue.continue')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaused(null)}
+                    className="h-9 rounded-full border border-[#8a5a12] px-4 text-[13px] font-semibold text-[#8a5a12]"
+                  >
+                    {t('queue.endPause')}
+                  </button>
+                </div>
+              ) : null}
               <h1 className="max-w-[420px] text-[28px] font-bold leading-tight">{t('queue.scanTitle')}</h1>
               <p className="text-[15px] text-ink">{t('queue.scanHint')}</p>
               <div className="flex w-full max-w-[580px] gap-2">
@@ -908,10 +1015,18 @@ export default function TriageStation() {
               ) : (
                 (queue?.queue ?? []).map((entry) => {
                   const inProgress = entry.status === CollectionRequestStatus.SCREENING;
+                  const assignedHere = !!station && entry.assignedStation === station;
+                  const elsewhere = entry.openStation && entry.openStation !== station ? entry.openStation : null;
                   return (
-                    <div key={entry.id} className="flex items-center justify-between gap-3 border-b border-line-soft py-3">
+                    <div
+                      key={entry.id}
+                      className={cn(
+                        'flex items-center justify-between gap-3 border-b border-line-soft py-3',
+                        assignedHere && '-mx-2 rounded-xl border-b-0 bg-[#eaf3f5] px-2'
+                      )}
+                    >
                       <div className="min-w-0">
-                        <p className="flex items-center gap-2">
+                        <p className="flex flex-wrap items-center gap-2">
                           <span className="font-mono text-[14px]">{entry.code}</span>
                           <span
                             className={cn(
@@ -921,6 +1036,16 @@ export default function TriageStation() {
                           >
                             {tStatus(entry.status)}
                           </span>
+                          {assignedHere ? (
+                            <span className="rounded-full bg-teal px-2 py-0.5 text-[10px] font-semibold text-white">
+                              {t('queue.assignedHere')}
+                            </span>
+                          ) : null}
+                          {elsewhere ? (
+                            <span className="rounded-full bg-[#fdf1dc] px-2 py-0.5 text-[10px] font-semibold text-[#8a5a12]">
+                              {t('queue.openAt', { n: elsewhere })}
+                            </span>
+                          ) : null}
                         </p>
                         <p className="truncate text-xs text-ink">
                           {[

@@ -1202,6 +1202,11 @@
       "zoneUpcyclingCapacityKg": "C · Upcycling (kg)",
       "zoneRecyclingCapacityKg": "D · Balles de recyclage (kg)",
       "min": "Doit être au moins 1."
+    },
+    "triage": {
+      "title": "Tri",
+      "help": "Objectif de chaque poste, affiché dans le panneau de supervision du tri.",
+      "triageTargetPerHour": "Objectif par poste (pièces/h)"
     }
   },
   "dashboard": {
@@ -1596,7 +1601,11 @@
       "loadError": "Impossible de charger les demandes.",
       "notFound": "Aucune demande ni sac avec ce code.",
       "alreadyDone": "La demande {code} a déjà été triée.",
-      "notReady": "Cette demande est « {status} » et ne peut pas encore être triée."
+      "notReady": "Cette demande est « {status} » et ne peut pas encore être triée.",
+      "assignedHere": "Attribué à ce poste",
+      "openAt": "Au poste {n}",
+      "paused": "En pause : {code}. La supervision voit ce poste en pause jusqu'à ce que tu reprennes ou termines la pause.",
+      "endPause": "Terminer la pause"
     },
     "bag": {
       "title": "Ouvrir le sac suivant",
@@ -1867,6 +1876,107 @@
       "confirm": "Annuler la collecte",
       "done": "Collecte annulée.",
       "error": "Impossible d'annuler la collecte."
+    }
+  },
+  "triageOverview": {
+    "title": "Tri",
+    "subtitle": "Supervision des postes en temps réel. Le tri se fait en mode Poste, en plein écran.",
+    "export": "Exporter la journée (CSV)",
+    "openStation": "Ouvrir le mode Poste",
+    "loadError": "Impossible de charger le tri.",
+    "perHour": "pièces/h",
+    "pieces": "{count, plural, one {# pièce} other {# pièces}}",
+    "bags": "{count, plural, one {# sac} other {# sacs}}",
+    "kpis": {
+      "pieces": "Pièces triées aujourd'hui",
+      "piecesHint": "{count, plural, =0 {aucun poste actif} one {sur # poste actif} other {sur # postes actifs}}",
+      "weight": "Kg triés",
+      "weightHint": "≈ {kg} kg par pièce",
+      "weightNone": "aucun sac pesé aujourd'hui",
+      "rhythm": "Rythme moyen",
+      "rhythmHint": "objectif : {target} pièces/h",
+      "bags": "Sacs à trier",
+      "bagsHint": "zone A de l'entrepôt",
+      "done": "Demandes terminées",
+      "doneHint": "aujourd'hui, jusqu'à {time}",
+      "doneNone": "aucune aujourd'hui"
+    },
+    "stations": {
+      "title": "Postes de tri",
+      "updated": "mis à jour il y a {seconds} s",
+      "station": "Poste {n}",
+      "noOperator": "sans opérateur",
+      "assigned": "attribué, en attente",
+      "columns": {
+        "station": "Poste",
+        "request": "Demande",
+        "bags": "Sacs",
+        "pieces": "Pièces",
+        "rhythm": "Rythme",
+        "status": "État"
+      },
+      "status": {
+        "SORTING": "En tri",
+        "PAUSED": "En pause",
+        "FREE": "Libre"
+      }
+    },
+    "queue": {
+      "title": "File à trier",
+      "order": "plus ancien d'abord",
+      "empty": "Aucune demande en attente de tri.",
+      "collectedOn": "collecté le {date}",
+      "waiting": "{days, plural, =0 {aujourd'hui} one {il y a # jour} other {il y a # jours}}",
+      "assign": "Attribuer à un poste"
+    },
+    "destinations": {
+      "title": "Destination des pièces aujourd'hui",
+      "reuse": "Réemploi",
+      "upcycling": "Upcycling",
+      "nonReusable": "Recyclage (non réutilisable)",
+      "accessories": "{count, plural, =0 {Aucun accessoire aujourd'hui.} other {Les accessoires sont comptés à part (# aujourd'hui).}}",
+      "clearIn": "{count, plural, one {Au rythme actuel, la zone A sera triée dans environ # jour.} other {Au rythme actuel, la zone A sera triée dans environ # jours.}}"
+    },
+    "alerts": {
+      "title": "Alertes",
+      "none": "Aucune alerte.",
+      "unboxed": "Lot sans caisse au Poste {n}",
+      "wrongBag": "Sac d'une autre demande lu au Poste {n}",
+      "belongsTo": "{bag} appartient à {request}",
+      "unknownBag": "{bag} n'appartient à aucune demande",
+      "waiting": "{days, plural, one {Demande en attente depuis # jour} other {Demande en attente depuis # jours}}",
+      "unknownBagTitle": "Sac inconnu lu au Poste {n}"
+    },
+    "assign": {
+      "title": "Attribuer à un poste",
+      "body": "La demande reste en tête de la file du poste choisi jusqu'à ce que quelqu'un l'ouvre.",
+      "request": "Demande",
+      "station": "Poste",
+      "none": "Aucun poste",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "done": "Attribuée au Poste {n}.",
+      "removed": "Attribution retirée.",
+      "error": "Impossible d'attribuer la demande."
+    },
+    "csv": {
+      "time": "Heure",
+      "station": "Poste",
+      "operator": "Opérateur",
+      "request": "Demande",
+      "client": "Client",
+      "bag": "Sac",
+      "quantity": "Pièces",
+      "destination": "Destination",
+      "category": "Catégorie",
+      "condition": "État",
+      "sex": "Sexe",
+      "ageGroup": "Âge",
+      "season": "Saison",
+      "brand": "Marque",
+      "lot": "Lot",
+      "empty": "Aucune pièce enregistrée aujourd'hui.",
+      "error": "Impossible d'exporter la journée."
     }
   }
 }

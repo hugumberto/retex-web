@@ -1202,6 +1202,11 @@
       "zoneUpcyclingCapacityKg": "C · Upcycling (kg)",
       "zoneRecyclingCapacityKg": "D · Recycling bales (kg)",
       "min": "Must be at least 1."
+    },
+    "triage": {
+      "title": "Sorting",
+      "help": "Target for each station, shown on the sorting supervision panel.",
+      "triageTargetPerHour": "Target per station (pieces/h)"
     }
   },
   "dashboard": {
@@ -1596,7 +1601,11 @@
       "loadError": "Couldn't load the requests.",
       "notFound": "No request or bag with this code.",
       "alreadyDone": "Request {code} has already been sorted.",
-      "notReady": "This request is “{status}” and can't be sorted yet."
+      "notReady": "This request is “{status}” and can't be sorted yet.",
+      "assignedHere": "Assigned to this station",
+      "openAt": "At station {n}",
+      "paused": "Paused: {code}. Supervisors see this station as paused until you continue or end the pause.",
+      "endPause": "End pause"
     },
     "bag": {
       "title": "Open the next bag",
@@ -1867,6 +1876,107 @@
       "confirm": "Cancel collection",
       "done": "Collection cancelled.",
       "error": "Couldn't cancel the collection."
+    }
+  },
+  "triageOverview": {
+    "title": "Sorting",
+    "subtitle": "Live supervision of the stations. Sorting itself happens in Station mode, full screen.",
+    "export": "Export day (CSV)",
+    "openStation": "Open Station mode",
+    "loadError": "Could not load sorting.",
+    "perHour": "pieces/h",
+    "pieces": "{count, plural, one {# piece} other {# pieces}}",
+    "bags": "{count, plural, one {# bag} other {# bags}}",
+    "kpis": {
+      "pieces": "Pieces sorted today",
+      "piecesHint": "{count, plural, =0 {no active stations} one {at # active station} other {at # active stations}}",
+      "weight": "Kg sorted",
+      "weightHint": "≈ {kg} kg per piece",
+      "weightNone": "no weighed bags today",
+      "rhythm": "Average pace",
+      "rhythmHint": "target: {target} pieces/h",
+      "bags": "Bags to sort",
+      "bagsHint": "warehouse zone A",
+      "done": "Requests completed",
+      "doneHint": "today, last at {time}",
+      "doneNone": "none today"
+    },
+    "stations": {
+      "title": "Sorting stations",
+      "updated": "updated {seconds} s ago",
+      "station": "Station {n}",
+      "noOperator": "no operator",
+      "assigned": "assigned, waiting",
+      "columns": {
+        "station": "Station",
+        "request": "Request",
+        "bags": "Bags",
+        "pieces": "Pieces",
+        "rhythm": "Pace",
+        "status": "Status"
+      },
+      "status": {
+        "SORTING": "Sorting",
+        "PAUSED": "Paused",
+        "FREE": "Free"
+      }
+    },
+    "queue": {
+      "title": "Sorting queue",
+      "order": "oldest first",
+      "empty": "No requests waiting for sorting.",
+      "collectedOn": "collected {date}",
+      "waiting": "{days, plural, =0 {today} one {# day ago} other {# days ago}}",
+      "assign": "Assign to a station"
+    },
+    "destinations": {
+      "title": "Where today's pieces go",
+      "reuse": "Reuse",
+      "upcycling": "Upcycling",
+      "nonReusable": "Recycling (not reusable)",
+      "accessories": "{count, plural, =0 {No accessories today.} other {Accessories are counted separately (# today).}}",
+      "clearIn": "{count, plural, one {At the current pace, zone A will be sorted in about # day.} other {At the current pace, zone A will be sorted in about # days.}}"
+    },
+    "alerts": {
+      "title": "Alerts",
+      "none": "No alerts.",
+      "unboxed": "Lot without a box at Station {n}",
+      "wrongBag": "Bag from another request scanned at Station {n}",
+      "belongsTo": "{bag} belongs to {request}",
+      "unknownBag": "{bag} does not belong to any request",
+      "waiting": "{days, plural, one {Request waiting for # day} other {Request waiting for # days}}",
+      "unknownBagTitle": "Unknown bag scanned at Station {n}"
+    },
+    "assign": {
+      "title": "Assign to a station",
+      "body": "The request stays at the top of the chosen station's queue until someone opens it.",
+      "request": "Request",
+      "station": "Station",
+      "none": "No station",
+      "cancel": "Cancel",
+      "save": "Save",
+      "done": "Assigned to Station {n}.",
+      "removed": "Assignment removed.",
+      "error": "Could not assign the request."
+    },
+    "csv": {
+      "time": "Time",
+      "station": "Station",
+      "operator": "Operator",
+      "request": "Request",
+      "client": "Client",
+      "bag": "Bag",
+      "quantity": "Pieces",
+      "destination": "Destination",
+      "category": "Category",
+      "condition": "Condition",
+      "sex": "Sex",
+      "ageGroup": "Age",
+      "season": "Season",
+      "brand": "Brand",
+      "lot": "Lot",
+      "empty": "No pieces recorded today yet.",
+      "error": "Could not export the day."
     }
   }
 }
