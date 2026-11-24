@@ -76,7 +76,7 @@ export async function generateMetadata({
     return { title: t('notFound') };
   }
 
-  const description = stripHtml(post.body).slice(0, 160);
+  const description = post.summary || stripHtml(post.body).slice(0, 160);
   return {
     title: `${post.title} | RETEX`,
     description,
@@ -128,7 +128,7 @@ export default async function BlogPostPage({
             <div className="blog-article-main">
               {post.hero && (
                 <div className="blog-article-hero">
-                  <img src={post.hero} alt={post.title} />
+                  <img src={post.hero} alt={post.heroAlt || post.title} />
                 </div>
               )}
               <div
@@ -149,7 +149,7 @@ export default async function BlogPostPage({
                     >
                       <div className="blog-aside-thumb">
                         {p.hero ? (
-                          <img src={p.hero} alt={p.title} />
+                          <img src={p.hero} alt={p.heroAlt || p.title} />
                         ) : (
                           <div
                             className="blog-thumb-placeholder"

@@ -10,6 +10,9 @@ export interface BlogPost {
   title: string;
   body: string;
   hero: string;
+  heroAlt?: string | null;
+  // Uma ou duas frases para o cartão e a descrição no Google.
+  summary?: string | null;
   publishDate?: string;
   categories?: BlogCategory[];
 }

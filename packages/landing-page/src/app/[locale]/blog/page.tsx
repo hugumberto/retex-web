@@ -77,7 +77,7 @@ export default async function BlogIndexPage({
                 >
                   <div className="blog-card-visual">
                     {post.hero ? (
-                      <img src={post.hero} alt={post.title} />
+                      <img src={post.hero} alt={post.heroAlt || post.title} />
                     ) : (
                       <div
                         className="blog-featured-visual--placeholder"
@@ -90,7 +90,7 @@ export default async function BlogIndexPage({
                       {post.categories?.[0]?.title ?? t('defaultCategory')}
                     </small>
                     <h3>{post.title}</h3>
-                    <p>{excerpt(post.body, 130)}</p>
+                    <p>{post.summary || excerpt(post.body, 130)}</p>
                     <div className="blog-meta-row">
                       <time
                         className="blog-date"

@@ -1978,5 +1978,286 @@
       "empty": "Aucune pièce enregistrée aujourd'hui.",
       "error": "Impossible d'exporter la journée."
     }
+  },
+  "blogList": {
+    "title": "Articles du blog",
+    "crumbSite": "Site et blog",
+    "crumbPosts": "Articles",
+    "loadError": "Impossible de charger les articles.",
+    "tabs": {
+      "posts": "Articles",
+      "categories": "Catégories"
+    },
+    "search": "Rechercher un article ou un mot-clé",
+    "viewSite": "Voir le blog sur le site",
+    "newPost": "Nouvel article",
+    "stats": {
+      "published": "Publiés",
+      "publishedHint": "visibles sur {site}/blog",
+      "drafts": "Brouillons",
+      "draftsHint": "seulement dans le backoffice",
+      "scheduled": "Programmés",
+      "scheduledHint": "{count, plural, =0 {aucun à publier} other {# à publier}}",
+      "highlighted": "À la une",
+      "highlightedHint": "en haut de la page du blog"
+    },
+    "allCategories": "Toutes",
+    "sort": {
+      "label": "Trier :",
+      "recent": "plus récents",
+      "oldest": "plus anciens",
+      "title": "titre (A–Z)"
+    },
+    "columns": {
+      "post": "Article",
+      "category": "Catégorie",
+      "status": "État",
+      "highlight": "À la une",
+      "updated": "Mis à jour",
+      "actions": "Actions"
+    },
+    "status": {
+      "PUBLISHED": "Publié",
+      "DRAFT": "Brouillon",
+      "SCHEDULED": "Programmé",
+      "scheduledFor": "Publié le {date}"
+    },
+    "star": {
+      "principal": "À la une principal",
+      "secondary": "À la une secondaire · cliquez pour le rendre principal",
+      "make": "Mettre à la une en haut du blog",
+      "on": "Article mis à la une.",
+      "off": "Article retiré de la une.",
+      "error": "Impossible de changer la une."
+    },
+    "actions": {
+      "edit": "Modifier",
+      "view": "Voir sur le site",
+      "notPublished": "Pas encore sur le site",
+      "delete": "Supprimer"
+    },
+    "delete": {
+      "title": "Supprimer « {title} » ?",
+      "titleMany": "{count, plural, one {Supprimer # article ?} other {Supprimer # articles ?}}",
+      "body": "Il n'apparaîtra plus sur le site ni dans le backoffice.",
+      "done": "{count, plural, one {Article supprimé.} other {# articles supprimés.}}",
+      "error": "Impossible de supprimer."
+    },
+    "bulk": {
+      "selected": "{count, plural, one {# sélectionné} other {# sélectionnés}}",
+      "publish": "Publier",
+      "delete": "Supprimer",
+      "clear": "Effacer la sélection",
+      "published": "{count, plural, one {Article publié.} other {# articles publiés.}}",
+      "publishError": "Impossible de publier."
+    },
+    "select": "Sélectionner « {title} »",
+    "selectAll": "Tout sélectionner",
+    "empty": "Aucun article pour l'instant.",
+    "emptyFilter": "Aucun article avec ces filtres.",
+    "showing": "{shown} sur {total} articles",
+    "starNote": "L'étoile marque l'article à la une en haut du blog"
+  },
+  "blogCategoriesPage": {
+    "title": "Catégories du blog",
+    "crumb": "Catégories",
+    "loadError": "Impossible de charger les catégories.",
+    "new": "Nouvelle catégorie",
+    "order": "Ordre sur le site",
+    "dragHint": "faites glisser la poignée pour réordonner",
+    "columns": {
+      "name": "Nom",
+      "posts": "Articles",
+      "visible": "Visible sur le site",
+      "actions": "Actions"
+    },
+    "visible": "Visible",
+    "hidden": "Masquée",
+    "visibleToggle": "Afficher « {name} » sur le site",
+    "edit": "Modifier « {name} »",
+    "delete": "Supprimer « {name} »",
+    "deleteTitle": "Supprimer « {name} » ?",
+    "deleteBody": "La catégorie sera supprimée. Elle n'a pas d'articles.",
+    "cannotDelete": "Elle contient des articles : masquez-la ou déplacez d'abord les articles.",
+    "deleteRule": "Une catégorie avec des articles ne peut pas être supprimée. Masquez-la ou déplacez d'abord les articles.",
+    "moveUp": "Monter « {name} »",
+    "moveDown": "Descendre « {name} »",
+    "empty": "Aucune catégorie pour l'instant.",
+    "orderError": "Impossible d'enregistrer l'ordre.",
+    "saveError": "Impossible d'enregistrer la catégorie.",
+    "saved": "Catégorie enregistrée.",
+    "created": "Catégorie créée.",
+    "deleted": "Catégorie supprimée.",
+    "deleteError": "Impossible de supprimer la catégorie.",
+    "form": {
+      "editTitle": "Modifier la catégorie",
+      "newTitle": "Nouvelle catégorie",
+      "posts": "{count, plural, =0 {aucun article} one {# article} other {# articles}}",
+      "name": "Nom",
+      "slugHint": "Créé automatiquement à partir du nom.",
+      "description": "Description (facultative)",
+      "descriptionPlaceholder": "Affichée en haut de la page de la catégorie",
+      "visible": "Visible sur le site",
+      "visibleHint": "Désactivez pour masquer sans supprimer.",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "create": "Créer la catégorie",
+      "placeholder": "Choisissez une catégorie à modifier ou créez-en une."
+    }
+  },
+  "blogEditor": {
+    "newTitle": "Nouvel article",
+    "editTitle": "Modifier l'article",
+    "loading": "Chargement…",
+    "loadError": "Impossible de charger l'article.",
+    "saveError": "Impossible d'enregistrer l'article.",
+    "save": {
+      "idle": "pas encore enregistré",
+      "dirty": "modifications non enregistrées",
+      "saving": "enregistrement…",
+      "saved": "brouillon enregistré automatiquement",
+      "error": "impossible d'enregistrer"
+    },
+    "actions": {
+      "preview": "Aperçu",
+      "publish": "Publier",
+      "saveChanges": "Enregistrer",
+      "schedule": "Programmer",
+      "saveDraft": "Enregistrer le brouillon"
+    },
+    "done": {
+      "published": "Article publié.",
+      "scheduled": "Article programmé pour le {date}.",
+      "draft": "Brouillon enregistré."
+    },
+    "missing": {
+      "title": "titre",
+      "slug": "adresse",
+      "body": "texte",
+      "hero": "image à la une",
+      "toast": "Il manque : {fields}."
+    },
+    "fields": {
+      "title": "Titre",
+      "titlePlaceholder": "Ex. : RETEX à Ecomondo 2026",
+      "slug": "Adresse de l'article",
+      "slugPlaceholder": "titre-de-l-article",
+      "slugEdit": "Modifier",
+      "slugDone": "OK",
+      "slugHint": "Générée à partir du titre. Erreur seulement si elle est vide à l'enregistrement.",
+      "summary": "Résumé",
+      "summaryPlaceholder": "Une ou deux phrases pour la carte de l'article et pour Google",
+      "characters": "caractères"
+    },
+    "body": {
+      "words": "{count, plural, one {# mot} other {# mots}}",
+      "reading": "temps de lecture : {minutes} min",
+      "readingNone": "temps de lecture : —"
+    },
+    "google": {
+      "title": "Aperçu dans Google",
+      "hint": "Utilise le titre et le résumé de l'article.",
+      "titlePlaceholder": "Titre de l'article",
+      "summaryPlaceholder": "Le résumé de l'article apparaît ici. Écrivez-le plus haut pour maîtriser ce que les gens lisent avant de cliquer."
+    },
+    "publication": {
+      "title": "Publication",
+      "when": "Publier le",
+      "dateInPast": "Choisissez une date et une heure futures.",
+      "hint": {
+        "DRAFT": "Seuls les administrateurs voient l'article. Il n'apparaît pas sur le site avant publication.",
+        "PUBLISHED": "L'article est visible sur le site dès l'enregistrement.",
+        "SCHEDULED": "L'article apparaît tout seul sur le site à la date et l'heure choisies."
+      }
+    },
+    "image": {
+      "title": "Image à la une",
+      "drop": "Glissez une image ou parcourez l'ordinateur",
+      "formats": "JPG, PNG ou WebP · 1200 × 630 px",
+      "alt": "Texte alternatif",
+      "altPlaceholder": "Décrivez l'image",
+      "remove": "Retirer l'image",
+      "type": "Utilisez une image JPG, PNG ou WebP.",
+      "error": "Impossible de lire l'image."
+    },
+    "categories": {
+      "title": "Catégories",
+      "manage": "Gérer",
+      "none": "Aucune catégorie pour l'instant.",
+      "newPlaceholder": "Nouvelle catégorie",
+      "add": "Ajouter",
+      "loadError": "Impossible de charger les catégories.",
+      "createError": "Impossible de créer la catégorie."
+    },
+    "tags": {
+      "title": "Mots-clés",
+      "placeholder": "Tapez et appuyez sur Entrée",
+      "remove": "Retirer « {tag} »"
+    },
+    "highlight": {
+      "title": "Mise en avant",
+      "0": {
+        "label": "Pas à la une",
+        "hint": "Apparaît dans la liste normale, par date."
+      },
+      "2": {
+        "label": "À la une principal",
+        "hint": "Grande carte en haut du blog. Un seul article à la fois."
+      },
+      "1": {
+        "label": "À la une secondaire",
+        "hint": "Bandeau de mises en avant, sous le principal."
+      }
+    }
+  },
+  "faqPage": {
+    "title": "Questions fréquentes",
+    "crumb": "FAQ",
+    "loadError": "Impossible de charger la FAQ.",
+    "loading": "Chargement…",
+    "viewSite": "Voir la FAQ sur le site",
+    "newQuestion": "Nouvelle question",
+    "groups": "Groupes",
+    "groupMeta": "{count, plural, =0 {aucune question} one {# question} other {# questions}} · {status}",
+    "visible": "visible",
+    "hidden": "masqué",
+    "newGroup": "Nouveau groupe",
+    "newGroupPlaceholder": "Nom du groupe",
+    "create": "Créer",
+    "groupSummary": "{count, plural, =0 {aucune question} one {# question} other {# questions}} · {visible} visibles sur le site",
+    "groupVisible": "Groupe visible",
+    "rename": "Renommer",
+    "descriptionPlaceholder": "Description du groupe (facultative)",
+    "deleteGroup": "Supprimer le groupe",
+    "deleteGroupTitle": "Supprimer le groupe « {name} » ?",
+    "deleteGroupBody": "{count, plural, =0 {Le groupe n'a pas de questions.} one {Sa question est aussi supprimée.} other {Ses # questions sont aussi supprimées.}}",
+    "groupDeleted": "Groupe supprimé.",
+    "search": "Rechercher dans cette liste",
+    "moveUp": "Monter « {name} »",
+    "moveDown": "Descendre « {name} »",
+    "itemVisible": "Afficher « {name} » sur le site",
+    "deleteItem": "Supprimer « {name} »",
+    "deleteItemTitle": "Supprimer cette question ?",
+    "expand": "Ouvrir",
+    "collapse": "Fermer",
+    "item": {
+      "question": "Question",
+      "answer": "Réponse",
+      "group": "Groupe",
+      "groupOption": "Groupe : {name}",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "saved": "Question enregistrée.",
+    "deleted": "Question supprimée.",
+    "saveError": "Impossible d'enregistrer.",
+    "deleteError": "Impossible de supprimer.",
+    "orderError": "Impossible d'enregistrer l'ordre.",
+    "pickGroup": "Choisissez ou créez d'abord un groupe.",
+    "emptyGroup": "Ce groupe n'a pas encore de questions.",
+    "noMatch": "Aucune question pour cette recherche.",
+    "noGroups": "Aucun groupe pour l'instant. Créez le premier à gauche.",
+    "showing": "{shown} sur {total}",
+    "loadMore": "Charger plus"
   }
 }

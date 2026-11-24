@@ -114,11 +114,6 @@ export const NAV_SECTIONS: NavSection[] = [
     labelKey: 'settings',
     items: [
       { href: '/portal/perfil', labelKey: 'account', roles: ALL },
-      {
-        href: '/portal/blog-categories',
-        labelKey: 'categories',
-        roles: [Role.ADMIN, Role.OPS],
-      },
       { href: '/portal/zona', labelKey: 'zones', roles: [Role.ADMIN] },
       { href: '/portal/parametros', labelKey: 'parameters', roles: [Role.ADMIN] },
       {
