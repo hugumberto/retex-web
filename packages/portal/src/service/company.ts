@@ -3,6 +3,11 @@ import { CompanyContextDTO } from '@/app/types/company';
 import api from '@/lib/api';
 import { isSuccessStatus } from '@/lib/utils';
 import { useAppStore } from '@/store';
+import { Role } from '@/app/types/user';
+import { getUserRoles } from '@/lib/access-control';
+
+// A API só responde a /company/me para estes perfis (um motorista não tem empresa).
+const COMPANY_ROLES: Role[] = [Role.ADMIN, Role.OPS, Role.USER];
 
 /**
  * Obtém o contexto de empresa do utilizador autenticado (GET /company/me) e
@@ -15,7 +20,12 @@ import { useAppStore } from '@/store';
  * guard das rotas de empresa.
  */
 export async function fetchCompanyContext(): Promise<CompanyContextDTO | null> {
-  const { setCompanyContext } = useAppStore.getState();
+  const { setCompanyContext, user } = useAppStore.getState();
+
+  if (user && !getUserRoles(user).some((role) => COMPANY_ROLES.includes(role))) {
+    setCompanyContext(null);
+    return null;
+  }
 
   try {
     const { data, status } = await api.get<CompanyContextDTO | null>(
