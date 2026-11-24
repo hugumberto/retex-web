@@ -1978,5 +1978,286 @@
       "empty": "Todavía no hay piezas registradas hoy.",
       "error": "No se pudo exportar el día."
     }
+  },
+  "blogList": {
+    "title": "Artículos del blog",
+    "crumbSite": "Sitio y blog",
+    "crumbPosts": "Artículos",
+    "loadError": "No se pudieron cargar los artículos.",
+    "tabs": {
+      "posts": "Artículos",
+      "categories": "Categorías"
+    },
+    "search": "Buscar artículo o palabra clave",
+    "viewSite": "Ver blog en el sitio",
+    "newPost": "Nuevo artículo",
+    "stats": {
+      "published": "Publicados",
+      "publishedHint": "visibles en {site}/blog",
+      "drafts": "Borradores",
+      "draftsHint": "solo en el backoffice",
+      "scheduled": "Programados",
+      "scheduledHint": "{count, plural, =0 {ninguno por publicar} other {# por publicar}}",
+      "highlighted": "Destacados",
+      "highlightedHint": "arriba en la página del blog"
+    },
+    "allCategories": "Todas",
+    "sort": {
+      "label": "Ordenar:",
+      "recent": "más recientes",
+      "oldest": "más antiguos",
+      "title": "título (A–Z)"
+    },
+    "columns": {
+      "post": "Artículo",
+      "category": "Categoría",
+      "status": "Estado",
+      "highlight": "Destacado",
+      "updated": "Actualizado",
+      "actions": "Acciones"
+    },
+    "status": {
+      "PUBLISHED": "Publicado",
+      "DRAFT": "Borrador",
+      "SCHEDULED": "Programado",
+      "scheduledFor": "Se publica el {date}"
+    },
+    "star": {
+      "principal": "Destacado principal",
+      "secondary": "Destacado secundario · haz clic para hacerlo principal",
+      "make": "Destacar arriba del blog",
+      "on": "Artículo destacado arriba del blog.",
+      "off": "Artículo quitado de destacados.",
+      "error": "No se pudo cambiar el destacado."
+    },
+    "actions": {
+      "edit": "Editar",
+      "view": "Ver en el sitio",
+      "notPublished": "Todavía no está en el sitio",
+      "delete": "Eliminar"
+    },
+    "delete": {
+      "title": "¿Eliminar «{title}»?",
+      "titleMany": "{count, plural, one {¿Eliminar # artículo?} other {¿Eliminar # artículos?}}",
+      "body": "Deja de aparecer en el sitio y en el backoffice.",
+      "done": "{count, plural, one {Artículo eliminado.} other {# artículos eliminados.}}",
+      "error": "No se pudo eliminar."
+    },
+    "bulk": {
+      "selected": "{count, plural, one {# seleccionado} other {# seleccionados}}",
+      "publish": "Publicar",
+      "delete": "Eliminar",
+      "clear": "Quitar selección",
+      "published": "{count, plural, one {Artículo publicado.} other {# artículos publicados.}}",
+      "publishError": "No se pudo publicar."
+    },
+    "select": "Seleccionar «{title}»",
+    "selectAll": "Seleccionar todos",
+    "empty": "Todavía no hay artículos.",
+    "emptyFilter": "Ningún artículo con estos filtros.",
+    "showing": "Mostrando {shown} de {total} artículos",
+    "starNote": "La estrella marca el artículo destacado arriba del blog"
+  },
+  "blogCategoriesPage": {
+    "title": "Categorías del blog",
+    "crumb": "Categorías",
+    "loadError": "No se pudieron cargar las categorías.",
+    "new": "Nueva categoría",
+    "order": "Orden en el sitio",
+    "dragHint": "arrastra por el asa para reordenar",
+    "columns": {
+      "name": "Nombre",
+      "posts": "Artículos",
+      "visible": "Visible en el sitio",
+      "actions": "Acciones"
+    },
+    "visible": "Visible",
+    "hidden": "Oculta",
+    "visibleToggle": "Mostrar «{name}» en el sitio",
+    "edit": "Editar «{name}»",
+    "delete": "Eliminar «{name}»",
+    "deleteTitle": "¿Eliminar «{name}»?",
+    "deleteBody": "La categoría deja de existir. No tiene artículos.",
+    "cannotDelete": "Tiene artículos: ocúltala o cambia primero los artículos.",
+    "deleteRule": "Una categoría con artículos no se puede eliminar. Ocúltala o mueve primero los artículos.",
+    "moveUp": "Subir «{name}»",
+    "moveDown": "Bajar «{name}»",
+    "empty": "Todavía no hay categorías.",
+    "orderError": "No se pudo guardar el orden.",
+    "saveError": "No se pudo guardar la categoría.",
+    "saved": "Categoría guardada.",
+    "created": "Categoría creada.",
+    "deleted": "Categoría eliminada.",
+    "deleteError": "No se pudo eliminar la categoría.",
+    "form": {
+      "editTitle": "Editar categoría",
+      "newTitle": "Nueva categoría",
+      "posts": "{count, plural, =0 {sin artículos} one {# artículo} other {# artículos}}",
+      "name": "Nombre",
+      "slugHint": "Creado automáticamente a partir del nombre.",
+      "description": "Descripción (opcional)",
+      "descriptionPlaceholder": "Aparece arriba en la página de la categoría",
+      "visible": "Visible en el sitio",
+      "visibleHint": "Desactívalo para ocultarla sin borrar.",
+      "cancel": "Cancelar",
+      "save": "Guardar cambios",
+      "create": "Crear categoría",
+      "placeholder": "Elige una categoría para editar o crea una nueva."
+    }
+  },
+  "blogEditor": {
+    "newTitle": "Nuevo artículo",
+    "editTitle": "Editar artículo",
+    "loading": "Cargando…",
+    "loadError": "No se pudo cargar el artículo.",
+    "saveError": "No se pudo guardar el artículo.",
+    "save": {
+      "idle": "todavía sin guardar",
+      "dirty": "cambios sin guardar",
+      "saving": "guardando…",
+      "saved": "borrador guardado automáticamente",
+      "error": "no se pudo guardar"
+    },
+    "actions": {
+      "preview": "Vista previa",
+      "publish": "Publicar",
+      "saveChanges": "Guardar cambios",
+      "schedule": "Programar",
+      "saveDraft": "Guardar borrador"
+    },
+    "done": {
+      "published": "Artículo publicado.",
+      "scheduled": "Artículo programado para el {date}.",
+      "draft": "Borrador guardado."
+    },
+    "missing": {
+      "title": "título",
+      "slug": "dirección",
+      "body": "texto",
+      "hero": "imagen destacada",
+      "toast": "Falta rellenar: {fields}."
+    },
+    "fields": {
+      "title": "Título",
+      "titlePlaceholder": "Ej.: RETEX en Ecomondo 2026",
+      "slug": "Dirección del artículo",
+      "slugPlaceholder": "titulo-del-articulo",
+      "slugEdit": "Editar",
+      "slugDone": "Listo",
+      "slugHint": "Generada a partir del título. Solo da error si queda vacía al guardar.",
+      "summary": "Resumen",
+      "summaryPlaceholder": "Una o dos frases para la tarjeta del artículo y para Google",
+      "characters": "caracteres"
+    },
+    "body": {
+      "words": "{count, plural, one {# palabra} other {# palabras}}",
+      "reading": "tiempo de lectura: {minutes} min",
+      "readingNone": "tiempo de lectura: —"
+    },
+    "google": {
+      "title": "Vista previa en Google",
+      "hint": "Usa el título y el resumen del artículo.",
+      "titlePlaceholder": "Título del artículo",
+      "summaryPlaceholder": "Aquí aparece el resumen del artículo. Escríbelo arriba para controlar lo que la gente lee antes de hacer clic."
+    },
+    "publication": {
+      "title": "Publicación",
+      "when": "Publicar el",
+      "dateInPast": "Elige una fecha y hora futuras.",
+      "hint": {
+        "DRAFT": "Solo los administradores ven el artículo. No aparece en el sitio hasta que lo publiques.",
+        "PUBLISHED": "El artículo queda visible en el sitio en cuanto guardes.",
+        "SCHEDULED": "El artículo aparece solo en el sitio en la fecha y hora elegidas."
+      }
+    },
+    "image": {
+      "title": "Imagen destacada",
+      "drop": "Arrastra una imagen o búscala en el ordenador",
+      "formats": "JPG, PNG o WebP · 1200 × 630 px",
+      "alt": "Texto alternativo",
+      "altPlaceholder": "Describe la imagen",
+      "remove": "Quitar la imagen",
+      "type": "Usa una imagen JPG, PNG o WebP.",
+      "error": "No se pudo leer la imagen."
+    },
+    "categories": {
+      "title": "Categorías",
+      "manage": "Gestionar",
+      "none": "Todavía no hay categorías.",
+      "newPlaceholder": "Nueva categoría",
+      "add": "Añadir",
+      "loadError": "No se pudieron cargar las categorías.",
+      "createError": "No se pudo crear la categoría."
+    },
+    "tags": {
+      "title": "Palabras clave",
+      "placeholder": "Escribe y pulsa Enter",
+      "remove": "Quitar «{tag}»"
+    },
+    "highlight": {
+      "title": "Destacado en el blog",
+      "0": {
+        "label": "Sin destacar",
+        "hint": "Aparece en la lista normal, por fecha."
+      },
+      "2": {
+        "label": "Destacado principal",
+        "hint": "Tarjeta grande arriba del blog. Solo un artículo a la vez."
+      },
+      "1": {
+        "label": "Destacado secundario",
+        "hint": "Franja de destacados, debajo del principal."
+      }
+    }
+  },
+  "faqPage": {
+    "title": "Preguntas frecuentes",
+    "crumb": "FAQ",
+    "loadError": "No se pudieron cargar las FAQ.",
+    "loading": "Cargando…",
+    "viewSite": "Ver FAQ en el sitio",
+    "newQuestion": "Nueva pregunta",
+    "groups": "Grupos",
+    "groupMeta": "{count, plural, =0 {sin preguntas} one {# pregunta} other {# preguntas}} · {status}",
+    "visible": "visible",
+    "hidden": "oculto",
+    "newGroup": "Nuevo grupo",
+    "newGroupPlaceholder": "Nombre del grupo",
+    "create": "Crear",
+    "groupSummary": "{count, plural, =0 {sin preguntas} one {# pregunta} other {# preguntas}} · {visible} visibles en el sitio",
+    "groupVisible": "Grupo visible",
+    "rename": "Renombrar",
+    "descriptionPlaceholder": "Descripción del grupo (opcional)",
+    "deleteGroup": "Eliminar grupo",
+    "deleteGroupTitle": "¿Eliminar el grupo «{name}»?",
+    "deleteGroupBody": "{count, plural, =0 {El grupo no tiene preguntas.} one {Su pregunta también se elimina.} other {Sus # preguntas también se eliminan.}}",
+    "groupDeleted": "Grupo eliminado.",
+    "search": "Buscar en esta lista",
+    "moveUp": "Subir «{name}»",
+    "moveDown": "Bajar «{name}»",
+    "itemVisible": "Mostrar «{name}» en el sitio",
+    "deleteItem": "Eliminar «{name}»",
+    "deleteItemTitle": "¿Eliminar esta pregunta?",
+    "expand": "Abrir",
+    "collapse": "Cerrar",
+    "item": {
+      "question": "Pregunta",
+      "answer": "Respuesta",
+      "group": "Grupo",
+      "groupOption": "Grupo: {name}",
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    },
+    "saved": "Pregunta guardada.",
+    "deleted": "Pregunta eliminada.",
+    "saveError": "No se pudo guardar.",
+    "deleteError": "No se pudo eliminar.",
+    "orderError": "No se pudo guardar el orden.",
+    "pickGroup": "Elige o crea primero un grupo.",
+    "emptyGroup": "Este grupo todavía no tiene preguntas.",
+    "noMatch": "Ninguna pregunta con esta búsqueda.",
+    "noGroups": "Todavía no hay grupos. Crea el primero a la izquierda.",
+    "showing": "Mostrando {shown} de {total}",
+    "loadMore": "Cargar más"
   }
 }

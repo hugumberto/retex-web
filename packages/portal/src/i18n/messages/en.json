@@ -1978,5 +1978,286 @@
       "empty": "No pieces recorded today yet.",
       "error": "Could not export the day."
     }
+  },
+  "blogList": {
+    "title": "Blog posts",
+    "crumbSite": "Site and blog",
+    "crumbPosts": "Posts",
+    "loadError": "Could not load the posts.",
+    "tabs": {
+      "posts": "Posts",
+      "categories": "Categories"
+    },
+    "search": "Search post or keyword",
+    "viewSite": "View blog on site",
+    "newPost": "New post",
+    "stats": {
+      "published": "Published",
+      "publishedHint": "visible at {site}/blog",
+      "drafts": "Drafts",
+      "draftsHint": "backoffice only",
+      "scheduled": "Scheduled",
+      "scheduledHint": "{count, plural, =0 {none to publish} other {# to publish}}",
+      "highlighted": "Featured",
+      "highlightedHint": "top of the blog page"
+    },
+    "allCategories": "All",
+    "sort": {
+      "label": "Sort:",
+      "recent": "most recent",
+      "oldest": "oldest",
+      "title": "title (A–Z)"
+    },
+    "columns": {
+      "post": "Post",
+      "category": "Category",
+      "status": "Status",
+      "highlight": "Featured",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "status": {
+      "PUBLISHED": "Published",
+      "DRAFT": "Draft",
+      "SCHEDULED": "Scheduled",
+      "scheduledFor": "Publishes on {date}"
+    },
+    "star": {
+      "principal": "Main feature",
+      "secondary": "Secondary feature · click to make it the main one",
+      "make": "Feature at the top of the blog",
+      "on": "Post featured at the top of the blog.",
+      "off": "Post no longer featured.",
+      "error": "Could not change the feature."
+    },
+    "actions": {
+      "edit": "Edit",
+      "view": "View on site",
+      "notPublished": "Not on the site yet",
+      "delete": "Delete"
+    },
+    "delete": {
+      "title": "Delete “{title}”?",
+      "titleMany": "{count, plural, one {Delete # post?} other {Delete # posts?}}",
+      "body": "It will no longer appear on the site or in the backoffice.",
+      "done": "{count, plural, one {Post deleted.} other {# posts deleted.}}",
+      "error": "Could not delete."
+    },
+    "bulk": {
+      "selected": "{count} selected",
+      "publish": "Publish",
+      "delete": "Delete",
+      "clear": "Clear selection",
+      "published": "{count, plural, one {Post published.} other {# posts published.}}",
+      "publishError": "Could not publish."
+    },
+    "select": "Select “{title}”",
+    "selectAll": "Select all",
+    "empty": "No posts yet.",
+    "emptyFilter": "No posts match these filters.",
+    "showing": "Showing {shown} of {total} posts",
+    "starNote": "The star marks the post featured at the top of the blog"
+  },
+  "blogCategoriesPage": {
+    "title": "Blog categories",
+    "crumb": "Categories",
+    "loadError": "Could not load the categories.",
+    "new": "New category",
+    "order": "Order on the site",
+    "dragHint": "drag the handle to reorder",
+    "columns": {
+      "name": "Name",
+      "posts": "Posts",
+      "visible": "Visible on site",
+      "actions": "Actions"
+    },
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "visibleToggle": "Show “{name}” on the site",
+    "edit": "Edit “{name}”",
+    "delete": "Delete “{name}”",
+    "deleteTitle": "Delete “{name}”?",
+    "deleteBody": "The category will be removed. It has no posts.",
+    "cannotDelete": "It has posts: hide it or move the posts first.",
+    "deleteRule": "A category with posts cannot be deleted. Hide it or move the posts first.",
+    "moveUp": "Move “{name}” up",
+    "moveDown": "Move “{name}” down",
+    "empty": "No categories yet.",
+    "orderError": "Could not save the order.",
+    "saveError": "Could not save the category.",
+    "saved": "Category saved.",
+    "created": "Category created.",
+    "deleted": "Category deleted.",
+    "deleteError": "Could not delete the category.",
+    "form": {
+      "editTitle": "Edit category",
+      "newTitle": "New category",
+      "posts": "{count, plural, =0 {no posts} one {# post} other {# posts}}",
+      "name": "Name",
+      "slugHint": "Created automatically from the name.",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Shown at the top of the category page",
+      "visible": "Visible on site",
+      "visibleHint": "Turn off to hide without deleting.",
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "create": "Create category",
+      "placeholder": "Pick a category to edit, or create a new one."
+    }
+  },
+  "blogEditor": {
+    "newTitle": "New post",
+    "editTitle": "Edit post",
+    "loading": "Loading…",
+    "loadError": "Could not load the post.",
+    "saveError": "Could not save the post.",
+    "save": {
+      "idle": "not saved yet",
+      "dirty": "unsaved changes",
+      "saving": "saving…",
+      "saved": "draft saved automatically",
+      "error": "could not save"
+    },
+    "actions": {
+      "preview": "Preview",
+      "publish": "Publish",
+      "saveChanges": "Save changes",
+      "schedule": "Schedule",
+      "saveDraft": "Save draft"
+    },
+    "done": {
+      "published": "Post published.",
+      "scheduled": "Post scheduled for {date}.",
+      "draft": "Draft saved."
+    },
+    "missing": {
+      "title": "title",
+      "slug": "address",
+      "body": "text",
+      "hero": "featured image",
+      "toast": "Still missing: {fields}."
+    },
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "E.g. RETEX at Ecomondo 2026",
+      "slug": "Post address",
+      "slugPlaceholder": "post-title",
+      "slugEdit": "Edit",
+      "slugDone": "Done",
+      "slugHint": "Generated from the title. Only an error if it is empty when saving.",
+      "summary": "Summary",
+      "summaryPlaceholder": "One or two sentences for the post card and Google",
+      "characters": "characters"
+    },
+    "body": {
+      "words": "{count, plural, one {# word} other {# words}}",
+      "reading": "reading time: {minutes} min",
+      "readingNone": "reading time: —"
+    },
+    "google": {
+      "title": "Google preview",
+      "hint": "Uses the post title and summary.",
+      "titlePlaceholder": "Post title",
+      "summaryPlaceholder": "The post summary shows here. Write it above to control what people read before clicking."
+    },
+    "publication": {
+      "title": "Publication",
+      "when": "Publish on",
+      "dateInPast": "Pick a future date and time.",
+      "hint": {
+        "DRAFT": "Only admins can see the post. It is not on the site until you publish it.",
+        "PUBLISHED": "The post is visible on the site as soon as you save.",
+        "SCHEDULED": "The post appears on the site by itself at the chosen date and time."
+      }
+    },
+    "image": {
+      "title": "Featured image",
+      "drop": "Drag an image or browse your computer",
+      "formats": "JPG, PNG or WebP · 1200 × 630 px",
+      "alt": "Alt text",
+      "altPlaceholder": "Describe the image",
+      "remove": "Remove the image",
+      "type": "Use a JPG, PNG or WebP image.",
+      "error": "Could not read the image."
+    },
+    "categories": {
+      "title": "Categories",
+      "manage": "Manage",
+      "none": "No categories yet.",
+      "newPlaceholder": "New category",
+      "add": "Add",
+      "loadError": "Could not load the categories.",
+      "createError": "Could not create the category."
+    },
+    "tags": {
+      "title": "Keywords",
+      "placeholder": "Type and press Enter",
+      "remove": "Remove “{tag}”"
+    },
+    "highlight": {
+      "title": "Blog feature",
+      "0": {
+        "label": "Not featured",
+        "hint": "Shows in the normal list, by date."
+      },
+      "2": {
+        "label": "Main feature",
+        "hint": "Large card at the top of the blog. One post at a time."
+      },
+      "1": {
+        "label": "Secondary feature",
+        "hint": "Feature strip, below the main one."
+      }
+    }
+  },
+  "faqPage": {
+    "title": "Frequently asked questions",
+    "crumb": "FAQ",
+    "loadError": "Could not load the FAQ.",
+    "loading": "Loading…",
+    "viewSite": "View FAQ on site",
+    "newQuestion": "New question",
+    "groups": "Groups",
+    "groupMeta": "{count, plural, =0 {no questions} one {# question} other {# questions}} · {status}",
+    "visible": "visible",
+    "hidden": "hidden",
+    "newGroup": "New group",
+    "newGroupPlaceholder": "Group name",
+    "create": "Create",
+    "groupSummary": "{count, plural, =0 {no questions} one {# question} other {# questions}} · {visible} visible on the site",
+    "groupVisible": "Group visible",
+    "rename": "Rename",
+    "descriptionPlaceholder": "Group description (optional)",
+    "deleteGroup": "Delete group",
+    "deleteGroupTitle": "Delete the group “{name}”?",
+    "deleteGroupBody": "{count, plural, =0 {The group has no questions.} one {Its question is deleted too.} other {Its # questions are deleted too.}}",
+    "groupDeleted": "Group deleted.",
+    "search": "Search this list",
+    "moveUp": "Move “{name}” up",
+    "moveDown": "Move “{name}” down",
+    "itemVisible": "Show “{name}” on the site",
+    "deleteItem": "Delete “{name}”",
+    "deleteItemTitle": "Delete this question?",
+    "expand": "Open",
+    "collapse": "Close",
+    "item": {
+      "question": "Question",
+      "answer": "Answer",
+      "group": "Group",
+      "groupOption": "Group: {name}",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "saved": "Question saved.",
+    "deleted": "Question deleted.",
+    "saveError": "Could not save.",
+    "deleteError": "Could not delete.",
+    "orderError": "Could not save the order.",
+    "pickGroup": "Pick or create a group first.",
+    "emptyGroup": "This group has no questions yet.",
+    "noMatch": "No questions match this search.",
+    "noGroups": "No groups yet. Create the first one on the left.",
+    "showing": "Showing {shown} of {total}",
+    "loadMore": "Load more"
   }
 }

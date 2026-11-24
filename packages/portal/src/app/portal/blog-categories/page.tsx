@@ -1,5 +1,6 @@
-import BlogCategories from './blog-categories';
+import { redirect } from 'next/navigation';
 
+// As categorias passaram a ser um separador do blog.
 export default function BlogCategoriesPage() {
-  return <BlogCategories />;
+  redirect('/portal/blog/categorias');
 }

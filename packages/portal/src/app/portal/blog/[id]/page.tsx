@@ -1,56 +1,30 @@
 'use client';
 
-import { BlogPostDTO, BlogPostFormData } from '@/app/types/blog';
+import { BlogPostDTO } from '@/app/types/blog';
 import api from '@/lib/api';
-import { isSuccessStatus } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import BlogForm from '../blog-form';
 
 export default function EditBlogPage() {
-  const t = useTranslations('blog');
-  const tCommon = useTranslations('common');
+  const t = useTranslations('blogEditor');
   const params = useParams<{ id: string }>();
-  const [initialData, setInitialData] = useState<BlogPostFormData | undefined>();
-  const [loading, setLoading] = useState(true);
-
-  const fetchPost = useCallback(async () => {
-    try {
-      const { data: post, status } = await api.get<BlogPostDTO>(
-        `/blog-post/${params.id}`
-      );
-      if (!isSuccessStatus(status)) throw new Error();
-      if (!post) {
-        toast.error(t('notFound'));
-        return;
-      }
-      setInitialData({
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        body: post.body,
-        hero: post.hero,
-        tags: post.tags,
-        status: post.status,
-        highlight: post.highlight,
-        categoryIds: post.categories?.map((category) => category.id) ?? [],
-      });
-    } catch {
-      toast.error(t('loadOneError'));
-    } finally {
-      setLoading(false);
-    }
-  }, [params.id, t]);
+  const [post, setPost] = useState<BlogPostDTO | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    fetchPost();
-  }, [fetchPost]);
+    api
+      .get<BlogPostDTO>(`/blog-post/${params.id}`)
+      .then(({ data }) => setPost(data))
+      .catch(() => {
+        setFailed(true);
+        toast.error(t('loadError'));
+      });
+  }, [params.id, t]);
 
-  if (loading) {
-    return <p className="p-6 text-muted-foreground">{tCommon('loading')}</p>;
-  }
-
-  return <BlogForm blogPostId={params.id} initialData={initialData} />;
+  if (failed) return <p className="p-6 text-ink">{t('loadError')}</p>;
+  if (!post) return <p className="p-6 text-ink">{t('loading')}</p>;
+  return <BlogForm key={post.id} post={post} />;
 }

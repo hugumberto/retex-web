@@ -10,6 +10,9 @@ export interface BlogPostFormData {
   highlight: BlogPostHighlight;
   tags: string[];
   categoryIds: string[];
+  summary?: string | null;
+  heroAlt?: string | null;
+  publishDate?: string | null;
 }
 
 export enum BlogCategoryStatus {
@@ -21,6 +24,10 @@ export interface BlogCategory extends Entity {
   title: string;
   slug: string;
   status: BlogCategoryStatus;
+  description?: string | null;
+  position?: number;
+  // Só nas listagens do backoffice.
+  postsCount?: number;
 }
 
 // Mirrors the backend (source of truth): highlight is stored as an integer.
@@ -34,6 +41,8 @@ export enum BlogPostHighlight {
 export enum BlogPostStatus {
   DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
+  // Publica-se sozinho na data escolhida.
+  SCHEDULED = 'SCHEDULED',
 }
 
 export interface BlogPostDTO extends Entity {
@@ -45,4 +54,7 @@ export interface BlogPostDTO extends Entity {
   highlight: BlogPostHighlight;
   tags: string[];
   categories?: BlogCategory[];
+  summary?: string | null;
+  heroAlt?: string | null;
+  publishDate?: string | null;
 }

@@ -65,15 +65,12 @@ import { useWindowSize } from '@/hooks/use-window-size';
 import { useCursorVisibility } from '@/hooks/use-cursor-visibility';
 
 // --- Components ---
-import { ThemeToggle } from '@/components/tiptap-templates/simple/theme-toggle';
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from '@/lib/tiptap-utils';
 
 // --- Styles ---
 import '@/components/tiptap-templates/simple/simple-editor.css';
-import { useAppStore } from '@/store';
-import { cn } from '@/lib/utils';
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -145,11 +142,6 @@ const MainToolbarContent = ({
 
       <Spacer />
 
-      {isMobile && <ToolbarSeparator />}
-
-      <ToolbarGroup>
-        <ThemeToggle />
-      </ToolbarGroup>
     </>
   );
 };
@@ -189,7 +181,6 @@ interface SimpleEditorProps {
 }
 
 export function SimpleEditor({ content, onChange }: SimpleEditorProps) {
-  const { isDarkMode } = useAppStore();
   const isMobile = useIsMobile();
   const { height } = useWindowSize();
   const [mobileView, setMobileView] = React.useState<
@@ -288,7 +279,7 @@ export function SimpleEditor({ content, onChange }: SimpleEditorProps) {
         <EditorContent
           editor={editor}
           role="presentation"
-          className={cn('simple-editor-content', isDarkMode ? 'dark' : '')}
+          className="simple-editor-content"
         />
       </EditorContext.Provider>
     </div>
