@@ -17,6 +17,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { calculatePlan, clockAfter, PlanResult, useSystemParameters } from '../collection-request/use-route-plan';
 import { hasValidCoords, readCoords } from '../package-collection/utils';
+import { formatZip } from '@/lib/address';
+
+// Botão desativado legível (texto escuro sobre cinzento, contraste ≥ 4,5:1).
+const DISABLED = 'bg-[#dde6e9] text-[#4f6573] [&_*]:text-[#4f6573]';
 
 type Tab = 'route' | 'stops' | 'vehicle' | 'profile';
 type RouteBags = { collectionRequest: { id: string }; bags: CollectionRequestBagDTO[] }[];
@@ -160,7 +164,10 @@ export default function DriverRoute() {
   const doneCount = stops.filter((s) => isDone(s.request)).length;
   const current =
     stops.find((s) => s.request.id === pickedId && isOpen(s.request)) ?? stops.find((s) => isOpen(s.request)) ?? null;
-  const upcoming = stops.filter((s) => s !== current && isOpen(s.request));
+  // Antes de iniciar, a lista mostra todas as paragens (ainda não há "a seguir").
+  const upcoming = stops.filter(
+    (s) => (route?.status !== CollectionStatus.IN_TRANSIT || s !== current) && isOpen(s.request)
+  );
   const interval = route?.collectionInterval ?? null;
   const eta = (minutes: number | null | undefined) =>
     interval && minutes != null ? clockAfter(interval, minutes) : null;
@@ -254,7 +261,7 @@ export default function DriverRoute() {
       const { lat, long } = readCoords(r);
       return `https://www.google.com/maps/dir/?api=1&destination=${lat},${long}`;
     }
-    const text = [streetOf(r), r.address?.zipCode, r.address?.city].filter(Boolean).join(', ');
+    const text = [streetOf(r), formatZip(r.address?.zipCode), r.address?.city].filter(Boolean).join(', ');
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(text)}`;
   };
 
@@ -327,12 +334,16 @@ export default function DriverRoute() {
           ) : null}
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
           {isLoading && !route ? <p className="py-10 text-center text-sm text-ink">{t('loading')}</p> : null}
 
           {!isLoading && routes.length === 0 ? (
             <div className="rounded-2xl bg-white p-6 text-center">
-              <p className="text-[17px] font-semibold">{t('noRoute')}</p>
+              <p className="text-[17px] font-semibold">
+                {today === format(new Date(), 'yyyy-MM-dd')
+                  ? t('noRoute')
+                  : t('noRouteOn', { date: format(new Date(`${today}T12:00:00`), 'dd/MM') })}
+              </p>
               <p className="mt-1 text-sm text-ink">{t('noRouteHint')}</p>
             </div>
           ) : null}
@@ -551,7 +562,7 @@ export default function DriverRoute() {
               </Link>
             </div>
           ) : null}
-        </main>
+        </div>
 
         {/* Barra de navegação */}
         <nav className="grid shrink-0 grid-cols-4 border-t border-line-soft bg-white pb-[env(safe-area-inset-bottom)]">
@@ -618,7 +629,7 @@ export default function DriverRoute() {
               onClick={finishCollect}
               className={cn(
                 'h-[58px] rounded-full text-[17px] font-semibold text-white',
-                bound.length > 0 ? 'bg-[linear-gradient(100deg,#013364_0%,#02748e_100%)]' : 'bg-mist'
+                bound.length > 0 ? 'bg-[linear-gradient(100deg,#013364_0%,#02748e_100%)]' : DISABLED
               )}
             >
               {bound.length > 0 ? t('collect.finish', { count: bound.length }) : t('collect.readFirst')}
@@ -670,7 +681,7 @@ export default function DriverRoute() {
               onClick={confirmFail}
               className={cn(
                 'h-[56px] rounded-full text-[16px] font-semibold text-white',
-                reason.trim() ? 'bg-[#a12a1e]' : 'bg-mist'
+                reason.trim() ? 'bg-[#a12a1e]' : DISABLED
               )}
             >
               {t('fail.confirm')}

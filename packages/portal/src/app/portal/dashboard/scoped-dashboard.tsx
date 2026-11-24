@@ -117,19 +117,19 @@ export default function ScopedDashboard() {
   const statusData = collectionRequests.byStatus.map((row) => ({
     label: tStatus(row.status),
     count: row.count,
-    color: STATUS_COLOR[row.status as CollectionRequestStatus] ?? '#64748b',
+    color: STATUS_COLOR[row.status as CollectionRequestStatus] ?? '#8fb0c4',
   }));
 
   const conditionData = triage.byCondition.map((row) => ({
     label: (row.key ? tCondition(row.key) : t('notSpecified')),
     value: row.quantity,
-    color: CONDITION_COLOR[row.key] ?? '#64748b',
+    color: CONDITION_COLOR[row.key] ?? '#8fb0c4',
   }));
 
   const destinationData = triage.byDestination.map((row) => ({
     label: tDestination(row.key),
     value: row.quantity,
-    color: DESTINATION_COLOR[row.key] ?? '#64748b',
+    color: DESTINATION_COLOR[row.key] ?? '#8fb0c4',
   }));
 
   // Há muitas categorias: mostra só as mais frequentes, como nas marcas.
@@ -194,7 +194,7 @@ export default function ScopedDashboard() {
 
       {/* Impacto ambiental */}
       <div>
-        <h2 className="mb-3 text-lg font-semibold text-secondary">
+        <h2 className="mb-3 text-left text-lg font-semibold text-navy">
           {t('environmentalImpact')}
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -259,8 +259,8 @@ export default function ScopedDashboard() {
               <Area
                 type="monotone"
                 dataKey="weight"
-                stroke="#14b8a6"
-                fill="#14b8a6"
+                stroke="#02748e"
+                fill="#02748e"
                 fillOpacity={0.2}
               />
             </AreaChart>
@@ -330,7 +330,7 @@ export default function ScopedDashboard() {
                 tick={{ fontSize: 11 }}
               />
               <Tooltip />
-              <Bar dataKey="value" fill="#f97316" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="value" fill="#02748e" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -341,7 +341,7 @@ export default function ScopedDashboard() {
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
               <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
               <Tooltip />
-              <Bar dataKey="value" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="value" fill="#5fa3b3" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -352,7 +352,7 @@ export default function ScopedDashboard() {
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
               <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
               <Tooltip />
-              <Bar dataKey="value" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="value" fill="#013364" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

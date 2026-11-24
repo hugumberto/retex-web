@@ -19,6 +19,7 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import AddressForm from './address-form';
+import { formatZip } from '@/lib/address';
 
 export default function MyCompanyAddresses() {
   const t = useTranslations('company');
@@ -87,7 +88,7 @@ export default function MyCompanyAddresses() {
                       .join(', ')}
                   </TableCell>
                   <TableCell>{address.city}</TableCell>
-                  <TableCell>{address.zipCode}</TableCell>
+                  <TableCell>{formatZip(address.zipCode)}</TableCell>
                   <TableCell>
                     <Badge variant={address.isInServiceZone ? 'default' : 'outline'}>
                       {address.isInServiceZone

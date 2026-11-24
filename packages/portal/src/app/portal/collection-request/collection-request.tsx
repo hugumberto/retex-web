@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatZip, streetLine } from '@/lib/address';
 import api from '@/lib/api';
 import { getUserRoles } from '@/lib/access-control';
 import { isSuccessStatus } from '@/lib/utils';
@@ -147,6 +148,12 @@ export default function CollectionRequest() {
       preferredInterval: '',
     },
   });
+  // Com uma só morada possível, já vem escolhida.
+  useEffect(() => {
+    if (inZoneAddresses.length === 1 && !userForm.getValues('addressId')) {
+      userForm.setValue('addressId', inZoneAddresses[0].id, { shouldValidate: true });
+    }
+  }, [inZoneAddresses, userForm]);
   const adminForm = useForm<AdminFormData>({
     defaultValues: {
       firstName: '',
@@ -597,11 +604,11 @@ export default function CollectionRequest() {
                           />
                           <div className="text-sm">
                             <p className="font-medium text-foreground">
-                              {addr.street}, {addr.number}
+                              {streetLine(addr.street, addr.number)}
                               {addr.complement ? ` ${addr.complement}` : ''}
                             </p>
                             <p className="text-muted-foreground">
-                              {addr.zipCode} — {addr.city}
+                              {formatZip(addr.zipCode)} — {addr.city}
                             </p>
                           </div>
                         </label>
@@ -688,8 +695,9 @@ export default function CollectionRequest() {
             <TableHeader>
               <TableRow>
                 <TableHead>{tCommon('code')}</TableHead>
-                <TableHead>{tCommon('name')}</TableHead>
-                <TableHead>{tCommon('email')}</TableHead>
+                {/* Quem pediu só interessa numa empresa (vários membros); um particular é sempre ele. */}
+                {isCompanyMember ? <TableHead>{tCommon('name')}</TableHead> : null}
+                {isCompanyMember ? <TableHead>{tCommon('email')}</TableHead> : null}
                 <TableHead className="whitespace-normal">
                   {tCommon('address')}
                 </TableHead>
@@ -706,20 +714,20 @@ export default function CollectionRequest() {
                     <TableCell className="font-medium">
                       {request.friendlyCode ?? '-'}
                     </TableCell>
-                    <TableCell>
-                      {`${request.user?.firstName ?? '-'} ${
-                        request.user?.lastName ?? ''
-                      }`.trim()}
-                      <RequesterTypeBadge
-                        companyId={request.companyId}
-                        company={request.company}
-                      />
-                    </TableCell>
-                    <TableCell>{request.user?.email ?? '-'}</TableCell>
+                    {isCompanyMember ? (
+                      <TableCell>
+                        {`${request.user?.firstName ?? '-'} ${
+                          request.user?.lastName ?? ''
+                        }`.trim()}
+                        <RequesterTypeBadge
+                          companyId={request.companyId}
+                          company={request.company}
+                        />
+                      </TableCell>
+                    ) : null}
+                    {isCompanyMember ? <TableCell>{request.user?.email ?? '-'}</TableCell> : null}
                     <TableCell className="whitespace-normal break-words max-w-[220px] min-w-[160px]">
-                      {`${request.address?.street ?? '-'} ${
-                        request.address?.number ?? ''
-                      }`.trim()}
+                      {streetLine(request.address?.street, request.address?.number) || '-'}
                     </TableCell>
                     <TableCell>{request.estimatedBags ?? '-'}</TableCell>
                     <TableCell>{tStatus(request.status)}</TableCell>
@@ -754,7 +762,7 @@ export default function CollectionRequest() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={isCompanyMember ? 8 : 6}
                     className="text-center py-6 text-muted-foreground"
                   >
                     {tCommon('noRecords')}

@@ -3,28 +3,28 @@ import { CollectionRequestStatus } from '@/app/types/collection-request';
 // As etiquetas de texto vivem no i18n (`enums.collectionRequestStatus.*`);
 // aqui ficam apenas as cores, que não dependem do idioma.
 export const STATUS_CLASS: Record<CollectionRequestStatus, string> = {
-  [CollectionRequestStatus.CREATED]: 'bg-blue-100 text-blue-700',
-  [CollectionRequestStatus.CONFIRMED]: 'bg-green-100 text-green-700',
-  [CollectionRequestStatus.OUT_OF_ZONE]: 'bg-amber-100 text-amber-700',
-  [CollectionRequestStatus.WAITING_FOR_COLLECTION]: 'bg-yellow-100 text-yellow-700',
-  [CollectionRequestStatus.COLLECTED]: 'bg-teal-100 text-teal-700',
-  [CollectionRequestStatus.IN_TRANSIT]: 'bg-purple-100 text-purple-700',
-  [CollectionRequestStatus.IN_HOUSE]: 'bg-indigo-100 text-indigo-700',
-  [CollectionRequestStatus.CANCELLED]: 'bg-red-100 text-red-600',
-  [CollectionRequestStatus.SCREENING]: 'bg-cyan-100 text-cyan-700',
-  [CollectionRequestStatus.STOCKED]: 'bg-emerald-100 text-emerald-700',
+  [CollectionRequestStatus.CREATED]: 'bg-neutral-badge text-ink',
+  [CollectionRequestStatus.CONFIRMED]: 'bg-sky text-navy',
+  [CollectionRequestStatus.OUT_OF_ZONE]: 'bg-[#fdf1dc] text-[#8a5a12]',
+  [CollectionRequestStatus.WAITING_FOR_COLLECTION]: 'bg-sky text-navy',
+  [CollectionRequestStatus.COLLECTED]: 'bg-[#dceff3] text-teal',
+  [CollectionRequestStatus.IN_TRANSIT]: 'bg-[#dceff3] text-teal',
+  [CollectionRequestStatus.IN_HOUSE]: 'bg-[#dceff3] text-teal',
+  [CollectionRequestStatus.CANCELLED]: 'bg-[#fbecea] text-[#a12a1e]',
+  [CollectionRequestStatus.SCREENING]: 'bg-[#dceff3] text-teal',
+  [CollectionRequestStatus.STOCKED]: 'bg-mint text-forest',
 };
 
 /** Cor (hex) por status, para usar em gráficos (recharts). */
 export const STATUS_COLOR: Record<CollectionRequestStatus, string> = {
-  [CollectionRequestStatus.CREATED]: '#3b82f6',
-  [CollectionRequestStatus.CONFIRMED]: '#22c55e',
-  [CollectionRequestStatus.OUT_OF_ZONE]: '#f59e0b',
-  [CollectionRequestStatus.WAITING_FOR_COLLECTION]: '#eab308',
-  [CollectionRequestStatus.COLLECTED]: '#14b8a6',
-  [CollectionRequestStatus.IN_TRANSIT]: '#a855f7',
-  [CollectionRequestStatus.IN_HOUSE]: '#6366f1',
-  [CollectionRequestStatus.CANCELLED]: '#dc2626',
-  [CollectionRequestStatus.SCREENING]: '#06b6d4',
-  [CollectionRequestStatus.STOCKED]: '#10b981',
+  [CollectionRequestStatus.CREATED]: '#8fb0c4',
+  [CollectionRequestStatus.CONFIRMED]: '#013364',
+  [CollectionRequestStatus.OUT_OF_ZONE]: '#d99a2b',
+  [CollectionRequestStatus.WAITING_FOR_COLLECTION]: '#4f7fa3',
+  [CollectionRequestStatus.COLLECTED]: '#02748e',
+  [CollectionRequestStatus.IN_TRANSIT]: '#5fa3b3',
+  [CollectionRequestStatus.IN_HOUSE]: '#2b8a9e',
+  [CollectionRequestStatus.CANCELLED]: '#a12a1e',
+  [CollectionRequestStatus.SCREENING]: '#7fb8c4',
+  [CollectionRequestStatus.STOCKED]: '#2d5a4e',
 };

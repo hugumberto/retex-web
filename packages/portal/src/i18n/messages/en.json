@@ -314,7 +314,7 @@
   },
   "auth": {
     "login": {
-      "title": "Log in",
+      "title": "Sign in",
       "email": "Email",
       "password": "Password",
       "emailPlaceholder": "Enter your email",
@@ -374,7 +374,16 @@
     "errorDeadlineExpired": "The deadline to confirm the collection has passed.",
     "errorRejectFailed": "Could not process the request.",
     "errorConfirmGeneric": "Could not confirm the collection. Please try again.",
-    "errorRejectGeneric": "Could not refuse the collection. Please try again."
+    "errorRejectGeneric": "Could not refuse the collection. Please try again.",
+    "loadingInfo": "Loading…",
+    "askTitle": "Hi {name}, do you confirm the pickup?",
+    "askBody": "Our driver will come to your address on this day and time.",
+    "day": "Day",
+    "hours": "Time",
+    "where": "Address",
+    "bags": "{count, plural, one {# bag} other {# bags}}",
+    "confirmButton": "Confirm pickup",
+    "rejectButton": "I can't on this day"
   },
   "portalHome": {
     "greeting": "Hello!",
@@ -382,7 +391,34 @@
     "welcome": "Welcome to the Retex portal.",
     "myRequests": "My requests",
     "empty": "You have no collection requests.",
-    "loadError": "Could not load the requests"
+    "loadError": "Could not load the requests",
+    "newRequest": "New request",
+    "activeLabel": "Request in progress",
+    "seeAll": "See all",
+    "loading": "Loading…",
+    "bags": "{count, plural, one {# bag} other {# bags}}",
+    "preferred": "preferred: {date} · {window}",
+    "steps": {
+      "requested": "Requested",
+      "scheduled": "Scheduled",
+      "collected": "Collected",
+      "sorting": "Sorting",
+      "done": "Done"
+    },
+    "hint": {
+      "requested": "We are planning the route. You will get an email to confirm the day.",
+      "scheduled": "The driver will come on the agreed day.",
+      "collected": "Your bags are on their way to the warehouse.",
+      "sorting": "Your pieces are being sorted.",
+      "done": "Sorting complete."
+    },
+    "columns": {
+      "code": "Request",
+      "address": "Address",
+      "bags": "Bags",
+      "created": "Created",
+      "status": "Status"
+    }
   },
   "imageUpload": {
     "remove": "Remove",
@@ -771,7 +807,9 @@
       "intervalPlaceholder": "Choose time slot",
       "hint": "This is a preference: we confirm the day and time by email once the route is set."
     },
-    "preferredWindow": "Requested window"
+    "preferredWindow": "Requested window",
+    "detailsHeading": "Request {code}",
+    "clientSection": "Client"
   },
   "packageCollection": {
     "pageTitle": "Manage collection",
@@ -1640,7 +1678,7 @@
       "category": "Category",
       "other": "Other…",
       "brand": "Brand",
-      "brandPlaceholder": "type or pick",
+      "brandPlaceholder": "type or choose · key M",
       "details": "Details",
       "less": "One less",
       "more": "One more",
@@ -1876,7 +1914,8 @@
       "confirm": "Cancel collection",
       "done": "Collection cancelled.",
       "error": "Couldn't cancel the collection."
-    }
+    },
+    "noRouteOn": "You have no route on {date}."
   },
   "triageOverview": {
     "title": "Sorting",

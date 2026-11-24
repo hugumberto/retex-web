@@ -314,7 +314,7 @@
   },
   "auth": {
     "login": {
-      "title": "Connexion",
+      "title": "Se connecter",
       "email": "E-mail",
       "password": "Mot de passe",
       "emailPlaceholder": "Indiquez votre e-mail",
@@ -374,7 +374,16 @@
     "errorDeadlineExpired": "Le délai pour confirmer la collecte est dépassé.",
     "errorRejectFailed": "Impossible de traiter la demande.",
     "errorConfirmGeneric": "Impossible de confirmer la collecte. Veuillez réessayer.",
-    "errorRejectGeneric": "Impossible de refuser la collecte. Veuillez réessayer."
+    "errorRejectGeneric": "Impossible de refuser la collecte. Veuillez réessayer.",
+    "loadingInfo": "Chargement…",
+    "askTitle": "Bonjour {name}, confirmez-vous la collecte ?",
+    "askBody": "Notre chauffeur passera à votre adresse ce jour et à cette heure.",
+    "day": "Jour",
+    "hours": "Heure",
+    "where": "Adresse",
+    "bags": "{count, plural, one {# sac} other {# sacs}}",
+    "confirmButton": "Confirmer la collecte",
+    "rejectButton": "Je ne peux pas ce jour-là"
   },
   "portalHome": {
     "greeting": "Bonjour !",
@@ -382,7 +391,34 @@
     "welcome": "Bienvenue sur le portail Retex.",
     "myRequests": "Mes demandes",
     "empty": "Vous n'avez aucune demande de collecte.",
-    "loadError": "Impossible de charger les demandes"
+    "loadError": "Impossible de charger les demandes",
+    "newRequest": "Nouvelle demande",
+    "activeLabel": "Demande en cours",
+    "seeAll": "Tout voir",
+    "loading": "Chargement…",
+    "bags": "{count, plural, one {# sac} other {# sacs}}",
+    "preferred": "préférence : {date} · {window}",
+    "steps": {
+      "requested": "Demandée",
+      "scheduled": "Planifiée",
+      "collected": "Collectée",
+      "sorting": "En tri",
+      "done": "Terminée"
+    },
+    "hint": {
+      "requested": "Nous préparons la tournée. Vous recevrez un email pour confirmer le jour.",
+      "scheduled": "Le chauffeur passera le jour convenu.",
+      "collected": "Vos sacs sont en route vers l'entrepôt.",
+      "sorting": "Vos pièces sont en cours de tri.",
+      "done": "Tri terminé."
+    },
+    "columns": {
+      "code": "Demande",
+      "address": "Adresse",
+      "bags": "Sacs",
+      "created": "Créée",
+      "status": "État"
+    }
   },
   "imageUpload": {
     "remove": "Supprimer",
@@ -771,7 +807,9 @@
       "intervalPlaceholder": "Choisir un créneau",
       "hint": "C'est une préférence : nous confirmons le jour et l'heure par email une fois la tournée planifiée."
     },
-    "preferredWindow": "Créneau demandé"
+    "preferredWindow": "Créneau demandé",
+    "detailsHeading": "Demande {code}",
+    "clientSection": "Client"
   },
   "packageCollection": {
     "pageTitle": "Gérer la collecte",
@@ -1640,7 +1678,7 @@
       "category": "Catégorie",
       "other": "Autre…",
       "brand": "Marque",
-      "brandPlaceholder": "saisir ou choisir",
+      "brandPlaceholder": "tapez ou choisissez · touche M",
       "details": "Détails",
       "less": "Une de moins",
       "more": "Une de plus",
@@ -1876,7 +1914,8 @@
       "confirm": "Annuler la collecte",
       "done": "Collecte annulée.",
       "error": "Impossible d'annuler la collecte."
-    }
+    },
+    "noRouteOn": "Tu n'as pas de tournée le {date}."
   },
   "triageOverview": {
     "title": "Tri",

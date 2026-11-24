@@ -1,13 +1,6 @@
 'use client';
 
 import { Condition, Destination } from '@/app/types/triage';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
 
@@ -18,19 +11,19 @@ import { useTranslations } from 'next-intl';
  */
 
 export const CONDITION_COLOR: Record<string, string> = {
-  [Condition.EXCELLENT]: '#10b981',
-  [Condition.GOOD]: '#84cc16',
-  [Condition.REGULAR]: '#f59e0b',
+  [Condition.EXCELLENT]: '#2d5a4e',
+  [Condition.GOOD]: '#02748e',
+  [Condition.REGULAR]: '#d99a2b',
 };
 
 export const DESTINATION_COLOR: Record<string, string> = {
-  [Destination.REUSE]: '#10b981',
-  [Destination.VINTAGE]: '#8b5cf6',
-  [Destination.RECONDITIONING]: '#0ea5e9',
-  [Destination.UPCYCLING]: '#14b8a6',
-  [Destination.STOCK_RESERVE]: '#6366f1',
-  [Destination.NON_REUSABLE]: '#dc2626',
-  [Destination.ACCESSORY]: '#94a3b8',
+  [Destination.REUSE]: '#02748e',
+  [Destination.VINTAGE]: '#013364',
+  [Destination.RECONDITIONING]: '#5fa3b3',
+  [Destination.UPCYCLING]: '#7fb8c4',
+  [Destination.STOCK_RESERVE]: '#4f7fa3',
+  [Destination.NON_REUSABLE]: '#2d5a4e',
+  [Destination.ACCESSORY]: '#8fb0c4',
 };
 
 const numberFmt = new Intl.NumberFormat('pt-PT');
@@ -48,20 +41,16 @@ export function KpiCard({
   hint?: string;
 }) {
   return (
-    <Card className="gap-2 py-4">
-      <CardContent className="flex items-center gap-4">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
-          <Icon className="size-5" />
-        </span>
-        <div className="min-w-0">
-          <p className="truncate text-sm text-muted-foreground">{label}</p>
-          <p className="text-2xl font-semibold text-foreground">{value}</p>
-          {hint ? (
-            <p className="truncate text-xs text-muted-foreground">{hint}</p>
-          ) : null}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-start gap-3 rounded-2xl border border-line-soft bg-white px-4 py-4">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#dceff3] text-teal">
+        <Icon className="size-4" />
+      </span>
+      <div className="min-w-0">
+        <p className="font-mono text-[10px] uppercase leading-snug tracking-[0.06em] text-ink">{label}</p>
+        <p className="mt-1 text-[26px] font-bold leading-tight text-navy">{value}</p>
+        {hint ? <p className="text-xs text-ink">{hint}</p> : null}
+      </div>
+    </div>
   );
 }
 
@@ -79,21 +68,17 @@ export function ChartCard({
   const t = useTranslations('dashboard');
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        {description ? <CardDescription>{description}</CardDescription> : null}
-      </CardHeader>
-      <CardContent>
-        {isEmpty ? (
-          <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
-            {t('noData')}
-          </div>
-        ) : (
-          children
-        )}
-      </CardContent>
-    </Card>
+    <section className="flex flex-col gap-3 rounded-2xl border border-line-soft bg-white p-5">
+      <div>
+        <h3 className="text-[17px] font-semibold text-navy">{title}</h3>
+        {description ? <p className="text-xs text-ink">{description}</p> : null}
+      </div>
+      {isEmpty ? (
+        <div className="flex h-[260px] items-center justify-center text-sm text-ink">{t('noData')}</div>
+      ) : (
+        children
+      )}
+    </section>
   );
 }
 
