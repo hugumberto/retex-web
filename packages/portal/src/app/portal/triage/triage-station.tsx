@@ -866,7 +866,8 @@ export default function TriageStation() {
       );
     }
     if (step === 'items' && activeBag) {
-      const index = bags.findIndex((b) => b.id === activeBag.id) + 1;
+      // Saco n.º (já processados + este): a ordem da lista muda quando o saco é gravado.
+      const index = bags.filter((b) => b.processedAt != null && b.id !== activeBag.id).length + 1;
       return (
         <div className="flex gap-8">
           {field(t('bar.request'), request.friendlyCode)}
