@@ -20,6 +20,7 @@ export interface SystemParameterDTO {
   zoneSortingCapacityKg?: number;
   zoneReuseCapacityKg?: number;
   zoneUpcyclingCapacityKg?: number;
+  triageTargetPerHour?: number;
   zoneRecyclingCapacityKg?: number;
 }
 

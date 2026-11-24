@@ -32,6 +32,7 @@ interface ParametrosFormData {
   zoneSortingCapacityKg: number;
   zoneReuseCapacityKg: number;
   zoneUpcyclingCapacityKg: number;
+  triageTargetPerHour: number;
   zoneRecyclingCapacityKg: number;
 }
 
@@ -64,6 +65,7 @@ export default function Parametros() {
       zoneSortingCapacityKg: 3000,
       zoneReuseCapacityKg: 1500,
       zoneUpcyclingCapacityKg: 500,
+      triageTargetPerHour: 40,
       zoneRecyclingCapacityKg: 2000,
     },
   });
@@ -89,6 +91,7 @@ export default function Parametros() {
         zoneSortingCapacityKg: data.zoneSortingCapacityKg ?? 3000,
         zoneReuseCapacityKg: data.zoneReuseCapacityKg ?? 1500,
         zoneUpcyclingCapacityKg: data.zoneUpcyclingCapacityKg ?? 500,
+        triageTargetPerHour: data.triageTargetPerHour ?? 40,
         zoneRecyclingCapacityKg: data.zoneRecyclingCapacityKg ?? 2000,
       });
     } catch (error) {
@@ -126,6 +129,7 @@ export default function Parametros() {
         zoneSortingCapacityKg: Number(data.zoneSortingCapacityKg),
         zoneReuseCapacityKg: Number(data.zoneReuseCapacityKg),
         zoneUpcyclingCapacityKg: Number(data.zoneUpcyclingCapacityKg),
+        triageTargetPerHour: Number(data.triageTargetPerHour),
         zoneRecyclingCapacityKg: Number(data.zoneRecyclingCapacityKg),
       });
       if (!isSuccessStatus(res.status)) throw new Error('Erro na requisição');
@@ -387,6 +391,26 @@ export default function Parametros() {
             <InputForm
               label={t('zoneCapacity.zoneRecyclingCapacityKg')}
               name="zoneRecyclingCapacityKg"
+              type="number"
+              control={control}
+              rules={{
+                required: t('measureRequired'),
+                min: { value: 1, message: t('zoneCapacity.min') },
+              }}
+              errors={errors}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4 border-t border-secondary/20 pt-6">
+          <div>
+            <h2 className="text-sm font-semibold text-secondary">{t('triage.title')}</h2>
+            <p className="mt-1 text-xs text-muted-foreground">{t('triage.help')}</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <InputForm
+              label={t('triage.triageTargetPerHour')}
+              name="triageTargetPerHour"
               type="number"
               control={control}
               rules={{

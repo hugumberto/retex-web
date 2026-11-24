@@ -1202,6 +1202,11 @@
       "zoneUpcyclingCapacityKg": "C · Upcycling (kg)",
       "zoneRecyclingCapacityKg": "D · Fardos de reciclaje (kg)",
       "min": "Debe ser al menos 1."
+    },
+    "triage": {
+      "title": "Clasificación",
+      "help": "Meta de cada puesto, mostrada en el panel de supervisión de la clasificación.",
+      "triageTargetPerHour": "Meta por puesto (piezas/h)"
     }
   },
   "dashboard": {
@@ -1596,7 +1601,11 @@
       "loadError": "No se pudieron cargar las solicitudes.",
       "notFound": "No hay solicitud ni bolsa con este código.",
       "alreadyDone": "La solicitud {code} ya se trió.",
-      "notReady": "Esta solicitud está «{status}» y aún no se puede triar."
+      "notReady": "Esta solicitud está «{status}» y aún no se puede triar.",
+      "assignedHere": "Asignado a este puesto",
+      "openAt": "En el puesto {n}",
+      "paused": "En pausa: {code}. La supervisión ve este puesto en pausa hasta que continúes o termines la pausa.",
+      "endPause": "Terminar pausa"
     },
     "bag": {
       "title": "Abrir la próxima bolsa",
@@ -1867,6 +1876,107 @@
       "confirm": "Cancelar recogida",
       "done": "Recogida cancelada.",
       "error": "No se pudo cancelar la recogida."
+    }
+  },
+  "triageOverview": {
+    "title": "Clasificación",
+    "subtitle": "Supervisión de los puestos en tiempo real. La clasificación se hace en el modo Puesto, a pantalla completa.",
+    "export": "Exportar día (CSV)",
+    "openStation": "Abrir modo Puesto",
+    "loadError": "No se pudo cargar la clasificación.",
+    "perHour": "piezas/h",
+    "pieces": "{count, plural, one {# pieza} other {# piezas}}",
+    "bags": "{count, plural, one {# bolsa} other {# bolsas}}",
+    "kpis": {
+      "pieces": "Piezas clasificadas hoy",
+      "piecesHint": "{count, plural, =0 {ningún puesto activo} one {en # puesto activo} other {en # puestos activos}}",
+      "weight": "Kg clasificados",
+      "weightHint": "≈ {kg} kg por pieza",
+      "weightNone": "sin bolsas pesadas hoy",
+      "rhythm": "Ritmo medio",
+      "rhythmHint": "meta: {target} piezas/h",
+      "bags": "Bolsas por clasificar",
+      "bagsHint": "zona A del almacén",
+      "done": "Pedidos terminados",
+      "doneHint": "hoy, hasta las {time}",
+      "doneNone": "ninguno hoy"
+    },
+    "stations": {
+      "title": "Puestos de clasificación",
+      "updated": "actualizado hace {seconds} s",
+      "station": "Puesto {n}",
+      "noOperator": "sin operador",
+      "assigned": "asignado, en espera",
+      "columns": {
+        "station": "Puesto",
+        "request": "Pedido",
+        "bags": "Bolsas",
+        "pieces": "Piezas",
+        "rhythm": "Ritmo",
+        "status": "Estado"
+      },
+      "status": {
+        "SORTING": "Clasificando",
+        "PAUSED": "En pausa",
+        "FREE": "Libre"
+      }
+    },
+    "queue": {
+      "title": "Cola por clasificar",
+      "order": "más antiguo primero",
+      "empty": "No hay pedidos esperando clasificación.",
+      "collectedOn": "recogido el {date}",
+      "waiting": "{days, plural, =0 {hoy} one {hace # día} other {hace # días}}",
+      "assign": "Asignar a un puesto"
+    },
+    "destinations": {
+      "title": "Destino de las piezas hoy",
+      "reuse": "Reutilización",
+      "upcycling": "Upcycling",
+      "nonReusable": "Reciclaje (no reutilizable)",
+      "accessories": "{count, plural, =0 {Sin accesorios hoy.} other {Los accesorios se cuentan aparte (# hoy).}}",
+      "clearIn": "{count, plural, one {Al ritmo actual, la zona A quedará clasificada en cerca de # día.} other {Al ritmo actual, la zona A quedará clasificada en cerca de # días.}}"
+    },
+    "alerts": {
+      "title": "Alertas",
+      "none": "Sin alertas.",
+      "unboxed": "Lote sin caja en el Puesto {n}",
+      "wrongBag": "Bolsa de otro pedido leída en el Puesto {n}",
+      "belongsTo": "{bag} pertenece a {request}",
+      "unknownBag": "{bag} no pertenece a ningún pedido",
+      "waiting": "{days, plural, one {Pedido en espera hace # día} other {Pedido en espera hace # días}}",
+      "unknownBagTitle": "Bolsa desconocida leída en el Puesto {n}"
+    },
+    "assign": {
+      "title": "Asignar a un puesto",
+      "body": "El pedido queda arriba en la cola del puesto elegido hasta que alguien lo abra.",
+      "request": "Pedido",
+      "station": "Puesto",
+      "none": "Sin puesto",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "done": "Asignado al Puesto {n}.",
+      "removed": "Asignación quitada.",
+      "error": "No se pudo asignar el pedido."
+    },
+    "csv": {
+      "time": "Hora",
+      "station": "Puesto",
+      "operator": "Operador",
+      "request": "Pedido",
+      "client": "Cliente",
+      "bag": "Bolsa",
+      "quantity": "Piezas",
+      "destination": "Destino",
+      "category": "Categoría",
+      "condition": "Estado",
+      "sex": "Sexo",
+      "ageGroup": "Edad",
+      "season": "Temporada",
+      "brand": "Marca",
+      "lot": "Lote",
+      "empty": "Todavía no hay piezas registradas hoy.",
+      "error": "No se pudo exportar el día."
     }
   }
 }
