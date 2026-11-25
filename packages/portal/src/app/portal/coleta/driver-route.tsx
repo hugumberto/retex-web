@@ -1,8 +1,17 @@
 'use client';
 
-import { CollectionRequestDTO, CollectionRequestStatus } from '@/app/types/collection-request';
-import { CollectionRequestBagDTO, CollectionResponse } from '@/app/types/collection-request-bag';
-import { CollectionStatus, PackageCollectionDTO } from '@/app/types/package-collection';
+import {
+  CollectionRequestDTO,
+  CollectionRequestStatus,
+} from '@/app/types/collection-request';
+import {
+  CollectionRequestBagDTO,
+  CollectionResponse,
+} from '@/app/types/collection-request-bag';
+import {
+  CollectionStatus,
+  PackageCollectionDTO,
+} from '@/app/types/package-collection';
 import { Role } from '@/app/types/user';
 import ScanInput from '@/components/custom/scan-input';
 import api from '@/lib/api';
@@ -10,12 +19,24 @@ import { getUserRoles } from '@/lib/access-control';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { format } from 'date-fns';
-import { Check, ClipboardList, Route as RouteIcon, Truck, User as UserIcon, X } from 'lucide-react';
+import {
+  Check,
+  ClipboardList,
+  Route as RouteIcon,
+  Truck,
+  User as UserIcon,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { calculatePlan, clockAfter, PlanResult, useSystemParameters } from '../collection-request/use-route-plan';
+import {
+  calculatePlan,
+  clockAfter,
+  PlanResult,
+  useSystemParameters,
+} from '../collection-request/use-route-plan';
 import { hasValidCoords, readCoords } from '../package-collection/utils';
 import { formatZip } from '@/lib/address';
 
@@ -23,7 +44,10 @@ import { formatZip } from '@/lib/address';
 const DISABLED = 'bg-[#dde6e9] text-[#4f6573] [&_*]:text-[#4f6573]';
 
 type Tab = 'route' | 'stops' | 'vehicle' | 'profile';
-type RouteBags = { collectionRequest: { id: string }; bags: CollectionRequestBagDTO[] }[];
+type RouteBags = {
+  collectionRequest: { id: string };
+  bags: CollectionRequestBagDTO[];
+}[];
 
 // Depois de recolhido, o pedido conta como paragem feita.
 const DONE = [
@@ -34,7 +58,8 @@ const DONE = [
   CollectionRequestStatus.STOCKED,
 ];
 const isDone = (r: CollectionRequestDTO) => DONE.includes(r.status);
-const isCancelled = (r: CollectionRequestDTO) => r.status === CollectionRequestStatus.CANCELLED;
+const isCancelled = (r: CollectionRequestDTO) =>
+  r.status === CollectionRequestStatus.CANCELLED;
 const isOpen = (r: CollectionRequestDTO) => !isDone(r) && !isCancelled(r);
 
 // Ordem de preferência quando o motorista tem mais do que uma rota no dia.
@@ -46,24 +71,34 @@ const ROUTE_ORDER = [
   CollectionStatus.FINISHED,
 ];
 
-const QUICK_REASONS = ['absent', 'wrongAddress', 'noAccess', 'refused'] as const;
+const QUICK_REASONS = [
+  'absent',
+  'wrongAddress',
+  'noAccess',
+  'refused',
+] as const;
 
-const unwrap = <T,>(data: { data: T[] } | T[]): T[] => (Array.isArray(data) ? data : data?.data ?? []);
+const unwrap = <T,>(data: { data: T[] } | T[]): T[] =>
+  Array.isArray(data) ? data : data?.data ?? [];
 const clientName = (r: CollectionRequestDTO) =>
-  r.company?.name ?? (`${r.user?.firstName ?? ''} ${r.user?.lastName ?? ''}`.trim() || '—');
-const phoneOf = (r: CollectionRequestDTO) => r.company?.phone || r.user?.contactPhone || null;
+  r.company?.name ??
+  (`${r.user?.firstName ?? ''} ${r.user?.lastName ?? ''}`.trim() || '—');
+const phoneOf = (r: CollectionRequestDTO) =>
+  r.company?.phone || r.user?.contactPhone || null;
 const streetOf = (r: CollectionRequestDTO) =>
   [r.address?.street, r.address?.number].filter(Boolean).join(' ') || '—';
 const apiMessage = (error: unknown, fallback: string) => {
-  const message = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data
-    ?.message;
+  const message = (
+    error as { response?: { data?: { message?: string | string[] } } }
+  )?.response?.data?.message;
   if (Array.isArray(message)) return message.join('; ');
   return typeof message === 'string' ? message : fallback;
 };
 
 /**
  * Ecrã do motorista (Figma 14-Motorista): a rota de hoje no telemóvel, uma
- * paragem de cada vez. Recolher continua a exigir a leitura dos sacos (a API
+ * paragem de cada vez. No computador fica dentro do portal: a paragem atual à
+ * esquerda e, à direita, todas as paragens e a carrinha. Recolher continua a exigir a leitura dos sacos (a API
  * recusa fechar sem eles); "Não consegui recolher" cancela com o motivo.
  */
 export default function DriverRoute() {
@@ -74,8 +109,13 @@ export default function DriverRoute() {
   const params = useSystemParameters();
   // `?date=YYYY-MM-DD` mostra outro dia (para o admin rever uma rota).
   const [today] = useState(() => {
-    const fromUrl = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('date') : null;
-    return fromUrl && /^\d{4}-\d{2}-\d{2}$/.test(fromUrl) ? fromUrl : format(new Date(), 'yyyy-MM-dd');
+    const fromUrl =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('date')
+        : null;
+    return fromUrl && /^\d{4}-\d{2}-\d{2}$/.test(fromUrl)
+      ? fromUrl
+      : format(new Date(), 'yyyy-MM-dd');
   });
 
   const [tab, setTab] = useState<Tab>('route');
@@ -87,7 +127,9 @@ export default function DriverRoute() {
   const [isLoading, setIsLoading] = useState(true);
   const [pickedId, setPickedId] = useState<string | null>(null);
 
-  const [collecting, setCollecting] = useState<CollectionRequestDTO | null>(null);
+  const [collecting, setCollecting] = useState<CollectionRequestDTO | null>(
+    null
+  );
   const [bound, setBound] = useState<CollectionRequestBagDTO[]>([]);
   const [bagCode, setBagCode] = useState('');
   const [failing, setFailing] = useState<CollectionRequestDTO | null>(null);
@@ -99,7 +141,11 @@ export default function DriverRoute() {
   const loadRoutes = useCallback(async () => {
     try {
       const { data } = await api.get('/route', {
-        params: { date: today, limit: 50, ...(isDriver && user?.id ? { driverId: user.id } : {}) },
+        params: {
+          date: today,
+          limit: 50,
+          ...(isDriver && user?.id ? { driverId: user.id } : {}),
+        },
       });
       const list = unwrap<PackageCollectionDTO>(data).sort(
         (a, b) => ROUTE_ORDER.indexOf(a.status) - ROUTE_ORDER.indexOf(b.status)
@@ -123,7 +169,9 @@ export default function DriverRoute() {
     try {
       const [{ data }, bags] = await Promise.all([
         api.get<PackageCollectionDTO>(`/route/${routeId}`),
-        api.get<RouteBags>(`/route/${routeId}/collection-request-bags`).catch(() => ({ data: [] as RouteBags })),
+        api
+          .get<RouteBags>(`/route/${routeId}/collection-request-bags`)
+          .catch(() => ({ data: [] as RouteBags })),
       ]);
       setRoute(data);
       setRouteBags(bags.data);
@@ -139,7 +187,9 @@ export default function DriverRoute() {
   }, [loadRoute]);
 
   // Percurso (ordem, km e minutos por troço). Só se recalcula quando muda a lista.
-  const requestsKey = (route?.collectionRequests ?? []).map((r) => r.id).join(',');
+  const requestsKey = (route?.collectionRequests ?? [])
+    .map((r) => r.id)
+    .join(',');
   useEffect(() => {
     if (!route) return;
     let cancelled = false;
@@ -154,26 +204,42 @@ export default function DriverRoute() {
 
   // Paragens pela ordem do percurso, com o estado mais recente da rota.
   const stops = useMemo(() => {
-    const byId = new Map((route?.collectionRequests ?? []).map((r) => [r.id, r]));
+    const byId = new Map(
+      (route?.collectionRequests ?? []).map((r) => [r.id, r])
+    );
     const ordered = plan?.stops.length
-      ? plan.stops.map((s) => ({ ...s, request: byId.get(s.request.id) ?? s.request }))
-      : (route?.collectionRequests ?? []).map((request) => ({ request, arrivalMinutes: null, legKm: null, legMinutes: null }));
+      ? plan.stops.map((s) => ({
+          ...s,
+          request: byId.get(s.request.id) ?? s.request,
+        }))
+      : (route?.collectionRequests ?? []).map((request) => ({
+          request,
+          arrivalMinutes: null,
+          legKm: null,
+          legMinutes: null,
+        }));
     return ordered.map((s, index) => ({ ...s, n: index + 1 }));
   }, [plan, route]);
 
   const doneCount = stops.filter((s) => isDone(s.request)).length;
   const current =
-    stops.find((s) => s.request.id === pickedId && isOpen(s.request)) ?? stops.find((s) => isOpen(s.request)) ?? null;
+    stops.find((s) => s.request.id === pickedId && isOpen(s.request)) ??
+    stops.find((s) => isOpen(s.request)) ??
+    null;
   // Antes de iniciar, a lista mostra todas as paragens (ainda não há "a seguir").
   const upcoming = stops.filter(
-    (s) => (route?.status !== CollectionStatus.IN_TRANSIT || s !== current) && isOpen(s.request)
+    (s) =>
+      (route?.status !== CollectionStatus.IN_TRANSIT || s !== current) &&
+      isOpen(s.request)
   );
   const interval = route?.collectionInterval ?? null;
   const eta = (minutes: number | null | undefined) =>
     interval && minutes != null ? clockAfter(interval, minutes) : null;
   const bagsInVan = routeBags
     .filter((rb) => {
-      const r = route?.collectionRequests?.find((x) => x.id === rb.collectionRequest.id);
+      const r = route?.collectionRequests?.find(
+        (x) => x.id === rb.collectionRequest.id
+      );
       return r ? isDone(r) : false;
     })
     .reduce((sum, rb) => sum + rb.bags.length, 0);
@@ -183,7 +249,9 @@ export default function DriverRoute() {
     if (!route) return;
     setIsBusy(true);
     try {
-      await api.put(`/route/${route.id}`, { status: CollectionStatus.IN_TRANSIT });
+      await api.put(`/route/${route.id}`, {
+        status: CollectionStatus.IN_TRANSIT,
+      });
       toast.success(t('started'));
       await loadRoute();
     } catch (error) {
@@ -199,7 +267,9 @@ export default function DriverRoute() {
     setBound([]);
     setBagCode('');
     try {
-      const { data } = await api.get<CollectionResponse>(`/collection/${request.id}`);
+      const { data } = await api.get<CollectionResponse>(
+        `/collection/${request.id}`
+      );
       setBound(data.bags ?? []);
     } catch {
       // Sem sacos lidos ainda.
@@ -211,8 +281,13 @@ export default function DriverRoute() {
     const code = value.trim();
     if (!code || !collecting) return;
     try {
-      const { data } = await api.post<CollectionRequestBagDTO>(`/collection/${collecting.id}/bind`, { code });
-      setBound((list) => (list.some((b) => b.id === data.id) ? list : [...list, data]));
+      const { data } = await api.post<CollectionRequestBagDTO>(
+        `/collection/${collecting.id}/bind`,
+        { code }
+      );
+      setBound((list) =>
+        list.some((b) => b.id === data.id) ? list : [...list, data]
+      );
       toast.success(t('collect.bagRead', { code: data.friendlyCode }));
     } catch (error) {
       toast.error(apiMessage(error, t('collect.bagError')));
@@ -243,7 +318,9 @@ export default function DriverRoute() {
     if (!failing || !reason.trim()) return;
     setIsBusy(true);
     try {
-      await api.post(`/collection/${failing.id}/cancel`, { reason: reason.trim() });
+      await api.post(`/collection/${failing.id}/cancel`, {
+        reason: reason.trim(),
+      });
       toast.success(t('fail.done'));
       setFailing(null);
       setReason('');
@@ -261,36 +338,57 @@ export default function DriverRoute() {
       const { lat, long } = readCoords(r);
       return `https://www.google.com/maps/dir/?api=1&destination=${lat},${long}`;
     }
-    const text = [streetOf(r), formatZip(r.address?.zipCode), r.address?.city].filter(Boolean).join(', ');
-    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(text)}`;
+    const text = [streetOf(r), formatZip(r.address?.zipCode), r.address?.city]
+      .filter(Boolean)
+      .join(', ');
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+      text
+    )}`;
   };
 
   const statusBadge = (r: CollectionRequestDTO) =>
     isDone(r)
       ? { label: t('stops.collected'), cls: 'bg-mint text-forest' }
       : isCancelled(r)
-        ? { label: t('stops.cancelled'), cls: 'bg-[#fbe3df] text-[#a12a1e]' }
-        : { label: t('stops.todo'), cls: 'bg-neutral-badge text-ink' };
+      ? { label: t('stops.cancelled'), cls: 'bg-[#fbe3df] text-[#a12a1e]' }
+      : { label: t('stops.todo'), cls: 'bg-neutral-badge text-ink' };
 
-  const pill = 'flex h-[54px] items-center justify-center rounded-full border-[1.5px] border-navy text-[16px] font-semibold text-navy';
+  const pill =
+    'flex h-[54px] items-center justify-center rounded-full border-[1.5px] border-navy text-[16px] font-semibold text-navy';
 
   return (
-    <div className="fixed inset-0 z-40 flex justify-center overflow-hidden bg-[#dfe7ea]">
-      <div className="flex h-full w-full max-w-[480px] flex-col bg-canvas text-navy">
+    <div className="fixed inset-0 z-40 flex justify-center overflow-hidden bg-[#dfe7ea] lg:static lg:z-auto lg:block lg:overflow-visible lg:bg-transparent">
+      <div className="flex h-full w-full max-w-[480px] flex-col bg-canvas text-navy lg:h-auto lg:max-w-none lg:gap-5 lg:bg-transparent">
         {/* Cabeçalho */}
-        <header className="shrink-0 bg-[linear-gradient(100deg,#013364_0%,#02748e_100%)] px-5 pb-5 pt-6 text-white">
-          <div className="flex items-center justify-between">
+        <header className="shrink-0 bg-[linear-gradient(100deg,#013364_0%,#02748e_100%)] px-5 pb-5 pt-6 text-white lg:rounded-2xl lg:px-7 lg:pt-5">
+          {/* No computador o portal já mostra a marca; a matrícula está no cartão do veículo. */}
+          <div className="flex items-center justify-between lg:hidden">
             <span className="flex items-baseline gap-2">
               <span className="text-[19px] font-bold">ReTeX:ID</span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-white/80">{t('badge')}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-white/80">
+                {t('badge')}
+              </span>
             </span>
-            <span className="font-mono text-[13px]">{vehicle?.plate ?? ''}</span>
+            <span className="font-mono text-[13px]">
+              {vehicle?.plate ?? ''}
+            </span>
           </div>
-          <div className="mt-4 flex items-baseline justify-between">
+          <div className="mt-4 flex items-baseline justify-between lg:mt-0">
             <h1 className="text-left text-[24px] font-bold">
-              {tab === 'route' && today !== format(new Date(), 'yyyy-MM-dd')
-                ? t('titles.routeOn', { date: today.split('-').reverse().slice(0, 2).join('/') })
-                : t(`titles.${tab}`)}
+              <span className="lg:hidden">
+                {tab === 'route' && today !== format(new Date(), 'yyyy-MM-dd')
+                  ? t('titles.routeOn', {
+                      date: today.split('-').reverse().slice(0, 2).join('/'),
+                    })
+                  : t(`titles.${tab}`)}
+              </span>
+              <span className="hidden lg:inline">
+                {today !== format(new Date(), 'yyyy-MM-dd')
+                  ? t('titles.routeOn', {
+                      date: today.split('-').reverse().slice(0, 2).join('/'),
+                    })
+                  : t('titles.route')}
+              </span>
             </h1>
             {route && stops.length > 0 ? (
               <span className="font-mono text-[12px] text-white/85">
@@ -305,7 +403,11 @@ export default function DriverRoute() {
                   key={s.request.id}
                   className={cn(
                     'h-1 flex-1 rounded-full',
-                    isDone(s.request) ? 'bg-white' : isCancelled(s.request) ? 'bg-[#e8a59c]' : 'bg-white/30'
+                    isDone(s.request)
+                      ? 'bg-white'
+                      : isCancelled(s.request)
+                      ? 'bg-[#e8a59c]'
+                      : 'bg-white/30'
                   )}
                 />
               ))}
@@ -334,27 +436,39 @@ export default function DriverRoute() {
           ) : null}
         </header>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          {isLoading && !route ? <p className="py-10 text-center text-sm text-ink">{t('loading')}</p> : null}
+        <div className="flex-1 overflow-y-auto px-4 py-4 lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-5 lg:overflow-visible lg:p-0">
+          {isLoading && !route ? (
+            <p className="py-10 text-center text-sm text-ink">{t('loading')}</p>
+          ) : null}
 
           {!isLoading && routes.length === 0 ? (
             <div className="rounded-2xl bg-white p-6 text-center">
               <p className="text-[17px] font-semibold">
                 {today === format(new Date(), 'yyyy-MM-dd')
                   ? t('noRoute')
-                  : t('noRouteOn', { date: format(new Date(`${today}T12:00:00`), 'dd/MM') })}
+                  : t('noRouteOn', {
+                      date: format(new Date(`${today}T12:00:00`), 'dd/MM'),
+                    })}
               </p>
               <p className="mt-1 text-sm text-ink">{t('noRouteHint')}</p>
             </div>
           ) : null}
 
           {/* Rota */}
-          {tab === 'route' && route ? (
-            <div className="flex flex-col gap-4">
+          {route ? (
+            <div
+              className={cn(
+                'flex flex-col gap-4',
+                tab !== 'route' && 'hidden lg:flex'
+              )}
+            >
               {route.status === CollectionStatus.WAITING_TO_START ? (
                 <div className="flex flex-col gap-3 rounded-2xl bg-white p-5">
                   <p className="text-[15px]">
-                    {t('notStarted', { time: interval ? interval.split(' - ')[0] : '—', count: stops.length })}
+                    {t('notStarted', {
+                      time: interval ? interval.split(' - ')[0] : '—',
+                      count: stops.length,
+                    })}
                   </p>
                   <button
                     type="button"
@@ -366,8 +480,11 @@ export default function DriverRoute() {
                   </button>
                 </div>
               ) : null}
-              {route.status === CollectionStatus.CREATED || route.status === CollectionStatus.DRAFTING ? (
-                <p className="rounded-2xl bg-white p-5 text-sm text-ink">{t('notConfirmed')}</p>
+              {route.status === CollectionStatus.CREATED ||
+              route.status === CollectionStatus.DRAFTING ? (
+                <p className="rounded-2xl bg-white p-5 text-sm text-ink">
+                  {t('notConfirmed')}
+                </p>
               ) : null}
 
               {current && route.status === CollectionStatus.IN_TRANSIT ? (
@@ -376,37 +493,74 @@ export default function DriverRoute() {
                     <span className="rounded-full bg-[#dceff3] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.06em] text-navy">
                       {t('stop.next', { n: current.n })}
                     </span>
-                    <span className="whitespace-nowrap font-mono text-[13px]">{interval?.replace(' - ', '–') ?? ''}</span>
+                    <span className="whitespace-nowrap font-mono text-[13px]">
+                      {interval?.replace(' - ', '–') ?? ''}
+                    </span>
                   </div>
                   <h2 className="text-[22px] font-bold leading-tight">
                     {streetOf(current.request)}
-                    {current.request.address?.city ? `, ${current.request.address.city}` : ''}
+                    {current.request.address?.city
+                      ? `, ${current.request.address.city}`
+                      : ''}
                   </h2>
                   <p className="text-[15px] text-ink">
-                    {[clientName(current.request), current.request.address?.complement].filter(Boolean).join(' · ')}
+                    {[
+                      clientName(current.request),
+                      current.request.address?.complement,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      [String(current.request.estimatedBags ?? '—'), t('stop.bags')],
-                      [current.legKm != null ? current.legKm.toLocaleString('pt-PT', { maximumFractionDigits: 1 }) : '—', 'km'],
-                      [current.legMinutes != null ? String(current.legMinutes) : '—', 'min'],
+                      [
+                        String(current.request.estimatedBags ?? '—'),
+                        t('stop.bags'),
+                      ],
+                      [
+                        current.legKm != null
+                          ? current.legKm.toLocaleString('pt-PT', {
+                              maximumFractionDigits: 1,
+                            })
+                          : '—',
+                        'km',
+                      ],
+                      [
+                        current.legMinutes != null
+                          ? String(current.legMinutes)
+                          : '—',
+                        'min',
+                      ],
                     ].map(([value, label]) => (
-                      <div key={label} className="rounded-xl bg-canvas py-3 text-center">
+                      <div
+                        key={label}
+                        className="rounded-xl bg-canvas py-3 text-center"
+                      >
                         <p className="text-[22px] font-bold">{value}</p>
                         <p className="text-[13px] text-ink">{label}</p>
                       </div>
                     ))}
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <a href={mapsUrl(current.request)} target="_blank" rel="noreferrer" className={pill}>
+                    <a
+                      href={mapsUrl(current.request)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={pill}
+                    >
                       {t('stop.navigate')}
                     </a>
                     {phoneOf(current.request) ? (
-                      <a href={`tel:${phoneOf(current.request)}`} className={pill}>
+                      <a
+                        href={`tel:${phoneOf(current.request)}`}
+                        className={pill}
+                      >
                         {t('stop.call')}
                       </a>
                     ) : (
-                      <span className={cn(pill, 'opacity-40')}>{t('stop.call')}</span>
+                      <span className={cn(pill, 'opacity-40')}>
+                        {t('stop.call')}
+                      </span>
                     )}
                   </div>
                   <button
@@ -435,16 +589,22 @@ export default function DriverRoute() {
                     <Check className="size-6" />
                   </span>
                   <p className="text-[17px] font-semibold">{t('allDone')}</p>
-                  <p className="text-sm text-ink">{t('backToWarehouse', { count: bagsInVan })}</p>
+                  <p className="text-sm text-ink">
+                    {t('backToWarehouse', { count: bagsInVan })}
+                  </p>
                 </div>
               ) : null}
               {route.status === CollectionStatus.FINISHED ? (
-                <p className="rounded-2xl bg-white p-5 text-center text-sm text-ink">{t('finished')}</p>
+                <p className="rounded-2xl bg-white p-5 text-center text-sm text-ink">
+                  {t('finished')}
+                </p>
               ) : null}
 
               {upcoming.length > 0 ? (
-                <>
-                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.08em] text-ink">{t('upcoming')}</p>
+                <div className="flex flex-col gap-4 lg:hidden">
+                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.08em] text-ink">
+                    {t('upcoming')}
+                  </p>
                   <div className="overflow-hidden rounded-2xl bg-white">
                     {upcoming.map((s, i) => (
                       <button
@@ -460,104 +620,183 @@ export default function DriverRoute() {
                           {s.n}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[17px] font-semibold">{clientName(s.request)}</span>
+                          <span className="block truncate text-[17px] font-semibold">
+                            {clientName(s.request)}
+                          </span>
                           <span className="block truncate text-[13px] text-ink">
-                            {[streetOf(s.request), s.request.address?.city].filter(Boolean).join(', ')} ·{' '}
-                            {t('stop.bagsCount', { count: s.request.estimatedBags ?? 0 })}
+                            {[streetOf(s.request), s.request.address?.city]
+                              .filter(Boolean)
+                              .join(', ')}{' '}
+                            ·{' '}
+                            {t('stop.bagsCount', {
+                              count: s.request.estimatedBags ?? 0,
+                            })}
                           </span>
                         </span>
-                        <span className="font-mono text-[13px]">{eta(s.arrivalMinutes) ?? ''}</span>
+                        <span className="font-mono text-[13px]">
+                          {eta(s.arrivalMinutes) ?? ''}
+                        </span>
                       </button>
                     ))}
                   </div>
-                </>
+                </div>
               ) : null}
             </div>
           ) : null}
 
           {/* Pedidos: todas as paragens do dia */}
-          {tab === 'stops' && route ? (
-            <div className="overflow-hidden rounded-2xl bg-white">
-              {stops.map((s) => {
-                const badge = statusBadge(s.request);
-                return (
-                  <button
-                    key={s.request.id}
-                    type="button"
-                    disabled={!isOpen(s.request)}
-                    onClick={() => {
-                      setPickedId(s.request.id);
-                      setTab('route');
-                    }}
-                    className="flex w-full items-center gap-3 border-b border-line-soft px-4 py-3.5 text-left last:border-b-0"
-                  >
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-canvas text-[12px] text-ink">
-                      {s.n}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[16px] font-semibold">{clientName(s.request)}</span>
-                      <span className="block truncate text-[12px] text-ink">
-                        {s.request.friendlyCode} · {streetOf(s.request)} ·{' '}
-                        {t('stop.bagsCount', { count: s.request.estimatedBags ?? 0 })}
+          {route ? (
+            <div className="flex flex-col gap-4 lg:row-span-2">
+              <p className="hidden font-mono text-[11px] uppercase tracking-[0.08em] text-ink lg:block">
+                {t('titles.stops')}
+              </p>
+              <div
+                className={cn(
+                  'overflow-hidden rounded-2xl bg-white',
+                  tab !== 'stops' && 'hidden lg:block'
+                )}
+              >
+                {stops.map((s) => {
+                  const badge = statusBadge(s.request);
+                  return (
+                    <button
+                      key={s.request.id}
+                      type="button"
+                      disabled={!isOpen(s.request)}
+                      onClick={() => {
+                        setPickedId(s.request.id);
+                        setTab('route');
+                      }}
+                      className={cn(
+                        'flex w-full items-center gap-3 border-b border-line-soft px-4 py-3.5 text-left last:border-b-0 enabled:hover:bg-canvas',
+                        route.status === CollectionStatus.IN_TRANSIT &&
+                          current?.request.id === s.request.id &&
+                          'lg:bg-[#eef6f8]'
+                      )}
+                    >
+                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-canvas text-[12px] text-ink">
+                        {s.n}
                       </span>
-                    </span>
-                    <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold', badge.cls)}>
-                      {badge.label}
-                    </span>
-                  </button>
-                );
-              })}
-              {stops.length === 0 ? <p className="p-5 text-sm text-ink">{t('noStops')}</p> : null}
-            </div>
-          ) : null}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[16px] font-semibold">
+                          {clientName(s.request)}
+                        </span>
+                        {eta(s.arrivalMinutes) && isOpen(s.request) ? (
+                          <span className="hidden font-mono text-[12px] text-ink lg:block">
+                            {eta(s.arrivalMinutes)}
+                          </span>
+                        ) : null}
+                        <span className="block truncate text-[12px] text-ink">
+                          {s.request.friendlyCode} · {streetOf(s.request)} ·{' '}
+                          {t('stop.bagsCount', {
+                            count: s.request.estimatedBags ?? 0,
+                          })}
+                        </span>
+                      </span>
+                      <span
+                        className={cn(
+                          'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold',
+                          badge.cls
+                        )}
+                      >
+                        {badge.label}
+                      </span>
+                    </button>
+                  );
+                })}
+                {stops.length === 0 ? (
+                  <p className="p-5 text-sm text-ink">{t('noStops')}</p>
+                ) : null}
+              </div>
 
-          {/* Veículo */}
-          {tab === 'vehicle' && route ? (
-            <div className="flex flex-col gap-3">
-              {vehicle ? (
-                <div className="flex flex-col gap-3 rounded-2xl bg-white p-5">
-                  <p className="font-mono text-[22px] font-semibold">{vehicle.plate}</p>
-                  <p className="text-sm text-ink">{vehicle.name}</p>
-                  <div className="h-3 overflow-hidden rounded-full bg-mist">
-                    <div
-                      className="h-full rounded-full bg-teal"
-                      style={{ width: `${Math.min(100, (bagsInVan / Math.max(1, vehicle.capacityBags)) * 100)}%` }}
-                    />
+              {/* Veículo: no computador fica por baixo das paragens */}
+              <p className="hidden font-mono text-[11px] uppercase tracking-[0.08em] text-ink lg:block">
+                {t('titles.vehicle')}
+              </p>
+              <div
+                className={cn(
+                  'flex flex-col gap-3',
+                  tab !== 'vehicle' && 'hidden lg:flex'
+                )}
+              >
+                {vehicle ? (
+                  <div className="flex flex-col gap-3 rounded-2xl bg-white p-5">
+                    <p className="font-mono text-[22px] font-semibold">
+                      {vehicle.plate}
+                    </p>
+                    <p className="text-sm text-ink">{vehicle.name}</p>
+                    <div className="h-3 overflow-hidden rounded-full bg-mist">
+                      <div
+                        className="h-full rounded-full bg-teal"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            (bagsInVan / Math.max(1, vehicle.capacityBags)) *
+                              100
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-[15px]">
+                      {t('vehicle.load', {
+                        bags: bagsInVan,
+                        capacity: vehicle.capacityBags,
+                      })}
+                    </p>
+                    <p className="text-xs text-ink">
+                      {t('vehicle.remaining', {
+                        count: stops
+                          .filter((s) => isOpen(s.request))
+                          .reduce(
+                            (sum, s) => sum + (s.request.estimatedBags ?? 0),
+                            0
+                          ),
+                      })}
+                    </p>
                   </div>
-                  <p className="text-[15px]">{t('vehicle.load', { bags: bagsInVan, capacity: vehicle.capacityBags })}</p>
-                  <p className="text-xs text-ink">
-                    {t('vehicle.remaining', {
-                      count: stops.filter((s) => isOpen(s.request)).reduce((sum, s) => sum + (s.request.estimatedBags ?? 0), 0),
-                    })}
+                ) : (
+                  <p className="rounded-2xl bg-white p-5 text-sm text-ink">
+                    {t('vehicle.none')}
+                  </p>
+                )}
+                <div className="rounded-2xl bg-white p-5 text-sm">
+                  <p className="text-ink">{t('vehicle.routeCode')}</p>
+                  <p className="font-mono text-[17px]">
+                    {route.friendlyCode ?? '—'}
                   </p>
                 </div>
-              ) : (
-                <p className="rounded-2xl bg-white p-5 text-sm text-ink">{t('vehicle.none')}</p>
-              )}
-              <div className="rounded-2xl bg-white p-5 text-sm">
-                <p className="text-ink">{t('vehicle.routeCode')}</p>
-                <p className="font-mono text-[17px]">{route.friendlyCode ?? '—'}</p>
               </div>
             </div>
           ) : null}
 
           {/* Perfil */}
           {tab === 'profile' ? (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 lg:hidden">
               <div className="rounded-2xl bg-white p-5">
                 <p className="text-[19px] font-semibold">
                   {user?.firstName} {user?.lastName}
                 </p>
                 <p className="text-sm text-ink">{user?.email}</p>
               </div>
-              <Link href="/portal/perfil" className="rounded-2xl bg-white p-5 text-[15px] font-semibold">
+              <Link
+                href="/portal/perfil"
+                className="rounded-2xl bg-white p-5 text-[15px] font-semibold"
+              >
                 {t('profile.account')}
               </Link>
-              <Link href="/portal/coleta?manual=1" className="rounded-2xl bg-white p-5 text-[15px] font-semibold">
+              <Link
+                href="/portal/coleta?manual=1"
+                className="rounded-2xl bg-white p-5 text-[15px] font-semibold"
+              >
                 {t('profile.manual')}
-                <span className="block text-xs font-normal text-ink">{t('profile.manualHint')}</span>
+                <span className="block text-xs font-normal text-ink">
+                  {t('profile.manualHint')}
+                </span>
               </Link>
-              <Link href="/portal" className="rounded-2xl bg-white p-5 text-[15px] font-semibold">
+              <Link
+                href="/portal"
+                className="rounded-2xl bg-white p-5 text-[15px] font-semibold"
+              >
                 {t('profile.portal')}
               </Link>
             </div>
@@ -565,7 +804,7 @@ export default function DriverRoute() {
         </div>
 
         {/* Barra de navegação */}
-        <nav className="grid shrink-0 grid-cols-4 border-t border-line-soft bg-white pb-[env(safe-area-inset-bottom)]">
+        <nav className="grid shrink-0 grid-cols-4 border-t lg:hidden border-line-soft bg-white pb-[env(safe-area-inset-bottom)]">
           {(
             [
               ['route', RouteIcon],
@@ -593,15 +832,29 @@ export default function DriverRoute() {
 
       {/* Recolher: ler os sacos */}
       {collecting ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy/40" role="dialog" aria-modal>
-          <div className="flex w-full max-w-[480px] flex-col gap-4 rounded-t-3xl bg-white p-5 pb-8">
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-navy/40 lg:items-center"
+          role="dialog"
+          aria-modal
+        >
+          <div className="flex w-full max-w-[480px] flex-col gap-4 rounded-t-3xl bg-white p-5 pb-8 lg:rounded-3xl lg:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink">{collecting.friendlyCode}</p>
-                <h2 className="text-[20px] font-bold">{clientName(collecting)}</h2>
-                <p className="text-sm text-ink">{t('collect.hint', { count: collecting.estimatedBags ?? 0 })}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink">
+                  {collecting.friendlyCode}
+                </p>
+                <h2 className="text-[20px] font-bold">
+                  {clientName(collecting)}
+                </h2>
+                <p className="text-sm text-ink">
+                  {t('collect.hint', { count: collecting.estimatedBags ?? 0 })}
+                </p>
               </div>
-              <button type="button" aria-label={t('close')} onClick={() => setCollecting(null)}>
+              <button
+                type="button"
+                aria-label={t('close')}
+                onClick={() => setCollecting(null)}
+              >
                 <X className="size-5" />
               </button>
             </div>
@@ -617,11 +870,16 @@ export default function DriverRoute() {
             />
             <div className="flex flex-wrap gap-1.5">
               {bound.map((b) => (
-                <span key={b.id} className="rounded-lg bg-mint px-2.5 py-1 font-mono text-[12px] text-forest">
+                <span
+                  key={b.id}
+                  className="rounded-lg bg-mint px-2.5 py-1 font-mono text-[12px] text-forest"
+                >
                   {b.friendlyCode}
                 </span>
               ))}
-              {bound.length === 0 ? <span className="text-xs text-ink">{t('collect.none')}</span> : null}
+              {bound.length === 0 ? (
+                <span className="text-xs text-ink">{t('collect.none')}</span>
+              ) : null}
             </div>
             <button
               type="button"
@@ -629,10 +887,14 @@ export default function DriverRoute() {
               onClick={finishCollect}
               className={cn(
                 'h-[58px] rounded-full text-[17px] font-semibold text-white',
-                bound.length > 0 ? 'bg-[linear-gradient(100deg,#013364_0%,#02748e_100%)]' : DISABLED
+                bound.length > 0
+                  ? 'bg-[linear-gradient(100deg,#013364_0%,#02748e_100%)]'
+                  : DISABLED
               )}
             >
-              {bound.length > 0 ? t('collect.finish', { count: bound.length }) : t('collect.readFirst')}
+              {bound.length > 0
+                ? t('collect.finish', { count: bound.length })
+                : t('collect.readFirst')}
             </button>
           </div>
         </div>
@@ -640,14 +902,24 @@ export default function DriverRoute() {
 
       {/* Não consegui recolher */}
       {failing ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy/40" role="dialog" aria-modal>
-          <div className="flex w-full max-w-[480px] flex-col gap-4 rounded-t-3xl bg-white p-5 pb-8">
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-navy/40 lg:items-center"
+          role="dialog"
+          aria-modal
+        >
+          <div className="flex w-full max-w-[480px] flex-col gap-4 rounded-t-3xl bg-white p-5 pb-8 lg:rounded-3xl lg:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-[20px] font-bold">{t('fail.title')}</h2>
-                <p className="text-sm text-ink">{t('fail.body', { name: clientName(failing) })}</p>
+                <p className="text-sm text-ink">
+                  {t('fail.body', { name: clientName(failing) })}
+                </p>
               </div>
-              <button type="button" aria-label={t('close')} onClick={() => setFailing(null)}>
+              <button
+                type="button"
+                aria-label={t('close')}
+                onClick={() => setFailing(null)}
+              >
                 <X className="size-5" />
               </button>
             </div>
@@ -659,7 +931,9 @@ export default function DriverRoute() {
                   onClick={() => setReason(t(`fail.reasons.${key}`))}
                   className={cn(
                     'rounded-full border px-3 py-1.5 text-sm',
-                    reason === t(`fail.reasons.${key}`) ? 'border-navy bg-navy text-white' : 'border-navy text-navy'
+                    reason === t(`fail.reasons.${key}`)
+                      ? 'border-navy bg-navy text-white'
+                      : 'border-navy text-navy'
                   )}
                 >
                   {t(`fail.reasons.${key}`)}
